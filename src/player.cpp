@@ -13,8 +13,7 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
 
 void ktp::Player::draw(SDL2_Renderer& renderer) {
   /* player's shape */ 
-  SDL_SetRenderDrawColor(renderer.getRenderer(), default_color_.r, default_color_.g, default_color_.b, default_color_.a);
-  SDL_RenderDrawPoint(renderer.getRenderer(), center_.x, center_.y);
+  SDL_SetRenderDrawColor(renderer.getRenderer(), kDefaultPlayerColor_.r, kDefaultPlayerColor_.g, kDefaultPlayerColor_.b, kDefaultPlayerColor_.a);
   SDL_RenderDrawLinesF(renderer.getRenderer(), render_shape_.data(), render_shape_.size());
   /* lasers */
   SDL_SetRenderDrawColor(renderer.getRenderer(), 255, 104, 10, 255);
@@ -25,35 +24,27 @@ void ktp::Player::draw(SDL2_Renderer& renderer) {
 
 void ktp::Player::generatePlayerShape() {
   shape_.clear();
-
-  /* shape_.push_back({         0,    -size_}); // top
-  shape_.push_back({-size_ / 2, size_ / 2}); // left
-  //shape_.push_back({-size_ / 4, size_ / 4}); // left flap
-  //shape_.push_back({ size_ / 4, size_ / 4}); // right flap
-  shape_.push_back({ size_ / 2, size_ / 2}); // right
-  shape_.push_back({         0,    -size_}); // top again  */
-
-  shape_.push_back({         0,    -size_*0.75f}); // top
-  shape_.push_back({-size_ / 2, (size_*0.75f)}); // left
-  //shape_.push_back({-size_ / 4, size_ / 4}); // left flap
-  //shape_.push_back({ size_ / 4, size_ / 4}); // right flap
-  shape_.push_back({ size_ / 2, (size_*0.75f)}); // right
-  shape_.push_back({         0,    -size_*0.75f}); // top again 
+  shape_.push_back({             0, -size_ * 0.50f}); // top
+  shape_.push_back({-size_ * 0.33f,  size_ * 0.50f}); // left
+  shape_.push_back({-size_ * 0.15f,  size_ * 0.33f}); // left flap
+  shape_.push_back({ size_ * 0.15f,  size_ * 0.33f}); // right flap
+  shape_.push_back({ size_ * 0.33f,  size_ * 0.50f}); // right
+  shape_.push_back({             0, -size_ * 0.50f}); // top again 
 }
 
 void ktp::Player::move(float delta_time) {
-  /* center_.x = static_cast<int>(center_.x + delta_.x * delta_time) % screen_size_.x;
-  center_.y = static_cast<int>(center_.y + delta_.y * delta_time) % screen_size_.y;
-  for (auto& point: render_shape_) {
-    point.x = static_cast<int>(point.x + delta_.x * delta_time) % screen_size_.x;
-    point.y = static_cast<int>(point.y + delta_.y * delta_time) % screen_size_.y;
-  }  */
-
   center_.x += delta_.x * delta_time;
+  if (center_.x < -size_ * 0.5f) {
+    center_.x = screen_size_.x + (size_ * 0.5f);
+  } else  if (center_.x > screen_size_.x + (size_ * 0.5f)) {
+    center_.x = -size_ * 0.5f;
+  }
+
   center_.y += delta_.y * delta_time;
-  for (auto& point: render_shape_) {
-    point.x += delta_.x * delta_time;
-    point.y += delta_.y * delta_time;
+  if (center_.y < -size_ * 0.5f) {
+    center_.y = screen_size_.y + (size_ * 0.5f);
+  } else  if (center_.y > screen_size_.y + (size_ * 0.5f)) {
+    center_.y = -size_ * 0.5f;
   }
 }
 
@@ -68,6 +59,7 @@ void ktp::Player::reset() {
 }
 
 void ktp::Player::rotate() {
+  // adding the center ath the end makes the shape move to the correct position
   for (auto i = 0u; i < shape_.size(); ++i) {
     render_shape_[i].x = (shape_[i].x * SDL_cosf(angle_) - shape_[i].y * SDL_sinf(angle_)) + center_.x;
     render_shape_[i].y = (shape_[i].x * SDL_sinf(angle_) + shape_[i].y * SDL_cosf(angle_)) + center_.y;
@@ -98,7 +90,17 @@ void ktp::Player::shoot() {
 
 void ktp::Player::thrust(float delta_time) {
   delta_.x +=  SDL_sinf(angle_) * 200.f * delta_time;
+  if (delta_.x < -kMaxDelta_ ) {
+    delta_.x = -kMaxDelta_;
+  } else if (delta_.x > kMaxDelta_) {
+    delta_.x = kMaxDelta_;
+  }
   delta_.y += -SDL_cosf(angle_) * 200.f * delta_time;
+  if (delta_.y < -kMaxDelta_) {
+    delta_.y = -kMaxDelta_;
+  } else if (delta_.y > kMaxDelta_) {
+    delta_.y = kMaxDelta_;
+  }
 }
 
 void ktp::Player::update(float delta_time) {
@@ -110,7 +112,7 @@ void ktp::Player::update(float delta_time) {
 
 void ktp::Player::updateLasers(float delta_time) {
   auto laser = lasers_.begin();
-  while (laser != lasers_.end()) { 
+  while (laser != lasers_.end()) {
     if (laser->shape_.front().x < -100 || laser->shape_.front().x > screen_size_.x + 100 ||
         laser->shape_.front().y < -100 || laser->shape_.front().y > screen_size_.y + 100) {
 

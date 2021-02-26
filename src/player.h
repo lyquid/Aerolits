@@ -38,8 +38,9 @@ class Player {
   SDL_Point& screen_size_;
 
   /* basic attributes */
-  const SDL_Color default_color_{245, 245, 245, 255};
-  float      size_ = 40;
+  const float kMaxDelta_ = 5000.f;
+  const SDL_Color kDefaultPlayerColor_{245, 245, 245, 255};
+  float      size_ = 50;
   bool       alive_ = true;
   float      angle_ = 0.f;
   SDL_FPoint center_{};
