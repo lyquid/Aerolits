@@ -1,0 +1,126 @@
+#include "player.h"
+
+ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
+  event_bus_(event_bus),
+  screen_size_(screen_size),
+  center_({screen_size.x / 2.f, screen_size.y / 2.f}) {
+
+  generatePlayerShape();
+  render_shape_.resize(shape_.size());
+  update(0.f); // needed to initialize render_shape_
+  lasers_.reserve(50);
+}
+
+void ktp::Player::draw(SDL2_Renderer& renderer) {
+  /* player's shape */ 
+  SDL_SetRenderDrawColor(renderer.getRenderer(), default_color_.r, default_color_.g, default_color_.b, default_color_.a);
+  SDL_RenderDrawPoint(renderer.getRenderer(), center_.x, center_.y);
+  SDL_RenderDrawLinesF(renderer.getRenderer(), render_shape_.data(), render_shape_.size());
+  /* lasers */
+  SDL_SetRenderDrawColor(renderer.getRenderer(), 255, 104, 10, 255);
+  for (auto& laser: lasers_) {
+    SDL_RenderDrawLinesF(renderer.getRenderer(), laser.shape_.data(), laser.shape_.size());
+  }
+}
+
+void ktp::Player::generatePlayerShape() {
+  shape_.clear();
+
+  /* shape_.push_back({         0,    -size_}); // top
+  shape_.push_back({-size_ / 2, size_ / 2}); // left
+  //shape_.push_back({-size_ / 4, size_ / 4}); // left flap
+  //shape_.push_back({ size_ / 4, size_ / 4}); // right flap
+  shape_.push_back({ size_ / 2, size_ / 2}); // right
+  shape_.push_back({         0,    -size_}); // top again  */
+
+  shape_.push_back({         0,    -size_*0.75f}); // top
+  shape_.push_back({-size_ / 2, (size_*0.75f)}); // left
+  //shape_.push_back({-size_ / 4, size_ / 4}); // left flap
+  //shape_.push_back({ size_ / 4, size_ / 4}); // right flap
+  shape_.push_back({ size_ / 2, (size_*0.75f)}); // right
+  shape_.push_back({         0,    -size_*0.75f}); // top again 
+}
+
+void ktp::Player::move(float delta_time) {
+  /* center_.x = static_cast<int>(center_.x + delta_.x * delta_time) % screen_size_.x;
+  center_.y = static_cast<int>(center_.y + delta_.y * delta_time) % screen_size_.y;
+  for (auto& point: render_shape_) {
+    point.x = static_cast<int>(point.x + delta_.x * delta_time) % screen_size_.x;
+    point.y = static_cast<int>(point.y + delta_.y * delta_time) % screen_size_.y;
+  }  */
+
+  center_.x += delta_.x * delta_time;
+  center_.y += delta_.y * delta_time;
+  for (auto& point: render_shape_) {
+    point.x += delta_.x * delta_time;
+    point.y += delta_.y * delta_time;
+  }
+}
+
+void ktp::Player::reset() {
+  alive_ = true;
+  angle_ = 0.f;
+  center_ = {screen_size_.x / 2.f, screen_size_.y / 2.f};
+  delta_ = {0, 0};
+  lasers_.clear();
+  shooting_timer_ = 0.f;
+  update(0.f); // needed to initialize render_shape_
+}
+
+void ktp::Player::rotate() {
+  for (auto i = 0u; i < shape_.size(); ++i) {
+    render_shape_[i].x = (shape_[i].x * SDL_cosf(angle_) - shape_[i].y * SDL_sinf(angle_)) + center_.x;
+    render_shape_[i].y = (shape_[i].x * SDL_sinf(angle_) + shape_[i].y * SDL_cosf(angle_)) + center_.y;
+  }
+}
+
+void ktp::Player::shoot() {
+  if ((SDL_GetTicks() - shooting_timer_) > 200.f) {
+    Laser laser;
+    laser.angle_ = angle_;
+    laser.delta_.x =  800.0f * SDL_sinf(angle_);
+    laser.delta_.y = -800.0f * SDL_cosf(angle_);
+
+    laser.shape_.resize(2);
+    const SDL_FPoint head = {0, 0};
+    const SDL_FPoint tail = {0, laser.size_};
+    laser.shape_[0].x = (head.x * SDL_cosf(laser.angle_) - head.y * SDL_sinf(laser.angle_)) + render_shape_.front().x;
+    laser.shape_[0].y = (head.x * SDL_sinf(laser.angle_) + head.y * SDL_cosf(laser.angle_)) + render_shape_.front().y;
+
+    laser.shape_[1].x = (tail.x * SDL_cosf(laser.angle_) - tail.y * SDL_sinf(laser.angle_)) + render_shape_.front().x;
+    laser.shape_[1].y = (tail.x * SDL_sinf(laser.angle_) + tail.y * SDL_cosf(laser.angle_)) + render_shape_.front().y;
+
+    lasers_.push_back(laser);
+    shooting_timer_ = SDL_GetTicks();
+    event_bus_.postEvent(kuge::EventTypes::LaserFired);
+  }
+}
+
+void ktp::Player::thrust(float delta_time) {
+  delta_.x +=  SDL_sinf(angle_) * 200.f * delta_time;
+  delta_.y += -SDL_cosf(angle_) * 200.f * delta_time;
+}
+
+void ktp::Player::update(float delta_time) {
+  rotate();
+  move(delta_time);
+  // alive_ = !checkPlayerCollisions(aerolites);
+  if (!lasers_.empty()) updateLasers(delta_time);
+}
+
+void ktp::Player::updateLasers(float delta_time) {
+  auto laser = lasers_.begin();
+  while (laser != lasers_.end()) { 
+    if (laser->shape_.front().x < -100 || laser->shape_.front().x > screen_size_.x + 100 ||
+        laser->shape_.front().y < -100 || laser->shape_.front().y > screen_size_.y + 100) {
+
+      laser = lasers_.erase(laser);
+    } else {
+      for (auto& point: laser->shape_) {
+        point.x += laser->delta_.x * delta_time;
+        point.y += laser->delta_.y * delta_time;
+      }
+      ++laser;
+    }
+  }
+}
