@@ -1,7 +1,9 @@
 #include "sdl2_renderer.h"
 
 bool ktp::SDL2_Renderer::clear() {
-  if (SDL_RenderClear(renderer_.get()) == 0) return true;
+  if (SDL_RenderClear(renderer_.get()) == 0) {
+    return true;
+  }
   return false;
 }
 
@@ -16,12 +18,72 @@ bool ktp::SDL2_Renderer::create(const SDL2_Window& window) {
   return true;
 }
 
+bool ktp::SDL2_Renderer::drawLines(const std::vector<SDL_Point>& points) {
+  if (SDL_RenderDrawLines(renderer_.get(), points.data(), points.size()) == 0) {
+    return true;
+  }
+  return false;
+}
+
+bool ktp::SDL2_Renderer::drawLines(const std::vector<SDL_FPoint>& points) {
+  if (SDL_RenderDrawLinesF(renderer_.get(), points.data(), points.size()) == 0) {
+    return true;
+  }
+  return false;
+}
+
+bool ktp::SDL2_Renderer::drawPoint(const SDL_Point& point) {
+  if (SDL_RenderDrawPoint(renderer_.get(), point.x, point.y) == 0) {
+    return true;
+  }
+  return false;
+}
+
+bool ktp::SDL2_Renderer::drawPoint(const SDL_FPoint& point) {
+  if (SDL_RenderDrawPointF(renderer_.get(), point.x, point.y) == 0) {
+    return true;
+  }
+  return false;
+}
+
+bool ktp::SDL2_Renderer::drawPoints(const std::vector<SDL_Point>& points) {
+  if (SDL_RenderDrawPoints(renderer_.get(), points.data(), points.size()) == 0) {
+    return true;
+  }
+  return false;
+}
+
+bool ktp::SDL2_Renderer::drawPoints(const std::vector<SDL_FPoint>& points) {
+  if (SDL_RenderDrawPointsF(renderer_.get(), points.data(), points.size()) == 0) {
+    return true;
+  }
+  return false;
+}
+
+bool ktp::SDL2_Renderer::drawRect(const SDL_Rect& rect) {
+  if (SDL_RenderDrawRect(renderer_.get(), &rect)) {
+    return true;
+  }
+  return false;
+}
+
+bool ktp::SDL2_Renderer::drawRectFill(const SDL_Rect& rect) {
+  if (SDL_RenderFillRect(renderer_.get(), &rect) == 0) {
+    return true;
+  }
+  return false;
+}
+
 bool ktp::SDL2_Renderer::setDrawColor(const SDL_Color& color) {
-  if (setDrawColor(color.r, color.g, color.b, color.a)) return true;
+  if (SDL_SetRenderDrawColor(renderer_.get(), color.r, color.g, color.b, color.a) == 0) {
+    return true;
+  }
   return false;
 }
 
 bool ktp::SDL2_Renderer::setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
-  if (SDL_SetRenderDrawColor(renderer_.get(), r, g, b, a) == 0) return true;
+  if (SDL_SetRenderDrawColor(renderer_.get(), r, g, b, a) == 0) {
+    return true;
+  }
   return false;
 }

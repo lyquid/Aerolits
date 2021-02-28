@@ -5,6 +5,7 @@
 #include "sdl2_window.h"
 #include <SDL.h>
 #include <memory>
+#include <vector>
 
 namespace ktp {
 
@@ -34,6 +35,22 @@ class SDL2_Renderer {
   * @return True on success, or false on errors.
   */
   bool create(const SDL2_Window& window);
+  
+  bool drawLines(const std::vector<SDL_Point>& points);
+  
+  bool drawLines(const std::vector<SDL_FPoint>& points);
+
+  bool drawPoint(const SDL_Point& point);
+
+  bool drawPoint(const SDL_FPoint& point);
+  
+  bool drawPoints(const std::vector<SDL_Point>& points);
+
+  bool drawPoints(const std::vector<SDL_FPoint>& points);
+  
+  bool drawRect(const SDL_Rect& rect);
+
+  bool drawRectFill(const SDL_Rect& rect);
 
   SDL_Renderer* getRenderer() const { return renderer_.get(); }
 
@@ -80,7 +97,7 @@ class SDL2_Renderer {
   * @return True on success, or false on errors.
   */ 
   bool setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
-
+  
  private:
   
   template <typename T>
