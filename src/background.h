@@ -1,6 +1,7 @@
 #ifndef AEROLITS_SRC_BACKGROUND_H_
 #define AEROLITS_SRC_BACKGROUND_H_
 
+#include "palette.h"
 #include "../kuge/kuge.h"
 #include "../sdl2_wrappers/sdl2_wrappers.h"
 #include <random>
@@ -26,7 +27,7 @@ class Background {
 
   const SDL_Point screen_size_;
   const SDL_Rect  background_shape_{0, 0, screen_size_.x, screen_size_.y};
-  const SDL_Color background_color_{2, 11, 48, 255};
+  const SDL_Color background_color_{ktp::Colors::black};
   
   // float angle_ = 0.f;
   // SDL_FPoint delta_{0, 0};

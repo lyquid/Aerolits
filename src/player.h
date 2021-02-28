@@ -1,6 +1,7 @@
 #ifndef AEROLITS_SRC_PLAYER_H_
 #define AEROLITS_SRC_PLAYER_H_
 
+#include "palette.h"
 #include "../kuge/kuge.h"
 #include "../sdl2_wrappers/sdl2_wrappers.h"
 
@@ -39,7 +40,7 @@ class Player {
 
   /* basic attributes */
   const float kMaxDelta_ = 5000.f;
-  const SDL_Color kDefaultPlayerColor_{245, 245, 245, 255};
+  const SDL_Color kDefaultPlayerColor_{Colors::white};
   float      size_ = 50;
   bool       alive_ = true;
   float      angle_ = 0.f;
