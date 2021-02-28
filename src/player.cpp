@@ -16,7 +16,7 @@ void ktp::Player::draw(SDL2_Renderer& renderer) {
   renderer.setDrawColor(kDefaultPlayerColor_);
   renderer.drawLines(render_shape_);
   /* lasers */
-  renderer.setDrawColor(255, 104, 10, 255);
+  renderer.setDrawColor(ktp::Colors::orange);
   for (auto& laser: lasers_) {
     renderer.drawLines(laser.shape_);
   }
