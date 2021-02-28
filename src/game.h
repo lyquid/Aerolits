@@ -1,6 +1,7 @@
 #ifndef AEROLITS_SRC_GAME_H_
 #define AEROLITS_SRC_GAME_H_
 
+#include "background.h"
 #include "player.h"
 #include "../include/resources_path.h"
 #include "../kuge/kuge.h"
@@ -28,7 +29,7 @@ class Game {
   bool loadResources();
 
   ktp::SDL2_Timer clock_{};
-  SDL_Point screen_size_{1024, 768};
+  SDL_Point screen_size_{1200, 900};
   bool quit_ = false;
 
   ktp::SDL2_Window main_window_{};
@@ -46,6 +47,8 @@ class Game {
   kuge::OutputSystem output_sys_{event_bus_};
   /* Player */
   ktp::Player player_{screen_size_, event_bus_};
+  /* Background */
+  ktp::Background background_{screen_size_};
 };
 
 } // end namespace ktp

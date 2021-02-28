@@ -54,6 +54,7 @@ add_executable(	Aerolits  main.cpp
 													kuge/input_system
 													kuge/output_system
 													kuge/system
+													src/background
 													src/game
 													src/player )
 target_link_libraries(Aerolits ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_MIXER_LIBRARY})

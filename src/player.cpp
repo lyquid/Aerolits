@@ -12,13 +12,13 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
 }
 
 void ktp::Player::draw(SDL2_Renderer& renderer) {
-  /* player's shape */ 
-  SDL_SetRenderDrawColor(renderer.getRenderer(), kDefaultPlayerColor_.r, kDefaultPlayerColor_.g, kDefaultPlayerColor_.b, kDefaultPlayerColor_.a);
-  SDL_RenderDrawLinesF(renderer.getRenderer(), render_shape_.data(), render_shape_.size());
+  /* player's shape */
+  renderer.setDrawColor(kDefaultPlayerColor_);
+  renderer.drawLines(render_shape_);
   /* lasers */
-  SDL_SetRenderDrawColor(renderer.getRenderer(), 255, 104, 10, 255);
+  renderer.setDrawColor(255, 104, 10, 255);
   for (auto& laser: lasers_) {
-    SDL_RenderDrawLinesF(renderer.getRenderer(), laser.shape_.data(), laser.shape_.size());
+    renderer.drawLines(laser.shape_);
   }
 }
 

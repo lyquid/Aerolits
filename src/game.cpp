@@ -28,11 +28,13 @@ void ktp::Game::clean() {
 }
 
 void ktp::Game::draw() {
-  SDL_SetRenderDrawColor(renderer_.getRenderer(), 0x00, 0x00, 0x00, 0x00);
-  SDL_RenderClear(renderer_.getRenderer());
+  renderer_.clear();
+
+  background_.draw(renderer_);
   fps_texture_.render({0, 0});
   player_.draw(renderer_);
-  SDL_RenderPresent(renderer_.getRenderer());
+  
+  renderer_.present();
   ++fps_;
 }
 
