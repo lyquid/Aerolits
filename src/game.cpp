@@ -107,6 +107,8 @@ void ktp::Game::update() {
   
   const float delta_time = clock_.restart() / 1000.f;
 
+  /* Background */
+  background_.update(delta_time);
   /* Player */
   checkKeyStates(delta_time);
   player_.update(delta_time);

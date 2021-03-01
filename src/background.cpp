@@ -16,17 +16,34 @@ void ktp::Background::draw(SDL2_Renderer& renderer) const {
 void ktp::Background::generateStars() {
   std::random_device seed;
   std::mt19937 generator(seed());
-  std::uniform_int_distribution<unsigned int> distribution_stars(0u, 1000u);
+  std::uniform_int_distribution<unsigned int> distribution_stars(0u, 3000u);
+  std::uniform_int_distribution<unsigned int> distribution_colors(0u, star_colors_.size() - 1);
+  std::uniform_real_distribution<float> distribution_delta(1.f, 50.f);
   Star star;
 
-  for (auto i = 0; i < screen_size_.x; ++i) {
-    for (auto j = 0; j < screen_size_.y; ++j) {
+  for (auto i = 0u; i < screen_size_.x; ++i) {
+    for (auto j = 0u; j < screen_size_.y; ++j) {
       if (distribution_stars(generator) == 1) {
         star.position_.x = i;
         star.position_.y = j;
-        star.color_ = ktp::Colors::white;
+        star.delta_ = {0.f, distribution_delta(generator)};
+        if (stars_.size() % 2 == 0 && stars_.size() % 3 == 0) {
+          star.color_ = star_colors_[distribution_colors(generator)];
+        } else {
+          star.color_ = ktp::Colors::white;
+        }
         stars_.push_back(star);
       }
+    }
+  }
+}
+
+void ktp::Background::update(float delta_time) {
+  for (auto& star: stars_) {
+    if (star.position_.y >= screen_size_.y) {
+      star.position_.y = 0.f;
+    } else {
+      star.position_.y += star.delta_.y * delta_time;
     }
   }
 }
