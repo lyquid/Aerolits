@@ -59,7 +59,7 @@ void ktp::Player::reset() {
 }
 
 void ktp::Player::rotate() {
-  // adding the center ath the end makes the shape move to the correct position
+  // adding the center at the end makes the shape move to the correct position
   for (auto i = 0u; i < shape_.size(); ++i) {
     render_shape_[i].x = (shape_[i].x * SDL_cosf(angle_) - shape_[i].y * SDL_sinf(angle_)) + center_.x;
     render_shape_[i].y = (shape_[i].x * SDL_sinf(angle_) + shape_[i].y * SDL_cosf(angle_)) + center_.y;

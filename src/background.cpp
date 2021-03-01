@@ -21,8 +21,8 @@ void ktp::Background::generateStars() {
   std::uniform_real_distribution<float> distribution_delta(1.f, 50.f);
   Star star;
 
-  for (auto i = 0u; i < screen_size_.x; ++i) {
-    for (auto j = 0u; j < screen_size_.y; ++j) {
+  for (auto i = 0; i < screen_size_.x; ++i) {
+    for (auto j = 0; j < screen_size_.y; ++j) {
       if (distribution_stars(generator) == 1) {
         star.position_.x = i;
         star.position_.y = j;
