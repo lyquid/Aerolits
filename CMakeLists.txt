@@ -58,7 +58,7 @@ add_executable(	Aerolits  main.cpp
 													src/game
 													src/player )
 target_link_libraries(Aerolits ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_MIXER_LIBRARY})
-target_include_directories(Aerolits PUBLIC "${Aerolits_SOURCE_DIR}/headers")
+target_include_directories(Aerolits PUBLIC "${Aerolits_SOURCE_DIR}/include")
 install(TARGETS Aerolits RUNTIME DESTINATION ${BIN_DIR})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
