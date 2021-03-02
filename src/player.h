@@ -23,7 +23,7 @@ class Player {
   void reset();
   void shoot();
   inline void steerLeft(float delta_time)  { angle_ -= 5.f * delta_time; }
-  inline void steerRight(float delta_time) { angle_ += 5.f * delta_time; };
+  inline void steerRight(float delta_time) { angle_ += 5.f * delta_time; }
   void stopThrusting();
   void thrust(float delta_time);
   void update(float delta_time);

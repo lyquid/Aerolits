@@ -39,10 +39,10 @@ void ktp::Player::generatePlayerShape() {
   shape_.shrink_to_fit();
 
   thrust_shape_.clear();
-  thrust_shape_.push_back({           0.f, size_ * 0.40f}); // bottom
-  thrust_shape_.push_back({ size_ * 0.15f, size_ * 0.35f}); // right vertice
-  thrust_shape_.push_back({-size_ * 0.15f, size_ * 0.35f}); // left vertice
-  thrust_shape_.push_back({           0.f, size_ * 0.40f}); // bottom again
+  thrust_shape_.push_back({           0.f, size_ * 0.40f}); // bottom           2 ____ 1
+  thrust_shape_.push_back({ size_ * 0.15f, size_ * 0.35f}); // right vertice      \  /
+  thrust_shape_.push_back({-size_ * 0.15f, size_ * 0.35f}); // left vertice        \/
+  thrust_shape_.push_back({           0.f, size_ * 0.40f}); // bottom again        3/0
   thrust_shape_.shrink_to_fit();
 }
 
@@ -86,7 +86,6 @@ void ktp::Player::rotate() {
     render_shape_[i].x = (shape_[i].x * SDL_cosf(angle_) - shape_[i].y * SDL_sinf(angle_)) + center_.x;
     render_shape_[i].y = (shape_[i].x * SDL_sinf(angle_) + shape_[i].y * SDL_cosf(angle_)) + center_.y;
   }
-
   if (thrusting_) {
     for (auto i = 0u; i < thrust_shape_.size(); ++i) {
       render_thrust_shape_[i].x = (thrust_shape_[i].x * SDL_cosf(angle_) - thrust_shape_[i].y * SDL_sinf(angle_)) + center_.x;
@@ -149,13 +148,16 @@ void ktp::Player::update(float delta_time) {
 }
 
 void ktp::Player::updateLasers(float delta_time) {
+  constexpr auto threshold = 100.f;
   auto laser = lasers_.begin();
   while (laser != lasers_.end()) {
-    if (laser->shape_.front().x < -100 || laser->shape_.front().x > screen_size_.x + 100 ||
-        laser->shape_.front().y < -100 || laser->shape_.front().y > screen_size_.y + 100) {
+    // check if laser is out of screen
+    if (laser->shape_.front().x < -threshold || laser->shape_.front().x > screen_size_.x + threshold ||
+        laser->shape_.front().y < -threshold || laser->shape_.front().y > screen_size_.y + threshold) {
 
       laser = lasers_.erase(laser);
     } else {
+      // move the laser's shape
       for (auto& point: laser->shape_) {
         point.x += laser->delta_.x * delta_time;
         point.y += laser->delta_.y * delta_time;
