@@ -35,7 +35,7 @@ class SDL2_Renderer {
   * @return True on success, or false on errors.
   */
   bool create(const SDL2_Window& window);
-  
+
   bool drawLines(const std::vector<SDL_Point>& points);
   
   bool drawLines(const std::vector<SDL_FPoint>& points);

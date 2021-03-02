@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_GAME_H_
 
 #include "background.h"
+#include "palette.h"
 #include "player.h"
 #include "../include/resources_path.h"
 #include "../kuge/kuge.h"

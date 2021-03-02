@@ -8,6 +8,8 @@ void ktp::Game::checkKeyStates(float delta_time) {
   const Uint8* state = SDL_GetKeyboardState(nullptr);
   if (state[SDL_SCANCODE_W] || state[SDL_SCANCODE_UP]){
     player_.thrust(delta_time);
+  } else {
+    player_.stopThrusting();
   }
   if (state[SDL_SCANCODE_A] || state[SDL_SCANCODE_LEFT]){
     player_.steerLeft(delta_time);
@@ -103,7 +105,7 @@ void ktp::Game::update() {
   /* FPS */
   fps_text_.str({});
   fps_text_ << fps_.average();
-  fps_texture_.loadFromTextSolid(font_, fps_text_.str(), {255, 255, 255, 255});
+  fps_texture_.loadFromTextSolid(font_, fps_text_.str(), ktp::Colors::white);
   
   const float delta_time = clock_.restart() / 1000.f;
 

@@ -10,15 +10,17 @@ enum class EventTypes {
   ExitGame,
   KeyPressed,
   LaserFired,
+  PlayerThrust,
   count
 };
 
 // https://stackoverflow.com/questions/65670462/elegant-way-to-ensure-a-stdmap-has-a-concrete-size-in-compilation-time
 
 static const std::map<EventTypes, std::string>::value_type kEventTypesNamesData[] = {
-  { EventTypes::ExitGame,   "ExitGame" },
-  { EventTypes::KeyPressed, "KeyPressed" },
-  { EventTypes::LaserFired, "LaserFired" }
+  { EventTypes::ExitGame,     "ExitGame" },
+  { EventTypes::KeyPressed,   "KeyPressed" },
+  { EventTypes::LaserFired,   "LaserFired" },
+  { EventTypes::PlayerThrust, "PlayerThrust" }
 };
 
 // Compile-time size check
