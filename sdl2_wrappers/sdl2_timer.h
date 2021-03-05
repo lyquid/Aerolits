@@ -7,22 +7,23 @@ namespace ktp {
 
 class SDL2_Timer {
  public:
-  SDL2_Timer();
 
-  bool isPaused() const { return started_ && paused_; }
-  bool isStarted() const { return started_; }
+  static inline auto getSDL2Ticks() { return SDL_GetTicks(); }
+  inline bool isPaused() const { return started_ && paused_; }
+  inline bool isStarted() const { return started_; }
   Uint32 getTicks() const;
   void pause();
   void resume();
-  float restart();
+  Uint32 restart();
   void start();
   void stop();
 
- private: 
-  Uint32 paused_ticks_;
-  Uint32 start_ticks_;
-  bool paused_;
-  bool started_;
+ private:
+
+  Uint32 paused_ticks_{0u};
+  Uint32 start_ticks_{0u};
+  bool paused_{false};
+  bool started_{false};
 };
 
 } //end namespace ktp
