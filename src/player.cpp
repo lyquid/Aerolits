@@ -7,20 +7,22 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
 
   generatePlayerShape();
   render_shape_.resize(shape_.size());
-  render_thrust_shape_.resize(thrust_shape_.size());
+  render_flame_shape_.resize(flame_shape_.size());
   update(0.f); // needed to initialize render_shape_
   lasers_.reserve(50);
 }
 
-void ktp::Player::draw(SDL2_Renderer& renderer) {
+void ktp::Player::draw(SDL2_Renderer& renderer) const {
   /* player's shape */
   renderer.setDrawColor(kDefaultPlayerColor_);
   renderer.drawLines(render_shape_);
   /* player's thrust fx */
   if (thrusting_) {
     renderer.setDrawColor(ktp::Colors::red);
-    renderer.drawLines(render_thrust_shape_);
+    renderer.drawLines(render_flame_shape_);
   }
+  /* particles */
+  particle_pool_.draw(renderer);
   /* lasers */
   renderer.setDrawColor(ktp::Colors::orange);
   for (const auto& laser: lasers_) {
@@ -38,12 +40,12 @@ void ktp::Player::generatePlayerShape() {
   shape_.push_back({           0.f, -size_ * 0.50f}); // top again
   shape_.shrink_to_fit();
 
-  thrust_shape_.clear();
-  thrust_shape_.push_back({           0.f, size_ * 0.40f}); // bottom           2 ____ 1
-  thrust_shape_.push_back({ size_ * 0.15f, size_ * 0.35f}); // right vertice      \  /
-  thrust_shape_.push_back({-size_ * 0.15f, size_ * 0.35f}); // left vertice        \/
-  thrust_shape_.push_back({           0.f, size_ * 0.40f}); // bottom again        3/0
-  thrust_shape_.shrink_to_fit();
+  flame_shape_.clear();
+  flame_shape_.push_back({           0.f, size_ * 0.40f}); // bottom           2 ____ 1
+  flame_shape_.push_back({ size_ * 0.15f, size_ * 0.35f}); // right vertice      \  /
+  flame_shape_.push_back({-size_ * 0.15f, size_ * 0.35f}); // left vertice        \/
+  flame_shape_.push_back({           0.f, size_ * 0.40f}); // bottom again        3/0
+  flame_shape_.shrink_to_fit();
 }
 
 void ktp::Player::move(float delta_time) {
@@ -87,9 +89,9 @@ void ktp::Player::rotate() {
     render_shape_[i].y = (shape_[i].x * SDL_sinf(angle_) + shape_[i].y * SDL_cosf(angle_)) + center_.y;
   }
   if (thrusting_) {
-    for (auto i = 0u; i < thrust_shape_.size(); ++i) {
-      render_thrust_shape_[i].x = (thrust_shape_[i].x * SDL_cosf(angle_) - thrust_shape_[i].y * SDL_sinf(angle_)) + center_.x;
-      render_thrust_shape_[i].y = (thrust_shape_[i].x * SDL_sinf(angle_) + thrust_shape_[i].y * SDL_cosf(angle_)) + center_.y;
+    for (auto i = 0u; i < flame_shape_.size(); ++i) {
+      render_flame_shape_[i].x = (flame_shape_[i].x * SDL_cosf(angle_) - flame_shape_[i].y * SDL_sinf(angle_)) + center_.x;
+      render_flame_shape_[i].y = (flame_shape_[i].x * SDL_sinf(angle_) + flame_shape_[i].y * SDL_cosf(angle_)) + center_.y;
     }
   }
 }
@@ -116,8 +118,8 @@ void ktp::Player::shoot() {
 
 void ktp::Player::stopThrusting() {
   thrusting_ = false;
-  thrust_shape_.front().y = kDefaultFlameMinLength_;
-  thrust_shape_.back().y = kDefaultFlameMinLength_;
+  flame_shape_.front().y = kDefaultFlameMinLength_;
+  flame_shape_.back().y = kDefaultFlameMinLength_;
 }
 
 void ktp::Player::thrust(float delta_time) {
@@ -134,16 +136,21 @@ void ktp::Player::thrust(float delta_time) {
     delta_.y = kMaxDelta_;
   }
   thrusting_ = true;
-  if (thrust_shape_.front().y < flame_max_lenght_) {
-    thrust_shape_.front().y += flame_growth_factor_;
-    thrust_shape_.back().y += flame_growth_factor_;
+  if (flame_shape_.front().y < flame_max_lenght_) {
+    flame_shape_.front().y += flame_growth_factor_;
+    flame_shape_.back().y += flame_growth_factor_;
   }
+
+  constexpr float max_delta = 200.f;
+  const SDL_FPoint inverse_delta{delta_.x * -1, delta_.y * -1};
+  particle_pool_.generate(render_flame_shape_.front(), inverse_delta, 200);
   event_bus_.postEvent(kuge::EventTypes::PlayerThrust);
 }
 
 void ktp::Player::update(float delta_time) {
   move(delta_time);
   rotate();
+  particle_pool_.update(delta_time);
   if (!lasers_.empty()) updateLasers(delta_time);
 }
 

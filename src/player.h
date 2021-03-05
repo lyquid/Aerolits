@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_PLAYER_H_
 
 #include "palette.h"
+#include "particle_system.h"
 #include "../kuge/kuge.h"
 #include "../sdl2_wrappers/sdl2_wrappers.h"
 #include <vector>
@@ -17,8 +18,9 @@ struct Laser {
 
 class Player {
  public:
+
   Player(SDL_Point& screen_size, kuge::EventBus& event_bus);
-  void draw(SDL2_Renderer& renderer);
+  void draw(SDL2_Renderer& renderer) const;
   inline bool isAlive() const { return alive_; }
   void reset();
   void shoot();
@@ -29,6 +31,7 @@ class Player {
   void update(float delta_time);
 
  private:
+
   void generatePlayerShape();
   void move(float delta_time);
   void resetPosition();
@@ -54,17 +57,20 @@ class Player {
   const float kDefaultShootingInterval_{200.f};
   std::vector<Laser> lasers_{};
   double shooting_timer_{0.f};
-  /* thrust and flame stuff */
+  /* thrust stuff */
+  const float kDefaultThrustSpeed_{200.f};
+  float thrust_speed_{kDefaultThrustSpeed_};
+  bool thrusting_{false};
+  /* flame stuff */
   const float kDefaultFlameGrowthFactor_{0.2f};
   const float kDefaultFlameMaxLength_{size_};
   const float kDefaultFlameMinLength_{size_ * 0.4f};
-  const float kDefaultThrustSpeed_{200.f};
   float flame_growth_factor_{kDefaultFlameGrowthFactor_};
   float flame_max_lenght_{kDefaultFlameMaxLength_};
-  float thrust_speed_{kDefaultThrustSpeed_};
-  std::vector<SDL_FPoint> thrust_shape_{};
-  std::vector<SDL_FPoint> render_thrust_shape_{};
-  bool thrusting_{false};
+  std::vector<SDL_FPoint> flame_shape_{};
+  std::vector<SDL_FPoint> render_flame_shape_{};
+  /* particles stuff */
+  ParticlePool particle_pool_{};
 };
 
 } // end namespace ktp

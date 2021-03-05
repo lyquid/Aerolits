@@ -18,15 +18,11 @@ struct Star {
 
 class Background {
  public:
-
   Background(const SDL_Point& screen_size);
-
   void draw(SDL2_Renderer& renderer) const;
-
   void update(float delta_time);
   
  private:
- 
   void generateStars();
 
   const SDL_Point screen_size_;

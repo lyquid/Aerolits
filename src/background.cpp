@@ -7,10 +7,10 @@ ktp::Background::Background(const SDL_Point& screen_size): screen_size_(screen_s
 void ktp::Background::draw(SDL2_Renderer& renderer) const {
   renderer.setDrawColor(background_color_);
   renderer.drawRectFill(background_shape_);
-  for (const auto& star: stars_) {
+  /* for (const auto& star: stars_) {
     renderer.setDrawColor(star.color_);
     renderer.drawPoint(star.position_);
-  }
+  } */
 }
 
 void ktp::Background::generateStars() {

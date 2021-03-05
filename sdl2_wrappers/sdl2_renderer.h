@@ -27,7 +27,7 @@ class SDL2_Renderer {
   * and the clip rectangle.
   * @return True on success, or false on errors.
   */
-  bool clear();
+  bool clear() const;
 
   /**
   * Use this function to create a 2D rendering context for a window.
@@ -36,23 +36,23 @@ class SDL2_Renderer {
   */
   bool create(const SDL2_Window& window);
 
-  bool drawLines(const std::vector<SDL_Point>& points);
+  bool drawLines(const std::vector<SDL_Point>& points) const;
   
-  bool drawLines(const std::vector<SDL_FPoint>& points);
+  bool drawLines(const std::vector<SDL_FPoint>& points) const;
 
-  bool drawPoint(const SDL_Point& point);
+  bool drawPoint(const SDL_Point& point) const;
 
-  bool drawPoint(const SDL_FPoint& point);
+  bool drawPoint(const SDL_FPoint& point) const;
   
-  bool drawPoints(const std::vector<SDL_Point>& points);
+  bool drawPoints(const std::vector<SDL_Point>& points) const;
 
-  bool drawPoints(const std::vector<SDL_FPoint>& points);
+  bool drawPoints(const std::vector<SDL_FPoint>& points) const;
   
-  bool drawRect(const SDL_Rect& rect);
+  bool drawRect(const SDL_Rect& rect) const;
 
-  bool drawRectFill(const SDL_Rect& rect);
+  bool drawRectFill(const SDL_Rect& rect) const;
 
-  SDL_Renderer* getRenderer() const { return renderer_.get(); }
+  inline SDL_Renderer* getRenderer() const { return renderer_.get(); }
 
   /**
   * Use this function to update the screen with any rendering performed since 
@@ -73,7 +73,7 @@ class SDL2_Renderer {
   * encouraged to call SDL_RenderClear() to initialize the backbuffer before 
   * starting each new frame's drawing, even if you plan to overwrite every pixel.
   */
-  void present() { SDL_RenderPresent(renderer_.get()); }
+  inline void present() const { SDL_RenderPresent(renderer_.get()); }
 
   /**
   * Use this function to set the color used for drawing operations.
@@ -82,7 +82,7 @@ class SDL2_Renderer {
   * @param color The SDL_Color used to draw on the rendering target.
   * @return True on success, or false on errors.
   */
-  bool setDrawColor(const SDL_Color& color);
+  bool setDrawColor(const SDL_Color& color) const;
 
   /**
   * Use this function to set the color used for drawing operations.
@@ -96,10 +96,10 @@ class SDL2_Renderer {
   *          how the alpha channel is used.
   * @return True on success, or false on errors.
   */ 
-  bool setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+  bool setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) const;
   
  private:
-  
+
   template <typename T>
   using unique_ptr_deleter = std::unique_ptr<T, deleter<T>>;
 
