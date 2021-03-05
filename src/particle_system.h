@@ -11,6 +11,9 @@ namespace ktp {
 /* https://gamedevelopment.tutsplus.com/tutorials/adding-turbulence-to-a-particle-system--gamedev-13332 */
 
 class Particle {
+
+  friend class ParticlePool;
+
  public:
 
   void draw(const SDL2_Renderer& renderer) const;
@@ -22,13 +25,15 @@ class Particle {
 
  private:
 
+  Particle() {}
+
   int frames_left_{0};
   union {
     struct {
       SDL_FPoint delta_{};
       SDL_FPoint position_{};
     } live_;
-    Particle* next_ = nullptr;
+    Particle* next_{nullptr};
   } state_{};
 };
 
@@ -43,7 +48,7 @@ class ParticlePool {
  private:
 
   static const int kPoolSize_{500};
-  Particle* first_available_ = nullptr;
+  Particle* first_available_{nullptr};
   Particle particles_[kPoolSize_];
 };
 
