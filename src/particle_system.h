@@ -47,7 +47,7 @@ class ParticlePool {
 
  private:
 
-  static const int kPoolSize_{500};
+  static const int kPoolSize_{10000};
   Particle* first_available_{nullptr};
   Particle particles_[kPoolSize_];
 };

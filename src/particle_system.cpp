@@ -1,7 +1,16 @@
 #include "particle_system.h"
 
 void ktp::Particle::draw(const SDL2_Renderer& renderer) const {
-  renderer.setDrawColor(ktp::Colors::yellow);
+  if (frames_left_ > 150) {
+    renderer.setDrawColor(ktp::Colors::white);
+  } else if (frames_left_ > 100) {
+    renderer.setDrawColor(ktp::Colors::yellow);
+  } else if (frames_left_ > 50) {
+    renderer.setDrawColor(ktp::Colors::red);
+  } else {
+    renderer.setDrawColor(ktp::Colors::violet);
+  }
+  //renderer.setDrawColor(ktp::Colors::yellow);
   renderer.drawPoint(state_.live_.position_);
 }
 
