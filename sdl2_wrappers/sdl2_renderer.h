@@ -4,7 +4,10 @@
 #include "sdl2_log.h"
 #include "sdl2_window.h"
 #include <SDL.h>
+#include <algorithm>
 #include <memory>
+#include <sstream>
+#include <string>
 #include <vector>
 
 namespace ktp {
@@ -100,10 +103,13 @@ class SDL2_Renderer {
   
  private:
 
+  bool getRendererInfo();
+
   template <typename T>
   using unique_ptr_deleter = std::unique_ptr<T, deleter<T>>;
 
   unique_ptr_deleter<SDL_Renderer> renderer_{nullptr};
+  SDL_RendererInfo renderer_info_{};
 };
 
 } // end namespace ktp
