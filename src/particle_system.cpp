@@ -1,5 +1,7 @@
 #include "particle_system.h"
 
+/* PARTICLE */
+
 void ktp::Particle::draw(const SDL2_Renderer& renderer) const {
   if (frames_left_ > 150) {
     renderer.setDrawColor(ktp::Colors::white);
@@ -32,8 +34,10 @@ bool ktp::Particle::update(float delta_time) {
 
 /* PARTICLEPOOL */
 
-ktp::ParticlePool::ParticlePool() {
+ktp::ParticlePool::ParticlePool(int pool_size): kPoolSize_(pool_size) {
+  particles_ = new Particle[kPoolSize_];
   first_available_ = &particles_[0];
+
   for (auto i = 0; i < kPoolSize_; ++i) {
     particles_[i].setNext(&particles_[i + 1]);
   }
@@ -64,3 +68,9 @@ void ktp::ParticlePool::update(float delta_time) {
     }
   }
 }
+
+/* EMITTER */
+
+/* ktp::Emitter::Emitter(EmitterTypes type): type_(type) {
+
+} */

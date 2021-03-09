@@ -14,6 +14,7 @@ namespace ktp {
 
 class Game {
  public:
+
   Game();
   ~Game() { clean(); }
   void draw();
@@ -24,6 +25,7 @@ class Game {
   void update();
 
  private:
+ 
   void checkKeyStates(float delta_time);
   void clean();
   bool initSDL2();
