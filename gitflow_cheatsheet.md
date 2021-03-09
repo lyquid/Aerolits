@@ -5,12 +5,14 @@ From [here](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-
 Without the git-flow extensions.
 
 ###### Start ######
+
 ~~~
 git branch develop
 git push -u origin develop
 ~~~
 
 ###### Feature branch ######
+
 ~~~
 git checkout develop
 git checkout -b feature_branch
@@ -26,6 +28,7 @@ git branch -d feature_branch
 ~~~
 
 ###### Release branch ######
+
 ~~~
 git checkout develop
 git checkout -b release/0.1.0
@@ -44,6 +47,7 @@ git branch -d release/0.1.0
 ~~~
 
 ###### Hotfix branch ######
+
 ~~~
 git checkout master
 git checkout -b hotfix_branch
