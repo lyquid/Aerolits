@@ -22,7 +22,7 @@ void ktp::Player::draw(SDL2_Renderer& renderer) const {
     renderer.drawLines(render_flame_shape_);
   }
   /* particles */
-  particle_pool_.draw(renderer);
+  emitter_.draw(renderer);
   /* lasers */
   renderer.setDrawColor(ktp::Colors::orange);
   for (const auto& laser: lasers_) {
@@ -88,7 +88,7 @@ void ktp::Player::rotate() {
     render_shape_[i].x = (shape_[i].x * SDL_cosf(angle_) - shape_[i].y * SDL_sinf(angle_)) + center_.x;
     render_shape_[i].y = (shape_[i].x * SDL_sinf(angle_) + shape_[i].y * SDL_cosf(angle_)) + center_.y;
   }
-  if (thrusting_) {
+  if (thrusting_) { // this makes the first particles to appear in a previous (wrong) position
     for (auto i = 0u; i < flame_shape_.size(); ++i) {
       render_flame_shape_[i].x = (flame_shape_[i].x * SDL_cosf(angle_) - flame_shape_[i].y * SDL_sinf(angle_)) + center_.x;
       render_flame_shape_[i].y = (flame_shape_[i].x * SDL_sinf(angle_) + flame_shape_[i].y * SDL_cosf(angle_)) + center_.y;
@@ -141,16 +141,17 @@ void ktp::Player::thrust(float delta_time) {
     flame_shape_.back().y += flame_growth_factor_;
   }
 
-  constexpr float max_delta = 200.f;
-  const SDL_FPoint inverse_delta{delta_.x * -1, delta_.y * -1};
-  particle_pool_.generate(render_flame_shape_.front(), inverse_delta, 200);
+  const SDL_FPoint inverse_delta{delta_.x * -0.5f, delta_.y * -0.5f};
+  emitter_.generate(render_flame_shape_[1], inverse_delta, 200);
+  emitter_.generate(render_flame_shape_.front(), inverse_delta, 200);
+  emitter_.generate(render_flame_shape_[2], inverse_delta, 200);
   event_bus_.postEvent(kuge::EventTypes::PlayerThrust);
 }
 
 void ktp::Player::update(float delta_time) {
   move(delta_time);
   rotate();
-  particle_pool_.update(delta_time);
+  emitter_.update(delta_time);
   if (!lasers_.empty()) updateLasers(delta_time);
 }
 
