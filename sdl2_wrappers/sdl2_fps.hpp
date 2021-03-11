@@ -14,17 +14,17 @@ class SDL2_FPS {
     ++counted_frames_;
     return *this;
   }
-  SDL2_FPS operator++(int) { operator++(); }
+  //SDL2_FPS operator++(int) { operator++(); }
 
-  void addFrame(unsigned int inc = 1u) { counted_frames_ += inc; }
+  inline void addFrame(unsigned int inc = 1u) { counted_frames_ += inc; }
 
-  auto average() const { return counted_frames_ / (fps_timer_.getTicks() / 1000.f); }
+  inline auto average() const { return counted_frames_ / (fps_timer_.getTicks() / 1000.f); }
 
-  void start() { fps_timer_.start(); }
+  inline void start() { fps_timer_.start(); }
 
  private:
  
-  unsigned long long counted_frames_ = 0;
+  unsigned long long counted_frames_{0};
   SDL2_Timer fps_timer_{}; 
 };
 
