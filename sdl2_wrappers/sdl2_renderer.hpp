@@ -1,8 +1,8 @@
 #ifndef KTP_SDL2_WRAPPERS_SDL2_RENDERER_H_
 #define KTP_SDL2_WRAPPERS_SDL2_RENDERER_H_
 
-#include "sdl2_log.h"
-#include "sdl2_window.h"
+#include "sdl2_log.hpp"
+#include "sdl2_window.hpp"
 #include <SDL.h>
 #include <algorithm>
 #include <memory>

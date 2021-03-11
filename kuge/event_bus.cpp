@@ -1,6 +1,6 @@
-#include "event_bus.h"
-#include "input_system.h"
-#include "output_system.h"
+#include "event_bus.hpp"
+#include "input_system.hpp"
+#include "output_system.hpp"
 
 void kuge::EventBus::postImmediateEvent(const Event& event) const {
   for (const auto& system: systems_) {

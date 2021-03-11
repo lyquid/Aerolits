@@ -1,4 +1,4 @@
-#include "sdl2_timer.h"
+#include "sdl2_timer.hpp"
 
 Uint32 ktp::SDL2_Timer::getTicks() const {
   if (started_) {

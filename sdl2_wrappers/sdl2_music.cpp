@@ -1,4 +1,4 @@
-#include "sdl2_music.h"
+#include "sdl2_music.hpp"
 
 bool ktp::SDL2_Music::loadMusic(const std::string& path) {
   music_.reset(Mix_LoadMUS(path.c_str()));

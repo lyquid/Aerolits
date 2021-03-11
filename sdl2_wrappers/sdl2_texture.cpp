@@ -1,4 +1,4 @@
-#include "sdl2_texture.h"
+#include "sdl2_texture.hpp"
 
 bool ktp::SDL2_Texture::loadFromFile(const std::string& path) {
   const auto surface = IMG_Load(path.c_str());

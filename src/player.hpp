@@ -1,10 +1,10 @@
 #ifndef AEROLITS_SRC_PLAYER_H_
 #define AEROLITS_SRC_PLAYER_H_
 
-#include "palette.h"
-#include "particle_system.h"
-#include "../kuge/kuge.h"
-#include "../sdl2_wrappers/sdl2_wrappers.h"
+#include "palette.hpp"
+#include "particle_system.hpp"
+#include "../kuge/kuge.hpp"
+#include "../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <vector>
 
 namespace ktp {

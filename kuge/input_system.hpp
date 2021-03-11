@@ -1,8 +1,8 @@
 #ifndef KUGE_HEADERS_INPUT_SYSTEM_H_
 #define KUGE_HEADERS_INPUT_SYSTEM_H_
 
-#include "event.h"
-#include "system.h"
+#include "event.hpp"
+#include "system.hpp"
 
 namespace kuge {
 

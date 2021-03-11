@@ -1,4 +1,4 @@
-#include "sdl2_window.h"
+#include "sdl2_window.hpp"
 
 bool ktp::SDL2_Window::create(const SDL_Point& size) {
   window_.reset(SDL_CreateWindow("Aeròlits", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, size.x, size.y, SDL_WINDOW_SHOWN));

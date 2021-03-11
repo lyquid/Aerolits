@@ -1,9 +1,9 @@
 #ifndef AEROLITS_SRC_BACKGROUND_H_
 #define AEROLITS_SRC_BACKGROUND_H_
 
-#include "palette.h"
-#include "../kuge/kuge.h"
-#include "../sdl2_wrappers/sdl2_wrappers.h"
+#include "palette.hpp"
+#include "../kuge/kuge.hpp"
+#include "../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <array>
 #include <random>
 #include <vector>

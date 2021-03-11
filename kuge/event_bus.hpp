@@ -1,7 +1,7 @@
 #ifndef KUGE_HEADERS_EVENT_BUS_H_
 #define KUGE_HEADERS_EVENT_BUS_H_
 
-#include "event.h"
+#include "event.hpp"
 #include <memory>
 #include <queue>
 #include <vector>

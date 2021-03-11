@@ -1,7 +1,7 @@
 #ifndef KUGE_HEADERS_SYSTEM_H_
 #define KUGE_HEADERS_SYSTEM_H_
 
-#include "./event.h"
+#include "event.hpp"
 #include <string>
 
 namespace kuge {

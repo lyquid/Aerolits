@@ -1,4 +1,4 @@
-#include "background.h"
+#include "background.hpp"
 
 ktp::Background::Background(const SDL_Point& screen_size): screen_size_(screen_size) {
   generateStars();

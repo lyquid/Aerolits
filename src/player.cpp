@@ -1,4 +1,4 @@
-#include "player.h"
+#include "player.hpp"
 
 ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
   event_bus_(event_bus),

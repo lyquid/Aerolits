@@ -1,7 +1,7 @@
 #ifndef KTP_SDL2_WRAPPERS_SDL2_AUDIO_H_
 #define KTP_SDL2_WRAPPERS_SDL2_AUDIO_H_
 
-#include "sdl2_log.h"
+#include "sdl2_log.hpp"
 #include <SDL_mixer.h>
 #include <memory>
 #include <string>

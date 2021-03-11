@@ -1,2 +1,2 @@
-#include "event_bus.h"
-#include "input_system.h"
+#include "event_bus.hpp"
+#include "input_system.hpp"

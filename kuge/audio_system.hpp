@@ -1,10 +1,10 @@
 #ifndef KUGE_HEADERS_AUDIO_SYSTEM_H_
 #define KUGE_HEADERS_AUDIO_SYSTEM_H_
 
-#include "event.h"
-#include "system.h"
-#include "../sdl2_wrappers/sdl2_wrappers.h"
-#include "../include/resources_path.h"
+#include "event.hpp"
+#include "system.hpp"
+#include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include "../include/resources_path.hpp"
 #include <array>
 #include <iterator>
 #include <random>

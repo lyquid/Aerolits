@@ -1,7 +1,7 @@
 #ifndef KTP_SDL2_WRAPPERS_SDL2_FPS_H_
 #define KTP_SDL2_WRAPPERS_SDL2_FPS_H_
 
-#include "sdl2_timer.h"
+#include "sdl2_timer.hpp"
 
 namespace ktp {
 

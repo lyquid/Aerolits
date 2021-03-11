@@ -1,13 +1,13 @@
 #ifndef AEROLITS_SRC_GAME_H_
 #define AEROLITS_SRC_GAME_H_
 
-#include "background.h"
-#include "palette.h"
-#include "particle_system.h"
-#include "player.h"
-#include "../include/resources_path.h"
-#include "../kuge/kuge.h"
-#include "../sdl2_wrappers/sdl2_wrappers.h"
+#include "background.hpp"
+#include "palette.hpp"
+#include "particle_system.hpp"
+#include "player.hpp"
+#include "../include/resources_path.hpp"
+#include "../kuge/kuge.hpp"
+#include "../sdl2_wrappers/sdl2_wrappers.hpp"
 
 #include <sstream>
 

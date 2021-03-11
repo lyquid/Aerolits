@@ -1,5 +1,5 @@
-#include "event_bus.h"
-#include "audio_system.h"
+#include "event_bus.hpp"
+#include "audio_system.hpp"
 
 std::vector<ktp::SDL2_Sound>           kuge::AudioSystem::lasers_{};
 kuge::AudioSystem::laser_randomizer    kuge::AudioSystem::lasers_sequence_{};

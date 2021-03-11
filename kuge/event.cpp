@@ -1,4 +1,4 @@
-#include "event.h"
+#include "event.hpp"
 
 kuge::Event::Event(kuge::EventTypes type):
   kMessage_(std::string()),

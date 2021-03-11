@@ -1,4 +1,4 @@
-#include "sdl2_image.h"
+#include "sdl2_image.hpp"
 
 void ktp::SDL2_Image::closeImage() { 
   IMG_Quit();

@@ -1,4 +1,4 @@
-#include "sdl2_sound.h"
+#include "sdl2_sound.hpp"
 
 bool ktp::SDL2_Sound::loadSound(const std::string& path) {
   sound_.reset(Mix_LoadWAV(path.c_str()));

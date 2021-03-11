@@ -1,7 +1,7 @@
 #ifndef KUGE_INCLUDE_RESOURCES_PATH_H
 #define KUGE_INCLUDE_RESOURCES_PATH_H
 
-#include "../sdl2_wrappers/sdl2_wrappers.h"
+#include "../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <SDL.h>
 #include <string>
 

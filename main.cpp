@@ -1,4 +1,4 @@
-#include "src/game.h"
+#include "src/game.hpp"
 
 int main(int argv, char* args[]) {
   

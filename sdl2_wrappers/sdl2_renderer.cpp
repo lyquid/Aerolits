@@ -1,4 +1,4 @@
-#include "sdl2_renderer.h"
+#include "sdl2_renderer.hpp"
 
 bool ktp::SDL2_Renderer::clear() const {
   if (SDL_RenderClear(renderer_.get()) == 0) {

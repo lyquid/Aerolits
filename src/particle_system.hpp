@@ -1,9 +1,9 @@
 #ifndef AEROLITS_SRC_PARTICLE_SYSTEM_H_
 #define AEROLITS_SRC_PARTICLE_SYSTEM_H_
 
-#include "palette.h"
-#include "../sdl2_wrappers/sdl2_wrappers.h"
-#include "../include/resources_path.h"
+#include "palette.hpp"
+#include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include "../include/resources_path.hpp"
 #include "../include/pugixml1.11/pugixml.hpp"
 #include <sstream>
 #include <string>

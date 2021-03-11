@@ -1,7 +1,7 @@
 #ifndef KTP_SDL2_WRAPPERS_SDL2_FONT_H_
 #define KTP_SDL2_WRAPPERS_SDL2_FONT_H_
 
-#include "sdl2_log.h"
+#include "sdl2_log.hpp"
 
 #include <SDL.h>
 #include <SDL_ttf.h>
