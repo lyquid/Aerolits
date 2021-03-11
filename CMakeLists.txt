@@ -39,6 +39,7 @@ find_package(SDL2_MIXER REQUIRED)
 include_directories(${SDL2_MIXER_INCLUDE_DIR})
 
 add_executable(	Aerolits  main.cpp
+													./include/pugixml1.11/pugixml
 													sdl2_wrappers/sdl2_audio
 													sdl2_wrappers/sdl2_font
 													sdl2_wrappers/sdl2_image

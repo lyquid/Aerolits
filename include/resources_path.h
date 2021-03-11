@@ -10,7 +10,7 @@ namespace ktp {
 /* Original idea from Will Usher */
 /* Check it here: https://github.com/Twinklebear/TwinklebearDev-Lessons */
 
-static std::string getResourcesPath(const std::string& subDir = "") {
+inline std::string getResourcesPath(const std::string& sub_dir = "") {
 
   constexpr auto kPROJECT_NAME = "Aerolits";
   constexpr auto kRESOURCES_FOLDER = "resources";
@@ -21,17 +21,17 @@ static std::string getResourcesPath(const std::string& subDir = "") {
     constexpr auto kPATH_SEPARATOR = '/';
   #endif
 
-  static std::string base_res;
+  std::string base_res{};
 
   if (base_res.empty()) {
 
-    auto base_path = SDL_GetBasePath();
+    const auto base_path = SDL_GetBasePath();
 
     if (base_path) {
       base_res = base_path;
       SDL_free(base_path);
     } else {
-      ktp::logSDL2Error("SDL_GetBasePath");
+      logSDL2Error("SDL_GetBasePath");
       return std::string();
     }
 
@@ -42,10 +42,10 @@ static std::string getResourcesPath(const std::string& subDir = "") {
     #endif  */
     // auto pos = base_res.rfind("bin");
 
-    auto pos = base_res.rfind(kPROJECT_NAME) + SDL_strlen(kPROJECT_NAME);
+    const auto pos = base_res.rfind(kPROJECT_NAME) + SDL_strlen(kPROJECT_NAME);
     base_res = base_res.substr(0, pos) + kPATH_SEPARATOR + kRESOURCES_FOLDER + kPATH_SEPARATOR;
   }
-  return subDir.empty() ? base_res : base_res + subDir + kPATH_SEPARATOR;
+  return sub_dir.empty() ? base_res : base_res + sub_dir + kPATH_SEPARATOR;
 }
 
 } // namespace ktp

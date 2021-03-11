@@ -11,10 +11,27 @@ namespace ktp {
 /* Check it here: https://github.com/Twinklebear/TwinklebearDev-Lessons */
 
 /**
+* Log a message to the standard error stream.
+* @param msg The message to write, format will be msg + '\n'.
+*/
+inline void logErrorMessage(std::string_view msg) {
+  std::cerr << msg << '\n';
+}
+
+/**
+* Log a message to the standard error stream.
+* @param msg The message to write, format will be msg + '\n'.
+* @param src Source of the resource.
+*/
+inline void logErrorMessage(std::string_view msg, std::string_view src){
+	std::cerr << msg << " (" << src << ")\n";
+}
+
+/**
 * Log a message to the standard output stream.
 * @param msg The message to write, format will be msg + '\n'.
 */
-static void logMessage(std::string_view msg) {
+inline void logMessage(std::string_view msg) {
   std::cout << msg << '\n';
 }
 
@@ -23,7 +40,7 @@ static void logMessage(std::string_view msg) {
 * @param os The output stream to write the message to.
 * @param msg The message to write, format will be msg + '\n'.
 */
-static void logMessage(std::ostream& os, std::string_view msg) {
+inline void logMessage(std::ostream& os, std::string_view msg) {
   os << msg << '\n';
 }
 
@@ -31,7 +48,7 @@ static void logMessage(std::ostream& os, std::string_view msg) {
 * Log an SDL error with some error message to the standard output stream.
 * @param msg The error message to write, format will be msg error: SDL_GetError() + '\n'.
 */
-static void logSDL2Error(std::string_view msg){
+inline void logSDL2Error(std::string_view msg){
 	std::cerr << msg << " error: " << SDL_GetError() << '\n';
 }
 
@@ -40,7 +57,7 @@ static void logSDL2Error(std::string_view msg){
 * @param os The output stream to write the message to.
 * @param msg The error message to write, format will be msg error: SDL_GetError() + '\n'.
 */
-static void logSDL2Error(std::ostream& os, std::string_view msg){
+inline void logSDL2Error(std::ostream& os, std::string_view msg){
 	os << msg << " error: " << SDL_GetError() << '\n';
 }
 
@@ -49,7 +66,7 @@ static void logSDL2Error(std::ostream& os, std::string_view msg){
 * @param msg The error message to write, format will be msg error: SDL_GetError() + '\n'.
 * @param src Source of the resource.
 */
-static void logSDL2Error(std::string_view msg, std::string_view src){
+inline void logSDL2Error(std::string_view msg, std::string_view src){
 	std::cerr << msg << " error: " << SDL_GetError() << " (" << src << ")\n";
 }
 
@@ -59,7 +76,7 @@ static void logSDL2Error(std::string_view msg, std::string_view src){
 * @param msg The error message to write, format will be msg error: SDL_GetError() + '\n'.
 * @param src Source of the resource.
 */
-static void logSDL2Error(std::ostream& os, std::string_view msg, std::string_view src){
+inline void logSDL2Error(std::ostream& os, std::string_view msg, std::string_view src){
 	os << msg << " error: " << SDL_GetError() << " (" << src << ")\n";
 }
 

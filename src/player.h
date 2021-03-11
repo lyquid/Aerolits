@@ -70,7 +70,7 @@ class Player {
   std::vector<SDL_FPoint> flame_shape_{};
   std::vector<SDL_FPoint> render_flame_shape_{};
   /* particles stuff */
-  Emitter emitter_{};
+  Emitter emitter_{EmitterTypes::Fire};
 };
 
 } // end namespace ktp

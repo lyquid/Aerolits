@@ -4,6 +4,8 @@ int main(int argv, char* args[]) {
   
   using namespace ktp;
 
+  loadConfigFiles();
+
   Game game{};
 
   if (game.init()) {

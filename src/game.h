@@ -3,6 +3,7 @@
 
 #include "background.h"
 #include "palette.h"
+#include "particle_system.h"
 #include "player.h"
 #include "../include/resources_path.h"
 #include "../kuge/kuge.h"
@@ -11,6 +12,8 @@
 #include <sstream>
 
 namespace ktp {
+
+void loadConfigFiles();
 
 class Game {
  public:
@@ -32,8 +35,8 @@ class Game {
   bool loadResources();
 
   ktp::SDL2_Timer clock_{};
-  SDL_Point screen_size_{1200, 900};
-  bool quit_ = false;
+  SDL_Point screen_size_{1024, 768};
+  bool quit_{false};
 
   ktp::SDL2_Window main_window_{};
   ktp::SDL2_Renderer renderer_{};

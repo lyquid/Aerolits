@@ -1,5 +1,11 @@
 #include "game.h"
 
+void ktp::loadConfigFiles() {
+  XMLParser::initEmitters();
+}
+
+/* GAME */
+
 ktp::Game::Game() {
   event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);
 }
@@ -90,7 +96,7 @@ bool ktp::Game::initSDL2() {
 }
 
 bool ktp::Game::loadResources() {
-  if (!font_.loadFont(ktp::getResourcesPath() + "fonts/Future n0t Found.ttf", 18)) {
+  if (!font_.loadFont(ktp::getResourcesPath("fonts") + "Future n0t Found.ttf", 18)) {
     return false;
   }
   if (!audio_sys_.loadResources()) {
