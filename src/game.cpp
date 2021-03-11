@@ -104,16 +104,14 @@ bool ktp::Game::loadResources() {
   return true;
 }
 
-void ktp::Game::update(float deltaTime) {
+void ktp::Game::update(float delta_time) {
   /* FPS */
-  fps_text_.str({});
-  fps_text_ << fps_.average();
-  SDL_SetWindowTitle(main_window_.getWindow(), ("Aeròlits - FPS: " + fps_text_.str()).c_str());
+  SDL_SetWindowTitle(main_window_.getWindow(), ("Aeròlits - FPS: " + std::to_string(fps_.average())).c_str());
   /* Background */
-  background_.update(deltaTime);
+  background_.update(delta_time);
   /* Player */
-  checkKeyStates(deltaTime);
-  player_.update(deltaTime);
+  checkKeyStates(delta_time);
+  player_.update(delta_time);
   /* Event bus */
   event_bus_.processEvents();
 }

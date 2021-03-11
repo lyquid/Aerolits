@@ -9,7 +9,7 @@
 #include "../kuge/kuge.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
 
-#include <sstream>
+#include <string>
 
 namespace ktp {
 
@@ -25,7 +25,7 @@ class Game {
   void handleSDL2KeyEvents(const SDL_Keycode& key);
   bool init();
   bool quit() const { return quit_; }
-  void update(float deltaTime);
+  void update(float delta_time);
 
  private:
  
@@ -42,8 +42,7 @@ class Game {
   SDL_Event sdl_event_{};
   ktp::SDL2_Font font_{};
   /* FPS */
-  ktp::SDL2_FPS     fps_{};
-  std::stringstream fps_text_{};
+  ktp::SDL2_FPS fps_{};
   /* KUGE engine */
   kuge::EventBus event_bus_{};
   kuge::AudioSystem audio_sys_{event_bus_};
