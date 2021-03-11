@@ -39,7 +39,6 @@ void ktp::Game::draw() {
   renderer_.clear();
 
   background_.draw(renderer_);
-  fps_texture_.render({0, 0});
   player_.draw(renderer_);
   
   renderer_.present();
@@ -102,25 +101,19 @@ bool ktp::Game::loadResources() {
   if (!audio_sys_.loadResources()) {
     return false;
   }
-
-  fps_texture_.setRenderer(renderer_);
   return true;
 }
 
-void ktp::Game::update() {
+void ktp::Game::update(float deltaTime) {
   /* FPS */
   fps_text_.str({});
   fps_text_ << fps_.average();
-  fps_texture_.loadFromTextSolid(font_, fps_text_.str(), ktp::Colors::white);
-  
-  const float delta_time = clock_.restart() / 1000.f;
-
+  SDL_SetWindowTitle(main_window_.getWindow(), ("Aeròlits - FPS: " + fps_text_.str()).c_str());
   /* Background */
-  background_.update(delta_time);
+  background_.update(deltaTime);
   /* Player */
-  checkKeyStates(delta_time);
-  player_.update(delta_time);
-
+  checkKeyStates(deltaTime);
+  player_.update(deltaTime);
   /* Event bus */
   event_bus_.processEvents();
 }

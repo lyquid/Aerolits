@@ -25,7 +25,7 @@ class Game {
   void handleSDL2KeyEvents(const SDL_Keycode& key);
   bool init();
   bool quit() const { return quit_; }
-  void update();
+  void update(float deltaTime);
 
  private:
  
@@ -34,7 +34,6 @@ class Game {
   bool initSDL2();
   bool loadResources();
 
-  ktp::SDL2_Timer clock_{};
   SDL_Point screen_size_{1024, 768};
   bool quit_{false};
 
@@ -45,7 +44,6 @@ class Game {
   /* FPS */
   ktp::SDL2_FPS     fps_{};
   std::stringstream fps_text_{};
-  ktp::SDL2_Texture fps_texture_{};
   /* KUGE engine */
   kuge::EventBus event_bus_{};
   kuge::AudioSystem audio_sys_{event_bus_};
