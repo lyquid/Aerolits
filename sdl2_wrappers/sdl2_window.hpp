@@ -97,7 +97,7 @@ class SDL2_Window {
    * SDL_GetError() for more information. 
    */
   inline int getDisplayMode(SDL_DisplayMode* mode) const { 
-    SDL_GetWindowDisplayMode(window_.get(), mode); 
+    return SDL_GetWindowDisplayMode(window_.get(), mode); 
   }
 
   /**
@@ -126,7 +126,7 @@ class SDL2_Window {
    * for more information. 
    */
   inline int getGammaRamp(Uint16* red, Uint16* green, Uint16* blue) const {
-    SDL_GetWindowGammaRamp(window_.get(), red, green, blue);
+    return SDL_GetWindowGammaRamp(window_.get(), red, green, blue);
   }
 
   /**
@@ -158,7 +158,7 @@ class SDL2_Window {
    * @return SDL_Point with the maximun width and height of the window.
    */
   inline SDL_Point getMaximumSize() const { 
-    int* w; int* h;
+    int* w = nullptr; int* h = nullptr;
     SDL_GetWindowMaximumSize(window_.get(), w, h); 
     return {*w, *h};
   }
@@ -177,7 +177,7 @@ class SDL2_Window {
    * @return SDL_Point with the minimum width and height of the window. 
    */
   inline SDL_Point getMinimumSize() const {
-    int* w; int* h;
+    int* w = nullptr; int* h = nullptr;
     SDL_GetWindowMinimumSize(window_.get(), w, h);
     return {*w, *h};
   }
@@ -189,7 +189,7 @@ class SDL2_Window {
    * @return Returns 0 on success or a negative error code on failure; call 
    * SDL_GetError() for more information. 
    */
-  inline int getOpacity(float* opacity) const { SDL_GetWindowOpacity(window_.get(), opacity); }
+  inline int getOpacity(float* opacity) const { return SDL_GetWindowOpacity(window_.get(), opacity); }
 
   /**
    * Use this function to get the pixel format associated with the window.
@@ -197,7 +197,7 @@ class SDL2_Window {
    * @return Returns the pixel format of the window on success or SDL_PIXELFORMAT_UNKNOWN 
    * on failure; call SDL_GetError() for more information. 
    */
-  inline Uint32 getPixelFormat() const { SDL_GetWindowPixelFormat(window_.get()); }
+  inline Uint32 getPixelFormat() const { return SDL_GetWindowPixelFormat(window_.get()); }
 
   /**
    * Use this function to get the position of a window.
