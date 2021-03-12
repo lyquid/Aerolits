@@ -49,4 +49,28 @@
     <lifeTime value="-12"/>
   </emitter>
 
+  <emitter type="exhaust">
+    <angleRange min="0" max="0"/>
+
+    <rotSpeed   value="0"   randMin="-1" randMax="1"/>
+    <startSpeed value="0" randMin="0"  randMax="1"/>
+    <endSpeed   value="0" randMin="0"  randMax="1"/>
+
+    <startSize value="200" randMin="0" randMax="1"/>
+    <endSize   value="80"  randMin="1" randMax="1"/>
+
+    <emitNumber value="1"/>
+    <emitVariance value="0" randMin="0" randMax="1"/>
+
+    <maxParticleLife value="200" randMin="0" randMax="1"/>
+
+    <textureRect x="0" y="0" w="0" h="0"/>
+    
+    <startColor r="196" g="101" b="28"   a="255"/>
+    <endColor   r="193" g="229" b="234" a="0"/>
+
+    <blendMode mode=""/>
+
+    <lifeTime value="-1"/>
+  </emitter>
 </emitterTypes>

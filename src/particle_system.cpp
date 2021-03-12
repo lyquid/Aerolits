@@ -5,14 +5,16 @@
 std::vector<ktp::EmitterType> ktp::XMLParser::emitter_types{};
 
 void ktp::XMLParser::constructEmitterTypesVector(const pugi::xml_document& doc) {
-  const auto emitters = doc.child("emitterTypes");
+  const auto emitters{doc.child("emitterTypes")};
   std::string types_created{};
   for (const auto& emitter: emitters) {
-    EmitterType emi;
+    EmitterType emi{};
     
     const std::string type{emitter.attribute("type").as_string()};
     types_created += (type + ' ');
-    if (type == std::string{"fire"}) {
+    if (type == std::string{"exhaust"}) {
+      emi.type_ = EmitterTypes::Exhaust;
+    } else if (type == std::string{"fire"}) {
       emi.type_ = EmitterTypes::Fire;
     } else if (type == std::string{"smoke"}) {
       emi.type_ = EmitterTypes::Smoke;
@@ -92,24 +94,24 @@ bool ktp::XMLParser::initEmitters() {
 }
 
 void ktp::XMLParser::loadEmitterTypes() {
-  constexpr auto file = "emitters.xml";
-  const auto path = getResourcesPath("particles") + file;
+  const std::string file{"emitters.xml"};
+  const std::string path{getResourcesPath("particles") + file};
   pugi::xml_document doc{};
-  const auto result = doc.load_file(path.c_str());
+  const auto result{doc.load_file(path.c_str())};
   if (result) {
     // printLoadedEmitterTypes(doc);
     constructEmitterTypesVector(doc);
   } else {
-    std::stringstream error_msg{};
-    error_msg << "WARNING! " << file << " parsed with errors\n"
-              << "Error description: " << result.description() << '\n'
-              << "Error offset: " << result.offset;
-    logErrorMessage(error_msg.str(), path);
+    const std::string error_msg{
+            "WARNING! " + file + " parsed with errors\n"
+            + "Error description: " + result.description() + '\n'
+            + "Error offset: " + std::to_string(result.offset)};
+    logErrorMessage(error_msg, path);
   }
 }
 
 void ktp::XMLParser::printLoadedEmitterTypes(const pugi::xml_document& doc) {
-  const auto emitters = doc.child("emitterTypes");
+  const auto emitters{doc.child("emitterTypes")};
   std::stringstream final_string{};
   for (const auto& emitter: emitters) {
     final_string << "<emitter ";
@@ -133,13 +135,13 @@ void ktp::XMLParser::printLoadedEmitterTypes(const pugi::xml_document& doc) {
 
 void ktp::Particle::draw(const SDL2_Renderer& renderer) const {
   if (frames_left_ > 150) {
-    renderer.setDrawColor(ktp::Colors::white);
+    renderer.setDrawColor(Colors::white);
   } else if (frames_left_ > 100) {
-    renderer.setDrawColor(ktp::Colors::yellow);
+    renderer.setDrawColor(Colors::yellow);
   } else if (frames_left_ > 50) {
-    renderer.setDrawColor(ktp::Colors::red);
+    renderer.setDrawColor(Colors::red);
   } else {
-    renderer.setDrawColor(ktp::Colors::violet);
+    renderer.setDrawColor(Colors::violet);
   }
   //renderer.setDrawColor(ktp::Colors::yellow);
   renderer.drawPoint(state_.live_.position_);
@@ -176,7 +178,7 @@ ktp::ParticlePool::ParticlePool(int pool_size): kPoolSize_(pool_size) {
 void ktp::ParticlePool::generate(const SDL_FPoint& pos, const SDL_FPoint& delta, int life_time) {
   if (first_available_ == nullptr) return;
 
-  Particle* new_particle = first_available_;
+  Particle* new_particle{first_available_};
   first_available_ = new_particle->getNext();
   new_particle->init(pos, delta, life_time);
 }

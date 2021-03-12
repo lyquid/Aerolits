@@ -16,6 +16,7 @@ namespace ktp {
 /* https://gamedevelopment.tutsplus.com/tutorials/adding-turbulence-to-a-particle-system--gamedev-13332 */
 
 enum class EmitterTypes {
+  Exhaust,
   Fire,
   Smoke,
   count
