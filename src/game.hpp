@@ -34,6 +34,7 @@ class Game {
   bool initSDL2();
   bool loadResources();
 
+  const std::string kGameTitle_{"Àerolits"};
   SDL_Point screen_size_{1024, 768};
   bool quit_{false};
 

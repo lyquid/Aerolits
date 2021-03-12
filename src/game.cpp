@@ -75,7 +75,7 @@ void ktp::Game::handleSDL2KeyEvents(const SDL_Keycode& key) {
 
 bool ktp::Game::init() {
   if (!initSDL2()) return false;
-  if (!main_window_.create(screen_size_)) return false;
+  if (!main_window_.create(kGameTitle_, screen_size_)) return false;
   if (!renderer_.create(main_window_)) return false; 
   if (!loadResources()) return false;
   fps_.start();
@@ -106,7 +106,7 @@ bool ktp::Game::loadResources() {
 
 void ktp::Game::update(float delta_time) {
   /* FPS */
-  SDL_SetWindowTitle(main_window_.getWindow(), ("Aeròlits - FPS: " + std::to_string(fps_.average())).c_str());
+  main_window_.setTitle(kGameTitle_ + " - FPS: " + std::to_string(fps_.average()));
   /* Background */
   background_.update(delta_time);
   /* Player */
