@@ -79,6 +79,14 @@ class SDL2_Renderer {
   inline void present() const { SDL_RenderPresent(renderer_.get()); }
 
   /**
+   * Use this function to set the blend mode used for drawing operations (Fill and Line).
+   * 
+   * @param mode The SDL_BlendMode to use for blending 
+   * @return Returns 0 on success or a negative error code on failure 
+   */
+  inline int setBlendMode(const SDL_BlendMode& mode) const { return SDL_SetRenderDrawBlendMode(renderer_.get(), mode); }
+
+  /**
   * Use this function to set the color used for drawing operations.
   * This function can set the color for drawing or filling rectangles, lines, 
   * and points, and for SDL_RenderClear().

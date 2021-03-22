@@ -24,7 +24,7 @@ void ktp::SDL2_Timer::resume() {
 }
 
 Uint32 ktp::SDL2_Timer::restart() {
-  const auto time = getTicks();
+  const auto time{getTicks()};
   stop();
   start();
   return time;

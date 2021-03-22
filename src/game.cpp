@@ -1,7 +1,7 @@
 #include "game.hpp"
 
 void ktp::loadConfigFiles() {
-  XMLParser::initEmitters();
+  EmitterParser::initEmitters();
 }
 
 /* GAME */
@@ -95,12 +95,13 @@ bool ktp::Game::initSDL2() {
 }
 
 bool ktp::Game::loadResources() {
-  if (!font_.loadFont(ktp::getResourcesPath("fonts") + "Future n0t Found.ttf", 18)) {
+  if (!font_.loadFont(getResourcesPath("fonts") + "Future n0t Found.ttf", 18)) {
     return false;
   }
   if (!audio_sys_.loadResources()) {
     return false;
   }
+  ParticlesAtlas::loadTexture(renderer_);
   return true;
 }
 

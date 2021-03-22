@@ -16,10 +16,10 @@ bool ktp::SDL2_Image::initImage() {
               std::to_string(image_linked_version_->patch));
 
   // Flags available: IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF
-  constexpr auto flags = IMG_INIT_JPG | IMG_INIT_PNG;
+  constexpr auto flags = IMG_INIT_PNG;
   const auto initted = IMG_Init(flags);
   if((initted & flags) != flags) {
-    ktp::logSDL2Error("IMG_Init");
+    logSDL2Error("IMG_Init");
 	  return false;
   }
   return true;

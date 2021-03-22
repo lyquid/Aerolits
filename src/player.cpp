@@ -22,7 +22,7 @@ void ktp::Player::draw(SDL2_Renderer& renderer) const {
     renderer.drawLines(render_flame_shape_);
   }
   /* particles */
-  emitter_.draw(renderer);
+  exhaust_emitter_.draw(renderer);
   /* lasers */
   renderer.setDrawColor(ktp::Colors::orange);
   for (const auto& laser: lasers_) {
@@ -63,6 +63,7 @@ void ktp::Player::move(float delta_time) {
   } else  if (center_.y > screen_size_.y + threshold) {
     center_.y = -threshold;
   }
+  exhaust_emitter_.setPosition({center_.x, center_.y});
 }
 
 void ktp::Player::reset() {
@@ -83,12 +84,11 @@ void ktp::Player::reset() {
 }
 
 void ktp::Player::rotate() {
-  // adding the center at the end makes the shape move to the correct position
   for (auto i = 0u; i < shape_.size(); ++i) {
     render_shape_[i].x = (shape_[i].x * SDL_cosf(angle_) - shape_[i].y * SDL_sinf(angle_)) + center_.x;
     render_shape_[i].y = (shape_[i].x * SDL_sinf(angle_) + shape_[i].y * SDL_cosf(angle_)) + center_.y;
   }
-  if (thrusting_) { // this makes the first particles to appear in a previous (wrong) position
+  if (thrusting_) {
     for (auto i = 0u; i < flame_shape_.size(); ++i) {
       render_flame_shape_[i].x = (flame_shape_[i].x * SDL_cosf(angle_) - flame_shape_[i].y * SDL_sinf(angle_)) + center_.x;
       render_flame_shape_[i].y = (flame_shape_[i].x * SDL_sinf(angle_) + flame_shape_[i].y * SDL_cosf(angle_)) + center_.y;
@@ -112,6 +112,7 @@ void ktp::Player::shoot() {
     
     lasers_.push_back(laser);
     shooting_timer_ = SDL_GetTicks();
+    exhaust_emitter_.generate();
     event_bus_.postEvent(kuge::EventTypes::LaserFired);
   }
 }
@@ -141,17 +142,14 @@ void ktp::Player::thrust(float delta_time) {
     flame_shape_.back().y += flame_growth_factor_;
   }
 
-  const SDL_FPoint inverse_delta{delta_.x * -0.5f, delta_.y * -0.5f};
-  emitter_.generate(render_flame_shape_[1], inverse_delta, 200);
-  emitter_.generate(render_flame_shape_.front(), inverse_delta, 200);
-  emitter_.generate(render_flame_shape_[2], inverse_delta, 200);
+  exhaust_emitter_.generate();
   event_bus_.postEvent(kuge::EventTypes::PlayerThrust);
 }
 
 void ktp::Player::update(float delta_time) {
   move(delta_time);
   rotate();
-  emitter_.update(delta_time);
+  exhaust_emitter_.update(delta_time);
   if (!lasers_.empty()) updateLasers(delta_time);
 }
 

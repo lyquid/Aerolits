@@ -56,9 +56,12 @@ add_executable(	Aerolits  main.cpp
 													kuge/output_system
 													kuge/system
 													src/background
+													src/emitter_parser
 													src/game
+													src/particle
 													src/particle_system
 													src/player )
+													
 target_link_libraries(Aerolits ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_MIXER_LIBRARY})
 target_include_directories(Aerolits PUBLIC "${Aerolits_SOURCE_DIR}/include")
 install(TARGETS Aerolits RUNTIME DESTINATION ${BIN_DIR})

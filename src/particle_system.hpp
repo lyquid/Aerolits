@@ -1,11 +1,10 @@
 #ifndef AEROLITS_SRC_PARTICLE_SYSTEM_H_
 #define AEROLITS_SRC_PARTICLE_SYSTEM_H_
 
-#include "palette.hpp"
+#include "emitter_parser.hpp"
+#include "particle.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
-#include "../include/resources_path.hpp"
-#include "../include/pugixml1.11/pugixml.hpp"
-#include <sstream>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -14,77 +13,6 @@ namespace ktp {
 /* http://gameprogrammingpatterns.com/object-pool.html */
 /* https://nintervik.github.io/2D-Particle-System/ */
 /* https://gamedevelopment.tutsplus.com/tutorials/adding-turbulence-to-a-particle-system--gamedev-13332 */
-
-enum class EmitterTypes {
-  Exhaust,
-  Fire,
-  Smoke,
-  count
-};
-
-struct AngleRange { float max_{0}, min_{0}; };
-
-struct ValueWithRnd { float value_{0}, rand_min_{0}, rand_max_{1}; };
-
-struct EmitterType {
-  EmitterTypes type_{};
-  AngleRange angle_range_{};
-
-  ValueWithRnd rotation_speed_{};
-  ValueWithRnd start_speed_{};
-  ValueWithRnd end_speed_{};
-  ValueWithRnd start_size_{};
-  ValueWithRnd end_size_{};
-
-  int emit_number_{};
-
-  ValueWithRnd emit_variance_{};
-  ValueWithRnd max_particle_life_{};
-
-  SDL_Rect texture_rect_{};
-
-  SDL_Color start_color_{};
-  SDL_Color end_color_{};
-
-  SDL_BlendMode blend_mode_{};
-  
-  int life_time_{};
-};
-
-namespace XMLParser {
-  void constructEmitterTypesVector(const pugi::xml_document& doc);
-  bool initEmitters();
-  void loadEmitterTypes();
-  void printLoadedEmitterTypes(const pugi::xml_document& doc);
-  extern std::vector<EmitterType> emitter_types;
-}
-
-class Particle {
-
-  friend class ParticlePool;
-
- public:
-
-  void draw(const SDL2_Renderer& renderer) const;
-  inline Particle* getNext() const { return state_.next_; }
-  void init(const SDL_FPoint& pos, const SDL_FPoint& delta, int life_time);
-  inline bool inUse() const { return frames_left_ > 0; }
-  void setNext(Particle* next) { state_.next_ = next; }
-  bool update(float delta_time);
-
- private:
-
-  Particle() {}
-
-  int frames_left_{0};
-  union {
-    struct {
-      SDL_FPoint delta_{};
-      SDL_FPoint position_{};
-    } live_;
-    Particle* next_{nullptr};
-  } state_{};
-};
 
 class ParticlePool {
  public:
@@ -96,7 +24,7 @@ class ParticlePool {
   void operator=(const ParticlePool& other) = delete;
 
   void draw(const SDL2_Renderer& renderer) const;
-  void generate(const SDL_FPoint& pos, const SDL_FPoint& delta, int life_time);
+  void generate(const ParticleData& data);
   void update(float delta_time);
 
  private:
@@ -109,36 +37,38 @@ class ParticlePool {
 class Emitter {
  public:
   
-  Emitter(EmitterTypes type);
-  inline void draw(const SDL2_Renderer& renderer) const { particle_pool_.draw(renderer); }
-  inline void generate(const SDL_FPoint& pos, const SDL_FPoint& delta, int life_time) { particle_pool_.generate(pos, delta, life_time); }
+  Emitter(EmitterTypes type, const SDL_FPoint& pos);
+  inline void draw(SDL2_Renderer& renderer) const { particle_pool_.draw(renderer); }
+  void generate();
+  inline SDL_FPoint getPosition() const { return position_; }
+  inline void setPosition(const SDL_FPoint& pos) { position_ = pos; }
   inline void update(float delta_time) { particle_pool_.update(delta_time); }
+
+  inline static int generateRand(int min, int max);
+  inline static float generateRand(float min, float max);
+  inline static double generateRand(double min, double max);
 
  private:
 
   ParticlePool particle_pool_{10000};
+  SDL_FPoint position_{};
+
   // from the xml 
   EmitterTypes type_{};
   AngleRange angle_range_{};
-
-  ValueWithRnd rotation_speed_{};
-  ValueWithRnd start_speed_{};
-  ValueWithRnd end_speed_{};
-  ValueWithRnd start_size_{};
-  ValueWithRnd end_size_{};
-
+  RRVFloat rotation_speed_{};
+  RRVFloat start_speed_{};
+  RRVFloat end_speed_{};
+  RRVFloat start_size_{};
+  RRVFloat end_size_{};
   int emit_number_{};
-
-  ValueWithRnd emit_variance_{};
-  ValueWithRnd max_particle_life_{};
-
+  RRVInt emit_variance_{};
+  RRVInt max_particle_life_{};
   SDL_Rect texture_rect_{};
-
   SDL_Color start_color_{};
   SDL_Color end_color_{};
-
   SDL_BlendMode blend_mode_{};
-
+  // emitter max life
   int life_time_{};
 };
 

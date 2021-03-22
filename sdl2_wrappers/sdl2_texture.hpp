@@ -25,9 +25,9 @@ template <> struct deleter<SDL_Texture> {
 class SDL2_Texture {
  public:
   
-  int getHeight() const { return height_; }
-  int getWidth() const { return width_; }
-  SDL_Point getSize() const { return {width_, height_}; }
+  inline int getHeight() const { return height_; }
+  inline int getWidth() const { return width_; }
+  inline SDL_Point getSize() const { return {width_, height_}; }
 
   /**
   * Load an image file to an SDL_Surface and then calls createTextureFromSurface() 
@@ -75,11 +75,56 @@ class SDL2_Texture {
   bool render(const SDL_Point& where);
 
   /**
+  * Renders the whole texture to the renderer member.
+  * @param where The coordinates to render the texture at.
+  * @return True on success, or false on errors.
+  */
+  bool render(const SDL_FPoint& where);
+
+  /**
+   * Renders the whole texture to the renderer member.
+   * @param src_rect The source rectangle of the texture atlas.
+   * @param dest_rect The destination rectangle.
+   * @return True on success, or false on errors. 
+   */
+  bool render(const SDL_Rect& src_rect, const SDL_Rect& dest_rect);
+
+  /**
+   * Use this function to set an additional alpha value multiplied into render copy operations.
+   * @param alpha The source alpha value multiplied into copy operations.
+   * @return Returns 0 on success or a negative error code on failure. 
+   */
+  inline int setAlphaMod(Uint8 alpha) { return SDL_SetTextureAlphaMod(texture_.get(), alpha); }
+
+  /**
+   * Use this function to set the blend mode for a texture, used by SDL_RenderCopy().
+   * @param mode The SDL_BlendMode to use for texture blending.
+   * @return Returns 0 on success or a negative error code on failure. 
+   */
+  inline int setBlendMode(const SDL_BlendMode& mode) const { return SDL_SetTextureBlendMode(texture_.get(), mode); }
+
+  /**
+   * Use this function to set an additional color value multiplied into render copy operations.
+   * @param r The red color value multiplied into copy operations.
+   * @param g The green color value multiplied into copy operations.
+   * @param b The blue color value multiplied into copy operations.
+   * @return Returns 0 on success or a negative error code on failure. 
+   */
+  inline int setColorMod(Uint8 r, Uint8 g, Uint8 b) const { return SDL_SetTextureColorMod(texture_.get(), r, g, b); }
+
+  /**
+   * Use this function to set an additional color value multiplied into render copy operations.
+   * @param color The SDL_Color multiplied into copy operations.
+   * @return Returns 0 on success or a negative error code on failure. 
+   */
+  inline int setColorMod(const SDL_Color& color) const { return SDL_SetTextureColorMod(texture_.get(), color.r, color.g, color.b); }
+
+  /**
   * Sets a pointer to the renderer where the texture will be rendered in. 
   * Don't try to render the texture without having called this function.
   * @param ren The address of the renderer in which the texture shall be rendered in.
   */
-  void setRenderer(SDL2_Renderer& ren) { renderer_ = &ren; }
+  inline void setRenderer(SDL2_Renderer& ren) { renderer_ = &ren; }
 
  private:
 
@@ -94,9 +139,9 @@ class SDL2_Texture {
   using unique_ptr_deleter = std::unique_ptr<T, deleter<T>>;
 
   unique_ptr_deleter<SDL_Texture> texture_{nullptr};
-  SDL2_Renderer* renderer_ = nullptr;
-  int height_ = 0;
-  int width_ = 0;
+  SDL2_Renderer* renderer_{nullptr};
+  int height_{};
+  int width_{};
 };
 
 } // end namespace ktp
