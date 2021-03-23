@@ -70,6 +70,14 @@ bool ktp::SDL2_Texture::render(const SDL_Rect& src_rect, const SDL_Rect& dest_re
   return true;
 }
 
+bool ktp::SDL2_Texture::render(const SDL_Rect& src_rect, const SDL_Rect& dest_rect, float angle) {
+  if (SDL_RenderCopyEx(renderer_->getRenderer(), texture_.get(), &src_rect, &dest_rect, angle, NULL, SDL_FLIP_NONE) != 0) {
+    logSDL2Error("SDL_RenderCopyEx");
+    return false;
+  }
+  return true;
+}
+
 void ktp::SDL2_Texture::createTextureFromSurface(SDL_Surface& surface) {
   texture_.reset(SDL_CreateTextureFromSurface(renderer_->getRenderer(), &surface));
   if (texture_ == nullptr) {

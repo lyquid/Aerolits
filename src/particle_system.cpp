@@ -23,10 +23,10 @@ void ktp::ParticlePool::generate(const ParticleData& data) {
   new_particle->init(data);
 }
 
-void ktp::ParticlePool::draw(const SDL2_Renderer& renderer) const {
+void ktp::ParticlePool::draw() const {
   for (auto i = 0; i < kPoolSize_; ++i) {
     if (particles_[i].inUse()) {
-      particles_[i].draw(renderer);
+      particles_[i].draw();
     }
   }
 }
@@ -47,19 +47,23 @@ ktp::Emitter::Emitter(EmitterTypes type, const SDL_FPoint& pos): position_(pos) 
   for (const auto& emitter_type: EmitterParser::emitter_types) {
     if (emitter_type.type_ == type) {
       type_              = emitter_type.type_;
-      angle_range_       = emitter_type.angle_range_;
-      rotation_speed_    = emitter_type.rotation_speed_;
-      start_speed_       = emitter_type.start_speed_;
-      end_speed_         = emitter_type.end_speed_;
-      start_size_        = emitter_type.start_size_;
-      end_size_          = emitter_type.end_size_;
-      emit_number_       = emitter_type.emit_number_;
-      emit_variance_     = emitter_type.emit_variance_;
       max_particle_life_ = emitter_type.max_particle_life_;
       texture_rect_      = emitter_type.texture_rect_;
+      blend_mode_        = emitter_type.blend_mode_;
+      start_size_        = emitter_type.start_size_;
+      end_size_          = emitter_type.end_size_;
       start_color_       = emitter_type.start_color_;
       end_color_         = emitter_type.end_color_;
-      blend_mode_        = emitter_type.blend_mode_;
+      rotation_          = emitter_type.rotation_;
+      start_rotation_speed_ = emitter_type.start_rotation_speed_;
+      end_rotation_speed_ = emitter_type.end_rotation_speed_;
+
+
+      angle_range_       = emitter_type.angle_range_;
+      start_speed_       = emitter_type.start_speed_;
+      end_speed_         = emitter_type.end_speed_;
+      emit_number_       = emitter_type.emit_number_;
+      emit_variance_     = emitter_type.emit_variance_;
       life_time_         = emitter_type.life_time_; // emitter life time
       emitter_found = true;
     }
@@ -71,20 +75,29 @@ ktp::Emitter::Emitter(EmitterTypes type, const SDL_FPoint& pos): position_(pos) 
 
 void ktp::Emitter::generate() {
   ParticleData data;
-  data.position_ = position_;
-  data.texture_rect_ = texture_rect_;
   data.start_life_ = max_particle_life_.value_ * generateRand(max_particle_life_.rand_min_, max_particle_life_.rand_max_);
-
+  
+  data.texture_rect_ = texture_rect_;
+  
   data.blend_mode_ = blend_mode_;
-
-  data.start_color_ = start_color_;
-  data.end_color_ = end_color_;
 
   data.start_size_ = start_size_.value_ * generateRand(start_size_.rand_min_, start_size_.rand_max_);
   data.end_size_ = end_size_.value_ * generateRand(end_size_.rand_min_, end_size_.rand_max_);
 
-  //data.start_rotation_speed_ = rotation_speed_.value_;
+  data.start_color_ = start_color_;
+  data.end_color_ = end_color_;
 
+  data.rotation_ = rotation_.value_ * generateRand(rotation_.rand_min_, rotation_.rand_max_);
+
+  data.start_rotation_speed_ = start_rotation_speed_.value_ * generateRand(start_rotation_speed_.rand_min_, start_rotation_speed_.rand_max_);
+  data.end_rotation_speed_ = end_rotation_speed_.value_ * generateRand(end_rotation_speed_.rand_min_, end_rotation_speed_.rand_max_);
+
+
+
+
+
+  
+  data.position_ = position_;
   particle_pool_.generate(data);
 }
 

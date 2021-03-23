@@ -18,8 +18,24 @@ namespace ParticlesAtlas {
 
 struct ParticleData {
   unsigned int start_life_{};
-  // current particle position
-  SDL_FPoint position_{};
+  // rectangle of the texture in the atlas
+  SDL_Rect texture_rect_{};
+  SDL_BlendMode blend_mode_{};
+
+  float start_size_{};
+  float current_size_{};
+  float end_size_{};
+
+  SDL_Color start_color_{};
+  SDL_Color current_color_{};
+  SDL_Color end_color_{};
+
+  float rotation_{};
+
+  float start_rotation_speed_{};
+  float current_rotation_speed_{};
+  float end_rotation_speed_{};
+
   // rectangle drawed at destination
   //SDL_Rect dest_rect_{};
 
@@ -27,25 +43,13 @@ struct ParticleData {
   //SDL_FPoint current_speed_{};
   //SDL_FPoint end_speed_{};
   
-  float start_size_{};
-  float current_size_{};
-  float end_size_{};
-
   //float age_ratio_{};
   //float angle_{};
   
-  float start_rotation_speed_{};
-  //double current_rotation_speed_{};
+  
 
-  // rectangle of the texture in the atlas
-  SDL_Rect texture_rect_{};
-  
-  SDL_Color start_color_{};
-  SDL_Color current_color_{};
-  SDL_Color end_color_{};
-  
-  SDL_BlendMode blend_mode_{};
-  
+  // current particle position
+  SDL_FPoint position_{};
   // timestep for interpolation
   float time_step_{0};
 };
@@ -56,7 +60,7 @@ class Particle {
 
  public:
 
-  void draw(const SDL2_Renderer& renderer) const;
+  void draw() const;
   inline Particle* getNext() const { return state_.next_; }
   void init(const ParticleData& data);
   inline bool inUse() const { return life_ > 0; }

@@ -16,6 +16,7 @@ struct AngleRange { float max_{0}, min_{0}; };
 template <typename T>
 struct RandomRangeValue { T value_{0}; float rand_min_{0}, rand_max_{1}; };
 using RRVInt = RandomRangeValue<int>;
+using RRVUint = RandomRangeValue<unsigned int>;
 using RRVFloat = RandomRangeValue<float>;
 
 enum class EmitterTypes {
@@ -27,25 +28,32 @@ enum class EmitterTypes {
 
 struct EmitterType {
   EmitterTypes type_{};
+  RRVUint max_particle_life_{};
+  SDL_Rect texture_rect_{};
+  SDL_BlendMode blend_mode_{};
+
+  RRVFloat start_size_{};
+  RRVFloat end_size_{};
+
+  SDL_Color start_color_{};
+  SDL_Color end_color_{};
+
+  RRVFloat rotation_{};
+
+  RRVFloat start_rotation_speed_{};
+  RRVFloat end_rotation_speed_{};
+
+
   AngleRange angle_range_{};
 
   RRVFloat rotation_speed_{};
   RRVFloat start_speed_{};
   RRVFloat end_speed_{};
-  RRVFloat start_size_{};
-  RRVFloat end_size_{};
+  
 
   int emit_number_{};
 
   RRVInt emit_variance_{};
-  RRVInt max_particle_life_{};
-
-  SDL_Rect texture_rect_{};
-
-  SDL_Color start_color_{};
-  SDL_Color end_color_{};
-
-  SDL_BlendMode blend_mode_{};
   
   int life_time_{};
 };

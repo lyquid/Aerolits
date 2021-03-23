@@ -82,12 +82,22 @@ class SDL2_Texture {
   bool render(const SDL_FPoint& where);
 
   /**
-   * Renders the whole texture to the renderer member.
+   * Use this function to copy a portion of the texture to the current rendering target.
    * @param src_rect The source rectangle of the texture atlas.
    * @param dest_rect The destination rectangle.
    * @return True on success, or false on errors. 
    */
   bool render(const SDL_Rect& src_rect, const SDL_Rect& dest_rect);
+
+  /**
+   * Use this function to copy a portion of the texture to the current rendering target, 
+   * optionally rotating it by angle.
+   * @param src_rect The source rectangle of the texture atlas.
+   * @param dest_rect The destination rectangle.
+   * @param angle The angle in degrees. Clockwise.
+   * @return True on success, or false on errors. 
+   */
+  bool render(const SDL_Rect& src_rect, const SDL_Rect& dest_rect, float angle);
 
   /**
    * Use this function to set an additional alpha value multiplied into render copy operations.

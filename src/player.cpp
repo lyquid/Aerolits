@@ -22,7 +22,7 @@ void ktp::Player::draw(SDL2_Renderer& renderer) const {
     renderer.drawLines(render_flame_shape_);
   }
   /* particles */
-  exhaust_emitter_.draw(renderer);
+  exhaust_emitter_.draw();
   /* lasers */
   renderer.setDrawColor(ktp::Colors::orange);
   for (const auto& laser: lasers_) {

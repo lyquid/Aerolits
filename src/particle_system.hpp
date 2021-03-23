@@ -23,7 +23,7 @@ class ParticlePool {
 
   void operator=(const ParticlePool& other) = delete;
 
-  void draw(const SDL2_Renderer& renderer) const;
+  void draw() const;
   void generate(const ParticleData& data);
   void update(float delta_time);
 
@@ -38,7 +38,7 @@ class Emitter {
  public:
   
   Emitter(EmitterTypes type, const SDL_FPoint& pos);
-  inline void draw(SDL2_Renderer& renderer) const { particle_pool_.draw(renderer); }
+  inline void draw() const { particle_pool_.draw(); }
   void generate();
   inline SDL_FPoint getPosition() const { return position_; }
   inline void setPosition(const SDL_FPoint& pos) { position_ = pos; }
@@ -55,19 +55,24 @@ class Emitter {
 
   // from the xml 
   EmitterTypes type_{};
-  AngleRange angle_range_{};
-  RRVFloat rotation_speed_{};
-  RRVFloat start_speed_{};
-  RRVFloat end_speed_{};
+  RRVUint max_particle_life_{};
+  SDL_Rect texture_rect_{};
+  SDL_BlendMode blend_mode_{};
   RRVFloat start_size_{};
   RRVFloat end_size_{};
-  int emit_number_{};
-  RRVInt emit_variance_{};
-  RRVInt max_particle_life_{};
-  SDL_Rect texture_rect_{};
   SDL_Color start_color_{};
   SDL_Color end_color_{};
-  SDL_BlendMode blend_mode_{};
+  RRVFloat rotation_{};
+  RRVFloat start_rotation_speed_{};
+  RRVFloat end_rotation_speed_{};
+
+
+
+  AngleRange angle_range_{};
+  RRVFloat start_speed_{};
+  RRVFloat end_speed_{};
+  int emit_number_{};
+  RRVInt emit_variance_{};
   // emitter max life
   int life_time_{};
 };

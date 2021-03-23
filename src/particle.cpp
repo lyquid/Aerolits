@@ -9,14 +9,16 @@ void ktp::ParticlesAtlas::loadTexture(SDL2_Renderer& ren) {
   particles_atlas.loadFromFile(path);
 }
 
-void ktp::Particle::draw(const SDL2_Renderer& renderer) const {
+void ktp::Particle::draw() const {
   ParticlesAtlas::particles_atlas.setBlendMode(state_.live_.blend_mode_);
   ParticlesAtlas::particles_atlas.setColorMod(state_.live_.current_color_);
   ParticlesAtlas::particles_atlas.setAlphaMod(state_.live_.current_color_.a);
-  ParticlesAtlas::particles_atlas.render(state_.live_.texture_rect_, {static_cast<int>(state_.live_.position_.x), 
-                                                                      static_cast<int>(state_.live_.position_.y), 
-                                                                      static_cast<int>(state_.live_.current_size_), 
-                                                                      static_cast<int>(state_.live_.current_size_)});
+  ParticlesAtlas::particles_atlas.render(state_.live_.texture_rect_, 
+                                        {static_cast<int>(state_.live_.position_.x), 
+                                         static_cast<int>(state_.live_.position_.y), 
+                                         static_cast<int>(state_.live_.current_size_), 
+                                         static_cast<int>(state_.live_.current_size_)},
+                                        state_.live_.rotation_);
 }
 
 void ktp::Particle::init(const ParticleData& data) {
@@ -27,17 +29,27 @@ void ktp::Particle::init(const ParticleData& data) {
 
   state_.live_.blend_mode_ = data.blend_mode_;
 
+  state_.live_.start_size_ = data.start_size_;
+  state_.live_.current_size_ = data.start_size_;
+  state_.live_.end_size_ = data.end_size_;
+
   state_.live_.start_color_ = data.start_color_;
   state_.live_.current_color_ = data.start_color_;
   state_.live_.end_color_ = data.end_color_;
 
-  state_.live_.start_size_ = data.start_size_;
-  state_.live_.current_size_ = data.start_size_;
-  state_.live_.end_size_ = data.end_size_;
-  
+  state_.live_.rotation_ = data.rotation_;
+
+  state_.live_.start_rotation_speed_ = data.start_rotation_speed_;
+  state_.live_.current_rotation_speed_ = data.start_rotation_speed_;
+  state_.live_.end_rotation_speed_ = data.end_rotation_speed_;
+
+
+
+
+
   // position is set to center the texture on the emitter
-  state_.live_.position_ = {data.position_.x - data.start_size_ / 2, 
-                            data.position_.y - data.start_size_ / 2};
+  state_.live_.position_ = {data.position_.x - data.start_size_ * 0.5f, 
+                            data.position_.y - data.start_size_ * 0.5f};
   state_.live_.time_step_ = 0.f;
 }
 
@@ -63,6 +75,12 @@ bool ktp::Particle::update(float delta_time) {
   state_.live_.position_.y += ((last_size - state_.live_.current_size_) * 0.5f);
   // color interpolation
   state_.live_.current_color_ = interpolateColors(state_.live_.start_color_, state_.live_.time_step_, state_.live_.end_color_);
+  // rotation speed interpolation
+  state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.time_step_, state_.live_.end_rotation_speed_);
+  state_.live_.rotation_ += state_.live_.current_rotation_speed_;
+
+
+
 
   --life_;
   return life_ == 0; 
