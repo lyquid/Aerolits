@@ -4,9 +4,7 @@
 #include "emitter_parser.hpp"
 #include "particle.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
-#include <random>
-#include <string>
-#include <vector>
+#include <utility>
 
 namespace ktp {
 
@@ -14,67 +12,36 @@ namespace ktp {
 /* https://nintervik.github.io/2D-Particle-System/ */
 /* https://gamedevelopment.tutsplus.com/tutorials/adding-turbulence-to-a-particle-system--gamedev-13332 */
 
-class ParticlePool {
- public:
- 
-  ParticlePool(int pool_size);
-  ParticlePool(const ParticlePool& other) = delete;
-  ~ParticlePool() { delete[] particles_; }
-
-  void operator=(const ParticlePool& other) = delete;
-
-  void draw() const;
-  void generate(const ParticleData& data);
-  void update(float delta_time);
-
- private:
-
-  const int kPoolSize_;
-  Particle* first_available_{nullptr};
-  Particle* particles_{nullptr};
-};
+inline int generateRand(int min, int max);
+inline float generateRand(float min, float max);
+inline double generateRand(double min, double max);
 
 class Emitter {
  public:
   
-  Emitter(EmitterTypes type, const SDL_FPoint& pos);
-  inline void draw() const { particle_pool_.draw(); }
-  void generate();
+  Emitter(EmitterTypes type, const SDL_FPoint& pos) noexcept;
+  Emitter(const Emitter& other) noexcept { *this = other; }
+  Emitter(Emitter&& other) noexcept { *this = std::move(other); }
+  ~Emitter() noexcept { delete[] particles_pool_; }
+
+  Emitter& operator=(const Emitter& other) noexcept;
+  Emitter& operator=(Emitter&& other) noexcept;
+
+  void draw() const;
+  void generateParticles();
   inline SDL_FPoint getPosition() const { return position_; }
   inline void setPosition(const SDL_FPoint& pos) { position_ = pos; }
-  inline void update(float delta_time) { particle_pool_.update(delta_time); }
-
-  inline static int generateRand(int min, int max);
-  inline static float generateRand(float min, float max);
-  inline static double generateRand(double min, double max);
+  void update(float delta_time);
 
  private:
 
-  ParticlePool particle_pool_{10000};
+  void inflatePool();
+
+  EmitterType data_{};
+  Particle* first_available_{nullptr};
+  Particle* particles_pool_{nullptr};
+  unsigned int particles_pool_size_{1000};
   SDL_FPoint position_{};
-
-  // from the xml 
-  EmitterTypes type_{};
-  RRVUint max_particle_life_{};
-  SDL_Rect texture_rect_{};
-  SDL_BlendMode blend_mode_{};
-  RRVFloat start_size_{};
-  RRVFloat end_size_{};
-  SDL_Color start_color_{};
-  SDL_Color end_color_{};
-  RRVFloat rotation_{};
-  RRVFloat start_rotation_speed_{};
-  RRVFloat end_rotation_speed_{};
-
-
-
-  AngleRange angle_range_{};
-  RRVFloat start_speed_{};
-  RRVFloat end_speed_{};
-  int emit_number_{};
-  RRVInt emit_variance_{};
-  // emitter max life
-  int life_time_{};
 };
 
 } // end namespace ktp

@@ -8,6 +8,7 @@ void ktp::loadConfigFiles() {
 
 ktp::Game::Game() {
   event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);
+  //emitters_.reserve(200);
 }
 
 void ktp::Game::checkKeyStates(float delta_time) {
@@ -40,6 +41,9 @@ void ktp::Game::draw() {
 
   background_.draw(renderer_);
   player_.draw(renderer_);
+  for (const auto& emitter: emitters_) {
+    emitter.draw();
+  }
   
   renderer_.present();
   ++fps_;
@@ -56,6 +60,15 @@ void ktp::Game::handleSDL2Events() {
         input_sys_.postEvent(kuge::EventTypes::KeyPressed, SDL_GetKeyName(sdl_event_.key.keysym.sym));
         handleSDL2KeyEvents(sdl_event_.key.keysym.sym);
         break;
+      case SDL_MOUSEBUTTONDOWN: {
+        int x{0}, y{0};
+        if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+          Emitter emi{EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}};
+          // emitters_.push_back(std::move({EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}}));
+          emitters_.push_back(std::move(emi));
+        }
+        break;
+      }
       default:
         break;
     }
@@ -113,6 +126,11 @@ void ktp::Game::update(float delta_time) {
   /* Player */
   checkKeyStates(delta_time);
   player_.update(delta_time);
+  /* Emitters */
+  for (auto& emitter: emitters_) {
+    emitter.generateParticles();
+    emitter.update(delta_time);
+  }
   /* Event bus */
   event_bus_.processEvents();
 }

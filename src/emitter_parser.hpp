@@ -43,12 +43,20 @@ struct EmitterType {
   RRVFloat start_rotation_speed_{};
   RRVFloat end_rotation_speed_{};
 
+  RRVFloat start_speed_{};
+  RRVFloat end_speed_{};
+
+
+
+
+
+
+
 
   AngleRange angle_range_{};
 
-  RRVFloat rotation_speed_{};
-  RRVFloat start_speed_{};
-  RRVFloat end_speed_{};
+  
+  
   
 
   int emit_number_{};

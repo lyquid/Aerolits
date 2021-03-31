@@ -1,11 +1,8 @@
 #ifndef AEROLITS_SRC_PARTICLE_H_
 #define AEROLITS_SRC_PARTICLE_H_
 
-#include "palette.hpp"
-#include "../include/resources_path.hpp"
+// #include "palette.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
-
-#include <string>
 
 namespace ktp {
 
@@ -36,18 +33,21 @@ struct ParticleData {
   float current_rotation_speed_{};
   float end_rotation_speed_{};
 
+  SDL_FPoint start_speed_{};
+  SDL_FPoint current_speed_{};
+  SDL_FPoint end_speed_{};
+  /* float start_speed_{};
+  float current_speed_{};
+  float end_speed_{}; */
+
+
+
+
   // rectangle drawed at destination
   //SDL_Rect dest_rect_{};
-
-  //SDL_FPoint start_speed_{};
-  //SDL_FPoint current_speed_{};
-  //SDL_FPoint end_speed_{};
-  
   //float age_ratio_{};
   //float angle_{};
   
-  
-
   // current particle position
   SDL_FPoint position_{};
   // timestep for interpolation
@@ -56,7 +56,7 @@ struct ParticleData {
 
 class Particle {
 
-  friend class ParticlePool;
+  friend class Emitter;
 
  public:
 

@@ -85,6 +85,17 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     emi.end_rotation_speed_.value_    = emitter.child("endRotationSpeed").attribute("value").as_float();
     emi.end_rotation_speed_.rand_min_ = emitter.child("endRotationSpeed").attribute("randMin").as_float();
     emi.end_rotation_speed_.rand_max_ = emitter.child("endRotationSpeed").attribute("randMax").as_float();
+    /* START SPEED */
+    emi.start_speed_.value_    = emitter.child("startSpeed").attribute("value").as_float();
+    emi.start_speed_.rand_min_ = emitter.child("startSpeed").attribute("randMin").as_float();
+    emi.start_speed_.rand_max_ = emitter.child("startSpeed").attribute("randMax").as_float();
+    /* END SPEED */
+    emi.end_speed_.value_    = emitter.child("endSpeed").attribute("value").as_float();
+    emi.end_speed_.rand_min_ = emitter.child("endSpeed").attribute("randMin").as_float();
+    emi.end_speed_.rand_max_ = emitter.child("endSpeed").attribute("randMax").as_float();
+
+
+
 
 
 
@@ -95,18 +106,6 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     emi.angle_range_.min_ = emitter.child("angleRange").attribute("min").as_float();
     emi.angle_range_.max_ = emitter.child("angleRange").attribute("max").as_float();
 
-    emi.rotation_speed_.value_    = emitter.child("rotSpeed").attribute("value").as_float();
-    emi.rotation_speed_.rand_min_ = emitter.child("rotSpeed").attribute("randMin").as_float();
-    emi.rotation_speed_.rand_max_ = emitter.child("rotSpeed").attribute("randMax").as_float();
-
-    emi.start_speed_.value_    = emitter.child("startSpeed").attribute("value").as_float();
-    emi.start_speed_.rand_min_ = emitter.child("startSpeed").attribute("randMin").as_float();
-    emi.start_speed_.rand_max_ = emitter.child("startSpeed").attribute("randMax").as_float();
-
-    emi.end_speed_.value_    = emitter.child("endSpeed").attribute("value").as_float();
-    emi.end_speed_.rand_min_ = emitter.child("endSpeed").attribute("randMin").as_float();
-    emi.end_speed_.rand_max_ = emitter.child("endSpeed").attribute("randMax").as_float();
-
     emi.emit_number_ = emitter.child("emitNumber").attribute("value").as_int();
 
     emi.emit_variance_.value_    = emitter.child("emitVariance").attribute("value").as_float();
@@ -114,6 +113,10 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     emi.emit_variance_.rand_max_ = emitter.child("emitVariance").attribute("randMax").as_float();
 
     emi.life_time_ = emitter.child("lifeTime").attribute("value").as_int();
+
+
+
+
 
     emitter_types.push_back(emi);
   }

@@ -53,6 +53,8 @@ class Game {
   ktp::Player player_{screen_size_, event_bus_};
   /* Background */
   ktp::Background background_{screen_size_};
+  /* Emitters */
+  std::vector<Emitter> emitters_{};
 };
 
 } // end namespace ktp

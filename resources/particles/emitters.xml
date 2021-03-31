@@ -1,6 +1,6 @@
 <emitterTypes>
   <emitter type="exhaust">
-    <maxParticleLife value="200" randMin="0.4" randMax="1"/>
+    <maxParticleLife value="800" randMin="0.4" randMax="1"/>
 
     <textureRect x="64" y="0" w="64" h="64"/>
 
@@ -14,9 +14,11 @@
 
     <rotation value="360" randMin="0" randMax="1"/>
 
-    <startRotationSpeed value="0.5"  randMin="-1" randMax="1"/>
+    <startRotationSpeed value="1"  randMin="-1" randMax="1"/>
     <endRotationSpeed value="0.01"   randMin="-1" randMax="1"/>
 
+    <startSpeed value="1" randMin="0"  randMax="1"/>
+    <endSpeed   value="0" randMin="0"  randMax="1"/>
 
 
 
@@ -27,8 +29,45 @@
     <angleRange min="0" max="0"/>
 
     
-    <startSpeed value="0" randMin="0"  randMax="1"/>
+    
+
+    <emitNumber value="1"/>
+    <emitVariance value="0" randMin="0" randMax="1"/>
+
+    <lifeTime value="-1"/>
+  </emitter>
+
+  <emitter type="fire">
+    <maxParticleLife value="800" randMin="0.4" randMax="1"/>
+
+    <textureRect x="0" y="0" w="64" h="64"/>
+
+    <blendMode mode="add"/>
+
+    <startSize value="10" randMin="0.1" randMax="1"/>
+    <endSize   value="90"  randMin="0.6" randMax="1"/>
+
+    <startColor r="255" g="240" b="0"   a="255"/>
+    <endColor   r="255" g="0" b="0" a="0"/>
+
+    <rotation value="360" randMin="0" randMax="1"/>
+
+    <startRotationSpeed value="1"  randMin="-1" randMax="1"/>
+    <endRotationSpeed value="0.01"   randMin="-1" randMax="1"/>
+
+    <startSpeed value="1" randMin="0"  randMax="1"/>
     <endSpeed   value="0" randMin="0"  randMax="1"/>
+
+
+
+
+
+
+
+    <angleRange min="0" max="0"/>
+
+    
+    
 
     <emitNumber value="1"/>
     <emitVariance value="0" randMin="0" randMax="1"/>
@@ -36,3 +75,4 @@
     <lifeTime value="-1"/>
   </emitter>
 </emitterTypes>
+

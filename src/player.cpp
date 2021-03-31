@@ -112,7 +112,7 @@ void ktp::Player::shoot() {
     
     lasers_.push_back(laser);
     shooting_timer_ = SDL_GetTicks();
-    exhaust_emitter_.generate();
+    //exhaust_emitter_.generateParticles();
     event_bus_.postEvent(kuge::EventTypes::LaserFired);
   }
 }
@@ -142,7 +142,7 @@ void ktp::Player::thrust(float delta_time) {
     flame_shape_.back().y += flame_growth_factor_;
   }
 
-  exhaust_emitter_.generate();
+  exhaust_emitter_.generateParticles();
   event_bus_.postEvent(kuge::EventTypes::PlayerThrust);
 }
 

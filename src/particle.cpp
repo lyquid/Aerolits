@@ -1,4 +1,6 @@
 #include "particle.hpp"
+#include "../include/resources_path.hpp"
+#include <string>
 
 ktp::SDL2_Texture ktp::ParticlesAtlas::particles_atlas{};
 
@@ -43,6 +45,10 @@ void ktp::Particle::init(const ParticleData& data) {
   state_.live_.current_rotation_speed_ = data.start_rotation_speed_;
   state_.live_.end_rotation_speed_ = data.end_rotation_speed_;
 
+  state_.live_.start_speed_ = data.start_speed_;
+  state_.live_.current_speed_ = data.start_speed_;
+  state_.live_.end_speed_ = data.end_speed_;
+
 
 
 
@@ -78,8 +84,11 @@ bool ktp::Particle::update(float delta_time) {
   // rotation speed interpolation
   state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.time_step_, state_.live_.end_rotation_speed_);
   state_.live_.rotation_ += state_.live_.current_rotation_speed_;
-
-
+  // speed interpolation
+  state_.live_.current_speed_.x = interpolateRange(state_.live_.start_speed_.x, state_.live_.time_step_, state_.live_.end_speed_.x);
+  state_.live_.current_speed_.y = interpolateRange(state_.live_.start_speed_.y, state_.live_.time_step_, state_.live_.end_speed_.y);
+  state_.live_.position_.x += state_.live_.current_speed_.x;
+  state_.live_.position_.y += state_.live_.current_speed_.y;
 
 
   --life_;
