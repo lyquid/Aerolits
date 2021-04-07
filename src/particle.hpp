@@ -17,7 +17,6 @@ struct ParticleData {
   unsigned int start_life_{};
   // rectangle of the texture in the atlas
   SDL_Rect texture_rect_{};
-  SDL_BlendMode blend_mode_{};
 
   float start_size_{};
   float current_size_{};
@@ -36,17 +35,6 @@ struct ParticleData {
   SDL_FPoint start_speed_{};
   SDL_FPoint current_speed_{};
   SDL_FPoint end_speed_{};
-  /* float start_speed_{};
-  float current_speed_{};
-  float end_speed_{}; */
-
-
-
-
-  // rectangle drawed at destination
-  //SDL_Rect dest_rect_{};
-  //float age_ratio_{};
-  //float angle_{};
   
   // current particle position
   SDL_FPoint position_{};

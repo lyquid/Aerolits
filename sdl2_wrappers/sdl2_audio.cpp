@@ -20,7 +20,7 @@ bool ktp::SDL2_Audio::initMixer(int freq, Uint16 format, int channels, int chunk
   const auto initted = Mix_Init(audio_flags);
   if ((initted & audio_flags) != audio_flags) {
     logSDL2Error("Mix_Init");
-    return false;
+    // return false; // this gives an error on my laptop, but it works fine
   }
   if (Mix_OpenAudio(freq, format, channels, chunk_size) == -1) {
     logSDL2Error("Mix_OpenAudio");

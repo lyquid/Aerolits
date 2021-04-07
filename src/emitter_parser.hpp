@@ -5,10 +5,6 @@
 #include "../include/resources_path.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
 
-#include <sstream>
-#include <string>
-#include <vector>
-
 namespace ktp {
 
 struct AngleRange { float max_{0}, min_{0}; };
@@ -22,6 +18,7 @@ using RRVFloat = RandomRangeValue<float>;
 enum class EmitterTypes {
   Exhaust,
   Fire,
+  Love,
   Smoke,
   count
 };
@@ -46,22 +43,11 @@ struct EmitterType {
   RRVFloat start_speed_{};
   RRVFloat end_speed_{};
 
-
-
-
-
-
-
-
   AngleRange angle_range_{};
 
-  
-  
-  
+  RRVUint emission_rate_{};
 
-  int emit_number_{};
-
-  RRVInt emit_variance_{};
+  RRVUint emission_interval_{};
   
   int life_time_{};
 };

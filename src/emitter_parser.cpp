@@ -1,4 +1,7 @@
 #include "emitter_parser.hpp"
+#include <sstream>
+#include <string>
+#include <vector>
 
 std::vector<ktp::EmitterType> ktp::EmitterParser::emitter_types{};
 
@@ -14,6 +17,8 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
       emi.type_ = EmitterTypes::Exhaust;
     } else if (type == std::string{"fire"}) {
       emi.type_ = EmitterTypes::Fire;
+    } else if (type == std::string{"love"}) {
+      emi.type_ = EmitterTypes::Love;
     } else if (type == std::string{"smoke"}) {
       emi.type_ = EmitterTypes::Smoke;
     } else {
@@ -93,30 +98,34 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     emi.end_speed_.value_    = emitter.child("endSpeed").attribute("value").as_float();
     emi.end_speed_.rand_min_ = emitter.child("endSpeed").attribute("randMin").as_float();
     emi.end_speed_.rand_max_ = emitter.child("endSpeed").attribute("randMax").as_float();
-
-
-
-
-
-
-
-
-
-
-    emi.angle_range_.min_ = emitter.child("angleRange").attribute("min").as_float();
-    emi.angle_range_.max_ = emitter.child("angleRange").attribute("max").as_float();
-
-    emi.emit_number_ = emitter.child("emitNumber").attribute("value").as_int();
-
-    emi.emit_variance_.value_    = emitter.child("emitVariance").attribute("value").as_float();
-    emi.emit_variance_.rand_min_ = emitter.child("emitVariance").attribute("randMin").as_float();
-    emi.emit_variance_.rand_max_ = emitter.child("emitVariance").attribute("randMax").as_float();
-
+    /* ANGLE RANGE - the "magic number" is to compensate the inverted y coordinate and put 0º at the top: 45º + 90º */
+    #ifndef M_PI
+      constexpr auto kPI{3.14159265358979323846264338327950288};
+      emi.angle_range_.min_ = (emitter.child("angleRange").attribute("min").as_float() - 135.f) * kPI / 180.f;
+      emi.angle_range_.max_ = (emitter.child("angleRange").attribute("max").as_float() - 135.f) * kPI / 180.f;
+    #else
+      emi.angle_range_.min_ = (emitter.child("angleRange").attribute("min").as_float() - 135.f) * M_PI / 180.f;
+      emi.angle_range_.max_ = (emitter.child("angleRange").attribute("max").as_float() - 135.f) * M_PI / 180.f;
+    #endif
+    /* EMISSION RATE */
+    if (emitter.child("emissionRate").attribute("value").as_uint() <= 0u) {
+      logMessage("WARNING! Emitter \"" + type + "\" has 0 or less emission rate.");
+    }
+    emi.emission_rate_.value_    = emitter.child("emissionRate").attribute("value").as_uint();
+    emi.emission_rate_.rand_min_ = emitter.child("emissionRate").attribute("randMin").as_float();
+    emi.emission_rate_.rand_max_ = emitter.child("emissionRate").attribute("randMax").as_float();
+    /* EMISSION INTERVAL */
+    if (emitter.child("emissionInterval").attribute("value").as_uint() < 0) {
+      logMessage("WARNING! Emitter \"" + type + "\" has less than 0 emission interval.");
+    }
+    emi.emission_interval_.value_     = emitter.child("emissionInterval").attribute("value").as_uint();
+    emi.emission_interval_.rand_min_  = emitter.child("emissionInterval").attribute("randMin").as_float();
+    emi.emission_interval_.rand_max_  = emitter.child("emissionInterval").attribute("randMax").as_float();
+    /* EMITTER'S LIFE TIME */
+    if (emitter.child("lifeTime").attribute("value").as_int() == 0) {
+      logMessage("WARNING! Emitter \"" + type + "\" has 0 life time.");
+    }
     emi.life_time_ = emitter.child("lifeTime").attribute("value").as_int();
-
-
-
-
 
     emitter_types.push_back(emi);
   }

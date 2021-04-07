@@ -9,6 +9,7 @@
 #include "../kuge/kuge.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
 
+#include <list>
 #include <string>
 
 namespace ktp {
@@ -54,7 +55,7 @@ class Game {
   /* Background */
   ktp::Background background_{screen_size_};
   /* Emitters */
-  std::vector<Emitter> emitters_{};
+  std::list<Emitter> emitters_{};
 };
 
 } // end namespace ktp

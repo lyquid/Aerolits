@@ -63,7 +63,7 @@ void ktp::Game::handleSDL2Events() {
       case SDL_MOUSEBUTTONDOWN: {
         int x{0}, y{0};
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          Emitter emi{EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}};
+          Emitter emi{EmitterTypes::Love, {static_cast<float>(x), static_cast<float>(y)}};
           // emitters_.push_back(std::move({EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}}));
           emitters_.push_back(std::move(emi));
         }
@@ -127,9 +127,15 @@ void ktp::Game::update(float delta_time) {
   checkKeyStates(delta_time);
   player_.update(delta_time);
   /* Emitters */
-  for (auto& emitter: emitters_) {
-    emitter.generateParticles();
-    emitter.update(delta_time);
+  auto iter = emitters_.begin();
+  while (iter != emitters_.end()) {
+    if (iter->canBeDeleted()) {
+      iter = emitters_.erase(iter);
+    } else {
+      iter->generateParticles();
+      iter->update(delta_time);
+      ++iter;
+    }
   }
   /* Event bus */
   event_bus_.processEvents();

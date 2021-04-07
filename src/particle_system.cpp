@@ -1,6 +1,7 @@
 #include "particle_system.hpp"
 //#include <algorithm> // std::copy
-#include <random>
+#include <cmath> // std::round
+#include <random> // std::rand
 
 int ktp::generateRand(int min, int max) {
   const auto random{rand() / RAND_MAX};
@@ -24,6 +25,8 @@ ktp::Emitter::Emitter(EmitterTypes type, const SDL_FPoint& pos) noexcept : posit
   for (const auto& emitter_type: EmitterParser::emitter_types) {
     if (emitter_type.type_ == type) {
       data_ = emitter_type;
+      particles_pool_size_ = (emitter_type.max_particle_life_.value_ + 1u) * emitter_type.emission_rate_.value_;
+      interval_time_ = emitter_type.emission_interval_.value_;
       emitter_found = true;
       break;
     }
@@ -35,11 +38,15 @@ ktp::Emitter::Emitter(EmitterTypes type, const SDL_FPoint& pos) noexcept : posit
 }
 
 ktp::Emitter& ktp::Emitter::operator=(const Emitter& other) noexcept {
+  alive_particles_count_ = other.alive_particles_count_;
   data_ = other.data_;
   first_available_ = nullptr;
   particles_pool_size_ = other.particles_pool_size_;
   position_ = other.position_;
+  start_time_ = other.start_time_;
+  interval_time_ = other.interval_time_;
 
+  delete[] particles_pool_;
   particles_pool_ = new Particle[particles_pool_size_];
   // std::copy(other.particles_pool_, other.particles_pool_ + particles_pool_size_, particles_pool_); // need to benchmark this
   for (auto i = 0u; i < particles_pool_size_; ++i) {
@@ -68,11 +75,14 @@ ktp::Emitter& ktp::Emitter::operator=(Emitter&& other) noexcept {
   if (this != &other) {
     delete[] particles_pool_;
 
+    alive_particles_count_ = other.alive_particles_count_;
     data_ = other.data_;
     first_available_ = other.first_available_;
     particles_pool_ = other.particles_pool_;
     particles_pool_size_ = other.particles_pool_size_;
     position_ = other.position_;
+    start_time_ = other.start_time_;
+    interval_time_ = other.interval_time_;
 
     other.particles_pool_ = nullptr;
   }
@@ -80,6 +90,7 @@ ktp::Emitter& ktp::Emitter::operator=(Emitter&& other) noexcept {
 }
 
 void ktp::Emitter::draw() const {
+  ParticlesAtlas::particles_atlas.setBlendMode(data_.blend_mode_);
   for (auto i = 0u; i < particles_pool_size_; ++i) {
     if (particles_pool_[i].inUse()) {
       particles_pool_[i].draw();
@@ -90,41 +101,49 @@ void ktp::Emitter::draw() const {
 void ktp::Emitter::generateParticles() {
   if (first_available_ == nullptr) return;
 
-  ParticleData data;
-  data.start_life_ = data_.max_particle_life_.value_ * generateRand(data_.max_particle_life_.rand_min_, data_.max_particle_life_.rand_max_);
-  
-  data.texture_rect_ = data_.texture_rect_;
-  
-  data.blend_mode_ = data_.blend_mode_;
+  const auto current_time{SDL2_Timer::getSDL2Ticks()};
+  if (current_time - start_time_ > data_.life_time_) return;
+  if (current_time - interval_time_ < data_.emission_interval_.value_) return;
 
-  data.start_size_ = data_.start_size_.value_ * generateRand(data_.start_size_.rand_min_, data_.start_size_.rand_max_);
-  data.end_size_ = data_.end_size_.value_ * generateRand(data_.end_size_.rand_min_, data_.end_size_.rand_max_);
+  const auto how_many{static_cast<unsigned int>(std::round(data_.emission_rate_.value_ * generateRand(data_.emission_rate_.rand_min_, data_.emission_rate_.rand_max_)))};
+  for (auto i = 0u; i < how_many; ++i) {
+    ParticleData new_data{};
+    new_data.start_life_ = data_.max_particle_life_.value_ * generateRand(data_.max_particle_life_.rand_min_, data_.max_particle_life_.rand_max_);
+    
+    new_data.texture_rect_ = data_.texture_rect_;
 
-  data.start_color_ = data_.start_color_;
-  data.end_color_ = data_.end_color_;
+    new_data.start_size_ = data_.start_size_.value_ * generateRand(data_.start_size_.rand_min_, data_.start_size_.rand_max_);
+    new_data.end_size_ = data_.end_size_.value_ * generateRand(data_.end_size_.rand_min_, data_.end_size_.rand_max_);
 
-  data.rotation_ = data_.rotation_.value_ * generateRand(data_.rotation_.rand_min_, data_.rotation_.rand_max_);
+    new_data.start_color_ = data_.start_color_;
+    new_data.end_color_ = data_.end_color_;
 
-  data.start_rotation_speed_ = data_.start_rotation_speed_.value_ * generateRand(data_.start_rotation_speed_.rand_min_, data_.start_rotation_speed_.rand_max_);
-  data.end_rotation_speed_ = data_.end_rotation_speed_.value_ * generateRand(data_.end_rotation_speed_.rand_min_, data_.end_rotation_speed_.rand_max_);
+    new_data.rotation_ = data_.rotation_.value_ * generateRand(data_.rotation_.rand_min_, data_.rotation_.rand_max_);
 
-  data.start_speed_.x = data_.start_speed_.value_ * generateRand(data_.start_speed_.rand_min_, data_.start_speed_.rand_max_);
-  data.start_speed_.y = data_.start_speed_.value_ * generateRand(data_.start_speed_.rand_min_, data_.start_speed_.rand_max_);
-  data.end_speed_.x = data_.end_speed_.value_ * generateRand(data_.end_speed_.rand_min_, data_.end_speed_.rand_max_);
-  data.end_speed_.y = data_.end_speed_.value_ * generateRand(data_.end_speed_.rand_min_, data_.end_speed_.rand_max_);
+    new_data.start_rotation_speed_ = data_.start_rotation_speed_.value_ * generateRand(data_.start_rotation_speed_.rand_min_, data_.start_rotation_speed_.rand_max_);
+    new_data.end_rotation_speed_ = data_.end_rotation_speed_.value_ * generateRand(data_.end_rotation_speed_.rand_min_, data_.end_rotation_speed_.rand_max_);
 
+    const auto start_speed_multiplier{data_.start_speed_.value_ * generateRand(data_.start_speed_.rand_min_, data_.start_speed_.rand_max_)};
+    const SDL_FPoint start_speed{start_speed_multiplier, start_speed_multiplier};
+    const auto end_speed_multiplier{data_.end_speed_.value_ * generateRand(data_.end_speed_.rand_min_, data_.end_speed_.rand_max_)};
+    const SDL_FPoint end_speed{end_speed_multiplier, end_speed_multiplier};
+    
+    const auto final_angle{generateRand(data_.angle_range_.min_, data_.angle_range_.max_)};
+    new_data.start_speed_.x = (start_speed.x * SDL_cosf(final_angle)) - (start_speed.y * SDL_sinf(final_angle));
+    new_data.start_speed_.y = (start_speed.x * SDL_sinf(final_angle)) + (start_speed.y * SDL_cosf(final_angle));
+    new_data.end_speed_.x   = (end_speed.x * SDL_cosf(final_angle)) - (end_speed.y * SDL_sinf(final_angle));
+    new_data.end_speed_.y   = (end_speed.x * SDL_sinf(final_angle)) + (end_speed.y * SDL_cosf(final_angle));
 
+    new_data.position_ = position_;
 
-  
-  data.position_ = position_;
-  
+    Particle* new_particle{first_available_};
+    first_available_ = new_particle->getNext();
+    new_particle->init(new_data);
+    ++alive_particles_count_;
 
-
-  
-
-  Particle* new_particle{first_available_};
-  first_available_ = new_particle->getNext();
-  new_particle->init(data);
+    if (first_available_ == nullptr) return;
+  }
+  interval_time_ = SDL2_Timer::getSDL2Ticks();
 }
 
 void ktp::Emitter::inflatePool() {
@@ -139,10 +158,12 @@ void ktp::Emitter::inflatePool() {
 }
 
 void ktp::Emitter::update(float delta_time) {
+  //logMessage("alive particles = " + std::to_string(alive_particles_count_));
   for (auto i = 0u; i < particles_pool_size_; ++i) {
     if (particles_pool_[i].inUse() && particles_pool_[i].update(delta_time)) {
       particles_pool_[i].setNext(first_available_);
       first_available_ = &particles_pool_[i];
+      --alive_particles_count_;
     }
   }
 }
