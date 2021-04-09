@@ -30,14 +30,14 @@
   </emitter>
 
   <emitter type="fire">
-    <maxParticleLife value="300" randMin="1" randMax="1"/>
+    <maxParticleLife value="800" randMin="1" randMax="1"/>
 
     <textureRect x="256" y="64" w="128" h="128"/>
 
     <blendMode mode="add"/>
 
-    <startSize value="1" randMin="0.6" randMax="1"/>
-    <endSize   value="100"  randMin="0.6" randMax="1"/>
+    <startSize value="50" randMin="0.6" randMax="1"/>
+    <endSize   value="500"  randMin="0.6" randMax="1"/>
 
     <startColor r="255" g="255" b="0"   a="255"/>
     <endColor   r="255" g="0" b="255" a="0"/>
@@ -50,13 +50,13 @@
     <startSpeed value="0.01" randMin="1"  randMax="1"/>
     <endSpeed   value="1" randMin="1"  randMax="1"/>
 
-    <angleRange min="0" max="360"/> <!-- Clockwise from the top -->
+    <angleRange min="80" max="100"/> <!-- Clockwise from the top -->
 
-    <emissionRate value="10" randMin="1" randMax="1"/>
+    <emissionRate value="1" randMin="1" randMax="1"/>
 
-    <emissionInterval value="100" randMin="1" randMax="1"/> <!-- In miliseconds. 0 for continuous emission -->
+    <emissionInterval value="0" randMin="1" randMax="1"/> <!-- In miliseconds. 0 for continuous emission -->
     
-    <lifeTime value="5000"/> <!-- In miliseconds. Negative for infinite -->
+    <lifeTime value="-1"/> <!-- In miliseconds. Negative for infinite -->
   </emitter>
 
   <emitter type="love">

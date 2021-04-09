@@ -1,4 +1,5 @@
 #include "particle.hpp"
+#include "particle_system.hpp"
 #include "../include/resources_path.hpp"
 #include <string>
 
@@ -6,7 +7,7 @@ ktp::SDL2_Texture ktp::ParticlesAtlas::particles_atlas{};
 
 void ktp::ParticlesAtlas::loadTexture(SDL2_Renderer& ren) {
   particles_atlas.setRenderer(ren);
-  const std::string file{"particles3.png"};
+  const std::string file{"particles2.png"};
   const std::string path{getResourcesPath("textures") + file};
   particles_atlas.loadFromFile(path);
 }
@@ -82,6 +83,56 @@ bool ktp::Particle::update(float delta_time) {
   state_.live_.current_speed_.y = interpolateRange(state_.live_.start_speed_.y, state_.live_.time_step_, state_.live_.end_speed_.y);
   state_.live_.position_.x += state_.live_.current_speed_.x;
   state_.live_.position_.y += state_.live_.current_speed_.y;
+
+  --life_;
+  return life_ == 0; 
+}
+
+/* return true if the previously live particle gave up the ghost in that frame */
+bool ktp::Particle::update(float delta_time, const Vortex& vortex) {
+  // time step increment to interpolate
+  state_.live_.time_step_ += (1.f / state_.live_.start_life_);
+  if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f; 
+  // size interpolation
+  const float last_size{state_.live_.current_size_};
+  state_.live_.current_size_ = interpolateRange(state_.live_.start_size_, state_.live_.time_step_, state_.live_.end_size_);
+  // new position based on the new size
+  state_.live_.position_.x += ((last_size - state_.live_.current_size_) * 0.5f);
+  state_.live_.position_.y += ((last_size - state_.live_.current_size_) * 0.5f);
+  // color interpolation
+  state_.live_.current_color_ = interpolateColors(state_.live_.start_color_, state_.live_.time_step_, state_.live_.end_color_);
+  // rotation speed interpolation
+  state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.time_step_, state_.live_.end_rotation_speed_);
+  state_.live_.rotation_ += state_.live_.current_rotation_speed_;
+  // speed interpolation
+  const auto dx{state_.live_.position_.x - vortex.position_.x};
+  const auto dy{state_.live_.position_.y - vortex.position_.y};
+
+  const auto vx{-dy * vortex.speed_};
+  const auto vy{ dx * vortex.speed_};
+
+  const auto factor{1.f / (1.f + (dx * dx + dy * dy) / vortex.scale_)};
+  state_.live_.current_speed_.x = interpolateRange(state_.live_.start_speed_.x, state_.live_.time_step_, state_.live_.end_speed_.x);
+  state_.live_.current_speed_.y = interpolateRange(state_.live_.start_speed_.y, state_.live_.time_step_, state_.live_.end_speed_.y);
+
+/*
+  //state_.live_.current_speed_.x = interpolateRange(state_.live_.start_speed_.x, state_.live_.time_step_, state_.live_.end_speed_.x);
+  //state_.live_.current_speed_.y = interpolateRange(state_.live_.start_speed_.y, state_.live_.time_step_, state_.live_.end_speed_.y);
+
+  state_.live_.current_speed_.x += (vx - state_.live_.current_speed_.x) * factor;
+  state_.live_.current_speed_.y += (vy - state_.live_.current_speed_.y) * factor;
+
+  //state_.live_.current_speed_.x += interpolateRange(state_.live_.start_speed_.x, state_.live_.time_step_, state_.live_.end_speed_.x);
+  //state_.live_.current_speed_.y += interpolateRange(state_.live_.start_speed_.y, state_.live_.time_step_, state_.live_.end_speed_.y);
+
+
+  state_.live_.position_.x += state_.live_.current_speed_.x;
+  state_.live_.position_.y += state_.live_.current_speed_.y; */
+
+  state_.live_.position_.x += (vx - state_.live_.current_speed_.x) * factor + state_.live_.current_speed_.x;
+  state_.live_.position_.y += (vy - state_.live_.current_speed_.y) * factor + state_.live_.current_speed_.y;
+
+	
 
   --life_;
   return life_ == 0; 

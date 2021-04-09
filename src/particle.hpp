@@ -13,6 +13,8 @@ namespace ParticlesAtlas {
 
 } // end namespace TextureAtlas
 
+struct Vortex;
+
 struct ParticleData {
   unsigned int start_life_{};
   // rectangle of the texture in the atlas
@@ -54,6 +56,7 @@ class Particle {
   inline bool inUse() const { return life_ > 0; }
   inline void setNext(Particle* next) { state_.next_ = next; }
   bool update(float delta_time);
+  bool update(float delta_time, const Vortex& vortex);
 
  private:
 

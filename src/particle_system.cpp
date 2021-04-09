@@ -27,6 +27,8 @@ ktp::Emitter::Emitter(EmitterTypes type, const SDL_FPoint& pos) noexcept : posit
       data_ = emitter_type;
       particles_pool_size_ = (emitter_type.max_particle_life_.value_ + 1u) * emitter_type.emission_rate_.value_;
       interval_time_ = emitter_type.emission_interval_.value_;
+      vortex_.position_.x = pos.x;
+      vortex_.position_.y = pos.y;
       emitter_found = true;
       break;
     }
@@ -45,6 +47,7 @@ ktp::Emitter& ktp::Emitter::operator=(const Emitter& other) noexcept {
   position_ = other.position_;
   start_time_ = other.start_time_;
   interval_time_ = other.interval_time_;
+  vortex_ = other.vortex_;
 
   delete[] particles_pool_;
   particles_pool_ = new Particle[particles_pool_size_];
@@ -83,6 +86,7 @@ ktp::Emitter& ktp::Emitter::operator=(Emitter&& other) noexcept {
     position_ = other.position_;
     start_time_ = other.start_time_;
     interval_time_ = other.interval_time_;
+    vortex_ = other.vortex_;
 
     other.particles_pool_ = nullptr;
   }
@@ -158,9 +162,9 @@ void ktp::Emitter::inflatePool() {
 }
 
 void ktp::Emitter::update(float delta_time) {
-  //logMessage("alive particles = " + std::to_string(alive_particles_count_));
   for (auto i = 0u; i < particles_pool_size_; ++i) {
-    if (particles_pool_[i].inUse() && particles_pool_[i].update(delta_time)) {
+    //if (particles_pool_[i].inUse() && particles_pool_[i].update(delta_time)) {
+    if (particles_pool_[i].inUse() && particles_pool_[i].update(delta_time, vortex_)) {
       particles_pool_[i].setNext(first_available_);
       first_available_ = &particles_pool_[i];
       --alive_particles_count_;

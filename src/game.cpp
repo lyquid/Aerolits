@@ -43,6 +43,8 @@ void ktp::Game::draw() {
   player_.draw(renderer_);
   for (const auto& emitter: emitters_) {
     emitter.draw();
+    renderer_.setDrawColor(ktp::Colors::white);
+    renderer_.drawPoint(emitter.vortex_.position_);
   }
   
   renderer_.present();
@@ -63,7 +65,7 @@ void ktp::Game::handleSDL2Events() {
       case SDL_MOUSEBUTTONDOWN: {
         int x{0}, y{0};
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          Emitter emi{EmitterTypes::Love, {static_cast<float>(x), static_cast<float>(y)}};
+          Emitter emi{EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}};
           // emitters_.push_back(std::move({EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}}));
           emitters_.push_back(std::move(emi));
         }
