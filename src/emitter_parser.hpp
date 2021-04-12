@@ -24,32 +24,29 @@ enum class EmitterTypes {
 };
 
 struct EmitterType {
-  EmitterTypes type_{};
-  RRVUint max_particle_life_{};
-  SDL_Rect texture_rect_{};
+  // Emitter properties
+  EmitterTypes  type_{};
+  AngleRange    angle_range_{};
   SDL_BlendMode blend_mode_{};
-
-  RRVFloat start_size_{};
-  RRVFloat end_size_{};
-
+  RRVUint       emission_interval_{};
+  RRVUint       emission_rate_{};
+  int           life_time_{};
+  SDL_Rect      texture_rect_{};
+  bool          vortex_{};
+  float         vortex_scale_{};
+  float         vortex_speed_{};
+  
+  // Particles properties
+  RRVUint   max_particle_life_{};
   SDL_Color start_color_{};
   SDL_Color end_color_{};
-
-  RRVFloat rotation_{};
-
-  RRVFloat start_rotation_speed_{};
-  RRVFloat end_rotation_speed_{};
-
-  RRVFloat start_speed_{};
-  RRVFloat end_speed_{};
-
-  AngleRange angle_range_{};
-
-  RRVUint emission_rate_{};
-
-  RRVUint emission_interval_{};
-  
-  int life_time_{};
+  RRVFloat  start_size_{};
+  RRVFloat  end_size_{};
+  RRVFloat  start_speed_{};
+  RRVFloat  end_speed_{};
+  RRVFloat  rotation_{};
+  RRVFloat  start_rotation_speed_{};
+  RRVFloat  end_rotation_speed_{};
 };
 
 namespace EmitterParser {

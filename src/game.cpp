@@ -44,7 +44,6 @@ void ktp::Game::draw() {
   for (const auto& emitter: emitters_) {
     emitter.draw();
     renderer_.setDrawColor(ktp::Colors::white);
-    renderer_.drawPoint(emitter.vortex_.position_);
   }
   
   renderer_.present();

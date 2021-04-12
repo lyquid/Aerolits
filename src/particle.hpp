@@ -17,16 +17,20 @@ struct Vortex;
 
 struct ParticleData {
   unsigned int start_life_{};
-  // rectangle of the texture in the atlas
+  
   SDL_Rect texture_rect_{};
+
+  SDL_Color start_color_{};
+  SDL_Color current_color_{};
+  SDL_Color end_color_{};
 
   float start_size_{};
   float current_size_{};
   float end_size_{};
 
-  SDL_Color start_color_{};
-  SDL_Color current_color_{};
-  SDL_Color end_color_{};
+  SDL_FPoint start_speed_{};
+  SDL_FPoint current_speed_{};
+  SDL_FPoint end_speed_{};
 
   float rotation_{};
 
@@ -34,13 +38,8 @@ struct ParticleData {
   float current_rotation_speed_{};
   float end_rotation_speed_{};
 
-  SDL_FPoint start_speed_{};
-  SDL_FPoint current_speed_{};
-  SDL_FPoint end_speed_{};
-  
-  // current particle position
   SDL_FPoint position_{};
-  // timestep for interpolation
+  
   float time_step_{0};
 };
 

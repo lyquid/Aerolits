@@ -18,8 +18,8 @@ inline double generateRand(double min, double max);
 
 struct Vortex {
   SDL_FPoint position_{};
-  float speed_{1};
-  float scale_{200};
+  float scale_{};
+  float speed_{};
 };
 
 class Emitter {
@@ -43,8 +43,6 @@ class Emitter {
   inline bool lifeTimeOver() const { return SDL2_Timer::getSDL2Ticks() - start_time_ >= data_.life_time_; }
   void update(float delta_time);
 
-  Vortex vortex_{};
-
  private:
 
   void inflatePool();
@@ -57,8 +55,6 @@ class Emitter {
   SDL_FPoint position_{};
   Uint32 start_time_{SDL2_Timer::getSDL2Ticks()};
   Uint32 interval_time_{};
-
-  
 };
 
 } // end namespace ktp
