@@ -14,20 +14,20 @@
 
     <textureRect x="256" y="64" w="128" h="128"/>
 
-    <vortex active="false">
-      <scale value="1000"/>
-      <speed value="0.2"/>
+    <vortex active="0">
+      <scale value="100"/>
+      <speed value="0.112"/>
     </vortex>
 
     <!-- Particles properties -->
 
-    <maxParticleLife value="400" randMin="1" randMax="1"/>
+    <maxParticleLife value="500" randMin="0" randMax="1"/>
 
     <startColor r="255" g="255" b="0"   a="255"/>
     <endColor   r="255" g="0"   b="255" a="0"/>
 
-    <startSize value="5" randMin="0.6" randMax="1"/>
-    <endSize   value="50"  randMin="0.6" randMax="1"/>
+    <startSize value="1" randMin="0.6" randMax="1"/>
+    <endSize   value="10"  randMin="0.6" randMax="1"/>
 
     <startSpeed value="1" randMin="0"  randMax="1"/>
     <endSpeed   value="0.0001" randMin="0"  randMax="1"/>

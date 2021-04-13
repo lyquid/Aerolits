@@ -27,6 +27,7 @@ void ktp::Particle::init(const ParticleData& data) {
   state_.live_.texture_rect_ = data.texture_rect_;
   
   life_ = data.start_life_;
+  logMessage("life = " + std::to_string(life_));
   state_.live_.start_life_ = data.start_life_;
 
   state_.live_.start_size_ = data.start_size_;
