@@ -82,8 +82,8 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
       emi.vortex_speed_ = emitter.child("vortex").child("speed").attribute("value").as_float();
     }
     /* PARTICLE LIFE */
-    if (emitter.child("maxParticleLife").attribute("value").as_uint() == 0) {
-      logMessage("WARNING! Emitter \"" + type + "\" has a starting life of 0 or less.");
+    if (emitter.child("maxParticleLife").attribute("value").as_uint() <= 0) {
+      logMessage("WARNING! Emitter \"" + type + "\" has a particle starting life of 0 or less.");
     }
     emi.max_particle_life_.value_    = emitter.child("maxParticleLife").attribute("value").as_uint();
     emi.max_particle_life_.rand_min_ = emitter.child("maxParticleLife").attribute("randMin").as_float();
@@ -149,7 +149,7 @@ void ktp::EmitterParser::loadEmitterTypes() {
   pugi::xml_document doc{};
   const auto result{doc.load_file(path.c_str())};
   if (result) {
-    printLoadedEmitterTypes(doc);
+    // printLoadedEmitterTypes(doc);
     constructEmitterTypesVector(doc);
   } else {
     const std::string error_msg{
@@ -175,7 +175,7 @@ void ktp::EmitterParser::printLoadedEmitterTypes(const pugi::xml_document& doc) 
         final_string << ' ' << child_attr.name() << "=\"" << child_attr.value() << '\"';
       }
 
-      if (std::strcmp(child.name(), "vortex") == 0) {
+      if (SDL_strcmp(child.name(), "vortex") == 0) {
         final_string << ">\n";
         for (const auto& vortex_childs: child.children()) {
           final_string << "  <" << vortex_childs.name();

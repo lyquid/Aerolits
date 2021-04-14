@@ -43,7 +43,6 @@ void ktp::Game::draw() {
   player_.draw(renderer_);
   for (const auto& emitter: emitters_) {
     emitter.draw();
-    renderer_.setDrawColor(ktp::Colors::white);
   }
   
   renderer_.present();
@@ -132,6 +131,7 @@ void ktp::Game::update(float delta_time) {
   while (iter != emitters_.end()) {
     if (iter->canBeDeleted()) {
       iter = emitters_.erase(iter);
+      logMessage("emitter deleted!");
     } else {
       iter->generateParticles();
       iter->update(delta_time);

@@ -99,7 +99,10 @@ void ktp::Emitter::draw() const {
 }
 
 void ktp::Emitter::generateParticles() {
-  if (first_available_ == nullptr) return;
+  if (first_available_ == nullptr) {
+    logMessage("no first available");
+    return;
+  }
 
   const auto current_time{SDL2_Timer::getSDL2Ticks()};
   if (current_time - start_time_ > data_->life_time_) return;
@@ -108,8 +111,11 @@ void ktp::Emitter::generateParticles() {
   const auto how_many{static_cast<unsigned int>(std::round(data_->emission_rate_.value_ * generateRand(data_->emission_rate_.rand_min_, data_->emission_rate_.rand_max_)))};
   for (auto i = 0u; i < how_many; ++i) {
     ParticleData new_data{};
-    new_data.start_life_ = data_->max_particle_life_.value_ * generateRand(data_->max_particle_life_.rand_min_, data_->max_particle_life_.rand_max_);
-    
+    new_data.start_life_ = std::round(data_->max_particle_life_.value_ * generateRand(data_->max_particle_life_.rand_min_, data_->max_particle_life_.rand_max_));
+    // we need to do this in order for the particle to be update()d at least one time,
+    // so we avoid the "not first available" plague
+    if (new_data.start_life_ <= 0u) new_data.start_life_ = 1u;
+
     new_data.texture_rect_ = data_->texture_rect_;
 
     new_data.start_size_ = data_->start_size_.value_ * generateRand(data_->start_size_.rand_min_, data_->start_size_.rand_max_);

@@ -70,6 +70,7 @@ class Particle {
   inline static T interpolateRange(T start, U time_step, T end) { return start + (end - start) * time_step; }
 
   unsigned int life_{};
+  //int life_{};
   union {
     ParticleData live_;
     Particle* next_{nullptr};
