@@ -4,6 +4,7 @@
 #include "../include/pugixml1.11/pugixml.hpp"
 #include "../include/resources_path.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include <vector>
 
 namespace ktp {
 
@@ -14,6 +15,7 @@ struct RandomRangeValue { T value_{0}; float rand_min_{0}, rand_max_{1}; };
 using RRVInt = RandomRangeValue<int>;
 using RRVUint = RandomRangeValue<unsigned int>;
 using RRVFloat = RandomRangeValue<float>;
+using ColorsVector = std::vector<SDL_Color>;
 
 enum class EmitterTypes {
   Exhaust,
@@ -37,16 +39,15 @@ struct EmitterType {
   float         vortex_speed_{};
   
   // Particles properties
-  RRVUint   max_particle_life_{};
-  SDL_Color start_color_{};
-  SDL_Color end_color_{};
-  RRVFloat  start_size_{};
-  RRVFloat  end_size_{};
-  RRVFloat  start_speed_{};
-  RRVFloat  end_speed_{};
-  RRVFloat  rotation_{};
-  RRVFloat  start_rotation_speed_{};
-  RRVFloat  end_rotation_speed_{};
+  RRVUint      max_particle_life_{};
+  ColorsVector colors_{};
+  RRVFloat     start_size_{};
+  RRVFloat     end_size_{};
+  RRVFloat     start_speed_{};
+  RRVFloat     end_speed_{};
+  RRVFloat     rotation_{};
+  RRVFloat     start_rotation_speed_{};
+  RRVFloat     end_rotation_speed_{};
 };
 
 namespace EmitterParser {

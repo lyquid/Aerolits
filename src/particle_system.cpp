@@ -121,8 +121,13 @@ void ktp::Emitter::generateParticles() {
     new_data.start_size_ = data_->start_size_.value_ * generateRand(data_->start_size_.rand_min_, data_->start_size_.rand_max_);
     new_data.end_size_ = data_->end_size_.value_ * generateRand(data_->end_size_.rand_min_, data_->end_size_.rand_max_);
 
-    new_data.start_color_ = data_->start_color_;
-    new_data.end_color_ = data_->end_color_;
+    new_data.colors_ = data_->colors_;
+    if (data_->colors_.size() == 0) {
+      // no color specified in xml
+      new_data.current_color_ = {255, 255, 255, 255};
+    } else {
+      new_data.current_color_ = data_->colors_.front();
+    }
 
     new_data.rotation_ = data_->rotation_.value_ * generateRand(data_->rotation_.rand_min_, data_->rotation_.rand_max_);
 

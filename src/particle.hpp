@@ -1,8 +1,10 @@
-#ifndef AEROLITS_SRC_PARTICLE_H_
-#define AEROLITS_SRC_PARTICLE_H_
+#ifndef AEROLITS_SRC_PARTICLE_HPP_
+#define AEROLITS_SRC_PARTICLE_HPP_
 
 // #include "palette.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include <utility>
+#include <vector>
 
 namespace ktp {
 
@@ -13,6 +15,8 @@ namespace ParticlesAtlas {
 
 } // end namespace TextureAtlas
 
+using ColorsVector = std::vector<SDL_Color>;
+
 struct Vortex;
 
 struct ParticleData {
@@ -20,9 +24,8 @@ struct ParticleData {
   
   SDL_Rect texture_rect_{};
 
-  SDL_Color start_color_{};
-  SDL_Color current_color_{};
-  SDL_Color end_color_{};
+  ColorsVector colors_{};
+  SDL_Color    current_color_{};
 
   float start_size_{};
   float current_size_{};
@@ -40,7 +43,7 @@ struct ParticleData {
 
   SDL_FPoint position_{};
   
-  float time_step_{0};
+  float time_step_{};
 };
 
 class Particle {
@@ -57,21 +60,50 @@ class Particle {
   bool update(float delta_time);
   bool update(float delta_time, const Vortex& vortex);
 
+  Particle& operator=(const Particle& other) noexcept;
+  Particle& operator=(Particle&& other) noexcept;
+
  private:
-
+  
   Particle() {}
+  Particle(const Particle& other) noexcept { *this = other; }
+  Particle(Particle&& other) noexcept { *this = std::move(other); }
+  ~Particle() {}
 
-  inline static SDL_Color interpolateColors(const SDL_Color& start_color, float time_step, const SDL_Color& end_color);
+  inline static SDL_Color interpolate2Colors(const SDL_Color& start_color, const SDL_Color& end_color, float time_step);
+
+  inline static SDL_Color interpolate3Colors(const SDL_Color& start_color, const SDL_Color& mid_color, const SDL_Color& end_color, float time_step);
 
   template<typename T>
-  inline static T interpolateRange(T start, T time_step, T end) { return start + (end - start) * time_step; }
+  inline static T interpolateRange(T start,T end, T time_step) { return start + (end - start) * time_step; }
 
   template<typename T, typename U>
-  inline static T interpolateRange(T start, U time_step, T end) { return start + (end - start) * time_step; }
+  inline static T interpolateRange(T start, T end, U time_step) { return start + (end - start) * time_step; }
+
+  template<typename T>
+  inline static T interpolateRange3(T start, T mid, T end, T time_step) { 
+    if (time_step < 0.5) {
+      return (mid * time_step * 2.0) + start * (0.5 - time_step) * 2.0;
+    } else {
+      return end * (time_step - 0.5) * 2.0 + mid * (1.0 - time_step) * 2.0;
+    }
+  }
+
+  template<typename T, typename U>
+  inline static T interpolateRange3(T start, T mid, T end, U time_step) { 
+    if (time_step < 0.5) {
+      return (mid * time_step * 2.0) + start * (0.5 - time_step) * 2.0;
+    } else {
+      return end * (time_step - 0.5) * 2.0 + mid * (1.0 - time_step) * 2.0;
+    }
+  }
 
   unsigned int life_{};
-  //int life_{};
-  union {
+  union State {
+    ~State() {}
+    State& operator=(const State& other) noexcept;
+    State& operator=(State&& other) noexcept;
+
     ParticleData live_;
     Particle* next_{nullptr};
   } state_{};
@@ -79,4 +111,4 @@ class Particle {
 
 } // end namespace ktp
 
-#endif // AEROLITS_SRC_PARTICLE_H_
+#endif // AEROLITS_SRC_PARTICLE_HPP_

@@ -12,6 +12,39 @@ void ktp::ParticlesAtlas::loadTexture(SDL2_Renderer& ren) {
   particles_atlas.loadFromFile(path);
 }
 
+ktp::Particle& ktp::Particle::operator=(const Particle& other) noexcept {
+  life_ = other.life_;
+  state_ = other.state_;
+  return *this;
+}
+
+ktp::Particle& ktp::Particle::operator=(Particle&& other) noexcept {
+  if (this != &other) {
+    life_ = other.life_;
+    state_ = std::move(other.state_);
+
+    other.life_ = 0u;
+  }
+  return *this;
+}
+
+ktp::Particle::State& ktp::Particle::State::operator=(const State& other) noexcept {
+  live_ = other.live_;
+  next_ = other.next_;
+  return *this;
+}
+
+ktp::Particle::State& ktp::Particle::State::operator=(State&& other) noexcept {
+  if (this != &other) {
+    live_ = std::move(other.live_);
+    next_ = other.next_;
+
+    other.live_ = {};
+    other.next_ = nullptr;
+  }
+  return *this;
+}
+
 void ktp::Particle::draw() const {
   ParticlesAtlas::particles_atlas.setColorMod(state_.live_.current_color_);
   ParticlesAtlas::particles_atlas.setAlphaMod(state_.live_.current_color_.a);
@@ -24,41 +57,28 @@ void ktp::Particle::draw() const {
 }
 
 void ktp::Particle::init(const ParticleData& data) {
-  state_.live_.texture_rect_ = data.texture_rect_;
-  
   life_ = data.start_life_;
-  state_.live_.start_life_ = data.start_life_;
-
-  state_.live_.start_size_ = data.start_size_;
-  state_.live_.current_size_ = data.start_size_;
-  state_.live_.end_size_ = data.end_size_;
-
-  state_.live_.start_color_ = data.start_color_;
-  state_.live_.current_color_ = data.start_color_;
-  state_.live_.end_color_ = data.end_color_;
-
-  state_.live_.rotation_ = data.rotation_;
-
-  state_.live_.start_rotation_speed_ = data.start_rotation_speed_;
-  state_.live_.current_rotation_speed_ = data.start_rotation_speed_;
-  state_.live_.end_rotation_speed_ = data.end_rotation_speed_;
-
-  state_.live_.start_speed_ = data.start_speed_;
-  state_.live_.current_speed_ = data.start_speed_;
-  state_.live_.end_speed_ = data.end_speed_;
-
+  state_.live_ = data;
   // position is set to center the texture on the emitter
   state_.live_.position_ = {data.position_.x - data.start_size_ * 0.5f, 
                             data.position_.y - data.start_size_ * 0.5f};
-  state_.live_.time_step_ = 0.f;
 }
 
-SDL_Color ktp::Particle::interpolateColors(const SDL_Color& start_color, float time_step, const SDL_Color& end_color) {
+SDL_Color ktp::Particle::interpolate2Colors(const SDL_Color& start_color, const SDL_Color& end_color, float time_step) {
   return {
-    interpolateRange(start_color.r, time_step, end_color.r),
-    interpolateRange(start_color.g, time_step, end_color.g),
-    interpolateRange(start_color.b, time_step, end_color.b),
-    interpolateRange(start_color.a, time_step, end_color.a)
+    interpolateRange(start_color.r, end_color.r, time_step),
+    interpolateRange(start_color.g, end_color.g, time_step),
+    interpolateRange(start_color.b, end_color.b, time_step),
+    interpolateRange(start_color.a, end_color.a, time_step)
+  };
+}
+
+SDL_Color ktp::Particle::interpolate3Colors(const SDL_Color& start_color, const SDL_Color& mid_color, const SDL_Color& end_color, float time_step) {
+  return {
+    interpolateRange3(start_color.r, mid_color.r, end_color.r, time_step),
+    interpolateRange3(start_color.g, mid_color.g, end_color.g, time_step),
+    interpolateRange3(start_color.b, mid_color.b, end_color.b, time_step),
+    interpolateRange3(start_color.a, mid_color.a, end_color.a, time_step)
   };
 }
 
@@ -69,23 +89,26 @@ bool ktp::Particle::update(float delta_time) {
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
   // size interpolation
   const float last_size{state_.live_.current_size_};
-  state_.live_.current_size_ = interpolateRange(state_.live_.start_size_, state_.live_.time_step_, state_.live_.end_size_);
+  state_.live_.current_size_ = interpolateRange(state_.live_.start_size_, state_.live_.end_size_, state_.live_.time_step_);
   // new position based on the new size
   state_.live_.position_.x += ((last_size - state_.live_.current_size_) * 0.5f);
   state_.live_.position_.y += ((last_size - state_.live_.current_size_) * 0.5f);
   // color interpolation
-  state_.live_.current_color_ = interpolateColors(state_.live_.start_color_, state_.live_.time_step_, state_.live_.end_color_);
+  if (state_.live_.colors_.size() == 2) {
+    state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
+  } else if (state_.live_.colors_.size() > 2) {
+    state_.live_.current_color_ = interpolate3Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.colors_[2], state_.live_.time_step_);
+  }
   // rotation speed interpolation
-  state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.time_step_, state_.live_.end_rotation_speed_);
+  state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.end_rotation_speed_, state_.live_.time_step_);
   state_.live_.rotation_ += state_.live_.current_rotation_speed_;
   // speed interpolation
-  state_.live_.current_speed_.x = interpolateRange(state_.live_.start_speed_.x, state_.live_.time_step_, state_.live_.end_speed_.x);
-  state_.live_.current_speed_.y = interpolateRange(state_.live_.start_speed_.y, state_.live_.time_step_, state_.live_.end_speed_.y);
+  state_.live_.current_speed_.x = interpolateRange(state_.live_.start_speed_.x, state_.live_.end_speed_.x, state_.live_.time_step_);
+  state_.live_.current_speed_.y = interpolateRange(state_.live_.start_speed_.y, state_.live_.end_speed_.y, state_.live_.time_step_);
   state_.live_.position_.x += state_.live_.current_speed_.x;
   state_.live_.position_.y += state_.live_.current_speed_.y;
-  //logMessage("  life = " + std::to_string(life_));
+  
   --life_;
-  //logMessage("--life = " + std::to_string(life_));
   return life_ == 0;
 }
 
@@ -96,14 +119,18 @@ bool ktp::Particle::update(float delta_time, const Vortex& vortex) {
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
   // size interpolation
   const float last_size{state_.live_.current_size_};
-  state_.live_.current_size_ = interpolateRange(state_.live_.start_size_, state_.live_.time_step_, state_.live_.end_size_);
+  state_.live_.current_size_ = interpolateRange(state_.live_.start_size_, state_.live_.end_size_, state_.live_.time_step_);
   // new position based on the new size
   state_.live_.position_.x += ((last_size - state_.live_.current_size_) * 0.5f);
   state_.live_.position_.y += ((last_size - state_.live_.current_size_) * 0.5f);
   // color interpolation
-  state_.live_.current_color_ = interpolateColors(state_.live_.start_color_, state_.live_.time_step_, state_.live_.end_color_);
+  if (state_.live_.colors_.size() == 2) {
+    state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
+  } else if (state_.live_.colors_.size() > 2) {
+    state_.live_.current_color_ = interpolate3Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.colors_[2], state_.live_.time_step_);
+  }
   // rotation speed interpolation
-  state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.time_step_, state_.live_.end_rotation_speed_);
+  state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.end_rotation_speed_, state_.live_.time_step_);
   state_.live_.rotation_ += state_.live_.current_rotation_speed_;
   // speed interpolation
   const auto dx{state_.live_.position_.x - vortex.position_.x};
@@ -113,8 +140,8 @@ bool ktp::Particle::update(float delta_time, const Vortex& vortex) {
   const auto vy{ dx * vortex.speed_};
 
   const auto factor{1.f / (1.f + (dx * dx + dy * dy) / vortex.scale_)};
-  state_.live_.current_speed_.x = interpolateRange(state_.live_.start_speed_.x, state_.live_.time_step_, state_.live_.end_speed_.x);
-  state_.live_.current_speed_.y = interpolateRange(state_.live_.start_speed_.y, state_.live_.time_step_, state_.live_.end_speed_.y);
+  state_.live_.current_speed_.x = interpolateRange(state_.live_.start_speed_.x, state_.live_.end_speed_.x, state_.live_.time_step_);
+  state_.live_.current_speed_.y = interpolateRange(state_.live_.start_speed_.y, state_.live_.end_speed_.y, state_.live_.time_step_);
   // vortex
   state_.live_.position_.x += (vx - state_.live_.current_speed_.x) * factor + state_.live_.current_speed_.x;
   state_.live_.position_.y += (vy - state_.live_.current_speed_.y) * factor + state_.live_.current_speed_.y;

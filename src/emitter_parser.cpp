@@ -88,16 +88,21 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     emi.max_particle_life_.value_    = emitter.child("maxParticleLife").attribute("value").as_uint();
     emi.max_particle_life_.rand_min_ = emitter.child("maxParticleLife").attribute("randMin").as_float();
     emi.max_particle_life_.rand_max_ = emitter.child("maxParticleLife").attribute("randMax").as_float();
-    /* START COLOR */
-    emi.start_color_.r = emitter.child("startColor").attribute("r").as_uint();
-    emi.start_color_.g = emitter.child("startColor").attribute("g").as_uint();
-    emi.start_color_.b = emitter.child("startColor").attribute("b").as_uint();
-    emi.start_color_.a = emitter.child("startColor").attribute("a").as_uint();
-    /* END COLOR */
-    emi.end_color_.r = emitter.child("endColor").attribute("r").as_uint();
-    emi.end_color_.g = emitter.child("endColor").attribute("g").as_uint();
-    emi.end_color_.b = emitter.child("endColor").attribute("b").as_uint();
-    emi.end_color_.a = emitter.child("endColor").attribute("a").as_uint();
+    /* COLORS */
+    auto it = emitter.child("colors").begin();
+    while (it != emitter.child("colors").end()) {
+      const SDL_Color color{
+        it->attribute("r").as_uint(),
+        it->attribute("g").as_uint(),
+        it->attribute("b").as_uint(),
+        it->attribute("a").as_uint()
+      };
+      emi.colors_.push_back(color);
+      ++it;
+    }
+    if (emi.colors_.size() > 3) {
+      logMessage("WARNING! Emitter \"" + type + "\" has more than 3 colors, but only the first 3 will be used for interpolation.");
+    }
     /* START SIZE */
     if (emitter.child("startSize").attribute("value").as_float() < 0) {
       logMessage("WARNING! Emitter \"" + type + "\" has a negative start size.");
@@ -169,22 +174,32 @@ void ktp::EmitterParser::printLoadedEmitterTypes(const pugi::xml_document& doc) 
       final_string << attr.name() << "=\"" << attr.value() << "\">\n";
     }
     for (const auto& child: emitter.children()) {
-      final_string << " <" << child.name();
+      final_string << "\t<" << child.name();
 
       for (const auto& child_attr: child.attributes()){
         final_string << ' ' << child_attr.name() << "=\"" << child_attr.value() << '\"';
       }
-
       if (SDL_strcmp(child.name(), "vortex") == 0) {
         final_string << ">\n";
         for (const auto& vortex_childs: child.children()) {
-          final_string << "  <" << vortex_childs.name();
+          final_string << "\t\t<" << vortex_childs.name();
 
           for (const auto& vortex_childs_attrs: vortex_childs.attributes()) {
-            final_string << ' ' << vortex_childs_attrs.name() << "=\"" << vortex_childs_attrs.value() << "\">\n";
+            final_string << ' ' << vortex_childs_attrs.name() << "=\"" << vortex_childs_attrs.value() << "\"/>\n";
           }
         }
-        final_string << " </vortex>\n";
+        final_string << "\t</vortex>\n";
+      } else if (SDL_strcmp(child.name(), "colors") == 0) {
+        final_string << ">\n";
+        for (const auto& colors_childs: child.children()) {
+          final_string << "\t\t<" << colors_childs.name();
+
+          for (const auto& colors_childs_attrs: colors_childs.attributes()) {
+            final_string << ' ' << colors_childs_attrs.name() << "=\"" << colors_childs_attrs.value() << "\"";
+          }
+          final_string << "/>\n";
+        }
+        final_string << "\t</colors>\n";
       } else {
         final_string << "/>\n";
       }
