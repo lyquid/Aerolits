@@ -100,7 +100,7 @@ void ktp::Emitter::draw() const {
 
 void ktp::Emitter::generateParticles() {
   if (first_available_ == nullptr) {
-    logMessage("no first available");
+    logMessage("WARNING!! NO FIRST AVAILABLE!!!!!");
     return;
   }
 
@@ -183,6 +183,5 @@ void ktp::Emitter::update(float delta_time) {
         --alive_particles_count_;
       }
     }
-    
   }
 }

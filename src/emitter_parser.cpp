@@ -92,10 +92,10 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     auto it = emitter.child("colors").begin();
     while (it != emitter.child("colors").end()) {
       const SDL_Color color{
-        it->attribute("r").as_uint(),
-        it->attribute("g").as_uint(),
-        it->attribute("b").as_uint(),
-        it->attribute("a").as_uint()
+        static_cast<Uint8>(it->attribute("r").as_uint()),
+        static_cast<Uint8>(it->attribute("g").as_uint()),
+        static_cast<Uint8>(it->attribute("b").as_uint()),
+        static_cast<Uint8>(it->attribute("a").as_uint())
       };
       emi.colors_.push_back(color);
       ++it;

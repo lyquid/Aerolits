@@ -6,7 +6,7 @@
 
     <blendMode mode="add"/>
 
-    <emissionInterval value="1" randMin="1" randMax="1"/> <!-- In miliseconds. 0 for continuous emission -->
+    <emissionInterval value="0" randMin="1" randMax="1"/> <!-- In miliseconds. 0 for continuous emission -->
 
     <emissionRate value="1" randMin="1" randMax="1"/>
 
@@ -14,14 +14,14 @@
 
     <textureRect x="256" y="64" w="128" h="128"/>
 
-    <vortex active="0">
-      <scale value="100"/>
-      <speed value="0.112"/>
+    <vortex active="false">
+      <scale value="1000"/>
+      <speed value="0.212"/>
     </vortex>
 
     <!-- Particles properties -->
 
-    <maxParticleLife value="500" randMin="1" randMax="1"/>
+    <maxParticleLife value="150" randMin="1" randMax="1"/>
  
     <colors>
       <color r="255" g="255" b="0"   a="255"/>
@@ -32,8 +32,8 @@
     <startSize value="1" randMin="1" randMax="1"/>
     <endSize   value="100"  randMin="1" randMax="1"/>
 
-    <startSpeed value="1" randMin="1"  randMax="1"/>
-    <endSpeed   value="0.01" randMin="1"  randMax="1"/>
+    <startSpeed value="0.51" randMin="1"  randMax="1"/>
+    <endSpeed   value="1" randMin="1"  randMax="1"/>
 
     <rotation value="360" randMin="0" randMax="1"/>
 
