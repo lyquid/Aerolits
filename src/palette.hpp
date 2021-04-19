@@ -1,5 +1,5 @@
-#ifndef KTP_SRC_PALETTE_H_
-#define KTP_SRC_PALETTE_H_
+#ifndef KTP_SRC_PALETTE_HPP_
+#define KTP_SRC_PALETTE_HPP_
 
 #include <SDL.h>
 
@@ -30,4 +30,4 @@ namespace Colors {
 
 } // end namespace ktp
 
-#endif // KTP_SRC_PALETTE_H_
+#endif // KTP_SRC_PALETTE_HPP_

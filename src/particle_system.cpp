@@ -1,3 +1,4 @@
+#include "palette.hpp"
 #include "particle_system.hpp"
 //#include <algorithm> // std::copy
 #include <cmath> // std::round
@@ -124,7 +125,7 @@ void ktp::Emitter::generateParticles() {
     new_data.colors_ = data_->colors_;
     if (data_->colors_.size() == 0) {
       // no color specified in xml
-      new_data.current_color_ = {255, 255, 255, 255};
+      new_data.current_color_ = ktp::Colors::white;
     } else {
       new_data.current_color_ = data_->colors_.front();
     }
@@ -134,16 +135,19 @@ void ktp::Emitter::generateParticles() {
     new_data.start_rotation_speed_ = data_->start_rotation_speed_.value_ * generateRand(data_->start_rotation_speed_.rand_min_, data_->start_rotation_speed_.rand_max_);
     new_data.end_rotation_speed_ = data_->end_rotation_speed_.value_ * generateRand(data_->end_rotation_speed_.rand_min_, data_->end_rotation_speed_.rand_max_);
 
-    const auto start_speed_multiplier{data_->start_speed_.value_ * generateRand(data_->start_speed_.rand_min_, data_->start_speed_.rand_max_)};
-    const SDL_FPoint start_speed{start_speed_multiplier, start_speed_multiplier};
-    const auto end_speed_multiplier{data_->end_speed_.value_ * generateRand(data_->end_speed_.rand_min_, data_->end_speed_.rand_max_)};
-    const SDL_FPoint end_speed{end_speed_multiplier, end_speed_multiplier};
-    
-    const auto final_angle{generateRand(data_->angle_range_.min_, data_->angle_range_.max_)};
-    new_data.start_speed_.x = (start_speed.x * SDL_cosf(final_angle)) - (start_speed.y * SDL_sinf(final_angle));
-    new_data.start_speed_.y = (start_speed.x * SDL_sinf(final_angle)) + (start_speed.y * SDL_cosf(final_angle));
-    new_data.end_speed_.x   = (end_speed.x * SDL_cosf(final_angle)) - (end_speed.y * SDL_sinf(final_angle));
-    new_data.end_speed_.y   = (end_speed.x * SDL_sinf(final_angle)) + (end_speed.y * SDL_cosf(final_angle));
+    const auto final_angle {generateRand(data_->angle_range_.min_, data_->angle_range_.max_)};
+    const auto final_angle_cosf {SDL_cosf(final_angle)};
+    const auto final_angle_sinf {SDL_sinf(final_angle)};
+
+    for (const auto& speed: data_->speeds_) {
+      const auto speed_multiplier {speed.value_ * generateRand(speed.rand_min_, speed.rand_max_)};
+      const SDL_FPoint final_speed {
+        (speed_multiplier * final_angle_cosf) - (speed_multiplier * final_angle_sinf),
+        (speed_multiplier * final_angle_sinf) + (speed_multiplier * final_angle_cosf)
+      };
+      new_data.speeds_.push_back(final_speed);
+    }
+    new_data.current_speed_ = new_data.speeds_.front();
 
     new_data.position_ = position_;
 

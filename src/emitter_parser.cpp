@@ -91,7 +91,7 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     /* COLORS */
     auto it = emitter.child("colors").begin();
     while (it != emitter.child("colors").end()) {
-      const SDL_Color color{
+      const SDL_Color color {
         static_cast<Uint8>(it->attribute("r").as_uint()),
         static_cast<Uint8>(it->attribute("g").as_uint()),
         static_cast<Uint8>(it->attribute("b").as_uint()),
@@ -117,14 +117,20 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     emi.end_size_.value_    = emitter.child("endSize").attribute("value").as_float();
     emi.end_size_.rand_min_ = emitter.child("endSize").attribute("randMin").as_float();
     emi.end_size_.rand_max_ = emitter.child("endSize").attribute("randMax").as_float();
-    /* START SPEED */
-    emi.start_speed_.value_    = emitter.child("startSpeed").attribute("value").as_float();
-    emi.start_speed_.rand_min_ = emitter.child("startSpeed").attribute("randMin").as_float();
-    emi.start_speed_.rand_max_ = emitter.child("startSpeed").attribute("randMax").as_float();
-    /* END SPEED */
-    emi.end_speed_.value_    = emitter.child("endSpeed").attribute("value").as_float();
-    emi.end_speed_.rand_min_ = emitter.child("endSpeed").attribute("randMin").as_float();
-    emi.end_speed_.rand_max_ = emitter.child("endSpeed").attribute("randMax").as_float();
+    /* SPEEDS */
+    it = emitter.child("speeds").begin();
+    while (it != emitter.child("speeds").end()) {
+      const RRVFloat speed {
+        it->attribute("value").as_float(),
+        it->attribute("randMin").as_float(),
+        it->attribute("randMax").as_float()
+      };
+      emi.speeds_.push_back(speed);
+      ++it;
+    }
+    if (emi.speeds_.size() > 3) {
+      logMessage("WARNING! Emitter \"" + type + "\" has more than 3 speeds, but only the first 3 will be used for interpolation.");
+    }
     /* ROTATION */
     emi.rotation_.value_    = emitter.child("rotation").attribute("value").as_float();
     emi.rotation_.rand_min_ = emitter.child("rotation").attribute("randMin").as_float();
@@ -200,6 +206,17 @@ void ktp::EmitterParser::printLoadedEmitterTypes(const pugi::xml_document& doc) 
           final_string << "/>\n";
         }
         final_string << "\t</colors>\n";
+      } else if (SDL_strcmp(child.name(), "speeds") == 0) {
+        final_string << ">\n";
+        for (const auto& speeds_childs: child.children()) {
+          final_string << "\t\t<" << speeds_childs.name();
+
+          for (const auto& speeds_childs_attrs: speeds_childs.attributes()) {
+            final_string << ' ' << speeds_childs_attrs.name() << "=\"" << speeds_childs_attrs.value() << "\"";
+          }
+          final_string << "/>\n";
+        }
+        final_string << "\t</speeds>\n";
       } else {
         final_string << "/>\n";
       }

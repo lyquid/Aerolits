@@ -1,5 +1,5 @@
-#ifndef AEROLITS_SRC_PARTICLE_SYSTEM_H_
-#define AEROLITS_SRC_PARTICLE_SYSTEM_H_
+#ifndef AEROLITS_SRC_PARTICLE_SYSTEM_HPP_
+#define AEROLITS_SRC_PARTICLE_SYSTEM_HPP_
 
 #include "emitter_parser.hpp"
 #include "particle.hpp"
@@ -59,4 +59,4 @@ class Emitter {
 
 } // end namespace ktp
 
-#endif // AEROLITS_SRC_PARTICLE_SYSTEM_H_
+#endif // AEROLITS_SRC_PARTICLE_SYSTEM_HPP_

@@ -21,19 +21,22 @@
 
     <!-- Particles properties -->
 
-    <maxParticleLife value="150" randMin="1" randMax="1"/>
+    <maxParticleLife value="850" randMin="1" randMax="1"/>
  
     <colors>
-      <color r="255" g="255" b="0"   a="255"/>
-      <color r="255" g="0"   b="0"   a="127"/>
+      <color r="255" g="255" b="0"   a="0"/>
+      <color r="255" g="0"   b="0"   a="255"/>
       <color r="0"   g="0"   b="255" a="0"/>
     </colors>
 
     <startSize value="1" randMin="1" randMax="1"/>
     <endSize   value="100"  randMin="1" randMax="1"/>
 
-    <startSpeed value="0.51" randMin="1"  randMax="1"/>
-    <endSpeed   value="1" randMin="1"  randMax="1"/>
+    <speeds>
+      <speed value="0.9" randMin="1"  randMax="1"/>
+      <speed value="0.00001" randMin="1"  randMax="1"/>
+      <speed value="0.8" randMin="1"  randMax="1"/>
+    </speeds>
 
     <rotation value="360" randMin="0" randMax="1"/>
 

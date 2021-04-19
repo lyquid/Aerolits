@@ -1,5 +1,5 @@
-#ifndef AEROLITS_SRC_EMITTER_PARSER_H_
-#define AEROLITS_SRC_EMITTER_PARSER_H_
+#ifndef AEROLITS_SRC_EMITTER_PARSER_HPP_
+#define AEROLITS_SRC_EMITTER_PARSER_HPP_
 
 #include "../include/pugixml1.11/pugixml.hpp"
 #include "../include/resources_path.hpp"
@@ -16,6 +16,7 @@ using RRVInt = RandomRangeValue<int>;
 using RRVUint = RandomRangeValue<unsigned int>;
 using RRVFloat = RandomRangeValue<float>;
 using ColorsVector = std::vector<SDL_Color>;
+using SpeedsVector = std::vector<RRVFloat>;
 
 enum class EmitterTypes {
   Exhaust,
@@ -43,8 +44,7 @@ struct EmitterType {
   ColorsVector colors_{};
   RRVFloat     start_size_{};
   RRVFloat     end_size_{};
-  RRVFloat     start_speed_{};
-  RRVFloat     end_speed_{};
+  SpeedsVector speeds_{};
   RRVFloat     rotation_{};
   RRVFloat     start_rotation_speed_{};
   RRVFloat     end_rotation_speed_{};
@@ -62,4 +62,4 @@ namespace EmitterParser {
 
 } // end namespace ktp
 
-#endif // AEROLITS_SRC_EMITTER_PARSER_H_
+#endif // AEROLITS_SRC_EMITTER_PARSER_HPP_

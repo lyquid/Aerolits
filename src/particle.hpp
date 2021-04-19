@@ -1,7 +1,6 @@
 #ifndef AEROLITS_SRC_PARTICLE_HPP_
 #define AEROLITS_SRC_PARTICLE_HPP_
 
-// #include "palette.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <utility>
 #include <vector>
@@ -16,6 +15,7 @@ namespace ParticlesAtlas {
 } // end namespace TextureAtlas
 
 using ColorsVector = std::vector<SDL_Color>;
+using FPointsVector = std::vector<SDL_FPoint>;
 
 struct Vortex;
 
@@ -31,9 +31,8 @@ struct ParticleData {
   float current_size_{};
   float end_size_{};
 
-  SDL_FPoint start_speed_{};
+  FPointsVector speeds_{};
   SDL_FPoint current_speed_{};
-  SDL_FPoint end_speed_{};
 
   float rotation_{};
 
