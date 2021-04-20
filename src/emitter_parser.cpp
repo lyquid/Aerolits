@@ -1,3 +1,4 @@
+#include "palette.hpp"
 #include "emitter_parser.hpp"
 #include <sstream>
 #include <string>
@@ -91,13 +92,15 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     /* COLORS */
     auto it = emitter.child("colors").begin();
     while (it != emitter.child("colors").end()) {
-      const SDL_Color color {
+      const SDL_Color requested_color {
         static_cast<Uint8>(it->attribute("r").as_uint()),
         static_cast<Uint8>(it->attribute("g").as_uint()),
         static_cast<Uint8>(it->attribute("b").as_uint()),
         static_cast<Uint8>(it->attribute("a").as_uint())
       };
-      emi.colors_.push_back(color);
+      SDL_Color final_color {Colors::getNearestColor(requested_color)};
+      final_color.a = requested_color.a;
+      emi.colors_.push_back(final_color);
       ++it;
     }
     if (emi.colors_.size() > 3) {

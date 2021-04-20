@@ -131,7 +131,6 @@ void ktp::Game::update(float delta_time) {
   while (iter != emitters_.end()) {
     if (iter->canBeDeleted()) {
       iter = emitters_.erase(iter);
-      logMessage("emitter deleted!");
     } else {
       iter->generateParticles();
       iter->update(delta_time);
