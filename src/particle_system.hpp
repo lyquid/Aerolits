@@ -4,7 +4,7 @@
 #include "emitter_parser.hpp"
 #include "particle.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
-#include <utility>
+#include <utility> // std::move
 
 namespace ktp {
 

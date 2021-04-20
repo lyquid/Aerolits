@@ -37,11 +37,11 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     #endif
     /* BLEND MODE */
     const std::string blend{emitter.child("blendMode").attribute("mode").as_string()};
-    if (blend == std::string{"add"}) {
+    if (blend == std::string{"add"} || blend == std::string{"ADD"}) {
       emi.blend_mode_ = SDL_BLENDMODE_ADD;
-    } else if (blend == std::string{"blend"}) {
+    } else if (blend == std::string{"blend"} || blend == std::string{"BLEND"}) {
       emi.blend_mode_ = SDL_BLENDMODE_BLEND;
-    } else if (blend == std::string{"mod"}) {
+    } else if (blend == std::string{"mod"} || blend == std::string{"MOD"}) {
       emi.blend_mode_ = SDL_BLENDMODE_MOD;
     } else {
       emi.blend_mode_ = SDL_BLENDMODE_NONE;
