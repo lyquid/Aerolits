@@ -6,11 +6,11 @@
 
     <blendMode mode="add"/>
 
-    <emissionInterval value="0" randMin="1" randMax="1"/> <!-- In miliseconds. 0 for continuous emission -->
+    <emissionInterval value="10" randMin="1" randMax="1"/> <!-- In miliseconds. 0 for continuous emission -->
 
-    <emissionRate value="1" randMin="1" randMax="1"/>
+    <emissionRate value="50" randMin="1" randMax="1"/>
 
-    <lifeTime value="-1"/> <!-- In miliseconds. Negative for infinite -->
+    <lifeTime value="1000"/> <!-- In miliseconds. Negative for infinite -->
 
     <textureRect x="256" y="64" w="128" h="128"/>
 
@@ -21,26 +21,29 @@
 
     <!-- Particles properties -->
 
-    <maxParticleLife value="450" randMin="0" randMax="1"/>
- 
+    <maxParticleLife value="450" randMin="1" randMax="1"/>
+
     <colors>
-      <color r="255" g="0" b="0"   a="255"/>
-      <color r="0" g="255"   b="0"   a="255"/>
-      <color r="0"   g="0"   b="0" a="255"/>
+      <color r="1" g="0" b="0"   a="100"/>
+      <color r="0" g="255"   b="255"   a="255"/>
+      <color r="0"   g="0"   b="255" a="255"/>
     </colors>
 
-    <startSize value="10" randMin="1" randMax="1"/>
-    <endSize   value="50"  randMin="1" randMax="1"/>
+    <sizes>
+      <size value="1" randMin="1" randMax="1"/>
+      <size value="100"  randMin="1" randMax="1"/>
+      <size value="10" randMin="1" randMax="1"/>
+    </sizes>
 
     <speeds>
-      <speed value="0.9" randMin="1"  randMax="1"/>
-      <speed value="0.00001" randMin="1"  randMax="1"/>
-      <speed value="0.9" randMin="1"  randMax="1"/>
+      <speed value="0.5" randMin="1"  randMax="1"/>
+      <speed value="0.001" randMin="1"  randMax="1"/>
+      <speed value="150" randMin="0.8"  randMax="1"/>
     </speeds>
 
     <rotation value="360" randMin="0" randMax="1"/>
 
-    <startRotationSpeed value="0.1"  randMin="-1" randMax="1"/>
-    <endRotationSpeed   value="1"   randMin="-1" randMax="1"/>
+    <startRotationSpeed value="0"  randMin="-1" randMax="1"/>
+    <endRotationSpeed   value="0"   randMin="-1" randMax="1"/>
   </emitter>
 </emitterTypes>

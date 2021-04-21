@@ -51,7 +51,7 @@ namespace Colors {
   auto colorDistance (const SDL_Color& color1, const SDL_Color& color2);
   SDL_Color getNearestColor(const SDL_Color& color);
 
-} // end namespace colors
+} // end namespace Colors
 
 } // end namespace ktp
 

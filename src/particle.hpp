@@ -16,33 +16,25 @@ namespace ParticlesAtlas {
 
 using ColorsVector = std::vector<SDL_Color>;
 using FPointsVector = std::vector<SDL_FPoint>;
+using SizeVector = std::vector<float>;
 
 struct Vortex;
 
 struct ParticleData {
-  unsigned int start_life_{};
-  
-  SDL_Rect texture_rect_{};
-
-  ColorsVector colors_{};
-  SDL_Color    current_color_{};
-
-  float start_size_{};
-  float current_size_{};
-  float end_size_{};
-
+  unsigned int  start_life_{};
+  SDL_Rect      texture_rect_{};
+  ColorsVector  colors_{};
+  SDL_Color     current_color_{};
+  SizeVector    sizes_{};
+  float         current_size_{};
   FPointsVector speeds_{};
-  SDL_FPoint current_speed_{};
-
-  float rotation_{};
-
-  float start_rotation_speed_{};
-  float current_rotation_speed_{};
-  float end_rotation_speed_{};
-
-  SDL_FPoint position_{};
-  
-  float time_step_{};
+  SDL_FPoint    current_speed_{};
+  float         rotation_{};
+  float         start_rotation_speed_{};
+  float         current_rotation_speed_{};
+  float         end_rotation_speed_{};
+  SDL_FPoint    position_{};
+  float         time_step_{};
 };
 
 class Particle {

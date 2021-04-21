@@ -106,20 +106,23 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     if (emi.colors_.size() > 3) {
       logMessage("WARNING! Emitter \"" + type + "\" has more than 3 colors, but only the first 3 will be used for interpolation.");
     }
-    /* START SIZE */
-    if (emitter.child("startSize").attribute("value").as_float() < 0) {
-      logMessage("WARNING! Emitter \"" + type + "\" has a negative start size.");
+    /* SIZES */
+    it = emitter.child("sizes").begin();
+    while (it != emitter.child("sizes").end()) {
+      const RRVFloat size {
+        it->attribute("value").as_float(),
+        it->attribute("randMin").as_float(),
+        it->attribute("randMax").as_float()
+      };
+      if (size.value_ < 0) {
+        logMessage("WARNING! Emitter \"" + type + "\" has a negative size.");
+      }
+      emi.sizes_.push_back(size);
+      ++it;
     }
-    emi.start_size_.value_    = emitter.child("startSize").attribute("value").as_float();
-    emi.start_size_.rand_min_ = emitter.child("startSize").attribute("randMin").as_float();
-    emi.start_size_.rand_max_ = emitter.child("startSize").attribute("randMax").as_float();
-    /* END SIZE */
-    if (emitter.child("endSize").attribute("value").as_float() < 0) {
-      logMessage("WARNING! Emitter \"" + type + "\" has a negative end size.");
+    if (emi.sizes_.size() > 3) {
+      logMessage("WARNING! Emitter \"" + type + "\" has more than 3 sizes, but only the first 3 will be used for interpolation.");
     }
-    emi.end_size_.value_    = emitter.child("endSize").attribute("value").as_float();
-    emi.end_size_.rand_min_ = emitter.child("endSize").attribute("randMin").as_float();
-    emi.end_size_.rand_max_ = emitter.child("endSize").attribute("randMax").as_float();
     /* SPEEDS */
     it = emitter.child("speeds").begin();
     while (it != emitter.child("speeds").end()) {

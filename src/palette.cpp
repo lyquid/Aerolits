@@ -1,6 +1,6 @@
 #include "palette.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
-#include <cmath>
+#include <cmath> // sqrt
 #include <string>
 
 auto ktp::Colors::colorDistance (const SDL_Color& color1, const SDL_Color& color2) {

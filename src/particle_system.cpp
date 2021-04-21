@@ -119,8 +119,11 @@ void ktp::Emitter::generateParticles() {
 
     new_data.texture_rect_ = data_->texture_rect_;
 
-    new_data.start_size_ = data_->start_size_.value_ * generateRand(data_->start_size_.rand_min_, data_->start_size_.rand_max_);
-    new_data.end_size_ = data_->end_size_.value_ * generateRand(data_->end_size_.rand_min_, data_->end_size_.rand_max_);
+    for (const auto& size: data_->sizes_) {
+      const auto final_size {size.value_ * generateRand(size.rand_min_, size.rand_max_)};
+      new_data.sizes_.push_back(final_size);
+    }
+    new_data.current_size_ = new_data.sizes_.front();
 
     new_data.colors_ = data_->colors_;
     if (data_->colors_.size() == 0) {

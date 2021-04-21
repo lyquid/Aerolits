@@ -60,8 +60,8 @@ void ktp::Particle::init(const ParticleData& data) {
   life_ = data.start_life_;
   state_.live_ = data;
   // position is set to center the texture on the emitter
-  state_.live_.position_ = {data.position_.x - data.start_size_ * 0.5f, 
-                            data.position_.y - data.start_size_ * 0.5f};
+  state_.live_.position_ = {data.position_.x - data.current_size_ * 0.5f, 
+                            data.position_.y - data.current_size_ * 0.5f};
 }
 
 SDL_Color ktp::Particle::interpolate2Colors(const SDL_Color& start_color, const SDL_Color& end_color, float time_step) {
@@ -89,7 +89,11 @@ bool ktp::Particle::update(float delta_time) {
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
   // size interpolation
   const float last_size{state_.live_.current_size_};
-  state_.live_.current_size_ = interpolateRange(state_.live_.start_size_, state_.live_.end_size_, state_.live_.time_step_);
+  if (state_.live_.sizes_.size() == 2) {
+    state_.live_.current_size_ = interpolateRange(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.time_step_);
+  } else if (state_.live_.sizes_.size() > 2) {
+    state_.live_.current_size_ = interpolateRange3(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.sizes_[2], state_.live_.time_step_);
+  }
   // new position based on the new size
   state_.live_.position_.x += ((last_size - state_.live_.current_size_) * 0.5f);
   state_.live_.position_.y += ((last_size - state_.live_.current_size_) * 0.5f);
@@ -125,7 +129,11 @@ bool ktp::Particle::update(float delta_time, const Vortex& vortex) {
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
   // size interpolation
   const float last_size{state_.live_.current_size_};
-  state_.live_.current_size_ = interpolateRange(state_.live_.start_size_, state_.live_.end_size_, state_.live_.time_step_);
+  if (state_.live_.sizes_.size() == 2) {
+    state_.live_.current_size_ = interpolateRange(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.time_step_);
+  } else if (state_.live_.sizes_.size() > 2) {
+    state_.live_.current_size_ = interpolateRange3(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.sizes_[2], state_.live_.time_step_);
+  }
   // new position based on the new size
   state_.live_.position_.x += ((last_size - state_.live_.current_size_) * 0.5f);
   state_.live_.position_.y += ((last_size - state_.live_.current_size_) * 0.5f);

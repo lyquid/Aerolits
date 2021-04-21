@@ -16,7 +16,7 @@ using RRVInt = RandomRangeValue<int>;
 using RRVUint = RandomRangeValue<unsigned int>;
 using RRVFloat = RandomRangeValue<float>;
 using ColorsVector = std::vector<SDL_Color>;
-using SpeedsVector = std::vector<RRVFloat>;
+using RRVFVector = std::vector<RRVFloat>;
 
 enum class EmitterTypes {
   Exhaust,
@@ -42,9 +42,8 @@ struct EmitterType {
   // Particles properties
   RRVUint      max_particle_life_{};
   ColorsVector colors_{};
-  RRVFloat     start_size_{};
-  RRVFloat     end_size_{};
-  SpeedsVector speeds_{};
+  RRVFVector   sizes_{};
+  RRVFVector   speeds_{};
   RRVFloat     rotation_{};
   RRVFloat     start_rotation_speed_{};
   RRVFloat     end_rotation_speed_{};
