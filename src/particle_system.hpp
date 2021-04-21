@@ -4,6 +4,7 @@
 #include "emitter_parser.hpp"
 #include "particle.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include <string>
 #include <utility> // std::move
 
 namespace ktp {
@@ -25,7 +26,7 @@ struct Vortex {
 class Emitter {
  public:
   
-  Emitter(EmitterTypes type, const SDL_FPoint& pos) noexcept;
+  Emitter(const std::string& type, const SDL_FPoint& pos) noexcept;
   Emitter(const Emitter& other) noexcept { *this = other; }
   Emitter(Emitter&& other) noexcept { *this = std::move(other); }
   ~Emitter() noexcept { delete[] particles_pool_; }

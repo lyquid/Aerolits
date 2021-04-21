@@ -1,6 +1,5 @@
 #include "palette.hpp"
 #include "particle_system.hpp"
-//#include <algorithm> // std::copy
 #include <cmath> // std::round
 #include <random> // std::rand
 
@@ -21,7 +20,7 @@ double ktp::generateRand(double min, double max) {
 
 /* EMITTER */
 
-ktp::Emitter::Emitter(EmitterTypes type, const SDL_FPoint& pos) noexcept : position_(pos) {
+ktp::Emitter::Emitter(const std::string& type, const SDL_FPoint& pos) noexcept : position_(pos) {
   bool emitter_found{false};
   for (const auto& emitter_type: EmitterParser::emitter_types) {
     if (emitter_type.type_ == type) {
@@ -33,7 +32,8 @@ ktp::Emitter::Emitter(EmitterTypes type, const SDL_FPoint& pos) noexcept : posit
     }
   }
   if (!emitter_found) {
-    logErrorMessage("Emitter type not found! This should never be seen...");
+    logErrorMessage("Emitter type \"" + type + "\" not found! Check emitters.xml for spelling errors or missing emitters.");
+    return;
   }
   inflatePool();
 }

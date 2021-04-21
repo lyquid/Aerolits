@@ -4,6 +4,7 @@
 #include "../include/pugixml1.11/pugixml.hpp"
 #include "../include/resources_path.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include <string>
 #include <vector>
 
 namespace ktp {
@@ -18,17 +19,9 @@ using RRVFloat = RandomRangeValue<float>;
 using ColorsVector = std::vector<SDL_Color>;
 using RRVFVector = std::vector<RRVFloat>;
 
-enum class EmitterTypes {
-  Exhaust,
-  Fire,
-  Love,
-  Smoke,
-  count
-};
-
 struct EmitterType {
   // Emitter properties
-  EmitterTypes  type_{};
+  std::string   type_{};
   AngleRange    angle_range_{};
   SDL_BlendMode blend_mode_{};
   RRVUint       emission_interval_{};

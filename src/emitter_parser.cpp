@@ -1,7 +1,7 @@
 #include "palette.hpp"
 #include "emitter_parser.hpp"
+#include <algorithm> // std::transform
 #include <sstream>
-#include <string>
 #include <vector>
 
 std::vector<ktp::EmitterType> ktp::EmitterParser::emitter_types{};
@@ -12,20 +12,10 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
   for (const auto& emitter: emitters) {
     EmitterType emi{};
     /* EMITTER TYPE */
-    const std::string type{emitter.attribute("type").as_string()};
+    std::string type{emitter.attribute("type").as_string()};
+    std::transform(type.begin(), type.end(), type.begin(), ::tolower);
     types_created += (type + ' ');
-    if (type == std::string{"exhaust"}) {
-      emi.type_ = EmitterTypes::Exhaust;
-    } else if (type == std::string{"fire"}) {
-      emi.type_ = EmitterTypes::Fire;
-    } else if (type == std::string{"love"}) {
-      emi.type_ = EmitterTypes::Love;
-    } else if (type == std::string{"smoke"}) {
-      emi.type_ = EmitterTypes::Smoke;
-    } else {
-      logErrorMessage("Unknown emitter type");
-      return;
-    }
+    emi.type_ = type;
     /* ANGLE RANGE - the "magic number" is to compensate the inverted y coordinate and put 0º at the top: 45º + 90º */
     #ifndef M_PI
       constexpr auto kPI{3.14159265358979323846264338327950288};
