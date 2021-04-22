@@ -83,7 +83,7 @@ SDL_Color ktp::Particle::interpolate3Colors(const SDL_Color& start_color, const 
 }
 
 /* return true if the previously live particle gave up the ghost in that frame */
-bool ktp::Particle::update(float delta_time) {
+bool ktp::Particle::update() {
   // time step increment to interpolate
   state_.live_.time_step_ += (1.f / state_.live_.start_life_);
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
@@ -123,7 +123,7 @@ bool ktp::Particle::update(float delta_time) {
 }
 
 /* return true if the previously live particle gave up the ghost in that frame */
-bool ktp::Particle::update(float delta_time, const Vortex& vortex) {
+bool ktp::Particle::update(const Vortex& vortex) {
   // time step increment to interpolate
   state_.live_.time_step_ += (1.f / state_.live_.start_life_);
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;

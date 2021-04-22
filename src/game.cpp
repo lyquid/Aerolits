@@ -133,7 +133,7 @@ void ktp::Game::update(float delta_time) {
       iter = emitters_.erase(iter);
     } else {
       iter->generateParticles();
-      iter->update(delta_time);
+      iter->update();
       ++iter;
     }
   }

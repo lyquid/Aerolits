@@ -42,7 +42,7 @@ class Emitter {
   inline void setPosition(const SDL_FPoint& pos) { position_ = pos; }
   inline bool particlesAlive() const { return alive_particles_count_ != 0u; }
   inline bool lifeTimeOver() const { return SDL2_Timer::getSDL2Ticks() - start_time_ >= data_->life_time_; }
-  void update(float delta_time);
+  void update();
 
  private:
 

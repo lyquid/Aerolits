@@ -48,8 +48,8 @@ class Particle {
   void init(const ParticleData& data);
   inline bool inUse() const { return life_ > 0; }
   inline void setNext(Particle* next) { state_.next_ = next; }
-  bool update(float delta_time);
-  bool update(float delta_time, const Vortex& vortex);
+  bool update();
+  bool update(const Vortex& vortex);
 
   Particle& operator=(const Particle& other) noexcept;
   Particle& operator=(Particle&& other) noexcept;

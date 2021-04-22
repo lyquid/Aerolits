@@ -175,16 +175,16 @@ void ktp::Emitter::inflatePool() {
   particles_pool_[particles_pool_size_ - 1].setNext(nullptr);
 }
 
-void ktp::Emitter::update(float delta_time) {
+void ktp::Emitter::update() {
   for (auto i = 0u; i < particles_pool_size_; ++i) {
     if (data_->vortex_) {
-      if (particles_pool_[i].inUse() && particles_pool_[i].update(delta_time, Vortex{position_, data_->vortex_scale_, data_->vortex_speed_})) {
+      if (particles_pool_[i].inUse() && particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_})) {
         particles_pool_[i].setNext(first_available_);
         first_available_ = &particles_pool_[i];
         --alive_particles_count_;
       }
     } else { // no vortex
-      if (particles_pool_[i].inUse() && particles_pool_[i].update(delta_time)) {
+      if (particles_pool_[i].inUse() && particles_pool_[i].update()) {
         particles_pool_[i].setNext(first_available_);
         first_available_ = &particles_pool_[i];
         --alive_particles_count_;

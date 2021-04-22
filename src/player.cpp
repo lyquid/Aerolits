@@ -149,7 +149,7 @@ void ktp::Player::thrust(float delta_time) {
 void ktp::Player::update(float delta_time) {
   move(delta_time);
   rotate();
-  exhaust_emitter_.update(delta_time);
+  exhaust_emitter_.update();
   if (!lasers_.empty()) updateLasers(delta_time);
 }
 
