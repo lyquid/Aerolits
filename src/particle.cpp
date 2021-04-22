@@ -146,8 +146,15 @@ bool ktp::Particle::update(const Vortex& vortex) {
   // rotation speed interpolation
   state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.end_rotation_speed_, state_.live_.time_step_);
   state_.live_.rotation_ += state_.live_.current_rotation_speed_;
+  // speed interpolation
+  if (state_.live_.speeds_.size() == 2) {
+    state_.live_.current_speed_.x = interpolateRange(state_.live_.speeds_[0].x, state_.live_.speeds_[1].x, state_.live_.time_step_);
+    state_.live_.current_speed_.y = interpolateRange(state_.live_.speeds_[0].y, state_.live_.speeds_[1].y, state_.live_.time_step_);
+  } else if (state_.live_.speeds_.size() > 2) {
+    state_.live_.current_speed_.x = interpolateRange3(state_.live_.speeds_[0].x, state_.live_.speeds_[1].x, state_.live_.speeds_[2].x, state_.live_.time_step_);
+    state_.live_.current_speed_.y = interpolateRange3(state_.live_.speeds_[0].y, state_.live_.speeds_[1].y, state_.live_.speeds_[2].y, state_.live_.time_step_);
+  }
   // vortex stuff
-  // not sure how to interpolate between speeds and the vortex
   const auto dx{state_.live_.position_.x - vortex.position_.x};
   const auto dy{state_.live_.position_.y - vortex.position_.y};
 
@@ -155,10 +162,10 @@ bool ktp::Particle::update(const Vortex& vortex) {
   const auto vy{ dx * vortex.speed_};
 
   const auto factor{1.f / (1.f + (dx * dx + dy * dy) / vortex.scale_)};
+  // position update
+  state_.live_.position_.x += (vx - state_.live_.current_speed_.x) * factor;
+  state_.live_.position_.y += (vy - state_.live_.current_speed_.y) * factor;
   
-  state_.live_.position_.x += (vx - state_.live_.current_speed_.x) * factor + state_.live_.current_speed_.x;
-  state_.live_.position_.y += (vy - state_.live_.current_speed_.y) * factor + state_.live_.current_speed_.y;
-
   --life_;
   return life_ == 0; 
 }
