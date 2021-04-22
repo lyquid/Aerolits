@@ -71,7 +71,13 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     emi.vortex_ = emitter.child("vortex").attribute("active").as_bool();
     if (emi.vortex_) {
       emi.vortex_scale_ = emitter.child("vortex").child("scale").attribute("value").as_float();
+      if (emitter.child("vortex").child("scale").attribute("value").as_float() == 0.f) {
+        logMessage("WARNING! Emitter \"" + type + "\" has a vortex with 0 scale.");
+      }
       emi.vortex_speed_ = emitter.child("vortex").child("speed").attribute("value").as_float();
+      if (emitter.child("vortex").child("speed").attribute("value").as_float() == 0.f) {
+        logMessage("WARNING! Emitter \"" + type + "\" has a vortex with 0 speed.");
+      }
     }
     /* PARTICLE LIFE */
     if (emitter.child("maxParticleLife").attribute("value").as_uint() <= 0) {
