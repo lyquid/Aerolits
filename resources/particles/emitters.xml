@@ -14,7 +14,7 @@
 
     <textureRect x="256" y="64" w="128" h="128"/>
 
-    <vortex active="true">
+    <vortex active="false">
       <scale value="1000"/>
       <speed value="0.1"/>
     </vortex>

@@ -1,9 +1,8 @@
-#ifndef KTP_SDL2_WRAPPERS_SDL2_WINDOW_H_
-#define KTP_SDL2_WRAPPERS_SDL2_WINDOW_H_
+#ifndef KTP_SDL2_WRAPPERS_SDL2_WINDOW_HPP_
+#define KTP_SDL2_WRAPPERS_SDL2_WINDOW_HPP_
 
-#include "sdl2_log.hpp"
 #include <SDL.h>
-#include <memory>
+#include <memory> // unique_ptr
 #include <string>
 
 namespace ktp {
@@ -25,7 +24,7 @@ class SDL2_Window {
   * @param size An SDL_Point structure with the desired size of the window.
   * @return True on success, or false on errors.
   */
-  bool create(const SDL_Point& size) { return create("", size); }
+  bool create(const SDL_Point& size) { return create("", size, 0); }
 
   /**
   * Creates a SDL_Window with the specified title and size.
@@ -33,7 +32,28 @@ class SDL2_Window {
   * @param size An SDL_Point structure with the desired size of the window.
   * @return True on success, or false on errors.
   */
-  bool create(const std::string& title, const SDL_Point& size);
+  bool create(const std::string& title, const SDL_Point& size) { return create(title, size, 0); }
+
+  /**
+  * Creates a SDL_Window with the specified title and size.
+  * @param title A string for use as title.
+  * @param size An SDL_Point structure with the desired size of the window.
+  * @param flags The flags for the window, a mask of any of the following: 
+  * ::SDL_WINDOW_FULLSCREEN, ::SDL_WINDOW_OPENGL, ::SDL_WINDOW_HIDDEN, 
+  * ::SDL_WINDOW_BORDERLESS, ::SDL_WINDOW_RESIZABLE, ::SDL_WINDOW_MAXIMIZED, 
+  * ::SDL_WINDOW_MINIMIZED, ::SDL_WINDOW_INPUT_GRABBED, ::SDL_WINDOW_ALLOW_HIGHDPI, 
+  * ::SDL_WINDOW_VULKAN ::SDL_WINDOW_METAL.
+  * @return True on success, or false on errors.
+  */
+  bool create(const std::string& title, const SDL_Point& size, Uint32 flags);
+
+  /**
+  * Creates a full screen SDL_Window with the specified title and size.
+  * @param title A string for use as title.
+  * @param size An SDL_Point structure with the desired size of the window.
+  * @return True on success, or false on errors.
+  */
+  bool createFullScreen(const std::string& title, const SDL_Point& size) { return create(title, size, SDL_WINDOW_FULLSCREEN_DESKTOP); }
 
   /**
    * Use this function to get the window that currently has an input grab enabled.
@@ -225,4 +245,4 @@ class SDL2_Window {
 
 } // end namespace ktp
 
-#endif // KTP_SDL2_WRAPPERS_SDL2_WINDOW_H_
+#endif // KTP_SDL2_WRAPPERS_SDL2_WINDOW_HPP_

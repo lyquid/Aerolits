@@ -1,7 +1,6 @@
-#ifndef KTP_SDL2_WRAPPERS_SDL2_MUSIC_H_
-#define KTP_SDL2_WRAPPERS_SDL2_MUSIC_H_
+#ifndef KTP_SDL2_WRAPPERS_SDL2_MUSIC_HPP_
+#define KTP_SDL2_WRAPPERS_SDL2_MUSIC_HPP_
 
-#include "sdl2_log.hpp"
 #include <SDL_mixer.h>
 #include <memory>
 #include <string>
@@ -85,4 +84,4 @@ class SDL2_Music {
 
 } // end namespace ktp
 
-#endif // KTP_SDL2_WRAPPERS_SDL2_MUSIC_H_
+#endif // KTP_SDL2_WRAPPERS_SDL2_MUSIC_HPP_

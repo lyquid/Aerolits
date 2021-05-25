@@ -1,5 +1,5 @@
-#ifndef KTP_SDL2_WRAPPERS_SDL2_LOG_H_
-#define KTP_SDL2_WRAPPERS_SDL2_LOG_H_
+#ifndef KTP_SDL2_WRAPPERS_SDL2_LOG_HPP_
+#define KTP_SDL2_WRAPPERS_SDL2_LOG_HPP_
 
 #include <SDL.h>
 #include <iostream>
@@ -82,4 +82,4 @@ inline void logSDL2Error(std::ostream& os, std::string_view msg, std::string_vie
 
 } // end namespace ktp
 
-#endif // KTP_SDL2_WRAPPERS_SDL2_LOG_H_
+#endif // KTP_SDL2_WRAPPERS_SDL2_LOG_HPP_

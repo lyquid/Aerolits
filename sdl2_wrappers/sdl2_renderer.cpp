@@ -1,4 +1,7 @@
 #include "sdl2_renderer.hpp"
+#include "sdl2_log.hpp"
+#include <cctype> // std::toupper
+#include <sstream> // stringstream
 
 bool ktp::SDL2_Renderer::clear() const {
   if (SDL_RenderClear(renderer_.get()) == 0) {
@@ -7,15 +10,31 @@ bool ktp::SDL2_Renderer::clear() const {
   return false;
 }
 
-bool ktp::SDL2_Renderer::create(const SDL2_Window& window) {
-  renderer_.reset(SDL_CreateRenderer(window.getWindow(), -1, SDL_RENDERER_ACCELERATED/*  | SDL_RENDERER_PRESENTVSYNC */));
+bool ktp::SDL2_Renderer::create(const SDL2_Window& window, Uint32 flags, const std::string& scale_q) {
+  renderer_.reset(SDL_CreateRenderer(window.getWindow(), -1, flags));
   if (renderer_ == nullptr) {
     logSDL2Error("SDL_CreateRenderer");
     return false;
   }
   getRendererInfo();
-  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+  if (scale_q == std::string{"linear"} || scale_q == std::string{"best"}) {
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scale_q.c_str());
+  }
   SDL_RenderSetLogicalSize(renderer_.get(), window.getSize().x, window.getSize().y);
+  return true;
+}
+
+bool ktp::SDL2_Renderer::create(const SDL2_Window& window, const SDL_Point& size, Uint32 flags, const std::string& scale_q) {
+  renderer_.reset(SDL_CreateRenderer(window.getWindow(), -1, flags));
+  if (renderer_ == nullptr) {
+    logSDL2Error("SDL_CreateRenderer");
+    return false;
+  }
+  getRendererInfo();
+  if (scale_q == std::string{"linear"} || scale_q == std::string{"best"}) {
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scale_q.c_str());
+  }
+  SDL_RenderSetLogicalSize(renderer_.get(), size.x, size.y);
   return true;
 }
 

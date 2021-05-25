@@ -1,8 +1,7 @@
-#ifndef KTP_SDL2_WRAPPERS_SDL2_TEXTURE_H_
-#define KTP_SDL2_WRAPPERS_SDL2_TEXTURE_H_
+#ifndef KTP_SDL2_WRAPPERS_SDL2_TEXTURE_HPP_
+#define KTP_SDL2_WRAPPERS_SDL2_TEXTURE_HPP_
 
 #include "sdl2_font.hpp"
-#include "sdl2_log.hpp"
 #include "sdl2_renderer.hpp"
 
 #include <SDL.h>
@@ -25,9 +24,19 @@ template <> struct deleter<SDL_Texture> {
 class SDL2_Texture {
  public:
   
-  inline int getHeight() const { return height_; }
-  inline int getWidth() const { return width_; }
+  bool create(Uint32 format, int access, const SDL_Point& size);
+
+  inline auto getAccess() const { return access_; }
+  
+  inline auto getFormat() const { return format_; }
+
+  inline auto getHeight() const { return height_; }
+
+  inline auto getWidth() const { return width_; }
+
   inline SDL_Point getSize() const { return {width_, height_}; }
+
+  inline SDL_Texture* getTexture() const { return texture_.get(); }
 
   /**
   * Load an image file to an SDL_Surface and then calls createTextureFromSurface() 
@@ -66,6 +75,50 @@ class SDL2_Texture {
   text is not as smooth. The resulting surface should blit faster than the Blended one. Use this mode for FPS and 
   other fast changing updating text displays. */
   bool loadFromTextSolid(const SDL2_Font& font, const std::string& text, const SDL_Color& color);
+
+  /**
+   * Lock a texture for write-only pixel access.
+   * @param pixels This is filled in with a pointer to the locked pixels, 
+   *                appropriately offset by the locked area.
+   * @param pitch This is filled in with the pitch of the locked pixels; 
+   *              the pitch is the length of one row in bytes
+   */
+  inline void lock(void** pixels, int* pitch) {
+    SDL_LockTexture(texture_.get(), NULL, pixels, pitch);
+  }
+
+  /**
+   * Lock a portion of the texture for write-only pixel access.
+   * @param rect An SDL_Rect structure representing the area to lock for access; 
+   *              NULL to lock the entire texture.
+   * @param pixels This is filled in with a pointer to the locked pixels, 
+   *                appropriately offset by the locked area.
+   * @param pitch This is filled in with the pitch of the locked pixels; 
+   *              the pitch is the length of one row in bytes
+   */
+  inline void lock(const SDL_Rect* rect, void** pixels, int* pitch) {
+    SDL_LockTexture(texture_.get(), rect, pixels, pitch);
+  }
+
+  /**
+   * Query the attributes of a texture.
+   * @param texture The texture to query.
+   * @param format A pointer filled in with the raw format of the texture; the 
+   * actual format may differ, but pixel transfers will use this format (one of 
+   * the SDL_PixelFormatEnum values).
+   * @param access A pointer filled in with the actual access to the texture 
+   * (one of the SDL_TextureAccess values).
+   * @param width A pointer filled in with the width of the texture in pixels.
+   * @param height A pointer filled in with the height of the texture in pixels.
+   * @return True on success, or false on errors.
+   */
+  static bool queryTexture(SDL2_Texture texture, Uint32* format, int* access, int* width, int* height);  
+
+  /**
+  * Renders the whole texture to the renderer member.
+  * @return True on success, or false on errors.
+  */
+  bool render();
 
   /**
   * Renders the whole texture to the renderer member.
@@ -134,7 +187,34 @@ class SDL2_Texture {
   * Don't try to render the texture without having called this function.
   * @param ren The address of the renderer in which the texture shall be rendered in.
   */
-  inline void setRenderer(SDL2_Renderer& ren) { renderer_ = &ren; }
+  inline void setRenderer(const SDL2_Renderer& ren) { renderer_ = &ren; }
+
+  /**
+   * Updates the given texture rectangle with new pixel data.
+   * @param pixels The raw pixel data in the format of the texture.
+   * @param pitch The number of bytes in a row of pixel data, including padding between lines
+   */
+  inline void update(const void* pixels, int pitch) {
+    SDL_UpdateTexture(texture_.get(), NULL, pixels, pitch);
+  }
+
+  /**
+   * Unlocks a texture, uploading the changes to video memory, if needed.
+   */
+  inline void unlock() {
+    SDL_UnlockTexture(texture_.get());
+  }
+
+  /**
+   * Updates the given texture rectangle with new pixel data.
+   * @param rect An SDL_Rect structure representing the area to update, or NULL 
+   *              to update the entire texture.
+   * @param pixels The raw pixel data in the format of the texture.
+   * @param pitch The number of bytes in a row of pixel data, including padding between lines
+   */
+  inline void update(const SDL_Rect* rect, const void* pixels, int pitch) {
+    SDL_UpdateTexture(texture_.get(), rect, pixels, pitch);
+  }
 
  private:
 
@@ -148,12 +228,15 @@ class SDL2_Texture {
   template <typename T>
   using unique_ptr_deleter = std::unique_ptr<T, deleter<T>>;
 
-  unique_ptr_deleter<SDL_Texture> texture_{nullptr};
-  SDL2_Renderer* renderer_{nullptr};
-  int height_{};
-  int width_{};
+  unique_ptr_deleter<SDL_Texture> texture_ {nullptr};
+  const SDL2_Renderer* renderer_ {nullptr};
+  
+  int access_ {};
+  Uint32 format_ {};
+  int height_ {};
+  int width_ {};
 };
 
 } // end namespace ktp
 
-#endif // KTP_SDL2_WRAPPERS_SDL2_TEXTURE_H_
+#endif // KTP_SDL2_WRAPPERS_SDL2_TEXTURE_HPP_

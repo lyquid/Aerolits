@@ -1,4 +1,16 @@
 #include "sdl2_texture.hpp"
+#include "sdl2_log.hpp"
+
+bool ktp::SDL2_Texture::create(Uint32 format, int access, const SDL_Point& size) {
+  texture_.reset(SDL_CreateTexture(renderer_->getRenderer(), format, access, size.x, size.y));
+  if (texture_ == nullptr) { 
+    logSDL2Error("SDL_CreateTexture");
+    return false;
+  } else {
+    SDL_QueryTexture(texture_.get(), &format_, &access_, &width_, &height_);
+    return true;
+  }
+}
 
 bool ktp::SDL2_Texture::loadFromFile(const std::string& path) {
   const auto surface{IMG_Load(path.c_str())};
@@ -44,6 +56,22 @@ bool ktp::SDL2_Texture::loadFromTextSolid(const ktp::SDL2_Font& font, const std:
   return texture_ != nullptr;
 }
 
+bool ktp::SDL2_Texture::queryTexture(SDL2_Texture texture, Uint32* format, int* access, int* width, int* height) {
+  if (SDL_QueryTexture(texture.getTexture(), format, access, width, height) != 0) {
+    logSDL2Error("SDL_QueryTexture");
+    return false;
+  }
+  return true;
+}
+
+bool ktp::SDL2_Texture::render() {
+  if (SDL_RenderCopy(renderer_->getRenderer(), texture_.get(), NULL, NULL) != 0) {
+    logSDL2Error("SDL_RenderCopy");
+    return false;
+  }
+  return true;
+}
+
 bool ktp::SDL2_Texture::render(const SDL_Point& where) {
   const SDL_Rect dest{where.x, where.y, width_, height_};
   if (SDL_RenderCopy(renderer_->getRenderer(), texture_.get(), NULL, &dest) != 0) {
@@ -83,7 +111,6 @@ void ktp::SDL2_Texture::createTextureFromSurface(SDL_Surface& surface) {
   if (texture_ == nullptr) {
     logSDL2Error("SDL_CreateTextureFromSurface");
   } else {
-    height_ = surface.h;
-    width_ = surface.w;
+    SDL_QueryTexture(texture_.get(), &format_, &access_, &width_, &height_);
   }
 }

@@ -1,4 +1,5 @@
 #include "sdl2_font.hpp"
+#include "sdl2_log.hpp"
 
 bool ktp::SDL2_Font::initTTF() {
   if (!TTF_WasInit() && TTF_Init() != 0) {

@@ -1,5 +1,5 @@
-#ifndef KTP_SDL2_WRAPPERS_SDL2_TIMER_H_
-#define KTP_SDL2_WRAPPERS_SDL2_TIMER_H_
+#ifndef KTP_SDL2_WRAPPERS_SDL2_TIMER_HPP_
+#define KTP_SDL2_WRAPPERS_SDL2_TIMER_HPP_
 
 #include <SDL.h>
 
@@ -28,4 +28,4 @@ class SDL2_Timer {
 
 } //end namespace ktp
 
-#endif // KTP_SDL2_WRAPPERS_SDL2_TIMER_H_
+#endif // KTP_SDL2_WRAPPERS_SDL2_TIMER_HPP_

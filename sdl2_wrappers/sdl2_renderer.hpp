@@ -1,12 +1,9 @@
-#ifndef KTP_SDL2_WRAPPERS_SDL2_RENDERER_H_
-#define KTP_SDL2_WRAPPERS_SDL2_RENDERER_H_
+#ifndef KTP_SDL2_WRAPPERS_SDL2_RENDERER_HPP_
+#define KTP_SDL2_WRAPPERS_SDL2_RENDERER_HPP_
 
-#include "sdl2_log.hpp"
 #include "sdl2_window.hpp"
 #include <SDL.h>
-#include <algorithm>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -35,9 +32,21 @@ class SDL2_Renderer {
   /**
   * Use this function to create a 2D rendering context for a window.
   * @param window The window where rendering is displayed.
+  * @param flags The renderer flags.
+  * @param scale_q The render scaling quality. Nearest, linear or best.
   * @return True on success, or false on errors.
   */
-  bool create(const SDL2_Window& window);
+  bool create(const SDL2_Window& window, Uint32 flags, const std::string& scale_q = "nearest");
+
+  /**
+  * Use this function to create a 2D rendering context for a window.
+  * @param window The window where rendering is displayed.
+  * @param size The renderer logical size.
+  * @param flags The renderer flags.
+  * @param scale_q The render scaling quality.
+  * @return True on success, or false on errors.
+  */
+  bool create(const SDL2_Window& window, const SDL_Point& size, Uint32 flags, const std::string& scale_q = "nearest");
 
   bool drawLines(const std::vector<SDL_Point>& points) const;
   
@@ -122,4 +131,4 @@ class SDL2_Renderer {
 
 } // end namespace ktp
 
-#endif // KTP_SDL2_WRAPPERS_SDL2_RENDERER_H_
+#endif // KTP_SDL2_WRAPPERS_SDL2_RENDERER_HPP_

@@ -89,7 +89,7 @@ void ktp::Game::handleSDL2KeyEvents(const SDL_Keycode& key) {
 bool ktp::Game::init() {
   if (!initSDL2()) return false;
   if (!main_window_.create(kGameTitle_, screen_size_)) return false;
-  if (!renderer_.create(main_window_)) return false; 
+  if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;    // renderer_.create(main_window_, render_size_, SDL_RENDERER_ACCELERATED)
   if (!loadResources()) return false;
   fps_.start();
   return true;

@@ -10,7 +10,7 @@ namespace kuge {
 class OutputSystem : virtual public System {
  public:
   OutputSystem(EventBus& bus): System(bus) { /* std::cout.sync_with_stdio(false); */ }
-  void handleEvent(const Event& event) { /* std::cout << event; */ }
+  void handleEvent(const Event& event) { std::cout << event; }
 };
 
 } // end namespace kuge

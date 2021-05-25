@@ -1,7 +1,5 @@
-#ifndef KTP_SDL2_WRAPPERS_SDL2_FONT_H_
-#define KTP_SDL2_WRAPPERS_SDL2_FONT_H_
-
-#include "sdl2_log.hpp"
+#ifndef KTP_SDL2_WRAPPERS_SDL2_FONT_HPP_
+#define KTP_SDL2_WRAPPERS_SDL2_FONT_HPP_
 
 #include <SDL.h>
 #include <SDL_ttf.h>
@@ -22,15 +20,15 @@ template <> struct deleter<TTF_Font> {
 struct FontInfo {
   std::string face_family_name_ {};
   std::string face_style_name_ {};
-  int hinting_ = 0;
-  bool kerning_ = false;
-  int line_skip_ = 0;
-  int max_ascent_ = 0;
-  int max_descent_ = 0;
-  int max_height_ = 0;
-  bool monospaced_ = false;
-  int outline_ = 0;
-  int style_ = 0;
+  int hinting_ {};
+  bool kerning_ {};
+  int line_skip_ {};
+  int max_ascent_ {};
+  int max_descent_ {};
+  int max_height_ {};
+  bool monospaced_ {};
+  int outline_ {};
+  int style_ {}; 
 };
 
 class SDL2_Font {
@@ -236,4 +234,4 @@ class SDL2_Font {
 
 } // end namespace ktp
 
-#endif // KTP_SDL2_WRAPPERS_SDL2_FONT_H_
+#endif // KTP_SDL2_WRAPPERS_SDL2_FONT_HPP_

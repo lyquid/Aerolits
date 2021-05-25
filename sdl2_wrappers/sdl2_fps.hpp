@@ -1,5 +1,5 @@
-#ifndef KTP_SDL2_WRAPPERS_SDL2_FPS_H_
-#define KTP_SDL2_WRAPPERS_SDL2_FPS_H_
+#ifndef KTP_SDL2_WRAPPERS_SDL2_FPS_HPP_
+#define KTP_SDL2_WRAPPERS_SDL2_FPS_HPP_
 
 #include "sdl2_timer.hpp"
 
@@ -29,4 +29,4 @@ class SDL2_FPS {
 };
 
 } // namespace ktp
-#endif // KTP_SDL2_WRAPPERS_SDL2_FPS_H_
+#endif // KTP_SDL2_WRAPPERS_SDL2_FPS_HPP_

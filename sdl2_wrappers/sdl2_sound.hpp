@@ -1,9 +1,9 @@
-#ifndef KTP_SDL2_WRAPPERS_SDL2_SOUND_H_
-#define KTP_SDL2_WRAPPERS_SDL2_SOUND_H_
+#ifndef KTP_SDL2_WRAPPERS_SDL2_SOUND_HPP_
+#define KTP_SDL2_WRAPPERS_SDL2_SOUND_HPP_
 
-#include "sdl2_log.hpp"
 #include <SDL_mixer.h>
 #include <memory>
+#include <string>
 
 namespace ktp {
 
@@ -34,4 +34,4 @@ class SDL2_Sound {
 
 } // end namespace ktp
 
-#endif // KTP_SDL2_WRAPPERS_SDL2_SOUND_H_
+#endif // KTP_SDL2_WRAPPERS_SDL2_SOUND_HPP_
