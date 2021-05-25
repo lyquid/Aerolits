@@ -1,8 +1,8 @@
 #ifndef AEROLITS_SRC_GAME_H_
 #define AEROLITS_SRC_GAME_H_
 
+#include "aerolites.hpp"
 #include "background.hpp"
-#include "palette.hpp"
 #include "particle_system.hpp"
 #include "player.hpp"
 #include "../include/resources_path.hpp"
@@ -11,6 +11,7 @@
 
 #include <list>
 #include <string>
+#include <vector>
 
 namespace ktp {
 
@@ -35,27 +36,29 @@ class Game {
   bool initSDL2();
   bool loadResources();
 
-  const std::string kGameTitle_{"Aeròlits"};
-  SDL_Point screen_size_{1366, 768};
-  bool quit_{false};
+  const std::string kGameTitle_ {"Aeròlits"};
+  SDL_Point screen_size_ {1366, 768};
+  bool quit_ {false};
 
-  ktp::SDL2_Window main_window_{};
-  ktp::SDL2_Renderer renderer_{};
-  SDL_Event sdl_event_{};
-  ktp::SDL2_Font font_{};
+  ktp::SDL2_Window main_window_ {};
+  ktp::SDL2_Renderer renderer_ {};
+  SDL_Event sdl_event_ {};
+  ktp::SDL2_Font font_ {};
   /* FPS */
-  ktp::SDL2_FPS fps_{};
+  ktp::SDL2_FPS fps_ {};
   /* KUGE engine */
-  kuge::EventBus event_bus_{};
-  kuge::AudioSystem audio_sys_{event_bus_};
-  kuge::InputSystem input_sys_{event_bus_};
-  kuge::OutputSystem output_sys_{event_bus_};
+  kuge::EventBus event_bus_ {};
+  kuge::AudioSystem audio_sys_ {event_bus_};
+  kuge::InputSystem input_sys_ {event_bus_};
+  kuge::OutputSystem output_sys_ {event_bus_};
   /* Player */
-  ktp::Player player_{screen_size_, event_bus_};
+  ktp::Player player_ {screen_size_, event_bus_};
   /* Background */
-  ktp::Background background_{screen_size_};
+  ktp::Background background_ {screen_size_};
   /* Emitters */
-  std::list<Emitter> emitters_{};
+  std::list<Emitter> emitters_ {};
+  /* Aerolites */
+  std::vector<Aerolite> aerolites_ {};
 };
 
 } // end namespace ktp

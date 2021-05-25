@@ -1,22 +1,7 @@
 #include "palette.hpp"
 #include "particle_system.hpp"
+#include "../include/random.hpp"
 #include <cmath> // std::round
-#include <random> // std::rand
-
-int ktp::generateRand(int min, int max) {
-  const auto random{rand() / RAND_MAX};
-	return min + (random * (max - min));
-}
-
-float ktp::generateRand(float min, float max) {
-  const auto random{static_cast<float>(rand()) / static_cast<float>(RAND_MAX)};
-	return min + (random * (max - min));
-}
-
-double ktp::generateRand(double min, double max) {
-  const auto random{static_cast<double>(rand()) / static_cast<double>(RAND_MAX)};
-	return min + (random * (max - min));
-}
 
 /* EMITTER */
 

@@ -47,6 +47,7 @@ add_executable(	Aerolits  main.cpp
 													kuge/input_system.cpp
 													kuge/output_system.cpp
 													kuge/system.cpp
+													src/aerolites.cpp
 													src/background.cpp
 													src/emitter_parser.cpp
 													src/game.cpp
@@ -90,7 +91,7 @@ if (sdl2-image_FOUND)
 	find_package(sdl2-image CONFIG REQUIRED)
 	find_package(sdl2-ttf CONFIG REQUIRED)
 	find_package(sdl2-mixer CONFIG REQUIRED)
-	target_link_libraries(Yamchd PRIVATE SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf SDL2::SDL2_mixer)
+	target_link_libraries(Aerolits PRIVATE SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf SDL2::SDL2_mixer)
 else()
 	message(STATUS "Using custom cmake find modules for SDL2 libs")
 	find_package(SDL2 REQUIRED)

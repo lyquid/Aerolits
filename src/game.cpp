@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "palette.hpp"
 
 void ktp::loadConfigFiles() {
   EmitterParser::initEmitters();
@@ -43,6 +44,9 @@ void ktp::Game::draw() {
   player_.draw(renderer_);
   for (const auto& emitter: emitters_) {
     emitter.draw();
+  }
+  for (const auto& aerolite: aerolites_) {
+    aerolite.draw(renderer_);
   }
   
   renderer_.present();
@@ -135,6 +139,20 @@ void ktp::Game::update(float delta_time) {
       iter->generateParticles();
       iter->update();
       ++iter;
+    }
+  }
+  /* Aerolites */
+  if (aerolites_.size() < 9) {
+    aerolites_.push_back(Aerolite::spawnAerolite(screen_size_));
+  } else {
+    auto aerolite = aerolites_.begin();
+    while (aerolite != aerolites_.end()) {
+      if (aerolite->canBeDeleted()) {
+        aerolite = aerolites_.erase(aerolite);
+      } else {
+        aerolite->update(delta_time);
+        ++aerolite;
+      }
     }
   }
   /* Event bus */

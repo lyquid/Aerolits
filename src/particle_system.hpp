@@ -13,10 +13,6 @@ namespace ktp {
 /* https://nintervik.github.io/2D-Particle-System/ */
 /* https://gamedevelopment.tutsplus.com/tutorials/adding-turbulence-to-a-particle-system--gamedev-13332 */
 
-inline int generateRand(int min, int max);
-inline float generateRand(float min, float max);
-inline double generateRand(double min, double max);
-
 struct Vortex {
   SDL_FPoint position_{};
   float scale_{};
