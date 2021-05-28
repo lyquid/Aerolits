@@ -1,9 +1,30 @@
 #include "aerolite.hpp"
 #include "palette.hpp"
 
+ktp::Aerolite::Aerolite(const SDL_FPoint& where) noexcept : center_(where) {
+  generateAeroliteShape(kMaxSize_ * generateRand(0.3f, 1.f));
+
+  
+  b2BodyDef body_def {};
+  body_def.type = b2_dynamicBody;
+  body_def.position.Set(0.f, 0.f);
+
+  body_ = b2_world_->CreateBody(&body_def);
+
+  b2PolygonShape dynamic_box {};
+  dynamic_box.SetAsBox(0.5f, 0.5f);
+
+  b2FixtureDef fixture_def {};
+  fixture_def.shape = &dynamic_box;
+  fixture_def.density = 1.f;
+  fixture_def.friction = 0.3f;
+
+  body_->CreateFixture(&fixture_def);
+}
+
 ktp::Aerolite ktp::Aerolite::spawnAerolite(const SDL_Point& screen_size) {
-  Aerolite aerolite {};
-  const auto final_size {kMaxSize_ * generateRand(0.3f, 1.f)};
+  //Aerolite aerolite {};
+  //const auto final_size {kMaxSize_ * generateRand(0.3f, 1.f)};
 /* 
   b2BodyDef body_def {};
   body_def.type = b2_dynamicBody;
@@ -58,29 +79,36 @@ ktp::Aerolite ktp::Aerolite::spawnAerolite(const SDL_Point& screen_size) {
   aerolite.shape_.w = final_size;
   aerolite.shape_.h = final_size; */
   
-  return aerolite;
+  //return aerolite;
 }
 
 ktp::Aerolite ktp::Aerolite::spawnAerolite2() {
-  Aerolite aerolite {};
-
-  b2BodyDef body_def {};
-  body_def.type = b2_dynamicBody;
-  body_def.position.Set(0.f, 0.f);
-
-  aerolite.body_ = b2_world_->CreateBody(&body_def);
-
-  b2PolygonShape dynamic_box {};
-  dynamic_box.SetAsBox(0.5f, 0.5f);
-
-  b2FixtureDef fixture_def {};
-  fixture_def.shape = &dynamic_box;
-  fixture_def.density = 1.f;
-  fixture_def.friction = 0.3f;
-
-  aerolite.body_->CreateFixture(&fixture_def);
-
-  return aerolite;
+  static int side {};
+  constexpr float delta {90};
+  Aerolite aerolite({static_cast<float>(screen_size_.x) / 2, static_cast<float>(screen_size_.y) / 2});
+  switch (side) {
+    case 0: // up
+      aerolite.center_ = {static_cast<float>(screen_size_.x) / 2, 0.f};
+      aerolite.delta_ = {0, delta};
+      ++side;
+      break;
+    case 1: // right
+      aerolite.center_ = {static_cast<float>(screen_size_.x), static_cast<float>(screen_size_.y) / 2};
+      aerolite.delta_ = {-delta, 0};
+      ++side;
+      break;
+    case 2: // down
+      aerolite.center_ = {static_cast<float>(screen_size_.x) / 2, static_cast<float>(screen_size_.y)};
+      aerolite.delta_ = {0, -delta};
+      ++side;
+      break;
+    case 3: // left
+      aerolite.center_ = {0.f, static_cast<float>(screen_size_.y) / 2};
+      aerolite.delta_ = {delta, 0};
+      side = 0;
+      break;
+  }
+  return std::move(aerolite);
 }
 
 void ktp::Aerolite::draw(const SDL2_Renderer& renderer) const {
@@ -121,6 +149,7 @@ void ktp::Aerolite::update(float delta_time) {
   if (center_.x < -kMaxSize_ || center_.x > screen_size_.x + kMaxSize_
    || center_.y < -kMaxSize_ || center_.y > screen_size_.y + kMaxSize_) {
     b2_world_->DestroyBody(body_);
+    body_ = nullptr;
     to_be_deleted_ = true;
   }
 

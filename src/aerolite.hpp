@@ -5,6 +5,8 @@
 #include "../include/random.hpp"
 
 #include <box2d/box2d.h>
+#include <memory> // std::unique_ptr
+#include <utility> // std::move
 #include <vector>
 
 namespace ktp {
@@ -16,9 +18,8 @@ enum class SpawnSides {
 class Aerolite {
  public:
 
-  Aerolite() { generateAeroliteShape(kMaxSize_ * generateRand(0.3f, 1.f)); }
-  // ~Aerolite() { b2_world_->DestroyBody(body_); }
-
+  Aerolite(const SDL_FPoint& where) noexcept;
+  
   static void setB2World(b2World* world) { b2_world_ = world; }
   static void setScreenSize(const SDL_Point& screen_size) { screen_size_ = screen_size; }
   static Aerolite spawnAerolite(const SDL_Point& screen_size);
@@ -48,14 +49,18 @@ class Aerolite {
   SDL_FPoint delta_ {kMaxSpeed_ * generateRand(-1.f, 1.f), kMaxSpeed_ * generateRand(-1.f, 1.f)};
   /* stuff for rotation */
   inline static constexpr float kMaxRotationSpeed_ {0.01f};
-  SDL_FPoint center_ {screen_size_.x / 2, screen_size_.y / 2};
+  SDL_FPoint center_ {};
   float angle_ {generateRand(-180.f, 180.f)};
   float rotation_speed_ {kMaxRotationSpeed_ * generateRand(-1.f, 1.f)};
   
   bool to_be_deleted_ {false};
+
   // box2d
   b2Body* body_ {nullptr};
 };
+
+
+
 
 
 } // namespace ktp
