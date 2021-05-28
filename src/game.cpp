@@ -41,6 +41,9 @@ void ktp::Game::draw() {
   renderer_.clear();
 
   background_.draw(renderer_);
+
+  renderer_.drawCross(Colors::copper_green);
+
   player_.draw(renderer_);
   for (const auto& emitter: emitters_) {
     emitter.draw();
@@ -67,7 +70,7 @@ void ktp::Game::handleSDL2Events() {
       case SDL_MOUSEBUTTONDOWN: {
         int x{0}, y{0};
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          Emitter emi{"fire", {static_cast<float>(x), static_cast<float>(y)}};
+          Emitter emi{"plasma", {static_cast<float>(x), static_cast<float>(y)}};
           // emitters_.push_back(std::move({EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}}));
           emitters_.push_back(std::move(emi));
         }
@@ -92,10 +95,15 @@ void ktp::Game::handleSDL2KeyEvents(const SDL_Keycode& key) {
 
 bool ktp::Game::init() {
   if (!initSDL2()) return false;
+  logMessage("Box2D version: " + std::to_string(b2_version.major) + '.' + std::to_string(b2_version.minor) + '.' + std::to_string(b2_version.revision));
   if (!main_window_.create(kGameTitle_, screen_size_)) return false;
-  if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;    // renderer_.create(main_window_, render_size_, SDL_RENDERER_ACCELERATED)
+  if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;
   if (!loadResources()) return false;
   fps_.start();
+
+  Aerolite::setB2World(&world_);
+  Aerolite::setScreenSize(screen_size_);
+
   return true;
 }
 
@@ -125,6 +133,8 @@ bool ktp::Game::loadResources() {
 void ktp::Game::update(float delta_time) {
   /* FPS */
   main_window_.setTitle(kGameTitle_ + " - FPS: " + std::to_string(fps_.average()));
+  /* Box2D */
+  world_.Step(delta_time, velocity_iterations_, position_iterations_);
   /* Background */
   background_.update(delta_time);
   /* Player */
@@ -142,19 +152,20 @@ void ktp::Game::update(float delta_time) {
     }
   }
   /* Aerolites */
-  if (aerolites_.size() < 9) {
-    aerolites_.push_back(Aerolite::spawnAerolite(screen_size_));
-  } else {
-    auto aerolite = aerolites_.begin();
-    while (aerolite != aerolites_.end()) {
-      if (aerolite->canBeDeleted()) {
-        aerolite = aerolites_.erase(aerolite);
-      } else {
-        aerolite->update(delta_time);
-        ++aerolite;
-      }
+  auto aerolite = aerolites_.begin();
+  while (aerolite != aerolites_.end()) {
+    if (aerolite->canBeDeleted()) {
+      aerolite = aerolites_.erase(aerolite);
+    } else {
+      aerolite->update(delta_time);
+      ++aerolite;
     }
   }
+  if (aerolites_.size() < 4) {
+    aerolites_.push_back(Aerolite::spawnAerolite2());
+  }
+
+  
   /* Event bus */
   event_bus_.processEvents();
 }

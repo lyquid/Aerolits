@@ -8,7 +8,7 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
   generatePlayerShape();
   render_shape_.resize(shape_.size());
   render_flame_shape_.resize(flame_shape_.size());
-  update(0.f); // needed to initialize render_shape_
+  //update(0.f); // needed to initialize render_shape_
   lasers_.reserve(50);
 }
 

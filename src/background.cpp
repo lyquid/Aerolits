@@ -1,10 +1,11 @@
 #include "background.hpp"
+#include <random>
 
 ktp::Background::Background(const SDL_Point& screen_size): screen_size_(screen_size) {
   generateStars();
 }
 
-void ktp::Background::draw(SDL2_Renderer& renderer) const {
+void ktp::Background::draw(const SDL2_Renderer& renderer) const {
   renderer.setDrawColor(background_color_);
   renderer.drawRectFill(background_shape_);
   /* for (const auto& star: stars_) {
@@ -30,7 +31,7 @@ void ktp::Background::generateStars() {
         if (stars_.size() % 2 == 0 && stars_.size() % 3 == 0) {
           star.color_ = star_colors_[distribution_colors(generator)];
         } else {
-          star.color_ = ktp::Colors::white;
+          star.color_ = Colors::white;
         }
         stars_.push_back(star);
       }

@@ -1,13 +1,15 @@
 #ifndef AEROLITS_SRC_GAME_H_
 #define AEROLITS_SRC_GAME_H_
 
-#include "aerolites.hpp"
+#include "aerolite.hpp"
 #include "background.hpp"
 #include "particle_system.hpp"
 #include "player.hpp"
 #include "../include/resources_path.hpp"
 #include "../kuge/kuge.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
+
+#include <box2d/box2d.h>
 
 #include <list>
 #include <string>
@@ -59,6 +61,11 @@ class Game {
   std::list<Emitter> emitters_ {};
   /* Aerolites */
   std::vector<Aerolite> aerolites_ {};
+  /* box2d */
+  const b2Vec2 gravity_ {0.f, -10.f};
+  b2World world_ {gravity_};
+  int32 velocity_iterations_ {8};
+  int32 position_iterations_ {3};
 };
 
 } // end namespace ktp

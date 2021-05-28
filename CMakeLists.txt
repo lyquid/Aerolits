@@ -1,4 +1,10 @@
 cmake_minimum_required(VERSION 3.11...3.20)
+
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      CACHE STRING "")
+endif()
+
 project(
   Aerolits
   VERSION 0.1.0
@@ -47,7 +53,7 @@ add_executable(	Aerolits  main.cpp
 													kuge/input_system.cpp
 													kuge/output_system.cpp
 													kuge/system.cpp
-													src/aerolites.cpp
+													src/aerolite.cpp
 													src/background.cpp
 													src/emitter_parser.cpp
 													src/game.cpp
@@ -84,22 +90,24 @@ endif()
 # Set an output directory for our binaries
 set(BIN_DIR ${Aerolits_SOURCE_DIR}/bin)
 
-find_package(sdl2-image CONFIG)
-if (sdl2-image_FOUND)
-	message(STATUS "Using vcpkg toolchain file for SDL2 libs")
+if(DEFINED CMAKE_TOOLCHAIN_FILE)
+	message(STATUS "Using vcpkg toolchain file")
 	find_package(SDL2 CONFIG REQUIRED)
 	find_package(sdl2-image CONFIG REQUIRED)
 	find_package(sdl2-ttf CONFIG REQUIRED)
 	find_package(sdl2-mixer CONFIG REQUIRED)
-	target_link_libraries(Aerolits PRIVATE SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf SDL2::SDL2_mixer)
+	find_package(box2d CONFIG REQUIRED)
+	target_link_libraries(Aerolits PRIVATE SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf SDL2::SDL2_mixer box2d::box2d)
 else()
-	message(STATUS "Using custom cmake find modules for SDL2 libs")
+	message(STATUS "Using cmake find modules")
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_image REQUIRED)
 	find_package(SDL2_ttf REQUIRED)
 	find_package(SDL2_mixer REQUIRED)
 	include_directories(${SDL2_MIXER_INCLUDE_DIR})
-	target_link_libraries(Aerolits PRIVATE ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_MIXER_LIBRARY})
+	set(box2d_DIR "H:/GRUPOS/ACREDITACIONES/TRABAJADORES_CA/ALEX/PrOG/repos/box2d-2.4.1/build/src/CMakeFiles/Export/lib/cmake/box2d")
+	find_package(box2d CONFIG REQUIRED)
+	target_link_libraries(Aerolits PRIVATE ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_MIXER_LIBRARY} box2d::box2d) 
 endif()
 
 install(TARGETS Aerolits RUNTIME DESTINATION ${BIN_DIR})

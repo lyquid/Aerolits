@@ -38,6 +38,40 @@ bool ktp::SDL2_Renderer::create(const SDL2_Window& window, const SDL_Point& size
   return true;
 }
 
+void ktp::SDL2_Renderer::drawCross(const SDL_Color& color) const {
+  SDL_SetRenderDrawColor(renderer_.get(), color.r, color.g, color.b, color.a);
+  int w {}, h {};
+  SDL_GetRendererOutputSize(renderer_.get(), &w, &h);
+  SDL_RenderDrawLine(renderer_.get(), w / 2, 0, w / 2, h);
+  SDL_RenderDrawLine(renderer_.get(), 0, h / 2, w, h / 2);
+}
+
+void ktp::SDL2_Renderer::drawGrid(int size, const SDL_Color& color) const {
+  SDL_SetRenderDrawColor(renderer_.get(), color.r, color.g, color.b, color.a);
+  int w {}, h {};
+  SDL_GetRendererOutputSize(renderer_.get(), &w, &h);
+  for (auto y = size; y < h; y += size) {
+    SDL_RenderDrawLine(renderer_.get(), 0, y, w, y);
+  }
+  for (auto x = size; x < w; x += size) {
+    SDL_RenderDrawLine(renderer_.get(), x, 0, x, h);
+  }
+}
+
+bool ktp::SDL2_Renderer::drawLine(const SDL_Point& start, const SDL_Point& end) const {
+  if (SDL_RenderDrawLine(renderer_.get(), start.x, start.y, end.x, end.y) == 0) {
+    return true;
+  }
+  return false;
+}
+
+bool ktp::SDL2_Renderer::drawLine(int x1, int y1, int x2, int y2) const {
+  if (SDL_RenderDrawLine(renderer_.get(), x1, y1, x2, y2) == 0) {
+    return true;
+  }
+  return false;
+}
+
 bool ktp::SDL2_Renderer::drawLines(const std::vector<SDL_Point>& points) const {
   if (SDL_RenderDrawLines(renderer_.get(), points.data(), points.size()) == 0) {
     return true;

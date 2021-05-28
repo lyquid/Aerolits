@@ -48,6 +48,14 @@ class SDL2_Renderer {
   */
   bool create(const SDL2_Window& window, const SDL_Point& size, Uint32 flags, const std::string& scale_q = "nearest");
 
+  void drawCross(const SDL_Color& color) const ;
+
+  void drawGrid(int size, const SDL_Color& color) const ;
+  
+  bool drawLine(const SDL_Point& start, const SDL_Point& end) const;
+
+  bool drawLine(int x1, int y1, int x2, int y2) const;
+
   bool drawLines(const std::vector<SDL_Point>& points) const;
   
   bool drawLines(const std::vector<SDL_FPoint>& points) const;
