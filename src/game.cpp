@@ -162,8 +162,7 @@ void ktp::Game::update(float delta_time) {
     }
   }
   if (aerolites_.size() < 4) {
-    // aerolites_.push_back(Aerolite({screen_size_.x / 2, screen_size_.y / 2}));
-    aerolites_.push_back(Aerolite::spawnAerolite2());
+    aerolites_.push_back(Aerolite::spawnAerolite());
   }
   /* Event bus */
   event_bus_.processEvents();

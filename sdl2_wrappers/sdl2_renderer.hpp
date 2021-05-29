@@ -63,6 +63,10 @@ class SDL2_Renderer {
   bool drawPoint(const SDL_Point& point) const;
 
   bool drawPoint(const SDL_FPoint& point) const;
+
+  bool drawPoint(int x, int y) const;
+
+  bool drawPoint(float x, float y) const;
   
   bool drawPoints(const std::vector<SDL_Point>& points) const;
 

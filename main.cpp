@@ -1,10 +1,14 @@
 #include "src/game.hpp"
+#include <stdlib.h>
+#include <time.h>
 
 int main(int argv, char* args[]) {
   
   using namespace ktp;
 
   loadConfigFiles();
+
+  srand(time(nullptr));
 
   Game game{};
 

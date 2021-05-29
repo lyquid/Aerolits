@@ -62,7 +62,7 @@ class Game {
   /* Aerolites */
   std::vector<Aerolite> aerolites_ {};
   /* box2d */
-  const b2Vec2 gravity_ {0.f, -10.f};
+  const b2Vec2 gravity_ {0.f, 0.f};
   b2World world_ {gravity_};
   int32 velocity_iterations_ {8};
   int32 position_iterations_ {3};

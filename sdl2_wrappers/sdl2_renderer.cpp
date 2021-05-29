@@ -100,6 +100,20 @@ bool ktp::SDL2_Renderer::drawPoint(const SDL_FPoint& point) const {
   return false;
 }
 
+bool ktp::SDL2_Renderer::drawPoint(int x, int y) const {
+  if (SDL_RenderDrawPoint(renderer_.get(), x, y) == 0) {
+    return true;
+  }
+  return false;
+}
+
+bool ktp::SDL2_Renderer::drawPoint(float x, float y) const {
+  if (SDL_RenderDrawPointF(renderer_.get(), x, y) == 0) {
+    return true;
+  }
+  return false;
+}
+
 bool ktp::SDL2_Renderer::drawPoints(const std::vector<SDL_Point>& points) const {
   if (SDL_RenderDrawPoints(renderer_.get(), points.data(), points.size()) == 0) {
     return true;
