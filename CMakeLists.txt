@@ -55,6 +55,7 @@ add_executable(	Aerolits  main.cpp
 													kuge/system.cpp
 													src/aerolite.cpp
 													src/background.cpp
+													src/debug_draw.cpp
 													src/emitter_parser.cpp
 													src/game.cpp
 													src/palette.cpp

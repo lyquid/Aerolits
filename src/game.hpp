@@ -3,6 +3,7 @@
 
 #include "aerolite.hpp"
 #include "background.hpp"
+#include "debug_draw.hpp"
 #include "particle_system.hpp"
 #include "player.hpp"
 #include "../include/resources_path.hpp"
@@ -66,6 +67,7 @@ class Game {
   b2World world_ {gravity_};
   int32 velocity_iterations_ {8};
   int32 position_iterations_ {3};
+  DebugDraw debug_draw_ {};
 };
 
 } // end namespace ktp

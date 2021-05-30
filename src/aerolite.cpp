@@ -1,5 +1,6 @@
 #include "aerolite.hpp"
 #include "palette.hpp"
+#include "scale.hpp"
 #include <utility> // std::move
 
 ktp::Aerolite::Aerolite(const SDL_FPoint& where) noexcept {
@@ -58,8 +59,8 @@ ktp::Aerolite ktp::Aerolite::spawnAerolite() {
 void ktp::Aerolite::draw(const SDL2_Renderer& renderer) const {
   renderer.setDrawColor(Colors::orange);
   renderer.drawLines(render_shape_);
-  renderer.setDrawColor(Colors::yellow);
-  renderer.drawPoint(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels);
+  //renderer.setDrawColor(Colors::yellow);
+  //renderer.drawPoint(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels);
 }
 
 void ktp::Aerolite::generateAeroliteShape(float size) {

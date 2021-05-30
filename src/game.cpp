@@ -51,6 +51,8 @@ void ktp::Game::draw() {
   for (const auto& aerolite: aerolites_) {
     aerolite.draw(renderer_);
   }
+
+  world_.DebugDraw();
   
   renderer_.present();
   ++fps_;
@@ -100,6 +102,10 @@ bool ktp::Game::init() {
   if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;
   if (!loadResources()) return false;
   fps_.start();
+
+  debug_draw_.setRenderer(&renderer_);
+  world_.SetDebugDraw(&debug_draw_);
+  debug_draw_.SetFlags(/* b2Draw::e_shapeBit |  */b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
 
   Aerolite::setB2World(&world_);
   Aerolite::setScreenSize(screen_size_);

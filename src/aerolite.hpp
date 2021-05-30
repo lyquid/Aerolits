@@ -13,8 +13,6 @@ enum class SpawnSides {
   Top, Right, Down, Left, count
 };
 
-inline constexpr float kMetersToPixels {50.f};
-
 class Aerolite {
  public:
 
