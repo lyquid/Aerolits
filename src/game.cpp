@@ -20,10 +20,10 @@ void ktp::Game::checkKeyStates(float delta_time) {
     player_.stopThrusting();
   }
   if (state[SDL_SCANCODE_A] || state[SDL_SCANCODE_LEFT]){
-    player_.steerLeft(delta_time);
+    player_.steerLeft();
   }
   if (state[SDL_SCANCODE_D] || state[SDL_SCANCODE_RIGHT]){
-    player_.steerRight(delta_time);
+    player_.steerRight();
   }
   if (state[SDL_SCANCODE_SPACE]){
     player_.shoot();
@@ -42,7 +42,7 @@ void ktp::Game::draw() {
 
   background_.draw(renderer_);
 
-  renderer_.drawCross(Colors::copper_green);
+  //renderer_.drawCross(Colors::copper_green);
 
   player_.draw(renderer_);
   for (const auto& emitter: emitters_) {
@@ -52,7 +52,7 @@ void ktp::Game::draw() {
     aerolite.draw(renderer_);
   }
 
-  world_.DebugDraw();
+  if (debug_draw_on_) world_.DebugDraw();
   
   renderer_.present();
   ++fps_;
@@ -90,6 +90,9 @@ void ktp::Game::handleSDL2KeyEvents(const SDL_Keycode& key) {
       input_sys_.postEvent(kuge::EventTypes::ExitGame);
       quit_ = true;
       break;
+    case SDLK_F1:
+      debug_draw_on_ = !debug_draw_on_;
+      break;
     default:
       break;
   }
@@ -106,6 +109,8 @@ bool ktp::Game::init() {
   debug_draw_.setRenderer(&renderer_);
   world_.SetDebugDraw(&debug_draw_);
   debug_draw_.SetFlags(/* b2Draw::e_shapeBit |  */b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
+
+  player_.setBox2d(&world_);
 
   Aerolite::setB2World(&world_);
   Aerolite::setScreenSize(screen_size_);
@@ -167,7 +172,7 @@ void ktp::Game::update(float delta_time) {
       ++aerolite;
     }
   }
-  if (aerolites_.size() < 4) {
+  if (aerolites_.size() < 5) {
     aerolites_.push_back(Aerolite::spawnAerolite());
   }
   /* Event bus */

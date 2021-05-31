@@ -68,6 +68,7 @@ class Game {
   int32 velocity_iterations_ {8};
   int32 position_iterations_ {3};
   DebugDraw debug_draw_ {};
+  bool debug_draw_on_ {};
 };
 
 } // end namespace ktp

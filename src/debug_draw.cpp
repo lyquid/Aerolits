@@ -58,6 +58,6 @@ void ktp::DebugDraw::DrawTransform(const b2Transform& xf) {
   renderer_->drawLine(p1.x * kMetersToPixels, p1.y * kMetersToPixels, p2.x * kMetersToPixels, p2.y * kMetersToPixels);
 
   renderer_->setDrawColor(0, 255, 0, 0);
-  p2 = p1 + axis_scale * xf.q.GetYAxis();
+  p2 = p1 - axis_scale * xf.q.GetYAxis();
   renderer_->drawLine(p1.x * kMetersToPixels, p1.y * kMetersToPixels, p2.x * kMetersToPixels, p2.y * kMetersToPixels);
 }

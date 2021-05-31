@@ -5,6 +5,7 @@
 #include "particle_system.hpp"
 #include "../kuge/kuge.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include <box2d/box2d.h>
 #include <vector>
 
 namespace ktp {
@@ -23,54 +24,59 @@ class Player {
   void draw(SDL2_Renderer& renderer) const;
   inline bool isAlive() const { return alive_; }
   void reset();
+  void setBox2d(b2World* world);
   void shoot();
-  inline void steerLeft(float delta_time)  { angle_ -= 5.f * delta_time; }
-  inline void steerRight(float delta_time) { angle_ += 5.f * delta_time; }
+  void steerLeft();
+  void steerRight();
   void stopThrusting();
   void thrust(float delta_time);
   void update(float delta_time);
 
  private:
 
+  void checkWrap();
   void generatePlayerShape();
-  void move(float delta_time);
   void resetPosition();
-  void rotate();
+  void transformRenderShape();
   void updateLasers(float delta_time);
   
   kuge::EventBus& event_bus_;
-  SDL_Point& screen_size_;
+  SDL_FPoint screen_size_b2_ {};
+  b2World* world_ {nullptr};
 
   /* basic attributes */
-  const float kMaxDelta_{5000.f};
-  const SDL_Color kDefaultPlayerColor_{Colors::white};
-  bool       alive_{true};
-  float      angle_{0.f};
-  SDL_FPoint center_{};
-  SDL_FPoint delta_{0.f, 0.f};
-  float      size_{50.f};
+  inline static constexpr float     kDefaultAngularImpulse_ {5.f};
+  inline static constexpr float     kDefaultLinearImpulse_ {0.05f};
+  inline static constexpr SDL_Color kDefaultPlayerColor_ {Colors::white};
+  inline static constexpr float     kDefaultPlayerSize_ {1.2f};
+  inline static constexpr float     kMaxDelta_ {0.1f};
+  bool    alive_ {true};
+  float   angular_impulse_ {kDefaultAngularImpulse_};
+  b2Body* body_ {nullptr};
+  b2Vec2  delta_ {};
+  float   linear_impulse_ {kDefaultLinearImpulse_};
+  float   size_ {kDefaultPlayerSize_};
+  Uint32  stabilizer_time_ {};
+  bool    steering_ {true};
+  bool    thrusting_ {false};
   /* shape stuff */
-  std::vector<SDL_FPoint> shape_{};
-  std::vector<SDL_FPoint> render_shape_{};
+  std::vector<SDL_FPoint> shape_ {};
+  std::vector<SDL_FPoint> render_shape_ {};
   /* shooting stuff */
-  const float kDefaultLaserSpeed_{1000.f};
-  const float kDefaultShootingInterval_{200.f};
-  std::vector<Laser> lasers_{};
-  double shooting_timer_{0.f};
-  /* thrust stuff */
-  const float kDefaultThrustSpeed_{200.f};
-  float thrust_speed_{kDefaultThrustSpeed_};
-  bool thrusting_{false};
+  inline static constexpr float kDefaultLaserSpeed_ {1000.f};
+  inline static constexpr float kDefaultShootingInterval_ {200.f};
+  std::vector<Laser> lasers_ {};
+  double shooting_timer_ {};
   /* flame stuff */
-  const float kDefaultFlameGrowthFactor_{0.2f};
-  const float kDefaultFlameMaxLength_{size_};
-  const float kDefaultFlameMinLength_{size_ * 0.4f};
-  float flame_growth_factor_{kDefaultFlameGrowthFactor_};
-  float flame_max_lenght_{kDefaultFlameMaxLength_};
-  std::vector<SDL_FPoint> flame_shape_{};
-  std::vector<SDL_FPoint> render_flame_shape_{};
+  inline static constexpr float kDefaultFlameGrowthFactor_ {0.02f};
+  inline static constexpr float kDefaultFlameMaxLength_ {kDefaultPlayerSize_};
+  inline static constexpr float kDefaultFlameMinLength_ {kDefaultPlayerSize_ * 0.4f};
+  float flame_growth_factor_ {kDefaultFlameGrowthFactor_};
+  float flame_max_lenght_ {kDefaultFlameMaxLength_};
+  std::vector<SDL_FPoint> flame_shape_ {};
+  std::vector<SDL_FPoint> render_flame_shape_ {};
   /* particles stuff */
-  Emitter exhaust_emitter_{"fire", {center_.x, center_.y}};
+  Emitter exhaust_emitter_ {"fire", {screen_size_b2_.x, screen_size_b2_.y}};
 };
 
 } // end namespace ktp
