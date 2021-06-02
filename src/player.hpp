@@ -1,6 +1,7 @@
 #ifndef AEROLITS_SRC_PLAYER_H_
 #define AEROLITS_SRC_PLAYER_H_
 
+#include "input_component.hpp"
 #include "palette.hpp"
 #include "particle_system.hpp"
 #include "../kuge/kuge.hpp"
@@ -23,14 +24,11 @@ class Player {
   inline bool isAlive() const { return alive_; }
   void reset();
   void setBox2d(b2World* world);
-  void shoot();
-  void steerLeft();
-  void steerRight();
-  void stopThrusting();
-  void thrust(float delta_time);
   void update(float delta_time);
 
  private:
+
+  friend class InputComponent;
 
   void checkWrap();
   void generateLaserShape();
@@ -48,7 +46,6 @@ class Player {
   inline static constexpr float     kDefaultLinearImpulse_ {0.05f};
   inline static constexpr SDL_Color kDefaultPlayerColor_ {Colors::white};
   inline static constexpr float     kDefaultPlayerSize_ {1.2f};
-  inline static constexpr float     kMaxDelta_ {0.1f};
   bool    alive_ {true};
   float   angular_impulse_ {kDefaultAngularImpulse_};
   b2Body* body_ {nullptr};
@@ -58,6 +55,7 @@ class Player {
   Uint32  stabilizer_time_ {};
   bool    steering_ {true};
   bool    thrusting_ {false};
+  Input input_ {};
   /* shape stuff */
   std::vector<SDL_FPoint> shape_ {};
   std::vector<SDL_FPoint> render_shape_ {};

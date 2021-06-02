@@ -12,24 +12,6 @@ ktp::Game::Game() {
   //emitters_.reserve(200);
 }
 
-void ktp::Game::checkKeyStates(float delta_time) {
-  const Uint8* state = SDL_GetKeyboardState(nullptr);
-  if (state[SDL_SCANCODE_W] || state[SDL_SCANCODE_UP]){
-    player_.thrust(delta_time);
-  } else {
-    player_.stopThrusting();
-  }
-  if (state[SDL_SCANCODE_A] || state[SDL_SCANCODE_LEFT]){
-    player_.steerLeft();
-  }
-  if (state[SDL_SCANCODE_D] || state[SDL_SCANCODE_RIGHT]){
-    player_.steerRight();
-  }
-  if (state[SDL_SCANCODE_SPACE]){
-    player_.shoot();
-  }
-}
-
 void ktp::Game::clean() {
   ktp::SDL2_Audio::closeMixer();
   ktp::SDL2_Font::closeTTF();
@@ -149,7 +131,6 @@ void ktp::Game::update(float delta_time) {
   /* Background */
   background_.update(delta_time);
   /* Player */
-  checkKeyStates(delta_time);
   player_.update(delta_time);
   /* Emitters */
   auto iter = emitters_.begin();
@@ -168,7 +149,7 @@ void ktp::Game::update(float delta_time) {
     if (aerolite->canBeDeleted()) {
       aerolite = aerolites_.erase(aerolite);
     } else {
-      aerolite->update(delta_time);
+      aerolite->update();
       ++aerolite;
     }
   }

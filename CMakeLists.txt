@@ -58,6 +58,7 @@ add_executable(	Aerolits  main.cpp
 													src/debug_draw.cpp
 													src/emitter_parser.cpp
 													src/game.cpp
+													src/input_component.cpp
 													src/palette.cpp
 													src/particle.cpp
 													src/particle_system.cpp

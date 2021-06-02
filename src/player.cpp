@@ -137,71 +137,6 @@ void ktp::Player::setBox2d(b2World* world) {
   laser_fixture_def_.restitution = 0.1f;
 }
 
-void ktp::Player::shoot() {
-  if ((SDL_GetTicks() - shooting_timer_) > kDefaultShootingInterval_) {
-    Laser laser {};
-    
-    laser.body_ = world_->CreateBody(&laser_body_def_);
-    laser.body_->CreateFixture(&laser_fixture_def_);
-    laser.body_->SetTransform({body_->GetPosition().x, body_->GetPosition().y}, body_->GetAngle());
-    laser.body_->SetLinearVelocity({kDefaultLaserSpeed_ * SDL_sinf(body_->GetAngle()), -kDefaultLaserSpeed_ * SDL_cosf(body_->GetAngle())});
-
-    laser.render_shape_.resize(laser_shape_.size());
-    
-    lasers_.push_back(laser);
-
-    shooting_timer_ = SDL_GetTicks();
-
-    event_bus_.postEvent(kuge::EventTypes::LaserFired);
-  }
-}
-
-void ktp::Player::steerLeft () {
-  body_->SetAngularVelocity(-angular_impulse_ );
-  stabilizer_time_ = SDL2_Timer::getSDL2Ticks();
-  steering_ = true;
-}
-
-void ktp::Player::steerRight () {
-  body_->SetAngularVelocity(angular_impulse_ );
-  stabilizer_time_ = SDL2_Timer::getSDL2Ticks();
-  steering_ = true;
-}
-
-void ktp::Player::stopThrusting() {
-  thrusting_ = false;
-  delta_ = {0.f, 0.f};
-  flame_shape_.front().y = kDefaultFlameMinLength_;
-  flame_shape_.back().y = kDefaultFlameMinLength_;
-}
-
-void ktp::Player::thrust(float delta_time) {
-  delta_.x +=  SDL_sinf(body_->GetAngle()) * linear_impulse_ * delta_time;
-  if (delta_.x < -kMaxDelta_ ) {
-    delta_.x = -kMaxDelta_;
-  } else if (delta_.x > kMaxDelta_) {
-    delta_.x = kMaxDelta_;
-  }
-  delta_.y += -SDL_cosf(body_->GetAngle()) * linear_impulse_ * delta_time;
-  if (delta_.y < -kMaxDelta_) {
-    delta_.y = -kMaxDelta_;
-  } else if (delta_.y > kMaxDelta_) {
-    delta_.y = kMaxDelta_;
-  }
-
-  body_->ApplyLinearImpulseToCenter(delta_, true);
-  
-  thrusting_ = true;
-  
-  if (flame_shape_.front().y < flame_max_lenght_) {
-    flame_shape_.front().y += flame_growth_factor_;
-    flame_shape_.back().y += flame_growth_factor_;
-  }
-
-  // exhaust_emitter_.generateParticles();
-  // event_bus_.postEvent(kuge::EventTypes::PlayerThrust);
-}
-
 void ktp::Player::transformRenderShape() {
   for (auto i = 0u; i < shape_.size(); ++i) {
     render_shape_[i].x = ((shape_[i].x * SDL_cosf(body_->GetAngle()) - shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
@@ -216,6 +151,8 @@ void ktp::Player::transformRenderShape() {
 }
 
 void ktp::Player::update(float delta_time) {
+  input_.update(*this, delta_time);
+
   if (SDL2_Timer::getSDL2Ticks() - stabilizer_time_ > delta_time && steering_) {
     body_->SetAngularVelocity(0.f);
     steering_ = false;

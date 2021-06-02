@@ -25,7 +25,7 @@ class Aerolite {
 
   inline bool canBeDeleted() const { return to_be_deleted_; }
   void draw(const SDL2_Renderer& renderer) const;
-  void update(float delta_time);
+  void update();
 
  private:
 

@@ -30,7 +30,7 @@ ktp::Aerolite ktp::Aerolite::spawnAerolite() {
   static int side {};
   const float delta {kMaxSpeed_ * generateRand(0.1f, 1.f)};
   Aerolite aerolite({static_cast<float>(screen_size_b2_.x) / 2, static_cast<float>(screen_size_b2_.y) / 2});
-  aerolite.body_->SetAngularVelocity(kMaxRotationSpeed_ * generateRand(-1, 1));
+  aerolite.body_->SetAngularVelocity(kMaxRotationSpeed_ * generateRand(-1.f, 1.f));
   switch (side) {
     case 0: // up
       aerolite.body_->SetTransform({static_cast<float>(screen_size_b2_.x) / 2, 0.f}, aerolite.body_->GetAngle());      
@@ -87,7 +87,7 @@ void ktp::Aerolite::setScreenSize(const SDL_Point& screen_size) {
   screen_size_b2_.y = screen_size.y / kMetersToPixels;
 }
 
-void ktp::Aerolite::update(float delta_time) {
+void ktp::Aerolite::update() {
   transformRenderShape();
   
   if (body_->GetPosition().x < -kMaxSize_ || body_->GetPosition().x > screen_size_b2_.x + kMaxSize_

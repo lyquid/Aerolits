@@ -34,7 +34,6 @@ class Game {
 
  private:
  
-  void checkKeyStates(float delta_time);
   void clean();
   bool initSDL2();
   bool loadResources();
