@@ -11,10 +11,8 @@
 namespace ktp {
 
 struct Laser {
-  float                   angle_{0};
-  SDL_FPoint              delta_{0, 0};
-  std::vector<SDL_FPoint> shape_{};
-  float                   size_{20};
+  b2Body*                 body_ {nullptr};
+  std::vector<SDL_FPoint> render_shape_ {};
 };
 
 class Player {
@@ -35,10 +33,11 @@ class Player {
  private:
 
   void checkWrap();
+  void generateLaserShape();
   void generatePlayerShape();
   void resetPosition();
   void transformRenderShape();
-  void updateLasers(float delta_time);
+  void updateLasers();
   
   kuge::EventBus& event_bus_;
   SDL_FPoint screen_size_b2_ {};
@@ -63,10 +62,16 @@ class Player {
   std::vector<SDL_FPoint> shape_ {};
   std::vector<SDL_FPoint> render_shape_ {};
   /* shooting stuff */
-  inline static constexpr float kDefaultLaserSpeed_ {1000.f};
   inline static constexpr float kDefaultShootingInterval_ {200.f};
-  std::vector<Laser> lasers_ {};
   double shooting_timer_ {};
+  /* lasers */
+  inline static constexpr float kDefaultLaserSize_ {0.15f};
+  inline static constexpr float kDefaultLaserSpeed_ {30.f};
+  std::vector<Laser> lasers_ {};
+  b2BodyDef          laser_body_def_ {};
+  b2FixtureDef       laser_fixture_def_ {};
+  b2PolygonShape     laser_shape_b2_ {};
+  FPointsVector      laser_shape_ {};
   /* flame stuff */
   inline static constexpr float kDefaultFlameGrowthFactor_ {0.02f};
   inline static constexpr float kDefaultFlameMaxLength_ {kDefaultPlayerSize_};

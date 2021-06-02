@@ -66,7 +66,7 @@ void ktp::Game::handleSDL2Events() {
         quit_ = true;
         break;
       case SDL_KEYDOWN:
-        input_sys_.postEvent(kuge::EventTypes::KeyPressed, SDL_GetKeyName(sdl_event_.key.keysym.sym));
+        // input_sys_.postEvent(kuge::EventTypes::KeyPressed, SDL_GetKeyName(sdl_event_.key.keysym.sym));
         handleSDL2KeyEvents(sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN: {
@@ -108,7 +108,7 @@ bool ktp::Game::init() {
 
   debug_draw_.setRenderer(&renderer_);
   world_.SetDebugDraw(&debug_draw_);
-  debug_draw_.SetFlags(/* b2Draw::e_shapeBit |  */b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
+  debug_draw_.SetFlags(b2Draw::e_shapeBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
 
   player_.setBox2d(&world_);
 
@@ -172,7 +172,7 @@ void ktp::Game::update(float delta_time) {
       ++aerolite;
     }
   }
-  if (aerolites_.size() < 5) {
+  if (aerolites_.size() < 4) {
     aerolites_.push_back(Aerolite::spawnAerolite());
   }
   /* Event bus */

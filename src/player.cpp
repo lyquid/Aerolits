@@ -6,6 +6,7 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
   screen_size_b2_({screen_size.x / kMetersToPixels, screen_size.y / kMetersToPixels}) {
 
   generatePlayerShape();
+  generateLaserShape();
   
   lasers_.reserve(50);
 }
@@ -38,10 +39,20 @@ void ktp::Player::draw(SDL2_Renderer& renderer) const {
   /* particles */
   exhaust_emitter_.draw();
   /* lasers */
-  renderer.setDrawColor(Colors::orange);
+  renderer.setDrawColor(Colors::red);
   for (const auto& laser: lasers_) {
-    renderer.drawLines(laser.shape_);
+    renderer.drawLines(laser.render_shape_);
   }
+}
+
+void ktp::Player::generateLaserShape() {
+  laser_shape_.clear();
+  laser_shape_.push_back({-kDefaultLaserSize_ * 0.15f, -kDefaultLaserSize_}); // top left
+  laser_shape_.push_back({-kDefaultLaserSize_ * 0.15f,  kDefaultLaserSize_}); // down left
+  laser_shape_.push_back({ kDefaultLaserSize_ * 0.15f,  kDefaultLaserSize_}); // down right
+  laser_shape_.push_back({ kDefaultLaserSize_ * 0.15f, -kDefaultLaserSize_}); // top right
+  laser_shape_.push_back({-kDefaultLaserSize_ * 0.15f, -kDefaultLaserSize_}); // top left again
+  laser_shape_.shrink_to_fit();
 }
 
 void ktp::Player::generatePlayerShape() {
@@ -83,7 +94,7 @@ void ktp::Player::reset() {
 
 void ktp::Player::setBox2d(b2World* world) {
   world_ = world;
-
+  /* Player */
   b2BodyDef body_def {};
   body_def.type = b2_dynamicBody;
   body_def.bullet = true;
@@ -103,28 +114,45 @@ void ktp::Player::setBox2d(b2World* world) {
   fixture_def.shape = &triangle;
   fixture_def.density = 1.5f;
   fixture_def.friction = 0.8f;
+  // https://www.iforce2d.net/b2dtut/collision-filtering
+  fixture_def.filter.groupIndex = -1;
 
   body_->CreateFixture(&fixture_def);
+
+  /* Lasers */
+  laser_body_def_.type = b2_dynamicBody;
+  laser_body_def_.bullet = true;
+  
+  b2Vec2 laser_vertices[4];
+  laser_vertices[0].Set(-kDefaultLaserSize_ * 0.15f, -kDefaultLaserSize_); // top left
+  laser_vertices[1].Set(-kDefaultLaserSize_ * 0.15f,  kDefaultLaserSize_); // down left
+  laser_vertices[2].Set( kDefaultLaserSize_ * 0.15f,  kDefaultLaserSize_); // down right
+  laser_vertices[3].Set( kDefaultLaserSize_ * 0.15f, -kDefaultLaserSize_); // up right
+  laser_shape_b2_.Set(laser_vertices, 4);
+
+  laser_fixture_def_.shape = &laser_shape_b2_;
+  laser_fixture_def_.density = 10.f;
+  laser_fixture_def_.friction = 0.1f;
+  laser_fixture_def_.filter.groupIndex = -1;
+  laser_fixture_def_.restitution = 0.1f;
 }
 
 void ktp::Player::shoot() {
   if ((SDL_GetTicks() - shooting_timer_) > kDefaultShootingInterval_) {
-    Laser laser;
-    laser.angle_ = body_->GetAngle();
-    laser.delta_.x =  kDefaultLaserSpeed_ * SDL_sinf(body_->GetAngle());
-    laser.delta_.y = -kDefaultLaserSpeed_ * SDL_cosf(body_->GetAngle());
-    laser.shape_.resize(2);
-    // laser head
-    laser.shape_[0].x = render_shape_.front().x;
-    laser.shape_[0].y = render_shape_.front().y;
-    // laser tail
-    laser.shape_[1].x = -laser.size_ * SDL_sinf(laser.angle_) + render_shape_.front().x;
-    laser.shape_[1].y =  laser.size_ * SDL_cosf(laser.angle_) + render_shape_.front().y;
+    Laser laser {};
+    
+    laser.body_ = world_->CreateBody(&laser_body_def_);
+    laser.body_->CreateFixture(&laser_fixture_def_);
+    laser.body_->SetTransform({body_->GetPosition().x, body_->GetPosition().y}, body_->GetAngle());
+    laser.body_->SetLinearVelocity({kDefaultLaserSpeed_ * SDL_sinf(body_->GetAngle()), -kDefaultLaserSpeed_ * SDL_cosf(body_->GetAngle())});
+
+    laser.render_shape_.resize(laser_shape_.size());
     
     lasers_.push_back(laser);
+
     shooting_timer_ = SDL_GetTicks();
 
-    //event_bus_.postEvent(kuge::EventTypes::LaserFired);
+    event_bus_.postEvent(kuge::EventTypes::LaserFired);
   }
 }
 
@@ -171,7 +199,7 @@ void ktp::Player::thrust(float delta_time) {
   }
 
   // exhaust_emitter_.generateParticles();
-  event_bus_.postEvent(kuge::EventTypes::PlayerThrust);
+  // event_bus_.postEvent(kuge::EventTypes::PlayerThrust);
 }
 
 void ktp::Player::transformRenderShape() {
@@ -199,23 +227,23 @@ void ktp::Player::update(float delta_time) {
   exhaust_emitter_.setPosition({body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels});
   exhaust_emitter_.update();
 
-  if (!lasers_.empty()) updateLasers(delta_time);
+  if (!lasers_.empty()) updateLasers();
 }
 
-void ktp::Player::updateLasers(float delta_time) {
-  constexpr auto threshold = 100.f;
+void ktp::Player::updateLasers() {
+  constexpr auto threshold {kDefaultLaserSize_};
   auto laser = lasers_.begin();
   while (laser != lasers_.end()) {
     // check if laser is out of screen
-    if (laser->shape_.front().x < -threshold || laser->shape_.front().x > screen_size_b2_.x + threshold ||
-        laser->shape_.front().y < -threshold || laser->shape_.front().y > screen_size_b2_.y + threshold) {
+    if (laser->body_->GetPosition().x < -threshold || laser->body_->GetPosition().x > screen_size_b2_.x + threshold ||
+        laser->body_->GetPosition().y < -threshold || laser->body_->GetPosition().y > screen_size_b2_.y + threshold) {
 
       laser = lasers_.erase(laser);
     } else {
       // move the laser's shape
-      for (auto& point: laser->shape_) {
-        point.x += laser->delta_.x * delta_time;
-        point.y += laser->delta_.y * delta_time;
+      for (auto i = 0u; i < laser_shape_.size(); ++i) {
+        laser->render_shape_[i].x = ((laser_shape_[i].x * SDL_cosf(laser->body_->GetAngle()) - laser_shape_[i].y * SDL_sinf(laser->body_->GetAngle())) + laser->body_->GetPosition().x) * kMetersToPixels;
+        laser->render_shape_[i].y = ((laser_shape_[i].x * SDL_sinf(laser->body_->GetAngle()) + laser_shape_[i].y * SDL_cosf(laser->body_->GetAngle())) + laser->body_->GetPosition().y) * kMetersToPixels;
       }
       ++laser;
     }

@@ -15,7 +15,7 @@ void kuge::AudioSystem::generateRandomSequence() {
 }
 
 void kuge::AudioSystem::handleEvent(const Event& event) {
-  switch (event.getType()) {
+  /* switch (event.getType()) {
     case EventTypes::LaserFired:
       if (lasers_[*lasers_it_].play() == -1) {
         ktp::logSDL2Error("laser_.play");
@@ -25,7 +25,7 @@ void kuge::AudioSystem::handleEvent(const Event& event) {
     
     default:
       break;
-  }
+  } */
 }
 
 bool kuge::AudioSystem::loadResources() {
