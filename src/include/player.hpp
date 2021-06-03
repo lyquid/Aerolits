@@ -4,8 +4,8 @@
 #include "player_input_component.hpp"
 #include "palette.hpp"
 #include "particle_system.hpp"
-#include "../kuge/kuge.hpp"
-#include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include "../../kuge/kuge.hpp"
+#include "../../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <box2d/box2d.h>
 #include <memory>
 #include <vector>
@@ -13,6 +13,8 @@
 namespace ktp {
 
 using Input = std::unique_ptr<InputComponent>;
+
+class Emitter;
 
 struct Laser {
   b2Body*                 body_ {nullptr};

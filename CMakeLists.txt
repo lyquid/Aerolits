@@ -37,7 +37,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
 add_executable(	Aerolits  main.cpp
-													./include/pugixml1.11/pugixml.cpp
+													./lib/pugixml1.11/pugixml.cpp
 													sdl2_wrappers/sdl2_audio.cpp
 													sdl2_wrappers/sdl2_font.cpp
 													sdl2_wrappers/sdl2_image.cpp
@@ -55,10 +55,8 @@ add_executable(	Aerolits  main.cpp
 													kuge/system.cpp
 													src/aerolite.cpp
 													src/background.cpp
-													src/debug_draw.cpp
 													src/emitter_parser.cpp
 													src/game.cpp
-													src/palette.cpp
 													src/particle.cpp
 													src/particle_system.cpp
 													src/player.cpp

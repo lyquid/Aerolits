@@ -1,17 +1,13 @@
 #ifndef AEROLITS_SRC_AEROLITES_HPP_
 #define AEROLITS_SRC_AEROLITES_HPP_
 
-#include "../sdl2_wrappers/sdl2_wrappers.hpp"
-#include "../include/random.hpp"
-
 #include <box2d/box2d.h>
+#include <SDL.h>
 #include <vector>
 
 namespace ktp {
 
-enum class SpawnSides {
-  Top, Right, Down, Left, count
-};
+class SDL2_Renderer;
 
 class Aerolite {
  public:

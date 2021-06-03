@@ -1,6 +1,6 @@
-#include "palette.hpp"
-#include "particle_system.hpp"
-#include "../include/random.hpp"
+#include "include/palette.hpp"
+#include "include/particle_system.hpp"
+#include "include/random.hpp"
 #include <cmath> // std::round
 
 /* EMITTER */

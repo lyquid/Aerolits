@@ -1,6 +1,8 @@
-#include "aerolite.hpp"
-#include "palette.hpp"
-#include "scale.hpp"
+#include "include/aerolite.hpp"
+#include "include/box2d_scale.hpp"
+#include "include/palette.hpp"
+#include "include/random.hpp"
+#include "../sdl2_wrappers/sdl2_renderer.hpp"
 #include <utility> // std::move
 
 ktp::Aerolite::Aerolite(const SDL_FPoint& where) noexcept {

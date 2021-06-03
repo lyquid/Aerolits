@@ -1,7 +1,7 @@
-#ifndef KUGE_INCLUDE_RESOURCES_PATH_H
-#define KUGE_INCLUDE_RESOURCES_PATH_H
+#ifndef AEROLITS_SRC_INCLUDE_RESOURCES_PATH_HPP_
+#define AEROLITS_SRC_INCLUDE_RESOURCES_PATH_HPP_
 
-#include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include "../../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <SDL.h>
 #include <string>
 
@@ -49,4 +49,5 @@ inline std::string getResourcesPath(const std::string& sub_dir = "") {
 }
 
 } // namespace ktp
-#endif // KUGE_INCLUDE_RESOURCES_PATH_H
+
+#endif // AEROLITS_SRC_INCLUDE_RESOURCES_PATH_HPP_

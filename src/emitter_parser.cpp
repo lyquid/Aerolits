@@ -1,8 +1,9 @@
-#include "palette.hpp"
-#include "emitter_parser.hpp"
+#include "include/emitter_parser.hpp"
+#include "include/palette.hpp"
+#include "include/resources_path.hpp"
 #include <algorithm> // std::transform
 #include <sstream>
-#include <vector>
+#include <string>
 
 std::vector<ktp::EmitterType> ktp::EmitterParser::emitter_types{};
 

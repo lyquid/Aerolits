@@ -1,10 +1,8 @@
 #ifndef AEROLITS_SRC_EMITTER_PARSER_HPP_
 #define AEROLITS_SRC_EMITTER_PARSER_HPP_
 
-#include "../include/pugixml1.11/pugixml.hpp"
-#include "../include/resources_path.hpp"
-#include "../sdl2_wrappers/sdl2_wrappers.hpp"
-#include <string>
+#include "../../lib/pugixml1.11/pugixml.hpp"
+#include <SDL.h>
 #include <vector>
 
 namespace ktp {

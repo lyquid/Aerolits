@@ -3,15 +3,15 @@
 
 #include "emitter_parser.hpp"
 #include "particle.hpp"
-#include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include "../../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <string>
 #include <utility> // std::move
-
-namespace ktp {
 
 /* http://gameprogrammingpatterns.com/object-pool.html */
 /* https://nintervik.github.io/2D-Particle-System/ */
 /* https://gamedevelopment.tutsplus.com/tutorials/adding-turbulence-to-a-particle-system--gamedev-13332 */
+
+namespace ktp {
 
 struct Vortex {
   SDL_FPoint position_{};

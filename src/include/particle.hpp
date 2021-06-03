@@ -1,11 +1,14 @@
 #ifndef AEROLITS_SRC_PARTICLE_HPP_
 #define AEROLITS_SRC_PARTICLE_HPP_
 
-#include "../sdl2_wrappers/sdl2_wrappers.hpp"
-#include <utility>
+#include <SDL.h>
+#include <utility> // std::move
 #include <vector>
 
 namespace ktp {
+
+class SDL2_Renderer;
+class SDL2_Texture;
 
 namespace ParticlesAtlas {
 

@@ -1,7 +1,7 @@
 #ifndef AEROLITS_SRC_INPUT_COMPONENT_HPP_
 #define AEROLITS_SRC_INPUT_COMPONENT_HPP_
 
-#include "components/input_component.hpp"
+#include "components.hpp"
 
 namespace ktp {
 

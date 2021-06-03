@@ -4,19 +4,18 @@
 #include "aerolite.hpp"
 #include "background.hpp"
 #include "debug_draw.hpp"
-#include "particle_system.hpp"
 #include "player.hpp"
-#include "../include/resources_path.hpp"
-#include "../kuge/kuge.hpp"
-#include "../sdl2_wrappers/sdl2_wrappers.hpp"
-
+#include "../../kuge/kuge.hpp"
+#include "../../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <box2d/box2d.h>
-
 #include <list>
 #include <string>
 #include <vector>
 
 namespace ktp {
+
+class Aerolite;
+class Emitter;
 
 void loadConfigFiles();
 
@@ -29,7 +28,7 @@ class Game {
   void handleSDL2Events();
   void handleSDL2KeyEvents(const SDL_Keycode& key);
   bool init();
-  bool quit() const { return quit_; }
+  inline bool quit() const { return quit_; }
   void update(float delta_time);
 
  private:

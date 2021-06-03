@@ -1,4 +1,5 @@
-#include "background.hpp"
+#include "include/background.hpp"
+#include "../sdl2_wrappers/sdl2_renderer.hpp"
 #include <random>
 
 ktp::Background::Background(const SDL_Point& screen_size): screen_size_(screen_size) {

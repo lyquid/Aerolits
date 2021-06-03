@@ -1,5 +1,7 @@
-#include "game.hpp"
-#include "palette.hpp"
+#include "include/emitter_parser.hpp"
+#include "include/game.hpp"
+#include "include/palette.hpp"
+#include "include/resources_path.hpp"
 
 void ktp::loadConfigFiles() {
   EmitterParser::initEmitters();

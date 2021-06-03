@@ -1,5 +1,5 @@
-#include "player.hpp"
-#include "scale.hpp"
+#include "include/box2d_scale.hpp"
+#include "include/player.hpp"
 
 ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
   event_bus_(event_bus),

@@ -2,12 +2,13 @@
 #define AEROLITS_SRC_BACKGROUND_H_
 
 #include "palette.hpp"
-#include "../kuge/kuge.hpp"
-#include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include <SDL.h>
 #include <array>
 #include <vector>
 
 namespace ktp {
+
+class SDL2_Renderer;
 
 struct Star {
   SDL_Color  color_{};

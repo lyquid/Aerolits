@@ -1,6 +1,7 @@
-#include "player_input_component.hpp"
-#include "player.hpp"
-#include "../sdl2_wrappers/sdl2_wrappers.hpp"
+#include "include/player_input_component.hpp"
+#include "include/player.hpp"
+#include "../sdl2_wrappers/sdl2_timer.hpp"
+#include <SDL.h>
 
 void ktp::PlayerInputComponent::reset() {
   angular_impulse_ = kDefaultAngularImpulse_;
@@ -76,7 +77,7 @@ void ktp::PlayerInputComponent::update(Player& player, float delta_time) {
       
       player.lasers_.push_back(laser);
 
-      shooting_timer_ = SDL_GetTicks();
+      shooting_timer_ = SDL2_Timer::getSDL2Ticks();
 
       player.event_bus_.postEvent(kuge::EventTypes::LaserFired);
     }
