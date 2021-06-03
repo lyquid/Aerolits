@@ -1,19 +1,29 @@
-#include "input_component.hpp"
+#include "player_input_component.hpp"
 #include "player.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
 
-void ktp::InputComponent::update(Player& player, float delta_time) {
+void ktp::PlayerInputComponent::reset() {
+  angular_impulse_ = kDefaultAngularImpulse_;
+  linear_impulse_ = kDefaultLinearImpulse_;
+  /* shooting */
+  shooting_interval_ = kDefaultShootingInterval_;
+  shooting_timer_ = 0.f;
+  /* lasers */ 
+  laser_speed_ = kDefaultLaserSpeed_;
+}
+
+void ktp::PlayerInputComponent::update(Player& player, float delta_time) {
   const auto state {SDL_GetKeyboardState(nullptr)};
 
   if (state[SDL_SCANCODE_W] || state[SDL_SCANCODE_UP]){
     // thrust
-    player.delta_.x +=  SDL_sinf(player.body_->GetAngle()) * player.linear_impulse_ * delta_time;
+    player.delta_.x +=  SDL_sinf(player.body_->GetAngle()) * linear_impulse_ * delta_time;
     if (player.delta_.x < -kMaxDelta_ ) {
       player.delta_.x = -kMaxDelta_;
     } else if (player.delta_.x > kMaxDelta_) {
       player.delta_.x = kMaxDelta_;
     }
-    player.delta_.y += -SDL_cosf(player.body_->GetAngle()) * player.linear_impulse_ * delta_time;
+    player.delta_.y += -SDL_cosf(player.body_->GetAngle()) * linear_impulse_ * delta_time;
     if (player.delta_.y < -kMaxDelta_) {
       player.delta_.y = -kMaxDelta_;
     } else if (player.delta_.y > kMaxDelta_) {
@@ -40,33 +50,33 @@ void ktp::InputComponent::update(Player& player, float delta_time) {
 
   if (state[SDL_SCANCODE_A] || state[SDL_SCANCODE_LEFT]){
     // steer left
-    player.body_->SetAngularVelocity(-player.angular_impulse_ );
+    player.body_->SetAngularVelocity(-angular_impulse_ );
     player.stabilizer_time_ = SDL2_Timer::getSDL2Ticks();
     player.steering_ = true;
   }
 
   if (state[SDL_SCANCODE_D] || state[SDL_SCANCODE_RIGHT]){
     // steer right
-    player.body_->SetAngularVelocity(player.angular_impulse_ );
+    player.body_->SetAngularVelocity(angular_impulse_ );
     player.stabilizer_time_ = SDL2_Timer::getSDL2Ticks();
     player.steering_ = true;
   }
 
   if (state[SDL_SCANCODE_SPACE]){
     // shoot
-    if ((SDL_GetTicks() - player.shooting_timer_) > player.kDefaultShootingInterval_) {
+    if (SDL_GetTicks() - shooting_timer_ > shooting_interval_) {
       Laser laser {};
       
       laser.body_ = player.world_->CreateBody(&player.laser_body_def_);
       laser.body_->CreateFixture(&player.laser_fixture_def_);
       laser.body_->SetTransform({player.body_->GetPosition().x, player.body_->GetPosition().y}, player.body_->GetAngle());
-      laser.body_->SetLinearVelocity({player.kDefaultLaserSpeed_ * SDL_sinf(player.body_->GetAngle()), -player.kDefaultLaserSpeed_ * SDL_cosf(player.body_->GetAngle())});
+      laser.body_->SetLinearVelocity({laser_speed_ * SDL_sinf(player.body_->GetAngle()), -laser_speed_ * SDL_cosf(player.body_->GetAngle())});
 
       laser.render_shape_.resize(player.laser_shape_.size());
       
       player.lasers_.push_back(laser);
 
-      player.shooting_timer_ = SDL_GetTicks();
+      shooting_timer_ = SDL_GetTicks();
 
       player.event_bus_.postEvent(kuge::EventTypes::LaserFired);
     }

@@ -1,15 +1,18 @@
 #ifndef AEROLITS_SRC_PLAYER_H_
 #define AEROLITS_SRC_PLAYER_H_
 
-#include "input_component.hpp"
+#include "player_input_component.hpp"
 #include "palette.hpp"
 #include "particle_system.hpp"
 #include "../kuge/kuge.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <box2d/box2d.h>
+#include <memory>
 #include <vector>
 
 namespace ktp {
+
+using Input = std::unique_ptr<InputComponent>;
 
 struct Laser {
   b2Body*                 body_ {nullptr};
@@ -28,7 +31,7 @@ class Player {
 
  private:
 
-  friend class InputComponent;
+  friend class PlayerInputComponent;
 
   void checkWrap();
   void generateLaserShape();
@@ -40,31 +43,22 @@ class Player {
   kuge::EventBus& event_bus_;
   SDL_FPoint screen_size_b2_ {};
   b2World* world_ {nullptr};
-
   /* basic attributes */
-  inline static constexpr float     kDefaultAngularImpulse_ {5.f};
-  inline static constexpr float     kDefaultLinearImpulse_ {0.05f};
   inline static constexpr SDL_Color kDefaultPlayerColor_ {Colors::white};
   inline static constexpr float     kDefaultPlayerSize_ {1.2f};
   bool    alive_ {true};
-  float   angular_impulse_ {kDefaultAngularImpulse_};
   b2Body* body_ {nullptr};
   b2Vec2  delta_ {};
-  float   linear_impulse_ {kDefaultLinearImpulse_};
   float   size_ {kDefaultPlayerSize_};
   Uint32  stabilizer_time_ {};
   bool    steering_ {true};
   bool    thrusting_ {false};
-  Input input_ {};
+  Input   input_ {};
   /* shape stuff */
   std::vector<SDL_FPoint> shape_ {};
   std::vector<SDL_FPoint> render_shape_ {};
-  /* shooting stuff */
-  inline static constexpr float kDefaultShootingInterval_ {200.f};
-  double shooting_timer_ {};
   /* lasers */
   inline static constexpr float kDefaultLaserSize_ {0.15f};
-  inline static constexpr float kDefaultLaserSpeed_ {30.f};
   std::vector<Laser> lasers_ {};
   b2BodyDef          laser_body_def_ {};
   b2FixtureDef       laser_fixture_def_ {};

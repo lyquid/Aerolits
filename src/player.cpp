@@ -5,6 +5,8 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
   event_bus_(event_bus),
   screen_size_b2_({screen_size.x / kMetersToPixels, screen_size.y / kMetersToPixels}) {
 
+  input_.reset(new PlayerInputComponent);
+
   generatePlayerShape();
   generateLaserShape();
   
@@ -76,15 +78,14 @@ void ktp::Player::generatePlayerShape() {
 }
 
 void ktp::Player::reset() {
-  angular_impulse_ = kDefaultAngularImpulse_;
   alive_ = true;
   delta_ = {0, 0};
-  linear_impulse_ = kDefaultLinearImpulse_;
   size_ = kDefaultPlayerSize_;
   thrusting_ = false;
+  /* components */
+  input_.reset();
   /* shooting stuff */
   lasers_.clear();
-  shooting_timer_ = 0.f;
   /* thrust and flame stuff */
   flame_growth_factor_ = kDefaultFlameGrowthFactor_;
   flame_max_lenght_ = kDefaultFlameMaxLength_;
@@ -151,7 +152,7 @@ void ktp::Player::transformRenderShape() {
 }
 
 void ktp::Player::update(float delta_time) {
-  input_.update(*this, delta_time);
+  input_->update(*this, delta_time);
 
   if (SDL2_Timer::getSDL2Ticks() - stabilizer_time_ > delta_time && steering_) {
     body_->SetAngularVelocity(0.f);
