@@ -1,5 +1,5 @@
-#ifndef AEROLITS_SRC_PLAYER_H_
-#define AEROLITS_SRC_PLAYER_H_
+#ifndef AEROLITS_SRC_INCLUDE_PLAYER_HPP_
+#define AEROLITS_SRC_INCLUDE_PLAYER_HPP_
 
 #include "player_input_component.hpp"
 #include "palette.hpp"
@@ -80,4 +80,4 @@ class Player {
 
 } // end namespace ktp
 
-#endif // AEROLITS_SRC_PLAYER_H_
+#endif // AEROLITS_SRC_INCLUDE_PLAYER_HPP_

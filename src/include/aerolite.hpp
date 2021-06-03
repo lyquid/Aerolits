@@ -1,5 +1,5 @@
-#ifndef AEROLITS_SRC_AEROLITES_HPP_
-#define AEROLITS_SRC_AEROLITES_HPP_
+#ifndef AEROLITS_SRC_INCLUDE_AEROLITES_HPP_
+#define AEROLITS_SRC_INCLUDE_AEROLITES_HPP_
 
 #include <box2d/box2d.h>
 #include <SDL.h>
@@ -46,4 +46,4 @@ class Aerolite {
 
 } // namespace ktp
 
-#endif // AEROLITS_SRC_AEROLITES_HPP_
+#endif // AEROLITS_SRC_INCLUDE_AEROLITES_HPP_

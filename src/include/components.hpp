@@ -11,6 +11,12 @@ class InputComponent {
   virtual void update(Player& player, float delta_time) = 0;
 };
 
+class RendererComponent {
+ public:
+  virtual ~RendererComponent() {}
+  virtual void update(Player& player) = 0;
+};
+
 } // namespace ktp
 
 #endif // AEROLITS_SRC_INCLUDE_COMPONENTS_HPP_

@@ -1,5 +1,5 @@
-#ifndef AEROLITS_SRC_PARTICLE_HPP_
-#define AEROLITS_SRC_PARTICLE_HPP_
+#ifndef AEROLITS_SRC_INCLUDE_PARTICLE_HPP_
+#define AEROLITS_SRC_INCLUDE_PARTICLE_HPP_
 
 #include <SDL.h>
 #include <utility> // std::move
@@ -105,4 +105,4 @@ class Particle {
 
 } // end namespace ktp
 
-#endif // AEROLITS_SRC_PARTICLE_HPP_
+#endif // AEROLITS_SRC_INCLUDE_PARTICLE_HPP_

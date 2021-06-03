@@ -1,5 +1,5 @@
-#ifndef AEROLITS_SRC_INPUT_COMPONENT_HPP_
-#define AEROLITS_SRC_INPUT_COMPONENT_HPP_
+#ifndef AEROLITS_SRC_INCLUDE_PLAYER_INPUT_COMPONENT_HPP_
+#define AEROLITS_SRC_INCLUDE_PLAYER_INPUT_COMPONENT_HPP_
 
 #include "components.hpp"
 
@@ -31,4 +31,4 @@ class PlayerInputComponent : public InputComponent {
 
 } // namespace ktp
 
-#endif // AEROLITS_SRC_INPUT_COMPONENT_HPP_
+#endif // AEROLITS_SRC_INCLUDE_PLAYER_INPUT_COMPONENT_HPP_

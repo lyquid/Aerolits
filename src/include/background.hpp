@@ -1,5 +1,5 @@
-#ifndef AEROLITS_SRC_BACKGROUND_H_
-#define AEROLITS_SRC_BACKGROUND_H_
+#ifndef AEROLITS_SRC_INCLUDE_BACKGROUND_HPP_
+#define AEROLITS_SRC_INCLUDE_BACKGROUND_HPP_
 
 #include "palette.hpp"
 #include <SDL.h>
@@ -40,4 +40,4 @@ class Background {
 
 } // end namespace ktp
 
-#endif // AEROLITS_SRC_BACKGROUND_H_
+#endif // AEROLITS_SRC_INCLUDE_BACKGROUND_HPP_

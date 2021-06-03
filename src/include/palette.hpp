@@ -1,5 +1,5 @@
-#ifndef KTP_SRC_PALETTE_HPP_
-#define KTP_SRC_PALETTE_HPP_
+#ifndef KTP_SRC_INCLUDE_PALETTE_HPP_
+#define KTP_SRC_INCLUDE_PALETTE_HPP_
 
 #include <SDL.h>
 #include <cmath> // sqrt
@@ -88,4 +88,4 @@ namespace Colors {
 
 } // end namespace ktp
 
-#endif // KTP_SRC_PALETTE_HPP_
+#endif // KTP_SRC_PALETTE_INCLUDE_HPP_

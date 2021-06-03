@@ -1,5 +1,5 @@
-#ifndef AEROLITS_SRC_GAME_H_
-#define AEROLITS_SRC_GAME_H_
+#ifndef AEROLITS_SRC_INCLUDE_GAME_HPP_
+#define AEROLITS_SRC_INCLUDE_GAME_HPP_
 
 #include "aerolite.hpp"
 #include "background.hpp"
@@ -71,4 +71,4 @@ class Game {
 
 } // end namespace ktp
 
-#endif // AEROLITS_SRC_GAME_H_
+#endif // AEROLITS_SRC_INCLUDE_GAME_HPP_

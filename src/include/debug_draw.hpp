@@ -1,5 +1,5 @@
-#ifndef KTP_SRC_DEBUG_DRAW_HPP_
-#define KTP_SRC_DEBUG_DRAW_HPP_
+#ifndef KTP_SRC_INCLUDE_DEBUG_DRAW_HPP_
+#define KTP_SRC_INCLUDE_DEBUG_DRAW_HPP_
 
 #include "box2d_scale.hpp"
 #include "../../sdl2_wrappers/sdl2_wrappers.hpp"
@@ -81,4 +81,4 @@ class DebugDraw : public b2Draw {
 
 } // namespace ktp
 
-#endif // KTP_SRC_DEBUG_DRAW_HPP_
+#endif // KTP_SRC_INCLUDE_DEBUG_DRAW_HPP_

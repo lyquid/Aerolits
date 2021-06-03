@@ -1,5 +1,5 @@
-#ifndef AEROLITS_SRC_EMITTER_PARSER_HPP_
-#define AEROLITS_SRC_EMITTER_PARSER_HPP_
+#ifndef AEROLITS_SRC_INCLUDE_EMITTER_PARSER_HPP_
+#define AEROLITS_SRC_INCLUDE_EMITTER_PARSER_HPP_
 
 #include "../../lib/pugixml1.11/pugixml.hpp"
 #include <SDL.h>
@@ -52,4 +52,4 @@ namespace EmitterParser {
 
 } // end namespace ktp
 
-#endif // AEROLITS_SRC_EMITTER_PARSER_HPP_
+#endif // AEROLITS_SRC_INCLUDE_EMITTER_PARSER_HPP_
