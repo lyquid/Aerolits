@@ -3,18 +3,20 @@
 
 namespace ktp {
 
+class GameObject;
 class Player; // this will change to gameobject or something
+class SDL2_Renderer;
 
 class InputComponent {
  public:
   virtual ~InputComponent() {}
-  virtual void update(Player& player, float delta_time) = 0;
+  virtual void update(Player&, float) = 0;
 };
 
 class RendererComponent {
  public:
   virtual ~RendererComponent() {}
-  virtual void update(Player& player) = 0;
+  virtual void update(Player&, SDL2_Renderer&) = 0;
 };
 
 } // namespace ktp

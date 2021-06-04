@@ -6,6 +6,7 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
   screen_size_b2_({screen_size.x / kMetersToPixels, screen_size.y / kMetersToPixels}) {
 
   input_.reset(new PlayerInputComponent);
+  //renderer_.reset(new PlayerRendererComponent);
 
   generatePlayerShape();
   generateLaserShape();
@@ -152,6 +153,7 @@ void ktp::Player::transformRenderShape() {
 }
 
 void ktp::Player::update(float delta_time) {
+  // input_->update(dynamic_cast<Player&>(*this), delta_time);
   input_->update(*this, delta_time);
 
   if (SDL2_Timer::getSDL2Ticks() - stabilizer_time_ > delta_time && steering_) {
@@ -166,6 +168,8 @@ void ktp::Player::update(float delta_time) {
   exhaust_emitter_.update();
 
   if (!lasers_.empty()) updateLasers();
+
+  // renderer_->update(*this);
 }
 
 void ktp::Player::updateLasers() {

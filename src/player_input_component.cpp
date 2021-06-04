@@ -1,5 +1,6 @@
-#include "include/player_input_component.hpp"
+#include "include/game_object.hpp"
 #include "include/player.hpp"
+#include "include/player_input_component.hpp"
 #include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <SDL.h>
 
@@ -18,6 +19,7 @@ void ktp::PlayerInputComponent::update(Player& player, float delta_time) {
 
   if (state[SDL_SCANCODE_W] || state[SDL_SCANCODE_UP]){
     // thrust
+    
     player.delta_.x +=  SDL_sinf(player.body_->GetAngle()) * linear_impulse_ * delta_time;
     if (player.delta_.x < -kMaxDelta_ ) {
       player.delta_.x = -kMaxDelta_;

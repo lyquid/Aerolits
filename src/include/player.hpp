@@ -1,7 +1,9 @@
 #ifndef AEROLITS_SRC_INCLUDE_PLAYER_HPP_
 #define AEROLITS_SRC_INCLUDE_PLAYER_HPP_
 
+#include "game_object.hpp"
 #include "player_input_component.hpp"
+#include "player_renderer_component.hpp"
 #include "palette.hpp"
 #include "particle_system.hpp"
 #include "../../kuge/kuge.hpp"
@@ -13,6 +15,7 @@
 namespace ktp {
 
 using Input = std::unique_ptr<InputComponent>;
+using Renderer = std::unique_ptr<RendererComponent>;
 
 class Emitter;
 
@@ -21,7 +24,7 @@ struct Laser {
   std::vector<SDL_FPoint> render_shape_ {};
 };
 
-class Player {
+class Player : public GameObject{
  public:
 
   Player(SDL_Point& screen_size, kuge::EventBus& event_bus);
@@ -34,6 +37,7 @@ class Player {
  private:
 
   friend class PlayerInputComponent;
+  friend class PlayerRendererComponent;
 
   void checkWrap();
   void generateLaserShape();
@@ -45,6 +49,9 @@ class Player {
   kuge::EventBus& event_bus_;
   SDL_FPoint screen_size_b2_ {};
   b2World* world_ {nullptr};
+  /* Components */
+  Input input_ {};
+  Renderer renderer_ {};
   /* basic attributes */
   inline static constexpr SDL_Color kDefaultPlayerColor_ {Colors::white};
   inline static constexpr float     kDefaultPlayerSize_ {1.2f};
@@ -55,7 +62,6 @@ class Player {
   Uint32  stabilizer_time_ {};
   bool    steering_ {true};
   bool    thrusting_ {false};
-  Input   input_ {};
   /* shape stuff */
   std::vector<SDL_FPoint> shape_ {};
   std::vector<SDL_FPoint> render_shape_ {};

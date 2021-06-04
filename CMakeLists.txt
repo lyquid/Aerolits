@@ -60,7 +60,8 @@ add_executable(	Aerolits  main.cpp
 													src/particle.cpp
 													src/particle_system.cpp
 													src/player.cpp
-													src/player_input_component.cpp )
+													src/player_input_component.cpp 
+													src/player_renderer_component.cpp )
 
 target_compile_features(Aerolits PUBLIC cxx_std_17)
 set_target_properties(Aerolits PROPERTIES CXX_EXTENSIONS OFF)

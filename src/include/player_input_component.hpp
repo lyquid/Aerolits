@@ -5,13 +5,14 @@
 
 namespace ktp {
 
+class GameObject;
 class Player;
 
 class PlayerInputComponent : public InputComponent {
  public:
 
   void reset();
-  void update(Player& player, float delta_time);
+  void update(Player&, float);
 
  private:
   

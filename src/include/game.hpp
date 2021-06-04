@@ -14,7 +14,6 @@
 
 namespace ktp {
 
-class Aerolite;
 class Emitter;
 
 void loadConfigFiles();
