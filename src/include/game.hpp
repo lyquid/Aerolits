@@ -4,6 +4,7 @@
 #include "aerolite.hpp"
 #include "background.hpp"
 #include "debug_draw.hpp"
+#include "game_state.hpp"
 #include "player.hpp"
 #include "../../kuge/kuge.hpp"
 #include "../../sdl2_wrappers/sdl2_wrappers.hpp"
@@ -23,14 +24,15 @@ class Game {
 
   Game();
   ~Game() { clean(); }
-  void draw();
-  void handleSDL2Events();
-  void handleSDL2KeyEvents(const SDL_Keycode& key);
+  inline void draw() { state_->draw(*this); }
+  inline void handleEvents() { state_->handleEvents(*this); }
   bool init();
   inline bool quit() const { return quit_; }
-  void update(float delta_time);
+  inline void update(float delta_time) { state_->update(*this, delta_time); }
 
  private:
+
+  friend class PlayingState;
  
   void clean();
   bool initSDL2();
@@ -39,22 +41,20 @@ class Game {
   const std::string kGameTitle_ {"Aeròlits"};
   SDL_Point screen_size_ {1366, 768};
   bool quit_ {false};
-
-  ktp::SDL2_Window main_window_ {};
-  ktp::SDL2_Renderer renderer_ {};
-  SDL_Event sdl_event_ {};
-  ktp::SDL2_Font font_ {};
+  SDL2_Window main_window_ {};
+  SDL2_Renderer renderer_ {};
+  SDL2_Font font_ {};
   /* FPS */
-  ktp::SDL2_FPS fps_ {};
+  SDL2_FPS fps_ {};
   /* KUGE engine */
   kuge::EventBus event_bus_ {};
   kuge::AudioSystem audio_sys_ {event_bus_};
   kuge::InputSystem input_sys_ {event_bus_};
   kuge::OutputSystem output_sys_ {event_bus_};
   /* Player */
-  ktp::Player player_ {screen_size_, event_bus_};
+  Player player_ {screen_size_, event_bus_};
   /* Background */
-  ktp::Background background_ {screen_size_};
+  Background background_ {screen_size_};
   /* Emitters */
   std::list<Emitter> emitters_ {};
   /* Aerolites */
@@ -65,7 +65,8 @@ class Game {
   int32 velocity_iterations_ {8};
   int32 position_iterations_ {3};
   DebugDraw debug_draw_ {};
-  bool debug_draw_on_ {};
+  /* state */
+  GameState* state_ {nullptr};
 };
 
 } // end namespace ktp

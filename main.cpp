@@ -25,7 +25,7 @@ int main(int argv, char* args[]) {
       current_time = new_time;
       accumulator += frame_time;
 
-      game.handleSDL2Events();
+      game.handleEvents();
 
       while (accumulator >= dt) {
         game.update(dt);
