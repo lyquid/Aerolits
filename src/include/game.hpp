@@ -32,6 +32,7 @@ class Game {
 
  private:
 
+  friend class PausedState;
   friend class PlayingState;
  
   void clean();
@@ -40,10 +41,13 @@ class Game {
 
   const std::string kGameTitle_ {"Aeròlits"};
   SDL_Point screen_size_ {1366, 768};
+  bool paused_ {false};
   bool quit_ {false};
   SDL2_Window main_window_ {};
   SDL2_Renderer renderer_ {};
   SDL2_Font font_ {};
+  /* State */
+  GameState* state_ {nullptr};
   /* FPS */
   SDL2_FPS fps_ {};
   /* KUGE engine */
@@ -59,14 +63,15 @@ class Game {
   std::list<Emitter> emitters_ {};
   /* Aerolites */
   std::vector<Aerolite> aerolites_ {};
-  /* box2d */
+  /* Box2D */
   const b2Vec2 gravity_ {0.f, 0.f};
   b2World world_ {gravity_};
   int32 velocity_iterations_ {8};
   int32 position_iterations_ {3};
   DebugDraw debug_draw_ {};
-  /* state */
-  GameState* state_ {nullptr};
+  bool debug_draw_on_ {false};
+  /* Paused text */
+  SDL2_Texture paused_text_ {};
 };
 
 } // end namespace ktp

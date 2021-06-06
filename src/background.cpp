@@ -9,18 +9,18 @@ ktp::Background::Background(const SDL_Point& screen_size): screen_size_(screen_s
 void ktp::Background::draw(const SDL2_Renderer& renderer) const {
   renderer.setDrawColor(background_color_);
   renderer.drawRectFill(background_shape_);
-  /* for (const auto& star: stars_) {
+  for (const auto& star: stars_) {
     renderer.setDrawColor(star.color_);
     renderer.drawPoint(star.position_);
-  } */
+  }
 }
 
 void ktp::Background::generateStars() {
   std::random_device seed;
   std::mt19937 generator(seed());
-  std::uniform_int_distribution<unsigned int> distribution_stars(0u, 3000u);
+  std::uniform_int_distribution<unsigned int> distribution_stars(0u, 6000u);
   std::uniform_int_distribution<unsigned int> distribution_colors(0u, star_colors_.size() - 1);
-  std::uniform_real_distribution<float> distribution_delta(1.f, 50.f);
+  std::uniform_real_distribution<float> distribution_delta(0.001f, 0.1f);
   Star star;
 
   for (auto i = 0; i < screen_size_.x; ++i) {

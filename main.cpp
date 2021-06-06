@@ -10,7 +10,7 @@ int main(int argv, char* args[]) {
 
   srand(time(nullptr));
 
-  Game game{};
+  Game game {};
 
   constexpr double dt = 0.01;
   double current_time = SDL_GetTicks() / 1000.0;

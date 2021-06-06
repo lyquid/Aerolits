@@ -38,7 +38,10 @@ bool ktp::Game::init() {
   Aerolite::setB2World(&world_);
   Aerolite::setScreenSize(screen_size_);
 
-  state_ = &GameState::playing_;
+  state_ = GameState::goToState(GameState::playing_);
+
+  paused_text_.setRenderer(renderer_);
+  paused_text_.loadFromTextSolid(font_, "PAUSED", Colors::white);
 
   return true;
 }

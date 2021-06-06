@@ -90,6 +90,14 @@ bool ktp::SDL2_Texture::render(const SDL_FPoint& where) {
   return true;
 }
 
+bool ktp::SDL2_Texture::render(const SDL_Rect& dest_rect) {
+  if (SDL_RenderCopy(renderer_->getRenderer(), texture_.get(), NULL, &dest_rect) != 0) {
+    logSDL2Error("SDL_RenderCopy");
+    return false;
+  }
+  return true;
+}
+
 bool ktp::SDL2_Texture::render(const SDL_Rect& src_rect, const SDL_Rect& dest_rect) {
   if (SDL_RenderCopy(renderer_->getRenderer(), texture_.get(), &src_rect, &dest_rect) != 0) {
     logSDL2Error("SDL_RenderCopy");
@@ -104,6 +112,15 @@ bool ktp::SDL2_Texture::render(const SDL_Rect& src_rect, const SDL_Rect& dest_re
     return false;
   }
   return true;
+}
+
+bool ktp::SDL2_Texture::render(const SDL_FPoint& where, const SDL2_Renderer& ren) {
+  const SDL_Rect dest{static_cast<int>(where.x), static_cast<int>(where.y), width_, height_};
+  if (SDL_RenderCopy(ren.getRenderer(), texture_.get(), NULL, &dest) != 0) {
+    logSDL2Error("SDL_RenderCopy");
+    return false;
+  }
+  return true;  
 }
 
 void ktp::SDL2_Texture::createTextureFromSurface(SDL_Surface& surface) {

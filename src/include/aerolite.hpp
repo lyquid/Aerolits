@@ -34,9 +34,9 @@ class Aerolite {
   inline static b2World* b2_world_ {nullptr};
 
   inline static constexpr float kKgPerMeter2_ {20.f};
-  inline static constexpr float kMaxRotationSpeed_ {1.f};
+  inline static constexpr float kMaxRotationSpeed_ {2.f};
   inline static constexpr float kMaxSize_ {5.f};
-  inline static constexpr float kMaxSpeed_ {2.f};
+  inline static constexpr float kMaxSpeed_ {10.f};
 
   b2Body* body_ {nullptr};
   std::vector<SDL_FPoint> shape_ {};
