@@ -34,12 +34,13 @@ class Game {
 
   friend class PausedState;
   friend class PlayingState;
+  friend class TitleState;
  
   void clean();
   bool initSDL2();
   bool loadResources();
 
-  const std::string kGameTitle_ {"Aeròlits"};
+  const std::string kGameTitle_ {"Aerolits"};
   SDL_Point screen_size_ {1366, 768};
   bool paused_ {false};
   bool quit_ {false};
@@ -72,6 +73,8 @@ class Game {
   bool debug_draw_on_ {false};
   /* Paused text */
   SDL2_Texture paused_text_ {};
+  /* Title */
+  SDL2_Texture title_text_ {};
 };
 
 } // end namespace ktp

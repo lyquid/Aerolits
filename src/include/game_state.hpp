@@ -8,10 +8,9 @@
 namespace ktp {
 
 class Game;
-class KioskState;
-class MenuState;
 class PausedState;
 class PlayingState;
+class TitleState;
 
 class GameState {
  public:
@@ -21,17 +20,12 @@ class GameState {
   virtual void update(Game&, float) {}
   inline virtual GameState* enter() { return this; }
 
-  static KioskState kiosk_;
-  static MenuState menu_;
   static PausedState paused_;
   static PlayingState playing_;
+  static TitleState title_;
  public:
   inline static GameState* goToState(GameState& state) { return state.enter(); }
 };
-
-class KioskState : public GameState {};
-
-class MenuState : public GameState {};
 
 class PausedState : public GameState {
  public:
@@ -54,6 +48,17 @@ class PlayingState : public GameState {
  private:
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key);
   SDL_Event sdl_event_ {};
+};
+
+class TitleState : public GameState {
+ public:
+  virtual void draw(Game& game);
+  virtual void handleEvents(Game& game);
+  virtual void update(Game& game, float delta_time);
+ private:
+  void handleSDL2KeyEvents(Game& game, SDL_Keycode key);
+  SDL_Event sdl_event_ {};
+  static inline constexpr float kDefaultBackgroundDeltaInMenu_ {500.f};
 };
 
 } // namespace ktp

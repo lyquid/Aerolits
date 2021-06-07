@@ -4,10 +4,9 @@
 #include <utility> // std::move
 #include <string> // std::to_string
 
-ktp::KioskState   ktp::GameState::kiosk_ {};
-ktp::MenuState    ktp::GameState::menu_ {};
 ktp::PausedState  ktp::GameState::paused_ {};
 ktp::PlayingState ktp::GameState::playing_ {};
+ktp::TitleState   ktp::GameState::title_ {};
 
 void ktp::PausedState::draw(Game& game) {
   game.renderer_.clear();
@@ -63,8 +62,7 @@ void ktp::PausedState::handleEvents(Game& game) {
 void ktp::PausedState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
-      game.input_sys_.postEvent(kuge::EventTypes::ExitGame);
-      game.quit_ = true;
+      game.state_ = goToState(GameState::title_);
       break;
     case SDLK_F1:
       game.debug_draw_on_ = !game.debug_draw_on_;
@@ -135,8 +133,7 @@ void ktp::PlayingState::handleEvents(Game& game) {
 void ktp::PlayingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
-      game.input_sys_.postEvent(kuge::EventTypes::ExitGame);
-      game.quit_ = true;
+      game.state_ = goToState(GameState::paused_);
       break;
     case SDLK_F1:
       game.debug_draw_on_ = !game.debug_draw_on_;
@@ -188,4 +185,56 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   }
   /* Event bus */
   game.event_bus_.processEvents();  
+}
+
+void ktp::TitleState::draw(Game& game) {
+  game.renderer_.clear();
+
+  game.background_.draw(game.renderer_);
+
+  const int w = game.screen_size_.x * 0.75f;
+  const int h = game.screen_size_.y * 0.50f;
+  game.title_text_.render({static_cast<int>(game.screen_size_.x * 0.5f - w * 0.5f), static_cast<int>(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
+  
+  game.renderer_.present();
+  ++game.fps_;
+}
+
+void ktp::TitleState::handleEvents(Game& game) {
+  while (SDL_PollEvent(&sdl_event_)) {
+    switch (sdl_event_.type) {
+      case SDL_QUIT:
+        game.input_sys_.postEvent(kuge::EventTypes::ExitGame);
+        game.quit_ = true;
+        break;
+      case SDL_KEYDOWN:
+        // input_sys_.postEvent(kuge::EventTypes::KeyPressed, SDL_GetKeyName(sdl_event_.key.keysym.sym));
+        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+void ktp::TitleState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
+  switch (key) {
+    case SDLK_ESCAPE:
+      game.input_sys_.postEvent(kuge::EventTypes::ExitGame);
+      game.quit_ = true;
+      break;
+    default:
+      game.state_ = goToState(GameState::playing_);
+      break;
+  }  
+}
+
+void ktp::TitleState::update(Game& game, float delta_time) {
+  game.main_window_.setTitle(
+    game.kGameTitle_ 
+    + " - FPS: " + std::to_string(game.fps_.average()) 
+    + " - delta time: " + std::to_string(delta_time)
+  );
+  /* Background */
+  game.background_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
 }
