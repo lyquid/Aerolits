@@ -29,10 +29,10 @@ class GameState {
 
 class PausedState : public GameState {
  public:
-  virtual void draw(Game& game);
-  virtual void handleEvents(Game& game);
-  virtual void update(Game& game, float delta_time);
-  virtual GameState* enter();
+  virtual void draw(Game& game) override;
+  virtual void handleEvents(Game& game) override;
+  virtual void update(Game& game, float delta_time) override;
+  virtual GameState* enter() override;
  private:
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key);
   SDL_Event sdl_event_ {};
@@ -42,9 +42,9 @@ class PausedState : public GameState {
 
 class PlayingState : public GameState {
  public:
-  virtual void draw(Game& game);
-  virtual void handleEvents(Game& game);
-  virtual void update(Game& game, float delta_time);
+  virtual void draw(Game& game) override;
+  virtual void handleEvents(Game& game) override;
+  virtual void update(Game& game, float delta_time) override;
  private:
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key);
   SDL_Event sdl_event_ {};
@@ -52,9 +52,9 @@ class PlayingState : public GameState {
 
 class TitleState : public GameState {
  public:
-  virtual void draw(Game& game);
-  virtual void handleEvents(Game& game);
-  virtual void update(Game& game, float delta_time);
+  virtual void draw(Game& game) override;
+  virtual void handleEvents(Game& game) override;
+  virtual void update(Game& game, float delta_time) override;
  private:
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key);
   SDL_Event sdl_event_ {};
