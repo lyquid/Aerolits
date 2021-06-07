@@ -67,10 +67,8 @@ void ktp::PausedState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
     case SDLK_F1:
       game.debug_draw_on_ = !game.debug_draw_on_;
       break;
-    case SDLK_p:
-      game.state_ = goToState(GameState::playing_);
-      break;
     default:
+      game.state_ = goToState(GameState::playing_);
       break;
   }
 }
