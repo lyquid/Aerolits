@@ -20,11 +20,13 @@ class GameState {
   virtual void update(Game&, float) {}
   inline virtual GameState* enter() { return this; }
 
+  inline static GameState* goToState(GameState& state) { return state.enter(); }
+  
   static PausedState paused_;
   static PlayingState playing_;
   static TitleState title_;
- public:
-  inline static GameState* goToState(GameState& state) { return state.enter(); }
+ protected:
+  virtual void setWindowTitle(Game& game);
 };
 
 class PausedState : public GameState {

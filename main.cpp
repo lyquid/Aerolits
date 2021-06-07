@@ -22,6 +22,7 @@ int main(int argv, char* args[]) {
 
       double new_time = SDL_GetTicks() / 1000.0;
       double frame_time = new_time - current_time;
+      game.setFrameTime(frame_time);
       current_time = new_time;
       accumulator += frame_time;
 

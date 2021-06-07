@@ -27,11 +27,13 @@ class Game {
   inline void draw() { state_->draw(*this); }
   inline void handleEvents() { state_->handleEvents(*this); }
   bool init();
+  inline void setFrameTime(double time) { frame_time_ = time; }
   inline bool quit() const { return quit_; }
   inline void update(float delta_time) { state_->update(*this, delta_time); }
 
  private:
 
+  friend class GameState;
   friend class PausedState;
   friend class PlayingState;
   friend class TitleState;
@@ -50,7 +52,7 @@ class Game {
   /* State */
   GameState* state_ {nullptr};
   /* FPS */
-  SDL2_FPS fps_ {};
+  double frame_time_ {};
   /* KUGE engine */
   kuge::EventBus event_bus_ {};
   kuge::AudioSystem audio_sys_ {event_bus_};

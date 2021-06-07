@@ -27,7 +27,6 @@ bool ktp::Game::init() {
   if (!main_window_.create(kGameTitle_, screen_size_)) return false;
   if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;
   if (!loadResources()) return false;
-  fps_.start();
 
   debug_draw_.setRenderer(&renderer_);
   world_.SetDebugDraw(&debug_draw_);

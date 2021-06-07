@@ -8,6 +8,13 @@ ktp::PausedState  ktp::GameState::paused_ {};
 ktp::PlayingState ktp::GameState::playing_ {};
 ktp::TitleState   ktp::GameState::title_ {};
 
+void ktp::GameState::setWindowTitle(Game& game) {
+  game.main_window_.setTitle(
+    game.kGameTitle_ 
+    + " - Frame time " + std::to_string(static_cast<int>(game.frame_time_ * 1000)) + "ms."
+  );
+}
+
 void ktp::PausedState::draw(Game& game) {
   game.renderer_.clear();
 
@@ -34,7 +41,6 @@ void ktp::PausedState::draw(Game& game) {
   }  
     
   game.renderer_.present();
-  ++game.fps_;
 }
 
 ktp::GameState* ktp::PausedState::enter() {
@@ -74,11 +80,8 @@ void ktp::PausedState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
 }
 
 void ktp::PausedState::update(Game& game, float delta_time) {
-  game.main_window_.setTitle(
-    game.kGameTitle_ 
-    + " - FPS: " + std::to_string(game.fps_.average()) 
-    + " - delta time: " + std::to_string(delta_time)
-  );
+  /* Window title */
+  setWindowTitle(game);
 }
 
 void ktp::PlayingState::draw(Game& game) {
@@ -99,7 +102,6 @@ void ktp::PlayingState::draw(Game& game) {
   if (game.debug_draw_on_) game.world_.DebugDraw();
   
   game.renderer_.present();
-  ++game.fps_;
 }
 
 void ktp::PlayingState::handleEvents(Game& game) {
@@ -145,12 +147,8 @@ void ktp::PlayingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
 }
 
 void ktp::PlayingState::update(Game& game, float delta_time) {
-  /* FPS */
-  game.main_window_.setTitle(
-    game.kGameTitle_ 
-    + " - FPS: " + std::to_string(game.fps_.average()) 
-    + " - delta time: " + std::to_string(delta_time)
-  );
+  /* Window title */
+  setWindowTitle(game);
   /* Box2D */
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   /* Background */
@@ -195,7 +193,6 @@ void ktp::TitleState::draw(Game& game) {
   game.title_text_.render({static_cast<int>(game.screen_size_.x * 0.5f - w * 0.5f), static_cast<int>(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
   
   game.renderer_.present();
-  ++game.fps_;
 }
 
 void ktp::TitleState::handleEvents(Game& game) {
@@ -228,11 +225,8 @@ void ktp::TitleState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
 }
 
 void ktp::TitleState::update(Game& game, float delta_time) {
-  game.main_window_.setTitle(
-    game.kGameTitle_ 
-    + " - FPS: " + std::to_string(game.fps_.average()) 
-    + " - delta time: " + std::to_string(delta_time)
-  );
+  /* Window title */
+  setWindowTitle(game);
   /* Background */
   game.background_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
 }
