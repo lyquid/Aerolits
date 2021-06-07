@@ -43,6 +43,8 @@ bool ktp::Game::init() {
   paused_text_.loadFromTextSolid(font_, "PAUSED", Colors::white);
   title_text_.setRenderer(renderer_);
   title_text_.loadFromTextSolid(font_, kGameTitle_, Colors::white);
+  demo_text_.setRenderer(renderer_);
+  demo_text_.loadFromTextSolid(font_, "DEMO MODE", Colors::white);
 
   return true;
 }

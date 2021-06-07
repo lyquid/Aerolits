@@ -34,6 +34,7 @@ class Game {
  private:
 
   friend class GameState;
+  friend class DemoState;
   friend class PausedState;
   friend class PlayingState;
   friend class TitleState;
@@ -77,6 +78,8 @@ class Game {
   SDL2_Texture paused_text_ {};
   /* Title */
   SDL2_Texture title_text_ {};
+  /* Demo */
+  SDL2_Texture demo_text_ {};
 };
 
 } // end namespace ktp
