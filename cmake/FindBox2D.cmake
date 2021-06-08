@@ -1,113 +1,91 @@
-# This script locates eXpl0it3r's port of the Box2D library.
+# - Find Box2D
+# Find the native Box2D includes and libraries
 #
-# USAGE
-#
-# By default, the dynamic version of Box2D will be found. To find the static
-# one instead, you must set the BOX2D_STATIC_LIBRARIES variable to TRUE before
-# calling find_package(BOX2D). In that case BOX2D_STATIC will also be defined
-# by this script. Example:
-#
-# set(BOX2D_STATIC_LIBRARIES TRUE)
-# find_package(BOX2D)
-#
-# If Box2D is not installed in a standard path, you can use the BOX2DDIR or
-# BOX2D_ROOT CMake (or environment) variables to tell CMake where to look for
-# Box2D.
-#
-#
-# OUTPUT
-#
-# This script defines the following variables:
-#   - BOX2D_LIBRARY_DEBUG:   the path to the debug library
-#   - BOX2D_LIBRARY_RELEASE: the path to the release library
-#   - BOX2D_LIBRARY:         the path to the library to link to
-#   - BOX2D_FOUND:           true if the Box2D library is found
-#   - BOX2D_INCLUDE_DIR:     the path where Box2D headers are located (the directory containing the Box2D/Box2D.hpp file)
-#
-#
-# EXAMPLE
-#
-# find_package(Box2D REQUIRED)
-# include_directories(${BOX2D_INCLUDE_DIR})
-# add_executable(myapp ...)
-# target_link_libraries(myapp ${BOX2D_LIBRARY} ...)
+#  BOX2D_INCLUDE_DIR - where to find TmxParser/Config.hpp, etc.
+#  BOX2D_LIBRARIES   - List of libraries when using libTmxParser.
+#  BOX2D_FOUND       - True if libTmxParser found.
 
-set(BOX2D_FOUND FALSE)
+if(BOX2D_INCLUDE_DIR)
+  # Already in cache, be silent
+  set(BOX2D_FIND_QUIETLY TRUE)
+endif(BOX2D_INCLUDE_DIR)
 
-if(BOX2D_STATIC_LIBRARIES)
-	set(BOX2D_SUFFIX "-s")
-	add_definitions(-DBOX2D_STATIC)
+find_path(BOX2D_INCLUDE_DIR Box2D/Box2D.h
+  PATH_SUFFIXES include
+  PATHS
+  ~/Library/Frameworks
+  /Library/Frameworks
+  /usr/local
+  /usr
+  /sw          # Fink
+  /opt/local   # DarwinPorts
+  /opt/csw     # Blastwave
+  /opt
+  ${BOX2DDIR}
+  $ENV{BOX2DDIR})
+
+find_library(BOX2D_LIBRARY_DEBUG
+  Box2D-d
+  PATH_SUFFIXES lib64 lib
+  PATHS
+  ~/Library/Frameworks
+  /Library/Frameworks
+  /usr/local
+  /usr
+  /sw          # Fink
+  /opt/local   # DarwinPorts
+  /opt/csw     # Blastwave
+  /opt
+  ${BOX2DDIR}
+  $ENV{BOX2DDIR})
+
+find_library(BOX2D_LIBRARY_RELEASE
+  Box2D
+  PATH_SUFFIXES lib64 lib
+  PATHS
+  ~/Library/Frameworks
+  /Library/Frameworks
+  /usr/local
+  /usr
+  /sw          # Fink
+  /opt/local   # DarwinPorts
+  /opt/csw     # Blastwave
+  /opt
+  ${BOX2DDIR}
+  $ENV{BOX2DDIR})
+
+if(BOX2D_LIBRARY_DEBUG OR BOX2D_LIBRARY_RELEASE)
+  # Library found
+  set(BOX2D_FOUND TRUE)
+
+  # If both were found, set BOX2D_LIBRARY to the release version
+  if(BOX2D_LIBRARY_DEBUG AND BOX2D_LIBRARY_RELEASE)
+    set(BOX2D_LIBRARY ${BOX2D_LIBRARY_RELEASE})
+  endif()
+
+  if(BOX2D_LIBRARY_DEBUG AND NOT BOX2D_LIBRARY_RELEASE)
+    set(BOX2D_LIBRARY ${BOX2D_LIBRARY_DEBUG})
+  endif()
+
+  if(NOT BOX2D_LIBRARY_DEBUG AND BOX2D_LIBRARY_RELEASE)
+    set(BOX2D_LIBRARY ${BOX2D_LIBRARY_RELEASE})
+  endif()
 else()
-	set(BOX2D_SUFFIX "")
+  set(BOX2D_FOUND FALSE)
 endif()
 
-find_path(
-	BOX2D_INCLUDE_DIR
-	Box2D/Box2D.hpp
-	PATH_SUFFIXES
-		include
-	PATHS
-		/usr
-		/usr/local
-		${BOX2DDIR}
-		${BOX2D_ROOT}
-		$ENV{BOX2DDIR}
-		$ENV{BOX2D_ROOT}
-)
+# Handle the QUIETLY and REQUIRED arguments and set SNDFILE_FOUND to TRUE if
+# all listed variables are TRUE.
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(BOX2D DEFAULT_MSG BOX2D_LIBRARY BOX2D_INCLUDE_DIR)
 
-find_library(
-	BOX2D_LIBRARY_RELEASE
-	box2d${BOX2D_SUFFIX}
-	PATH_SUFFIXES
-		lib
-		lib64
-	PATHS
-		/usr
-		/usr/local
-		${BOX2DDIR}
-		${BOX2D_ROOT}
-		$ENV{BOX2DDIR}
-		$ENV{BOX2D_ROOT}
-)
+if(BOX2D_FOUND)
+  set(BOX2D_LIBRARIES ${BOX2D_LIBRARY})
+else(BOX2D_FOUND)
+  set(BOX2D_LIBRARIES)
+endif(BOX2D_FOUND)
 
-find_library(
-	BOX2D_LIBRARY_DEBUG
-	box2d${BOX2D_SUFFIX}-d
-	PATH_SUFFIXES
-		lib
-		lib64
-	PATHS
-		/usr
-		/usr/local
-		${BOX2DDIR}
-		${BOX2D_ROOT}
-		$ENV{BOX2DDIR}
-		$ENV{BOX2D_ROOT}
-)
-
-if(BOX2D_LIBRARY_RELEASE AND BOX2D_LIBRARY_DEBUG)
-	set(BOX2D_LIBRARY debug ${BOX2D_LIBRARY_DEBUG} optimized ${BOX2D_LIBRARY_RELEASE})
-endif()
-
-if(BOX2D_LIBRARY_RELEASE AND NOT BOX2D_LIBRARY_DEBUG)
-	set(BOX2D_LIBRARY_DEBUG ${BOX2D_LIBRARY_RELEASE})
-	set(BOX2D_LIBRARY ${BOX2D_LIBRARY_RELEASE})
-endif()
-
-if(BOX2D_LIBRARY_DEBUG AND NOT BOX2D_LIBRARY_RELEASE)
-	set(BOX2D_LIBRARY_RELEASE ${BOX2D_LIBRARY_DEBUG})
-	set(BOX2D_LIBRARY ${BOX2D_LIBRARY_DEBUG})
-endif()
-
-if(NOT BOX2D_INCLUDE_DIR OR NOT BOX2D_LIBRARY)
-	if(BOX2D_FIND_REQUIRED)
-		message(FATAL_ERROR "Box2D not found.")
-	elseif(NOT BOX2D_FIND_QUIETLY)
-		message("Box2D not found.")
-	endif()
-else()
-	set(BOX2D_FOUND true)
-	if (NOT BOX2D_FIND_QUIETLY)
-		message(STATUS "Box2D found: ${BOX2D_INCLUDE_DIR}")
-	endif()
-endif()
+mark_as_advanced(BOX2D_INCLUDE_DIR
+  BOX2D_LIBRARY
+  BOX2D_LIBRARY_RELEASE
+  BOX2D_LIBRARY_DEBUG)
