@@ -1,9 +1,10 @@
 #include "include/box2d_scale.hpp"
 #include "include/player.hpp"
 
-ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
+ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* world):
   event_bus_(event_bus),
-  screen_size_b2_({screen_size.x / kMetersToPixels, screen_size.y / kMetersToPixels}) {
+  screen_size_b2_({screen_size.x / kMetersToPixels, screen_size.y / kMetersToPixels}),
+  world_(world) {
 
   input_.reset(new PlayerInputComponent);
   //renderer_.reset(new PlayerRendererComponent);
@@ -12,6 +13,8 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus):
   generateLaserShape();
   
   lasers_.reserve(50);
+
+  setBox2D();
 }
 
 void ktp::Player::checkWrap() {
@@ -94,8 +97,7 @@ void ktp::Player::reset() {
   //update(0.f); // needed to initialize render_shape_ // ????
 }
 
-void ktp::Player::setBox2d(b2World* world) {
-  world_ = world;
+void ktp::Player::setBox2D() {
   /* Player */
   b2BodyDef body_def {};
   body_def.type = b2_dynamicBody;
@@ -179,7 +181,7 @@ void ktp::Player::updateLasers() {
     // check if laser is out of screen
     if (laser->body_->GetPosition().x < -threshold || laser->body_->GetPosition().x > screen_size_b2_.x + threshold ||
         laser->body_->GetPosition().y < -threshold || laser->body_->GetPosition().y > screen_size_b2_.y + threshold) {
-
+      world_->DestroyBody(laser->body_);
       laser = lasers_.erase(laser);
     } else {
       // move the laser's shape

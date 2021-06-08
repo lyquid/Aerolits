@@ -27,11 +27,11 @@ struct Laser {
 class Player : public GameObject{
  public:
 
-  Player(SDL_Point& screen_size, kuge::EventBus& event_bus);
+  Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* world);
+  ~Player() { world_->DestroyBody(body_); }
   void draw(SDL2_Renderer& renderer) const;
   inline bool isAlive() const { return alive_; }
   void reset();
-  void setBox2d(b2World* world);
   void update(float delta_time);
 
  private:
@@ -43,6 +43,7 @@ class Player : public GameObject{
   void generateLaserShape();
   void generatePlayerShape();
   void resetPosition();
+  void setBox2D();
   void transformRenderShape();
   void updateLasers();
   

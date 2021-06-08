@@ -11,7 +11,7 @@ void ktp::loadConfigFiles() {
 
 ktp::Game::Game() {
   event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);
-  //emitters_.reserve(200);
+  emitters_.reserve(60);
 }
 
 void ktp::Game::clean() {
@@ -32,12 +32,8 @@ bool ktp::Game::init() {
   world_.SetDebugDraw(&debug_draw_);
   debug_draw_.SetFlags(b2Draw::e_shapeBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
 
-  player_.setBox2d(&world_);
-
   Aerolite::setB2World(&world_);
   Aerolite::setScreenSize(screen_size_);
-
-  state_ = GameState::goToState(GameState::title_);
 
   paused_text_.setRenderer(renderer_);
   paused_text_.loadFromTextSolid(font_, "PAUSED", Colors::white);
@@ -45,6 +41,8 @@ bool ktp::Game::init() {
   title_text_.loadFromTextSolid(font_, kGameTitle_, Colors::white);
   demo_text_.setRenderer(renderer_);
   demo_text_.loadFromTextSolid(font_, "DEMO MODE", Colors::white);
+
+  state_ = GameState::goToState(*this, GameState::title_);
 
   return true;
 }

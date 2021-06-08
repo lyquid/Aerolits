@@ -1,6 +1,8 @@
 #include "include/game.hpp"
 #include "include/game_state.hpp"
+#include "include/player.hpp"
 #include <SDL.h>
+#include <memory>
 #include <utility> // std::move
 #include <string> // std::to_string
 
@@ -23,7 +25,7 @@ void ktp::DemoState::draw(Game& game) {
 
   game.background_.draw(game.renderer_);
 
-  game.player_.draw(game.renderer_);
+  game.player_->draw(game.renderer_);
   for (const auto& emitter: game.emitters_) {
     emitter.draw();
   }
@@ -46,7 +48,8 @@ void ktp::DemoState::draw(Game& game) {
   game.renderer_.present();
 }
 
-ktp::GameState* ktp::DemoState::enter() {
+ktp::GameState* ktp::DemoState::enter(Game& game) {
+  game.player_ = std::make_unique<Player>(game.screen_size_, game.event_bus_, &game.world_);
   blink_flag_ = true;
   blink_timer_ = SDL2_Timer::getSDL2Ticks();
   return this;
@@ -63,7 +66,7 @@ void ktp::DemoState::handleEvents(Game& game) {
         handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN:
-        game.state_ = goToState(GameState::title_);
+        game.state_ = goToState(game, GameState::title_);
         break;
       default:
         break;
@@ -81,7 +84,7 @@ void ktp::DemoState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.debug_draw_on_ = !game.debug_draw_on_;
       break;
     default:
-      game.state_ = goToState(GameState::title_);
+      game.state_ = goToState(game, GameState::title_);
       break;
   }
 }
@@ -94,7 +97,7 @@ void ktp::DemoState::update(Game& game, float delta_time) {
   /* Background */
   game.background_.update(delta_time);
   /* Player */
-  game.player_.update(delta_time);
+  game.player_->update(delta_time);
   /* Emitters */
   auto iter = game.emitters_.begin();
   while (iter != game.emitters_.end()) {
@@ -130,7 +133,7 @@ void ktp::PausedState::draw(Game& game) {
 
   game.background_.draw(game.renderer_);
 
-  game.player_.draw(game.renderer_);
+  game.player_->draw(game.renderer_);
   for (const auto& emitter: game.emitters_) {
     emitter.draw();
   }
@@ -153,7 +156,7 @@ void ktp::PausedState::draw(Game& game) {
   game.renderer_.present();
 }
 
-ktp::GameState* ktp::PausedState::enter() {
+ktp::GameState* ktp::PausedState::enter(Game& game) {
   blink_flag_ = true;
   blink_timer_ = SDL2_Timer::getSDL2Ticks();
   return this;
@@ -178,13 +181,13 @@ void ktp::PausedState::handleEvents(Game& game) {
 void ktp::PausedState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
-      game.state_ = goToState(GameState::title_);
+      game.state_ = goToState(game, GameState::title_);
       break;
     case SDLK_F1:
       game.debug_draw_on_ = !game.debug_draw_on_;
       break;
     default:
-      game.state_ = goToState(GameState::playing_);
+      game.state_ = goToState(game, GameState::playing_);
       break;
   }
 }
@@ -201,7 +204,7 @@ void ktp::PlayingState::draw(Game& game) {
 
   game.background_.draw(game.renderer_);
 
-  game.player_.draw(game.renderer_);
+  game.player_->draw(game.renderer_);
   for (const auto& emitter: game.emitters_) {
     emitter.draw();
   }
@@ -212,6 +215,11 @@ void ktp::PlayingState::draw(Game& game) {
   if (game.debug_draw_on_) game.world_.DebugDraw();
   
   game.renderer_.present();
+}
+
+ktp::GameState* ktp::PlayingState::enter(Game& game) {
+  game.player_ = std::make_unique<Player>(game.screen_size_, game.event_bus_, &game.world_);
+  return this;
 }
 
 void ktp::PlayingState::handleEvents(Game& game) {
@@ -243,13 +251,13 @@ void ktp::PlayingState::handleEvents(Game& game) {
 void ktp::PlayingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
-      game.state_ = goToState(GameState::paused_);
+      game.state_ = goToState(game, GameState::paused_);
       break;
     case SDLK_F1:
       game.debug_draw_on_ = !game.debug_draw_on_;
       break;
     case SDLK_p:
-      game.state_ = goToState(GameState::paused_);
+      game.state_ = goToState(game, GameState::paused_);
       break;
     default:
       break;
@@ -264,7 +272,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   /* Background */
   game.background_.update(delta_time);
   /* Player */
-  game.player_.update(delta_time);
+  game.player_->update(delta_time);
   /* Emitters */
   auto iter = game.emitters_.begin();
   while (iter != game.emitters_.end()) {
@@ -307,7 +315,7 @@ void ktp::TitleState::draw(Game& game) {
   game.renderer_.present();
 }
 
-ktp::GameState* ktp::TitleState::enter() {
+ktp::GameState* ktp::TitleState::enter(Game& game) {
   demo_time_ = SDL2_Timer::getSDL2Ticks();
   return this;
 }
@@ -340,7 +348,7 @@ void ktp::TitleState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       break;
     default:
       demo_time_ = SDL2_Timer::getSDL2Ticks();
-      game.state_ = goToState(GameState::playing_);
+      game.state_ = goToState(game, GameState::playing_);
       break;
   }  
 }
@@ -352,6 +360,6 @@ void ktp::TitleState::update(Game& game, float delta_time) {
   game.background_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
   /* Demo mode*/
   if (SDL2_Timer::getSDL2Ticks() - demo_time_ > kWaitForDemo_) {
-    game.state_ = goToState(GameState::demo_);
+    game.state_ = goToState(game, GameState::demo_);
   }
 }

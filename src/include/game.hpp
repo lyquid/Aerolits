@@ -9,7 +9,7 @@
 #include "../../kuge/kuge.hpp"
 #include "../../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <box2d/box2d.h>
-#include <list>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -60,11 +60,11 @@ class Game {
   kuge::InputSystem input_sys_ {event_bus_};
   kuge::OutputSystem output_sys_ {event_bus_};
   /* Player */
-  Player player_ {screen_size_, event_bus_};
+  std::unique_ptr<Player> player_ {};
   /* Background */
   Background background_ {screen_size_};
   /* Emitters */
-  std::list<Emitter> emitters_ {};
+  std::vector<Emitter> emitters_ {};
   /* Aerolites */
   std::vector<Aerolite> aerolites_ {};
   /* Box2D */
