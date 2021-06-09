@@ -18,18 +18,17 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* 
 }
 
 void ktp::Player::checkWrap() {
-  const auto threshold {size_ * 0.5f};
-  
-  if (body_->GetPosition().x < -threshold) {
-    body_->SetTransform({screen_size_b2_.x + threshold, body_->GetPosition().y}, body_->GetAngle());
-  } else  if (body_->GetPosition().x > screen_size_b2_.x + threshold) {
-    body_->SetTransform({-threshold, body_->GetPosition().y}, body_->GetAngle());
+  aabb_ = body_->GetFixtureList()->GetAABB(0);
+  if (aabb_.upperBound.x < 0) {
+    body_->SetTransform({screen_size_b2_.x + ((aabb_.upperBound.x - aabb_.lowerBound.x) * 0.5f), body_->GetPosition().y}, body_->GetAngle());
+  } else if (aabb_.lowerBound.x > screen_size_b2_.x) {
+    body_->SetTransform({-(aabb_.upperBound.x - aabb_.lowerBound.x) * 0.5f, body_->GetPosition().y}, body_->GetAngle());
   }
 
-  if (body_->GetPosition().y < -threshold) {
-    body_->SetTransform({body_->GetPosition().x, screen_size_b2_.y + threshold}, body_->GetAngle());
-  } else  if (body_->GetPosition().y > screen_size_b2_.y + threshold) {
-    body_->SetTransform({body_->GetPosition().x, -threshold}, body_->GetAngle());
+  if (aabb_.upperBound.y < 0) {
+    body_->SetTransform({body_->GetPosition().x, screen_size_b2_.y + ((aabb_.upperBound.y - aabb_.lowerBound.y) * 0.5f)}, body_->GetAngle());
+  } else if (aabb_.lowerBound.y > screen_size_b2_.y) {
+    body_->SetTransform({body_->GetPosition().x, -(aabb_.upperBound.y - aabb_.lowerBound.y) * 0.5f}, body_->GetAngle());
   }
 }
 
@@ -163,8 +162,8 @@ void ktp::Player::update(float delta_time) {
     steering_ = false;
   }
 
-  checkWrap();
   transformRenderShape();
+  checkWrap();
 
   exhaust_emitter_.setPosition({body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels});
   exhaust_emitter_.update();

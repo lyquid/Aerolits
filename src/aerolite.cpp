@@ -119,7 +119,7 @@ void ktp::Aerolite::update() {
     to_be_deleted_ = true;
   }
   // this will be usefull when the body_ has n fixtures
-  /* 
+  /*
   aabb_.lowerBound = b2Vec2( FLT_MAX, FLT_MAX);
   aabb_.upperBound = b2Vec2(-FLT_MAX,-FLT_MAX);
   for (b2Fixture* fixture = body_->GetFixtureList(); fixture; fixture = fixture->GetNext()) {

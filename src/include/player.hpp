@@ -56,6 +56,7 @@ class Player : public GameObject{
   /* basic attributes */
   inline static constexpr SDL_Color kDefaultPlayerColor_ {Colors::white};
   inline static constexpr float     kDefaultPlayerSize_ {1.2f};
+  b2AABB  aabb_ {};
   bool    alive_ {true};
   b2Body* body_ {nullptr};
   b2Vec2  delta_ {};
