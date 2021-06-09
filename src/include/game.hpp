@@ -29,6 +29,7 @@ class Game {
   bool init();
   inline void setFrameTime(double time) { frame_time_ = time; }
   inline bool quit() const { return quit_; }
+  inline void reset() { aerolites_.clear(); }
   inline void update(float delta_time) { state_->update(*this, delta_time); }
 
  private:
@@ -59,6 +60,12 @@ class Game {
   kuge::AudioSystem audio_sys_ {event_bus_};
   kuge::InputSystem input_sys_ {event_bus_};
   kuge::OutputSystem output_sys_ {event_bus_};
+  /* Box2D */
+  b2World world_ {b2Vec2{0.f, 0.f}};
+  int32 velocity_iterations_ {8};
+  int32 position_iterations_ {3};
+  DebugDraw debug_draw_ {};
+  bool debug_draw_on_ {false};
   /* Player */
   std::unique_ptr<Player> player_ {};
   /* Background */
@@ -67,19 +74,10 @@ class Game {
   std::vector<Emitter> emitters_ {};
   /* Aerolites */
   std::vector<Aerolite> aerolites_ {};
-  /* Box2D */
-  const b2Vec2 gravity_ {0.f, 0.f};
-  b2World world_ {gravity_};
-  int32 velocity_iterations_ {8};
-  int32 position_iterations_ {3};
-  DebugDraw debug_draw_ {};
-  bool debug_draw_on_ {false};
-  /* Paused text */
-  SDL2_Texture paused_text_ {};
-  /* Title */
-  SDL2_Texture title_text_ {};
-  /* Demo */
+  /* Game texts */
   SDL2_Texture demo_text_ {};
+  SDL2_Texture paused_text_ {};
+  SDL2_Texture title_text_ {};
 };
 
 } // end namespace ktp

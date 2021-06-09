@@ -49,7 +49,6 @@ void ktp::DemoState::draw(Game& game) {
 }
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
-  game.player_ = std::make_unique<Player>(game.screen_size_, game.event_bus_, &game.world_);
   blink_flag_ = true;
   blink_timer_ = SDL2_Timer::getSDL2Ticks();
   return this;
@@ -218,7 +217,6 @@ void ktp::PlayingState::draw(Game& game) {
 }
 
 ktp::GameState* ktp::PlayingState::enter(Game& game) {
-  game.player_ = std::make_unique<Player>(game.screen_size_, game.event_bus_, &game.world_);
   return this;
 }
 
@@ -298,7 +296,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
     game.aerolites_.push_back(Aerolite::spawnAerolite());
   }
   /* Event bus */
-  game.event_bus_.processEvents();  
+  game.event_bus_.processEvents();
 }
 
 /* TITLE STATE */
@@ -316,6 +314,8 @@ void ktp::TitleState::draw(Game& game) {
 }
 
 ktp::GameState* ktp::TitleState::enter(Game& game) {
+  game.reset();
+  game.player_ = std::make_unique<Player>(game.screen_size_, game.event_bus_, &game.world_);
   demo_time_ = SDL2_Timer::getSDL2Ticks();
   return this;
 }

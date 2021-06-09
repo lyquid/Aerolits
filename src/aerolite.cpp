@@ -3,7 +3,7 @@
 #include "include/palette.hpp"
 #include "include/random.hpp"
 #include "../sdl2_wrappers/sdl2_renderer.hpp"
-#include <utility> // std::move
+#include <utility> // std::exchange, std::swap
 
 ktp::Aerolite::Aerolite(const SDL_FPoint& where) noexcept {
   const auto size {kMaxSize_ * generateRand(0.3f, 1.f)};
@@ -26,6 +26,27 @@ ktp::Aerolite::Aerolite(const SDL_FPoint& where) noexcept {
   fixture_def.friction = 1.f;
 
   body_->CreateFixture(&fixture_def);
+}
+
+ktp::Aerolite::Aerolite(Aerolite&& other) noexcept {
+  body_ = std::exchange(other.body_, nullptr);
+  shape_ = other.shape_;
+  render_shape_ = other.render_shape_;
+  to_be_deleted_ = other.to_be_deleted_;
+}
+
+ktp::Aerolite& ktp::Aerolite::operator=(Aerolite&& other) noexcept {
+  if (this != &other) {
+    if (body_ != nullptr) {
+      b2_world_->DestroyBody(body_);
+      body_ = nullptr;
+    }
+    std::swap(body_, other.body_);
+    shape_ = other.shape_;
+    render_shape_ = other.render_shape_;
+    to_be_deleted_ = other.to_be_deleted_;
+  }
+  return *this;
 }
 
 ktp::Aerolite ktp::Aerolite::spawnAerolite() {
@@ -55,7 +76,7 @@ ktp::Aerolite ktp::Aerolite::spawnAerolite() {
       side = 0;
       break;
   }
-  return std::move(aerolite);
+  return aerolite;
 }
 
 void ktp::Aerolite::draw(const SDL2_Renderer& renderer) const {
@@ -94,7 +115,6 @@ void ktp::Aerolite::update() {
   
   if (body_->GetPosition().x < -kMaxSize_ || body_->GetPosition().x > screen_size_b2_.x + kMaxSize_
    || body_->GetPosition().y < -kMaxSize_ || body_->GetPosition().y > screen_size_b2_.y + kMaxSize_) {
-    b2_world_->DestroyBody(body_);
     to_be_deleted_ = true;
   }
 }
