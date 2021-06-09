@@ -16,13 +16,11 @@ class Aerolite {
   Aerolite(const Aerolite& other) = delete;
   Aerolite(Aerolite&& other) noexcept;
   ~Aerolite() noexcept { if (body_ != nullptr) b2_world_->DestroyBody(body_); }
-  
   Aerolite& operator=(const Aerolite& other) = delete;
   Aerolite& operator=(Aerolite&& other) noexcept;
 
   static void setB2World(b2World* world) { b2_world_ = world; }
   static void setScreenSize(const SDL_Point& screen_size);
-
   static Aerolite spawnAerolite();
 
   inline bool canBeDeleted() const { return to_be_deleted_; }
@@ -44,6 +42,7 @@ class Aerolite {
   inline static constexpr float kMaxSize_ {5.f};
   inline static constexpr float kMaxSpeed_ {10.f};
 
+  b2AABB aabb_ {};
   b2Body* body_ {nullptr};
   std::vector<SDL_FPoint> shape_ {};
   std::vector<SDL_FPoint> render_shape_ {};

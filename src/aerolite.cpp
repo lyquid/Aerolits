@@ -18,7 +18,7 @@ ktp::Aerolite::Aerolite(const SDL_FPoint& where) noexcept {
   body_ = b2_world_->CreateBody(&body_def);
 
   b2PolygonShape dynamic_box {};
-  dynamic_box.SetAsBox(size / 2.f, size / 2.f);
+  dynamic_box.SetAsBox(size * 0.5f, size * 0.5f);
 
   b2FixtureDef fixture_def {};
   fixture_def.shape = &dynamic_box;
@@ -29,6 +29,7 @@ ktp::Aerolite::Aerolite(const SDL_FPoint& where) noexcept {
 }
 
 ktp::Aerolite::Aerolite(Aerolite&& other) noexcept {
+  aabb_ = other.aabb_;
   body_ = std::exchange(other.body_, nullptr);
   shape_ = other.shape_;
   render_shape_ = other.render_shape_;
@@ -37,6 +38,7 @@ ktp::Aerolite::Aerolite(Aerolite&& other) noexcept {
 
 ktp::Aerolite& ktp::Aerolite::operator=(Aerolite&& other) noexcept {
   if (this != &other) {
+    aabb_ = other.aabb_;
     if (body_ != nullptr) {
       b2_world_->DestroyBody(body_);
       body_ = nullptr;
@@ -82,8 +84,6 @@ ktp::Aerolite ktp::Aerolite::spawnAerolite() {
 void ktp::Aerolite::draw(const SDL2_Renderer& renderer) const {
   renderer.setDrawColor(Colors::orange);
   renderer.drawLines(render_shape_);
-  //renderer.setDrawColor(Colors::yellow);
-  //renderer.drawPoint(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels);
 }
 
 void ktp::Aerolite::generateAeroliteShape(float size) {
@@ -112,9 +112,17 @@ void ktp::Aerolite::setScreenSize(const SDL_Point& screen_size) {
 
 void ktp::Aerolite::update() {
   transformRenderShape();
-  
-  if (body_->GetPosition().x < -kMaxSize_ || body_->GetPosition().x > screen_size_b2_.x + kMaxSize_
-   || body_->GetPosition().y < -kMaxSize_ || body_->GetPosition().y > screen_size_b2_.y + kMaxSize_) {
+
+  aabb_ = body_->GetFixtureList()->GetAABB(0);
+  if (aabb_.upperBound.x < 0 || aabb_.lowerBound.x > screen_size_b2_.x
+   || aabb_.upperBound.y < 0 || aabb_.lowerBound.y > screen_size_b2_.y) {
     to_be_deleted_ = true;
   }
+  // this will be usefull when the body_ has n fixtures
+  /* 
+  aabb_.lowerBound = b2Vec2( FLT_MAX, FLT_MAX);
+  aabb_.upperBound = b2Vec2(-FLT_MAX,-FLT_MAX);
+  for (b2Fixture* fixture = body_->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+    aabb_.Combine(aabb_, fixture->GetAABB(0)); /// wtf is childIndex
+  } */
 }
