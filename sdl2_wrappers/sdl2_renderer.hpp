@@ -54,7 +54,11 @@ class SDL2_Renderer {
   
   bool drawLine(const SDL_Point& start, const SDL_Point& end) const;
 
+  bool drawLine(const SDL_FPoint& start, const SDL_FPoint& end) const;
+
   bool drawLine(int x1, int y1, int x2, int y2) const;
+
+  bool drawLine(float x1, float y1, float x2, float y2) const;
 
   bool drawLines(const std::vector<SDL_Point>& points) const;
   

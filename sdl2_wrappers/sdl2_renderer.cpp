@@ -65,7 +65,21 @@ bool ktp::SDL2_Renderer::drawLine(const SDL_Point& start, const SDL_Point& end) 
   return false;
 }
 
+bool ktp::SDL2_Renderer::drawLine(const SDL_FPoint& start, const SDL_FPoint& end) const {
+  if (SDL_RenderDrawLine(renderer_.get(), start.x, start.y, end.x, end.y) == 0) {
+    return true;
+  }
+  return false;
+}
+
 bool ktp::SDL2_Renderer::drawLine(int x1, int y1, int x2, int y2) const {
+  if (SDL_RenderDrawLine(renderer_.get(), x1, y1, x2, y2) == 0) {
+    return true;
+  }
+  return false;
+}
+
+bool ktp::SDL2_Renderer::drawLine(float x1, float y1, float x2, float y2) const {
   if (SDL_RenderDrawLine(renderer_.get(), x1, y1, x2, y2) == 0) {
     return true;
   }

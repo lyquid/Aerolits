@@ -3,7 +3,7 @@
 
 ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* world):
   event_bus_(event_bus),
-  screen_size_b2_({screen_size.x / kMetersToPixels, screen_size.y / kMetersToPixels}),
+  screen_size_b2_({(float)screen_size.x / kMetersToPixels, (float)screen_size.y / kMetersToPixels}),
   world_(world) {
 
   input_.reset(new PlayerInputComponent);
@@ -18,17 +18,16 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* 
 }
 
 void ktp::Player::checkWrap() {
-  aabb_ = body_->GetFixtureList()->GetAABB(0);
-  if (aabb_.upperBound.x < 0) {
-    body_->SetTransform({screen_size_b2_.x + ((aabb_.upperBound.x - aabb_.lowerBound.x) * 0.5f), body_->GetPosition().y}, body_->GetAngle());
-  } else if (aabb_.lowerBound.x > screen_size_b2_.x) {
-    body_->SetTransform({-(aabb_.upperBound.x - aabb_.lowerBound.x) * 0.5f, body_->GetPosition().y}, body_->GetAngle());
+  const auto threshold {size_ * 0.5f};
+  if (body_->GetPosition().x < -threshold) {
+    body_->SetTransform({screen_size_b2_.x + threshold, body_->GetPosition().y}, body_->GetAngle());
+  } else if (body_->GetPosition().x > screen_size_b2_.x + threshold) {
+    body_->SetTransform({-threshold, body_->GetPosition().y}, body_->GetAngle());
   }
-
-  if (aabb_.upperBound.y < 0) {
-    body_->SetTransform({body_->GetPosition().x, screen_size_b2_.y + ((aabb_.upperBound.y - aabb_.lowerBound.y) * 0.5f)}, body_->GetAngle());
-  } else if (aabb_.lowerBound.y > screen_size_b2_.y) {
-    body_->SetTransform({body_->GetPosition().x, -(aabb_.upperBound.y - aabb_.lowerBound.y) * 0.5f}, body_->GetAngle());
+  if (body_->GetPosition().y < -threshold) {
+    body_->SetTransform({body_->GetPosition().x, screen_size_b2_.y + threshold}, body_->GetAngle());
+  } else if (body_->GetPosition().y > screen_size_b2_.y + threshold) {
+    body_->SetTransform({body_->GetPosition().x, -threshold}, body_->GetAngle());
   }
 }
 
@@ -101,7 +100,7 @@ void ktp::Player::setBox2D() {
   b2BodyDef body_def {};
   body_def.type = b2_dynamicBody;
   body_def.bullet = true;
-  body_def.position.Set(screen_size_b2_.x / 2, screen_size_b2_.y / 2);
+  body_def.position.Set(screen_size_b2_.x * 0.5f, screen_size_b2_.y * 0.5f);
   body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
 
   body_ = world_->CreateBody(&body_def);
@@ -161,10 +160,10 @@ void ktp::Player::update(float delta_time) {
     body_->SetAngularVelocity(0.f);
     steering_ = false;
   }
-
-  transformRenderShape();
   checkWrap();
 
+  transformRenderShape();
+  
   exhaust_emitter_.setPosition({body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels});
   exhaust_emitter_.update();
 
