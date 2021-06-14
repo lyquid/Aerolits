@@ -105,17 +105,18 @@ void ktp::Aerolite::transformRenderShape() {
 }
 
 void ktp::Aerolite::setScreenSize(const SDL_Point& screen_size) {
-  screen_size_ = screen_size;
-  screen_size_b2_.x = screen_size.x / kMetersToPixels;
-  screen_size_b2_.y = screen_size.y / kMetersToPixels;
+  screen_size_b2_.x = static_cast<float>(screen_size.x) / kMetersToPixels;
+  screen_size_b2_.y = static_cast<float>(screen_size.y) / kMetersToPixels;
 }
 
 void ktp::Aerolite::update() {
   transformRenderShape();
 
   aabb_ = body_->GetFixtureList()->GetAABB(0);
-  if (aabb_.upperBound.x < 0 || aabb_.lowerBound.x > screen_size_b2_.x
-   || aabb_.upperBound.y < 0 || aabb_.lowerBound.y > screen_size_b2_.y) {
+
+  constexpr auto threshold {0.1f};
+  if (aabb_.upperBound.x < 0 || aabb_.lowerBound.x > screen_size_b2_.x + threshold
+   || aabb_.upperBound.y < 0 || aabb_.lowerBound.y > screen_size_b2_.y + threshold) {
     to_be_deleted_ = true;
   }
   // this will be usefull when the body_ has n fixtures

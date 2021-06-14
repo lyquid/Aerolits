@@ -32,10 +32,8 @@ class Aerolite {
   void generateAeroliteShape(float size);
   void transformRenderShape();
   
-  inline static SDL_Point screen_size_ {};
-  inline static SDL_Point screen_size_b2_ {};
-
   inline static b2World* b2_world_ {nullptr};
+  inline static SDL_FPoint screen_size_b2_ {};
 
   inline static constexpr float kKgPerMeter2_ {20.f};
   inline static constexpr float kMaxRotationSpeed_ {2.f};
