@@ -49,6 +49,7 @@ void ktp::DemoState::draw(Game& game) {
 }
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
+  game.player_ = std::make_unique<Player>(game.screen_size_, game.event_bus_, &game.world_, InputComponents::Demo);
   blink_flag_ = true;
   blink_timer_ = SDL2_Timer::getSDL2Ticks();
   return this;

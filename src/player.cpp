@@ -6,15 +6,14 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* 
   screen_size_b2_({(float)screen_size.x / kMetersToPixels, (float)screen_size.y / kMetersToPixels}),
   world_(world) {
 
-  
   switch (input) {
     case InputComponents::Demo:
-      /* code */
+      input_ = std::make_unique<DemoInputComponent>();
       break;
     case InputComponents::Player:
-      input_ = std::make_unique<PlayerInputComponent>();
-      break;
+      [[fallthrought]]
     default:
+      input_ = std::make_unique<PlayerInputComponent>();
       break;
   }
 
@@ -52,7 +51,7 @@ void ktp::Player::draw(SDL2_Renderer& renderer) const {
   /* particles */
   exhaust_emitter_.draw();
   /* lasers */
-  renderer.setDrawColor(Colors::red);
+  renderer.setDrawColor(Colors::copper_green);
   for (const auto& laser: lasers_) {
     renderer.drawLines(laser.render_shape_);
   }

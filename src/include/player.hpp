@@ -34,6 +34,7 @@ class Player : public GameObject{
 
  private:
 
+  friend class InputComponent;
   friend class PlayerInputComponent;
 
   void checkWrap();
