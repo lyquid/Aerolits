@@ -13,7 +13,7 @@
 
 namespace ktp {
 
-//using Input = std::unique_ptr<InputComponent>;
+using Input = std::unique_ptr<InputComponent>;
 
 class Emitter;
 
@@ -48,8 +48,7 @@ class Player : public GameObject{
   SDL_FPoint screen_size_b2_ {};
   b2World* world_ {nullptr};
   /* Components */
-  InputComponent* input_ {nullptr};
-  //Renderer renderer_ {};
+  Input input_ {};
   /* basic attributes */
   static constexpr SDL_Color kDefaultPlayerColor_ {Colors::white};
   static constexpr float     kDefaultPlayerSize_ {1.2f};

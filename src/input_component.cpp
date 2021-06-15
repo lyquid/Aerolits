@@ -4,6 +4,12 @@
 #include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <SDL.h>
 
+/* DEMO INPUT */
+
+
+
+/* PLAYER INPUT */
+
 void ktp::PlayerInputComponent::reset() {
   angular_impulse_ = kDefaultAngularImpulse_;
   linear_impulse_ = kDefaultLinearImpulse_;

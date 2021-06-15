@@ -6,13 +6,13 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* 
   screen_size_b2_({(float)screen_size.x / kMetersToPixels, (float)screen_size.y / kMetersToPixels}),
   world_(world) {
 
-  // input_ = std::make_unique<PlayerInputComponent>();
+  
   switch (input) {
     case InputComponents::Demo:
       /* code */
       break;
     case InputComponents::Player:
-      input_ = new PlayerInputComponent;
+      input_ = std::make_unique<PlayerInputComponent>();
       break;
     default:
       break;
@@ -100,8 +100,6 @@ void ktp::Player::reset() {
   /* thrust and flame stuff */
   flame_growth_factor_ = kDefaultFlameGrowthFactor_;
   flame_max_lenght_ = kDefaultFlameMaxLength_;
-
-  //update(0.f); // needed to initialize render_shape_ // ????
 }
 
 void ktp::Player::setBox2D() {
@@ -162,7 +160,6 @@ void ktp::Player::transformRenderShape() {
 }
 
 void ktp::Player::update(float delta_time) {
-  // input_->update(dynamic_cast<Player&>(*this), delta_time);
   input_->update(*this, delta_time);
 
   if (SDL2_Timer::getSDL2Ticks() - stabilizer_time_ > delta_time && steering_) {
@@ -177,8 +174,6 @@ void ktp::Player::update(float delta_time) {
   exhaust_emitter_.update();
 
   if (!lasers_.empty()) updateLasers();
-
-  // renderer_->update(*this);
 }
 
 void ktp::Player::updateLasers() {
