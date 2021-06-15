@@ -315,7 +315,7 @@ void ktp::TitleState::draw(Game& game) {
 
 ktp::GameState* ktp::TitleState::enter(Game& game) {
   game.reset();
-  game.player_ = std::make_unique<Player>(game.screen_size_, game.event_bus_, &game.world_);
+  game.player_ = std::make_unique<Player>(game.screen_size_, game.event_bus_, &game.world_, InputComponents::Player);
   demo_time_ = SDL2_Timer::getSDL2Ticks();
   return this;
 }

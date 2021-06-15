@@ -1,13 +1,22 @@
 #include "include/box2d_scale.hpp"
 #include "include/player.hpp"
 
-ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* world):
+ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* world, InputComponents input):
   event_bus_(event_bus),
   screen_size_b2_({(float)screen_size.x / kMetersToPixels, (float)screen_size.y / kMetersToPixels}),
   world_(world) {
 
-  input_.reset(new PlayerInputComponent);
-  //renderer_.reset(new PlayerRendererComponent);
+  // input_ = std::make_unique<PlayerInputComponent>();
+  switch (input) {
+    case InputComponents::Demo:
+      /* code */
+      break;
+    case InputComponents::Player:
+      input_ = new PlayerInputComponent;
+      break;
+    default:
+      break;
+  }
 
   generatePlayerShape();
   generateLaserShape();
@@ -85,7 +94,7 @@ void ktp::Player::reset() {
   size_ = kDefaultPlayerSize_;
   thrusting_ = false;
   /* components */
-  input_.reset();
+  // input_->reset();
   /* shooting stuff */
   lasers_.clear();
   /* thrust and flame stuff */

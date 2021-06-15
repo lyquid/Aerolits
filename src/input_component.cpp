@@ -1,6 +1,6 @@
 #include "include/game_object.hpp"
 #include "include/player.hpp"
-#include "include/player_input_component.hpp"
+#include "include/input_component.hpp"
 #include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <SDL.h>
 
