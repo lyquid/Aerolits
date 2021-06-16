@@ -8,7 +8,7 @@
 
     <emissionInterval value="0" randMin="1" randMax="1"/> <!-- In miliseconds. 0 for continuous emission -->
 
-    <emissionRate value="1" randMin="1" randMax="1"/>
+    <emissionRate value="2" randMin="1" randMax="1"/>
 
     <lifeTime value="-1"/> <!-- In miliseconds. Negative for infinite -->
 
@@ -21,20 +21,21 @@
 
     <!-- Particles properties -->
 
-    <maxParticleLife value="450" randMin="1" randMax="1"/>
+    <maxParticleLife value="180" randMin="0.9" randMax="1"/>
 
     <colors>
-      <color r="255" g="255" b="0"   a="255"/>
-      <color r="255" g="0"   b="255"   a="0"/>
+      <color r="0" g="0" b="255"   a="255"/>
+      <color r="255" g="0"   b="255"   a="255"/>
+      <color r="255" g="0"   b="0"   a="0"/>
     </colors>
 
     <sizes>
-      <size value="10" randMin="1" randMax="1"/>
-      <size value="10" randMin="1" randMax="1"/>
+      <size value="10" randMin="0.5" randMax="1"/>
+      <size value="150" randMin="0.2" randMax="1"/>
     </sizes>
 
     <speeds>
-      <speed value="1" randMin="1"  randMax="1"/>
+      <speed value="0.1" randMin="0.1"  randMax="1"/>
       <speed value="0.001" randMin="1"  randMax="1"/>
     </speeds>
 

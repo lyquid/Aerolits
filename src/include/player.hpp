@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_INCLUDE_PLAYER_HPP_
 
 #include "game_object.hpp"
+#include "graphics_component.hpp"
 #include "input_component.hpp"
 #include "palette.hpp"
 #include "particle_system.hpp"
@@ -14,6 +15,7 @@
 namespace ktp {
 
 using Input = std::unique_ptr<InputComponent>;
+using Graphics = std::unique_ptr<GraphicsComponent>;
 
 class Emitter;
 
@@ -36,6 +38,7 @@ class Player : public GameObject{
 
   friend class InputComponent;
   friend class PlayerInputComponent;
+  friend class PlayerGraphicsComponent;
 
   void checkWrap();
   void generateLaserShape();
@@ -49,16 +52,14 @@ class Player : public GameObject{
   SDL_FPoint screen_size_b2_ {};
   b2World* world_ {nullptr};
   /* Components */
-  Input input_ {};
+  Input    input_ {};
+  Graphics graphics_ {};
   /* basic attributes */
-  static constexpr SDL_Color kDefaultPlayerColor_ {Colors::white};
-  static constexpr float     kDefaultPlayerSize_ {1.2f};
+  static constexpr float kDefaultPlayerSize_ {1.2f};
   bool    alive_ {true};
   b2Body* body_ {nullptr};
   b2Vec2  delta_ {};
   float   size_ {kDefaultPlayerSize_};
-  Uint32  stabilizer_time_ {};
-  bool    steering_ {true};
   bool    thrusting_ {false};
   /* shape stuff */
   std::vector<SDL_FPoint> shape_ {};

@@ -61,6 +61,7 @@ add_executable(	Aerolits  main.cpp
 													src/particle.cpp
 													src/particle_system.cpp
 													src/player.cpp
+													src/graphics_component.cpp
 													src/input_component.cpp )
 
 target_compile_features(Aerolits PUBLIC cxx_std_17)

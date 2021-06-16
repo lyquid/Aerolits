@@ -17,6 +17,8 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* 
       break;
   }
 
+  graphics_ = std::make_unique<PlayerGraphicsComponent>();
+
   generatePlayerShape();
   generateLaserShape();
   
@@ -40,21 +42,7 @@ void ktp::Player::checkWrap() {
 }
 
 void ktp::Player::draw(SDL2_Renderer& renderer) const {
-  /* player's shape */
-  renderer.setDrawColor(kDefaultPlayerColor_);
-  renderer.drawLines(render_shape_);
-  /* player's thrust fx */
-  if (thrusting_) {
-    renderer.setDrawColor(Colors::red);
-    renderer.drawLines(render_flame_shape_);
-  }
-  /* particles */
-  exhaust_emitter_.draw();
-  /* lasers */
-  renderer.setDrawColor(Colors::copper_green);
-  for (const auto& laser: lasers_) {
-    renderer.drawLines(laser.render_shape_);
-  }
+  graphics_->update(*this, renderer);
 }
 
 void ktp::Player::generateLaserShape() {
@@ -142,7 +130,7 @@ void ktp::Player::setBox2D() {
   laser_fixture_def_.density = 10.f;
   laser_fixture_def_.friction = 0.1f;
   laser_fixture_def_.filter.groupIndex = -1;
-  laser_fixture_def_.restitution = 0.1f;
+  laser_fixture_def_.restitution = 0.35f;
 }
 
 void ktp::Player::transformRenderShape() {
@@ -161,10 +149,6 @@ void ktp::Player::transformRenderShape() {
 void ktp::Player::update(float delta_time) {
   input_->update(*this, delta_time);
 
-  if (SDL2_Timer::getSDL2Ticks() - stabilizer_time_ > delta_time && steering_) {
-    body_->SetAngularVelocity(0.f);
-    steering_ = false;
-  }
   checkWrap();
 
   transformRenderShape();

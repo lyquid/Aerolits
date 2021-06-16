@@ -22,14 +22,17 @@ class InputComponent {
  protected:
   void shoot(Player& player);
   void steer(Player& player, float angular_impulse);
+  void stopSteering(Player& player, float delta_time);
   void stopThrusting(Player& player);
   void thrust(Player& player, float delta_time);
 
   static constexpr float kDefaultAngularImpulse_ {5.f};
   static constexpr float kDefaultLinearImpulse_ {0.05f};
   static constexpr float kMaxDelta_ {0.1f};
-  float angular_impulse_ {kDefaultAngularImpulse_};
-  float linear_impulse_ {kDefaultLinearImpulse_};
+  float  angular_impulse_ {kDefaultAngularImpulse_};
+  float  linear_impulse_ {kDefaultLinearImpulse_};
+  Uint32 stabilizer_time_ {};
+  bool   steering_ {true};
   /* shooting stuff */
   static constexpr float kDefaultShootingInterval_ {200.f};
   float shooting_interval_ {kDefaultShootingInterval_};

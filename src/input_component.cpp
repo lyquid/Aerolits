@@ -1,6 +1,6 @@
 #include "include/game_object.hpp"
-#include "include/player.hpp"
 #include "include/input_component.hpp"
+#include "include/player.hpp"
 #include <SDL.h>
 
 /* INPUT COMPONENT */
@@ -26,8 +26,15 @@ void ktp::InputComponent::shoot(Player& player) {
 
 void ktp::InputComponent::steer(Player& player, float angular_impulse) {
   player.body_->SetAngularVelocity(angular_impulse);
-  player.stabilizer_time_ = SDL2_Timer::getSDL2Ticks();
-  player.steering_ = true;
+  stabilizer_time_ = SDL2_Timer::getSDL2Ticks();
+  steering_ = true;
+}
+
+void ktp::InputComponent::stopSteering(Player& player, float delta_time) {
+  if (steering_ && SDL2_Timer::getSDL2Ticks() - stabilizer_time_ > delta_time) {
+    player.body_->SetAngularVelocity(0.f);
+    steering_ = false;
+  }
 }
 
 void ktp::InputComponent::stopThrusting(Player& player) {
@@ -59,13 +66,14 @@ void ktp::InputComponent::thrust(Player& player, float delta_time) {
     player.flame_shape_.front().y += player.flame_growth_factor_;
     player.flame_shape_.back().y += player.flame_growth_factor_;
   }
-  // player.exhaust_emitter_.generateParticles();
+  player.exhaust_emitter_.generateParticles();
   // player.event_bus_.postEvent(kuge::EventTypes::PlayerThrust);
 }
 
 /* DEMO INPUT */
 
 void ktp::DemoInputComponent::update(Player& player, float delta_time) {
+  stopSteering(player, delta_time);
   shoot(player);
 
   thrust_ ? thrust(player, delta_time) : stopThrusting(player);
@@ -79,6 +87,9 @@ void ktp::DemoInputComponent::update(Player& player, float delta_time) {
 /* PLAYER INPUT */
 
 void ktp::PlayerInputComponent::update(Player& player, float delta_time) {
+
+  stopSteering(player, delta_time);
+
   const auto state {SDL_GetKeyboardState(nullptr)};
 
   if (state[SDL_SCANCODE_W] || state[SDL_SCANCODE_UP]) {
