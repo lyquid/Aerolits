@@ -14,21 +14,27 @@
 
 namespace ktp {
 
+using FPointsVector = std::vector<SDL_FPoint>;
 using Input = std::unique_ptr<InputComponent>;
 using Graphics = std::unique_ptr<GraphicsComponent>;
 
 class Emitter;
 
 struct Laser {
-  b2Body*                 body_ {nullptr};
-  std::vector<SDL_FPoint> render_shape_ {};
+  b2Body*       body_ {nullptr};
+  FPointsVector render_shape_ {};
 };
 
-class Player : public GameObject{
+class Player : public GameObject {
  public:
 
   Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* world, InputComponents input);
+  Player(const Player& other) = delete;
+  Player(Player&& other) = delete;
   ~Player() { world_->DestroyBody(body_); }
+  Player& operator=(const Player& other) = delete;
+  Player& operator=(Player&& other) = delete;
+
   void draw(SDL2_Renderer& renderer) const;
   inline bool isAlive() const { return alive_; }
   void reset();
@@ -47,7 +53,7 @@ class Player : public GameObject{
   void setBox2D();
   void transformRenderShape();
   void updateLasers();
-  
+
   kuge::EventBus& event_bus_;
   SDL_FPoint screen_size_b2_ {};
   b2World* world_ {nullptr};
@@ -62,8 +68,8 @@ class Player : public GameObject{
   float   size_ {kDefaultPlayerSize_};
   bool    thrusting_ {false};
   /* shape stuff */
-  std::vector<SDL_FPoint> shape_ {};
-  std::vector<SDL_FPoint> render_shape_ {};
+  FPointsVector shape_ {};
+  FPointsVector render_shape_ {};
   /* lasers */
   static constexpr float kDefaultLaserSize_ {0.15f};
   std::vector<Laser> lasers_ {};
@@ -77,8 +83,8 @@ class Player : public GameObject{
   static constexpr float kDefaultFlameMinLength_ {kDefaultPlayerSize_ * 0.4f};
   float flame_growth_factor_ {kDefaultFlameGrowthFactor_};
   float flame_max_lenght_ {kDefaultFlameMaxLength_};
-  std::vector<SDL_FPoint> flame_shape_ {};
-  std::vector<SDL_FPoint> render_flame_shape_ {};
+  FPointsVector flame_shape_ {};
+  FPointsVector render_flame_shape_ {};
   /* particles stuff */
   Emitter exhaust_emitter_ {"fire", {screen_size_b2_.x, screen_size_b2_.y}};
 };
