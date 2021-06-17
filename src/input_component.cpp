@@ -1,11 +1,10 @@
-#include "include/game_object.hpp"
+#include "include/game_entity.hpp"
 #include "include/input_component.hpp"
-#include "include/player.hpp"
 #include <SDL.h>
 
 /* INPUT COMPONENT */
 
-void ktp::InputComponent::shoot(Player& player) {
+/* void ktp::InputComponent::shoot(GameEntity& player) {
   if (SDL_GetTicks() - shooting_timer_ > shooting_interval_) {
     Laser laser {};
     // b2 body
@@ -22,59 +21,62 @@ void ktp::InputComponent::shoot(Player& player) {
 
     // player.event_bus_.postEvent(kuge::EventTypes::LaserFired);
   }
-}
+} */
 
-void ktp::InputComponent::steer(Player& player, float angular_impulse) {
-  player.body_->SetAngularVelocity(angular_impulse);
+void ktp::InputComponent::steer(GameEntity& player, float angular_impulse) {
+  physics_->body_->SetAngularVelocity(angular_impulse);
+  //player.body_->SetAngularVelocity(angular_impulse);
   stabilizer_time_ = SDL2_Timer::getSDL2Ticks();
   steering_ = true;
 }
 
-void ktp::InputComponent::stopSteering(Player& player, float delta_time) {
+void ktp::InputComponent::stopSteering(GameEntity& player, float delta_time) {
   if (steering_ && SDL2_Timer::getSDL2Ticks() - stabilizer_time_ > delta_time) {
-    player.body_->SetAngularVelocity(0.f);
+    //player.body_->SetAngularVelocity(0.f);
+    physics_->body_->SetAngularVelocity(0.f);
     steering_ = false;
   }
 }
 
-void ktp::InputComponent::stopThrusting(Player& player) {
+void ktp::InputComponent::stopThrusting(GameEntity& player) {
   player.delta_ = {0.f, 0.f};
-  player.flame_shape_.front().y = player.kDefaultFlameMinLength_;
-  player.flame_shape_.back().y = player.kDefaultFlameMinLength_;
-  player.thrusting_ = false;
+  //player.flame_shape_.front().y = player.kDefaultFlameMinLength_;
+  //player.flame_shape_.back().y = player.kDefaultFlameMinLength_;
+  //player.thrusting_ = false;
 }
 
-void ktp::InputComponent::thrust(Player& player, float delta_time) {
-  player.delta_.x +=  SDL_sinf(player.body_->GetAngle()) * linear_impulse_ * delta_time;
+void ktp::InputComponent::thrust(GameEntity& player, float delta_time) {
+  //player.delta_.x += SDL_sinf(player.body_->GetAngle()) * linear_impulse_ * delta_time;
+  player.delta_.x += SDL_sinf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
   if (player.delta_.x < -kMaxDelta_ ) {
     player.delta_.x = -kMaxDelta_;
   } else if (player.delta_.x > kMaxDelta_) {
     player.delta_.x = kMaxDelta_;
   }
-  player.delta_.y += -SDL_cosf(player.body_->GetAngle()) * linear_impulse_ * delta_time;
+  player.delta_.y += -SDL_cosf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
   if (player.delta_.y < -kMaxDelta_) {
     player.delta_.y = -kMaxDelta_;
   } else if (player.delta_.y > kMaxDelta_) {
     player.delta_.y = kMaxDelta_;
   }
 
-  player.body_->ApplyLinearImpulseToCenter(player.delta_, true);
+  physics_->body_->ApplyLinearImpulseToCenter({player.delta_.x, player.delta_.y}, true);
 
-  player.thrusting_ = true;
+  // player.thrusting_ = true;
   
-  if (player.flame_shape_.front().y < player.flame_max_lenght_) {
+  /* if (player.flame_shape_.front().y < player.flame_max_lenght_) {
     player.flame_shape_.front().y += player.flame_growth_factor_;
     player.flame_shape_.back().y += player.flame_growth_factor_;
   }
-  player.exhaust_emitter_.generateParticles();
+  player.exhaust_emitter_.generateParticles(); */
   // player.event_bus_.postEvent(kuge::EventTypes::PlayerThrust);
 }
 
 /* DEMO INPUT */
 
-void ktp::DemoInputComponent::update(Player& player, float delta_time) {
+void ktp::DemoInputComponent::update(GameEntity& player, float delta_time) {
   stopSteering(player, delta_time);
-  shoot(player);
+  // shoot(player);
 
   thrust_ ? thrust(player, delta_time) : stopThrusting(player);
 
@@ -86,7 +88,7 @@ void ktp::DemoInputComponent::update(Player& player, float delta_time) {
 
 /* PLAYER INPUT */
 
-void ktp::PlayerInputComponent::update(Player& player, float delta_time) {
+void ktp::PlayerInputComponent::update(GameEntity& player, float delta_time) {
 
   stopSteering(player, delta_time);
 
@@ -109,6 +111,6 @@ void ktp::PlayerInputComponent::update(Player& player, float delta_time) {
   }
 
   if (state[SDL_SCANCODE_SPACE]) {
-    shoot(player);
+    // shoot(player);
   }
 }

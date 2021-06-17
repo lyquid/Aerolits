@@ -1,6 +1,7 @@
 #include "include/emitter_parser.hpp"
 #include "include/game.hpp"
 #include "include/palette.hpp"
+#include "include/particle.hpp"
 #include "include/resources_path.hpp"
 
 void ktp::loadConfigFiles() {
@@ -11,7 +12,7 @@ void ktp::loadConfigFiles() {
 
 ktp::Game::Game() {
   event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);
-  emitters_.reserve(60);
+  //emitters_.reserve(60);
 }
 
 void ktp::Game::clean() {
@@ -31,6 +32,9 @@ bool ktp::Game::init() {
   debug_draw_.setRenderer(&renderer_);
   world_.SetDebugDraw(&debug_draw_);
   debug_draw_.SetFlags(b2Draw::e_shapeBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
+
+  PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});
+  PhysicsComponent::setWorld(&world_);
 
   Aerolite::setB2World(&world_);
   Aerolite::setScreenSize(screen_size_);

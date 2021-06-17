@@ -21,7 +21,7 @@ ktp::Player::Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* 
 
   generatePlayerShape();
   generateLaserShape();
-  
+
   lasers_.reserve(50);
 
   setBox2D();

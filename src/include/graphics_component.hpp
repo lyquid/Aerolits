@@ -2,24 +2,33 @@
 #define AEROLITS_SRC_INCLUDE_GRAPHICS_COMPONENT_HPP_
 
 #include "palette.hpp"
+#include <SDL.h>
+#include <vector>
 
 namespace ktp {
 
-class GameObject;
-class Player;
+using FPointsVector = std::vector<SDL_FPoint>;
+
+class GameEntity;
 class SDL2_Renderer;
 
 class GraphicsComponent {
  public:
   virtual ~GraphicsComponent() {}
-  virtual void update(const Player&, SDL2_Renderer&) = 0;
+  virtual void update(const GameEntity&, const SDL2_Renderer&) = 0;
+  static FPointsVector render_shape_;
 };
 
 class PlayerGraphicsComponent : public GraphicsComponent {
  public:
-  virtual void update(const Player& player, SDL2_Renderer& renderer);
+  virtual void update(const GameEntity& player, const SDL2_Renderer& renderer) override;
  private:
   static constexpr SDL_Color kDefaultPlayerColor_ {Colors::white};
+};
+
+class AeroliteGraphicsComponent : public GraphicsComponent {
+ public:
+  virtual void update(const GameEntity& aerolite, const SDL2_Renderer& renderer) override;
 };
 
 } // namespace ktp

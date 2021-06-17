@@ -28,7 +28,7 @@ class GameState {
   static PlayingState playing_;
   static TitleState   title_;
  protected:
-  virtual void setWindowTitle(Game& game);
+  virtual void setWindowTitle(Game& game); // why virtual?
 };
 
 class DemoState : public GameState {

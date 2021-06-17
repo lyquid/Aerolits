@@ -1,10 +1,9 @@
 #ifndef AEROLITS_SRC_INCLUDE_PLAYER_HPP_
 #define AEROLITS_SRC_INCLUDE_PLAYER_HPP_
 
-#include "game_object.hpp"
+#include "game_entity.hpp"
 #include "graphics_component.hpp"
 #include "input_component.hpp"
-#include "palette.hpp"
 #include "particle_system.hpp"
 #include "../../kuge/kuge.hpp"
 #include "../../sdl2_wrappers/sdl2_wrappers.hpp"
@@ -18,14 +17,12 @@ using FPointsVector = std::vector<SDL_FPoint>;
 using Input = std::unique_ptr<InputComponent>;
 using Graphics = std::unique_ptr<GraphicsComponent>;
 
-class Emitter;
-
 struct Laser {
   b2Body*       body_ {nullptr};
   FPointsVector render_shape_ {};
 };
 
-class Player : public GameObject {
+class Player {
  public:
 
   Player(SDL_Point& screen_size, kuge::EventBus& event_bus, b2World* world, InputComponents input);

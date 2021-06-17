@@ -1,6 +1,5 @@
 #include "include/game.hpp"
 #include "include/game_state.hpp"
-#include "include/player.hpp"
 #include <SDL.h>
 #include <memory>
 #include <utility> // std::move
@@ -26,9 +25,9 @@ void ktp::DemoState::draw(Game& game) {
   game.background_.draw(game.renderer_);
 
   game.player_->draw(game.renderer_);
-  for (const auto& emitter: game.emitters_) {
+  /* for (const auto& emitter: game.emitters_) {
     emitter.draw();
-  }
+  } */
   for (const auto& aerolite: game.aerolites_) {
     aerolite.draw(game.renderer_);
   }
@@ -49,7 +48,7 @@ void ktp::DemoState::draw(Game& game) {
 }
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
-  game.player_ = std::make_unique<Player>(game.screen_size_, game.event_bus_, &game.world_, InputComponents::Demo);
+  game.player_ = std::make_unique<GameEntity>(game.event_bus_, GameEntities::PlayerDemo);
   blink_flag_ = true;
   blink_timer_ = SDL2_Timer::getSDL2Ticks();
   return this;
@@ -97,9 +96,9 @@ void ktp::DemoState::update(Game& game, float delta_time) {
   /* Background */
   game.background_.update(delta_time);
   /* Player */
-  game.player_->update(delta_time);
+  game.player_->update(game.renderer_, delta_time);
   /* Emitters */
-  auto iter = game.emitters_.begin();
+  /* auto iter = game.emitters_.begin();
   while (iter != game.emitters_.end()) {
     if (iter->canBeDeleted()) {
       iter = game.emitters_.erase(iter);
@@ -108,7 +107,7 @@ void ktp::DemoState::update(Game& game, float delta_time) {
       iter->update();
       ++iter;
     }
-  }
+  } */
   /* Aerolites */
   auto aerolite = game.aerolites_.begin();
   while (aerolite != game.aerolites_.end()) {
@@ -134,9 +133,9 @@ void ktp::PausedState::draw(Game& game) {
   game.background_.draw(game.renderer_);
 
   game.player_->draw(game.renderer_);
-  for (const auto& emitter: game.emitters_) {
+  /* for (const auto& emitter: game.emitters_) {
     emitter.draw();
-  }
+  } */
   for (const auto& aerolite: game.aerolites_) {
     aerolite.draw(game.renderer_);
   }
@@ -205,9 +204,9 @@ void ktp::PlayingState::draw(Game& game) {
   game.background_.draw(game.renderer_);
 
   game.player_->draw(game.renderer_);
-  for (const auto& emitter: game.emitters_) {
+  /* for (const auto& emitter: game.emitters_) {
     emitter.draw();
-  }
+  } */
   for (const auto& aerolite: game.aerolites_) {
     aerolite.draw(game.renderer_);
   }
@@ -235,9 +234,9 @@ void ktp::PlayingState::handleEvents(Game& game) {
       case SDL_MOUSEBUTTONDOWN: {
         int x{0}, y{0};
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          Emitter emi{"plasma", {static_cast<float>(x), static_cast<float>(y)}};
+          //Emitter emi{"plasma", {static_cast<float>(x), static_cast<float>(y)}};
           // emitters_.push_back(std::move({EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}}));
-          game.emitters_.push_back(std::move(emi));
+          //game.emitters_.push_back(std::move(emi));
         }
         break;
       }
@@ -271,9 +270,9 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   /* Background */
   game.background_.update(delta_time);
   /* Player */
-  game.player_->update(delta_time);
+  game.player_->update(game.renderer_, delta_time);
   /* Emitters */
-  auto iter = game.emitters_.begin();
+  /* auto iter = game.emitters_.begin();
   while (iter != game.emitters_.end()) {
     if (iter->canBeDeleted()) {
       iter = game.emitters_.erase(iter);
@@ -282,7 +281,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
       iter->update();
       ++iter;
     }
-  }
+  } */
   /* Aerolites */
   auto aerolite = game.aerolites_.begin();
   while (aerolite != game.aerolites_.end()) {
@@ -316,7 +315,7 @@ void ktp::TitleState::draw(Game& game) {
 
 ktp::GameState* ktp::TitleState::enter(Game& game) {
   game.reset();
-  game.player_ = std::make_unique<Player>(game.screen_size_, game.event_bus_, &game.world_, InputComponents::Player);
+  game.player_ = std::make_unique<GameEntity>(game.event_bus_, GameEntities::Player);
   demo_time_ = SDL2_Timer::getSDL2Ticks();
   return this;
 }

@@ -4,8 +4,8 @@
 #include "aerolite.hpp"
 #include "background.hpp"
 #include "debug_draw.hpp"
+#include "game_entity.hpp"
 #include "game_state.hpp"
-#include "player.hpp"
 #include "../../kuge/kuge.hpp"
 #include "../../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <box2d/box2d.h>
@@ -67,11 +67,11 @@ class Game {
   DebugDraw debug_draw_ {};
   bool debug_draw_on_ {false};
   /* Player */
-  std::unique_ptr<Player> player_ {};
+  std::unique_ptr<GameEntity> player_ {};
   /* Background */
   Background background_ {screen_size_};
   /* Emitters */
-  std::vector<Emitter> emitters_ {};
+  //std::vector<Emitter> emitters_ {};
   /* Aerolites */
   std::vector<Aerolite> aerolites_ {};
   /* Game texts */

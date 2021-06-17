@@ -5,8 +5,9 @@
 
 namespace ktp {
 
-class GameObject;
+class GameEntity;
 class Player;
+class PhysicsComponent;
 
 enum class InputComponents {
   Demo,
@@ -16,15 +17,18 @@ enum class InputComponents {
 
 class InputComponent {
  public:
+  InputComponent(PhysicsComponent* physics): physics_(physics) {}
   virtual ~InputComponent() {}
-  virtual void update(Player&, float) = 0;
+  virtual void update(GameEntity&, float) = 0;
 
  protected:
-  void shoot(Player& player);
-  void steer(Player& player, float angular_impulse);
-  void stopSteering(Player& player, float delta_time);
-  void stopThrusting(Player& player);
-  void thrust(Player& player, float delta_time);
+  // void shoot(GameEntity& player);
+  void steer(GameEntity& player, float angular_impulse);
+  void stopSteering(GameEntity& player, float delta_time);
+  void stopThrusting(GameEntity& player);
+  void thrust(GameEntity& player, float delta_time);
+
+  PhysicsComponent* physics_ {nullptr};
 
   static constexpr float kDefaultAngularImpulse_ {5.f};
   static constexpr float kDefaultLinearImpulse_ {0.05f};
@@ -44,7 +48,8 @@ class InputComponent {
 
 class DemoInputComponent : public InputComponent {
  public:
-  virtual void update(Player& player, float delta_time);
+  DemoInputComponent(PhysicsComponent* physics): InputComponent(physics) {}
+  virtual void update(GameEntity& player, float delta_time) override;
  private:
   static constexpr int kThrustingInterval_ {5000};
   bool thrust_ {};
@@ -53,7 +58,9 @@ class DemoInputComponent : public InputComponent {
 
 class PlayerInputComponent : public InputComponent {
  public:
-  virtual void update(Player& player, float delta_time);
+  PlayerInputComponent(PhysicsComponent* physics): InputComponent(physics) {}
+  virtual void update(GameEntity& player, float delta_time) override;
+ private:
 };
 
 } // namespace ktp
