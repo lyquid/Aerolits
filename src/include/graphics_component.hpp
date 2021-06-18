@@ -16,14 +16,18 @@ class GraphicsComponent {
  public:
   virtual ~GraphicsComponent() {}
   virtual void update(const GameEntity&, const SDL2_Renderer&) = 0;
-  static FPointsVector render_shape_;
+ protected:
+  FPointsVector render_shape_ {};
 };
 
 class PlayerGraphicsComponent : public GraphicsComponent {
  public:
   virtual void update(const GameEntity& player, const SDL2_Renderer& renderer) override;
  private:
+  friend class PlayerPhysicsComponent;
   static constexpr SDL_Color kDefaultPlayerColor_ {Colors::white};
+  FPointsVector render_flame_shape_ {};
+  bool thrusting_ {false};
 };
 
 class AeroliteGraphicsComponent : public GraphicsComponent {

@@ -1,5 +1,6 @@
 #include "include/physics_component.hpp"
 #include "include/graphics_component.hpp"
+#include "include/input_component.hpp"
 #include "include/box2d_scale.hpp"
 
 SDL_FPoint ktp::PhysicsComponent::b2_screen_size_ {};
@@ -12,9 +13,11 @@ void ktp::PhysicsComponent::setScreenSize(const SDL_FPoint& screen_size) {
 
 /* PlayerPhysicsComponent */
 
-ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GraphicsComponent* graphics): graphics_(graphics) {
-  generatePlayerShape(shape_, size_);
+ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(PlayerGraphicsComponent* graphics): 
+ graphics_(graphics) {
+  generatePlayerShape(shape_, flame_shape_, size_);
   graphics_->render_shape_.resize(shape_.size());
+  graphics_->render_flame_shape_.resize(flame_shape_.size());
   setBox2D();
 }
 
@@ -32,7 +35,7 @@ void ktp::PlayerPhysicsComponent::checkWrap() {
   }
 }
 
-void ktp::PlayerPhysicsComponent::generatePlayerShape(FPointsVector& shape, float size) {
+void ktp::PlayerPhysicsComponent::generatePlayerShape(FPointsVector& shape, FPointsVector& flame_shape, float size) {
   shape.push_back({          0.f, -size * 0.50f}); // top
   shape.push_back({-size * 0.33f,  size * 0.50f}); // left
   shape.push_back({-size * 0.15f,  size * 0.33f}); // left flap
@@ -40,15 +43,12 @@ void ktp::PlayerPhysicsComponent::generatePlayerShape(FPointsVector& shape, floa
   shape.push_back({ size * 0.33f,  size * 0.50f}); // right
   shape.push_back({          0.f, -size * 0.50f}); // top again
   shape.shrink_to_fit();
-  // render_shape_.resize(shape_.size());
   
-  /* flame_shape_.clear();
-  flame_shape_.push_back({           0.f, size_ * 0.40f}); // bottom           2 ____ 1
-  flame_shape_.push_back({ size_ * 0.15f, size_ * 0.35f}); // right vertice      \  /
-  flame_shape_.push_back({-size_ * 0.15f, size_ * 0.35f}); // left vertice        \/
-  flame_shape_.push_back({           0.f, size_ * 0.40f}); // bottom again        3/0
-  flame_shape_.shrink_to_fit();
-  render_flame_shape_.resize(flame_shape_.size()); */
+  flame_shape.push_back({          0.f, size * 0.40f}); // bottom           2 ____ 1
+  flame_shape.push_back({ size * 0.15f, size * 0.35f}); // right vertice      \  /
+  flame_shape.push_back({-size * 0.15f, size * 0.35f}); // left vertice        \/
+  flame_shape.push_back({          0.f, size * 0.40f}); // bottom again        3/0
+  flame_shape.shrink_to_fit();
 }
 
 void ktp::PlayerPhysicsComponent::setBox2D() {
@@ -97,19 +97,19 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
 
 void ktp::PlayerPhysicsComponent::transformRenderShape() {
   for (auto i = 0u; i < shape_.size(); ++i) {
-    //graphics_->render_
     graphics_->render_shape_[i].x = ((shape_[i].x * SDL_cosf(body_->GetAngle()) - shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
     graphics_->render_shape_[i].y = ((shape_[i].x * SDL_sinf(body_->GetAngle()) + shape_[i].y * SDL_cosf(body_->GetAngle())) + body_->GetPosition().y) * kMetersToPixels;
   }
-  /* if (thrusting_) {
+  if (thrusting_) {
     for (auto i = 0u; i < flame_shape_.size(); ++i) {
-      render_flame_shape_[i].x = ((flame_shape_[i].x * SDL_cosf(body_->GetAngle()) - flame_shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
-      render_flame_shape_[i].y = ((flame_shape_[i].x * SDL_sinf(body_->GetAngle()) + flame_shape_[i].y * SDL_cosf(body_->GetAngle())) + body_->GetPosition().y) * kMetersToPixels;
+      graphics_->render_flame_shape_[i].x = ((flame_shape_[i].x * SDL_cosf(body_->GetAngle()) - flame_shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
+      graphics_->render_flame_shape_[i].y = ((flame_shape_[i].x * SDL_sinf(body_->GetAngle()) + flame_shape_[i].y * SDL_cosf(body_->GetAngle())) + body_->GetPosition().y) * kMetersToPixels;
     }
-  } */
+  }
 }
 
 void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_time) {
+  graphics_->thrusting_ = thrusting_;
   checkWrap();
   transformRenderShape();
   

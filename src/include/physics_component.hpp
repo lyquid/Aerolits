@@ -10,7 +10,8 @@ namespace ktp {
 using FPointsVector = std::vector<SDL_FPoint>;
 
 class GameEntity;
-class GraphicsComponent;
+class PlayerGraphicsComponent;
+class PlayerInputComponent;
 
 class PhysicsComponent {
  public:
@@ -27,18 +28,27 @@ class PhysicsComponent {
 
 class PlayerPhysicsComponent : public PhysicsComponent {
  public:
-  PlayerPhysicsComponent(GraphicsComponent* graphics);
+  PlayerPhysicsComponent(PlayerGraphicsComponent* graphics);
   virtual void update(const GameEntity& player, float delta_time) override;
  private:
-  static void generatePlayerShape(FPointsVector& shape, float size);
+  friend class InputComponent;
+  static void generatePlayerShape(FPointsVector& shape, FPointsVector& flame_shape, float size);
   void checkWrap();
   void setBox2D();
   void transformRenderShape();
 
   static constexpr float kDefaultPlayerSize_ {1.2f};
-  GraphicsComponent* graphics_ {nullptr};
-  FPointsVector shape_;
+  PlayerGraphicsComponent* graphics_ {nullptr};
+  FPointsVector shape_ {};
+  FPointsVector flame_shape_ {};
   float size_ {kDefaultPlayerSize_};
+  bool thrusting_ {false};
+  // flame stuff
+  static constexpr float kDefaultFlameGrowthFactor_ {0.02f};
+  static constexpr float kDefaultFlameMaxLength_ {kDefaultPlayerSize_};
+  static constexpr float kDefaultFlameMinLength_ {kDefaultPlayerSize_ * 0.4f};
+  float flame_growth_factor_ {kDefaultFlameGrowthFactor_};
+  float flame_max_lenght_ {kDefaultFlameMaxLength_};
 };
 
 /* class AerolitePhysicsComponent : public PhysicsComponent {

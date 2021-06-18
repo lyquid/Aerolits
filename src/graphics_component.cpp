@@ -3,17 +3,15 @@
 
 /* PLAYER RENDER */
 
-ktp::FPointsVector ktp::GraphicsComponent::render_shape_ {};
-
 void ktp::PlayerGraphicsComponent::update(const GameEntity& player, const SDL2_Renderer& renderer) {
   // player's shape
   renderer.setDrawColor(kDefaultPlayerColor_);
   renderer.drawLines(render_shape_);
   // player's thrust fx
-  /* if (player.thrusting_) {
+  if (thrusting_) {
     renderer.setDrawColor(Colors::red);
-    renderer.drawLines(player.render_flame_shape_);
-  } */
+    renderer.drawLines(render_flame_shape_);
+  }
   // particles
   // player.exhaust_emitter_.draw();
   // lasers

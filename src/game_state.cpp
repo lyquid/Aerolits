@@ -96,7 +96,7 @@ void ktp::DemoState::update(Game& game, float delta_time) {
   /* Background */
   game.background_.update(delta_time);
   /* Player */
-  game.player_->update(game.renderer_, delta_time);
+  game.player_->update(delta_time);
   /* Emitters */
   /* auto iter = game.emitters_.begin();
   while (iter != game.emitters_.end()) {
@@ -270,7 +270,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   /* Background */
   game.background_.update(delta_time);
   /* Player */
-  game.player_->update(game.renderer_, delta_time);
+  game.player_->update(delta_time);
   /* Emitters */
   /* auto iter = game.emitters_.begin();
   while (iter != game.emitters_.end()) {
