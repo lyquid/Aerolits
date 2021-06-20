@@ -33,6 +33,9 @@ class PlayerGraphicsComponent : public GraphicsComponent {
 class AeroliteGraphicsComponent : public GraphicsComponent {
  public:
   virtual void update(const GameEntity& aerolite, const SDL2_Renderer& renderer) override;
+ private:
+  friend class AerolitePhysicsComponent;
+  static constexpr SDL_Color kDefaultColor_ {Colors::orange};
 };
 
 } // namespace ktp

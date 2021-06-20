@@ -10,20 +10,26 @@ namespace ktp {
 using FPointsVector = std::vector<SDL_FPoint>;
 
 class GameEntity;
+class AeroliteGraphicsComponent;
 class PlayerGraphicsComponent;
 class PlayerInputComponent;
 
 class PhysicsComponent {
  public:
-  virtual ~PhysicsComponent() {}
+  virtual ~PhysicsComponent() { world_->DestroyBody(body_); }
+  inline bool canBeDeleted() const { return to_be_deleted_; }
   virtual void update(const GameEntity&, float) = 0;
   static void setScreenSize(const SDL_FPoint& screen_size);
   static void setWorld(b2World* world) { world_ = world; }
+  inline b2Body* getBody() const { return body_; }
  protected:
   friend class InputComponent;
   static SDL_FPoint b2_screen_size_;
   static b2World* world_;
   b2Body* body_ {nullptr};
+  FPointsVector shape_ {};
+  float size_ {};
+  bool to_be_deleted_ {false};
 };
 
 class PlayerPhysicsComponent : public PhysicsComponent {
@@ -39,9 +45,7 @@ class PlayerPhysicsComponent : public PhysicsComponent {
 
   static constexpr float kDefaultPlayerSize_ {1.2f};
   PlayerGraphicsComponent* graphics_ {nullptr};
-  FPointsVector shape_ {};
   FPointsVector flame_shape_ {};
-  float size_ {kDefaultPlayerSize_};
   bool thrusting_ {false};
   // flame stuff
   static constexpr float kDefaultFlameGrowthFactor_ {0.02f};
@@ -51,10 +55,22 @@ class PlayerPhysicsComponent : public PhysicsComponent {
   float flame_max_lenght_ {kDefaultFlameMaxLength_};
 };
 
-/* class AerolitePhysicsComponent : public PhysicsComponent {
+class AerolitePhysicsComponent : public PhysicsComponent {
  public:
+  AerolitePhysicsComponent(AeroliteGraphicsComponent* graphics);
+  static GameEntity spawnAerolite();
+  inline float getMaxSpeed() const { return kMaxSpeed_; }
   virtual void update(const GameEntity& aerolite, float delta_time) override;
-}; */
+ private:
+  static void generateAeroliteShape(FPointsVector& shape, float size);
+  void transformRenderShape();
+  static constexpr float kKgPerMeter2_ {20.f};
+  static constexpr float kMaxRotationSpeed_ {2.f};
+  static constexpr float kMaxSize_ {5.f};
+  static constexpr float kMaxSpeed_ {10.f};
+  AeroliteGraphicsComponent* graphics_ {nullptr};
+  b2AABB aabb_ {};
+};
 
 } // namespace ktp
 

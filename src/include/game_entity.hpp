@@ -25,11 +25,11 @@ class SDL2_Renderer;
 class GameEntity {
  public:
 
-  GameEntity(kuge::EventBus& event_bus, GameEntities type): event_bus_(event_bus) {
+  GameEntity(/* kuge::EventBus& event_bus,  */GameEntities type)/* : event_bus_(event_bus)  */{
     switch (type) {
       case GameEntities::Aerolite:
-        //graphics_ = std::make_unique<AeroliteGraphicsComponent>();
-        //physics_ = std::make_unique<AerolitePhysicsComponent>(graphics_.get()); 
+        graphics_ = std::make_unique<AeroliteGraphicsComponent>();
+        physics_  = std::make_unique<AerolitePhysicsComponent>(static_cast<AeroliteGraphicsComponent*>(graphics_.get())); 
         break;
       case GameEntities::Player:
         graphics_ = std::make_unique<PlayerGraphicsComponent>();
@@ -58,13 +58,16 @@ class GameEntity {
 
  private:
 
+  friend class DemoState;
+  friend class PlayingState;
   friend class InputComponent;
+  friend class AerolitePhysicsComponent;
 
   SDL_FPoint      delta_ {};
   Graphics        graphics_ {nullptr};
   Input           input_ {nullptr};
   Physics         physics_ {nullptr};
-  kuge::EventBus& event_bus_;
+  //kuge::EventBus& event_bus_;
 };
 
 } // namespace ktp

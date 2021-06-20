@@ -36,9 +36,6 @@ bool ktp::Game::init() {
   PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});
   PhysicsComponent::setWorld(&world_);
 
-  Aerolite::setB2World(&world_);
-  Aerolite::setScreenSize(screen_size_);
-
   paused_text_.setRenderer(renderer_);
   paused_text_.loadFromTextSolid(font_, "PAUSED", Colors::white);
   title_text_.setRenderer(renderer_);

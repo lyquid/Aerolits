@@ -1,5 +1,6 @@
 #include "include/game.hpp"
 #include "include/game_state.hpp"
+#include "include/physics_component.hpp"
 #include <SDL.h>
 #include <memory>
 #include <utility> // std::move
@@ -48,7 +49,7 @@ void ktp::DemoState::draw(Game& game) {
 }
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
-  game.player_ = std::make_unique<GameEntity>(game.event_bus_, GameEntities::PlayerDemo);
+  game.player_ = std::make_unique<GameEntity>(GameEntities::PlayerDemo);
   blink_flag_ = true;
   blink_timer_ = SDL2_Timer::getSDL2Ticks();
   return this;
@@ -111,18 +112,18 @@ void ktp::DemoState::update(Game& game, float delta_time) {
   /* Aerolites */
   auto aerolite = game.aerolites_.begin();
   while (aerolite != game.aerolites_.end()) {
-    if (aerolite->canBeDeleted()) {
+    if (aerolite->physics_->canBeDeleted()) {
       aerolite = game.aerolites_.erase(aerolite);
     } else {
-      aerolite->update();
+      aerolite->update(delta_time);
       ++aerolite;
     }
   }
   if (game.aerolites_.size() < 4) {
-    game.aerolites_.push_back(Aerolite::spawnAerolite());
+    game.aerolites_.push_back(AerolitePhysicsComponent::spawnAerolite());
   }
   /* Event bus */
-  game.event_bus_.processEvents();  
+  game.event_bus_.processEvents();
 }
 
 /* PAUSED STATE */
@@ -285,15 +286,15 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   /* Aerolites */
   auto aerolite = game.aerolites_.begin();
   while (aerolite != game.aerolites_.end()) {
-    if (aerolite->canBeDeleted()) {
+    if (aerolite->physics_->canBeDeleted()) {
       aerolite = game.aerolites_.erase(aerolite);
     } else {
-      aerolite->update();
+      aerolite->update(delta_time);
       ++aerolite;
     }
   }
   if (game.aerolites_.size() < 4) {
-    game.aerolites_.push_back(Aerolite::spawnAerolite());
+    game.aerolites_.push_back(AerolitePhysicsComponent::spawnAerolite());
   }
   /* Event bus */
   game.event_bus_.processEvents();
@@ -315,7 +316,7 @@ void ktp::TitleState::draw(Game& game) {
 
 ktp::GameState* ktp::TitleState::enter(Game& game) {
   game.reset();
-  game.player_ = std::make_unique<GameEntity>(game.event_bus_, GameEntities::Player);
+  game.player_ = std::make_unique<GameEntity>(GameEntities::Player);
   demo_time_ = SDL2_Timer::getSDL2Ticks();
   return this;
 }

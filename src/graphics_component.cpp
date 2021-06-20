@@ -20,3 +20,10 @@ void ktp::PlayerGraphicsComponent::update(const GameEntity& player, const SDL2_R
     renderer.drawLines(laser.render_shape_);
   } */
 }
+
+/* AEROLITES */
+
+void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite, const SDL2_Renderer& renderer) {
+  renderer.setDrawColor(kDefaultColor_);
+  renderer.drawLines(render_shape_);
+}

@@ -1,7 +1,7 @@
 #ifndef AEROLITS_SRC_INCLUDE_GAME_HPP_
 #define AEROLITS_SRC_INCLUDE_GAME_HPP_
 
-#include "aerolite.hpp"
+//#include "aerolite.hpp"
 #include "background.hpp"
 #include "debug_draw.hpp"
 #include "game_entity.hpp"
@@ -73,7 +73,7 @@ class Game {
   /* Emitters */
   //std::vector<Emitter> emitters_ {};
   /* Aerolites */
-  std::vector<Aerolite> aerolites_ {};
+  std::vector<GameEntity> aerolites_ {};
   /* Game texts */
   SDL2_Texture demo_text_ {};
   SDL2_Texture paused_text_ {};
