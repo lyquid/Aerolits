@@ -10,14 +10,18 @@ void ktp::InputComponent::shoot(GameEntity& player) {
   if (SDL_GetTicks() - shooting_timer_ > shooting_interval_) {
     GameEntity projectile {GameEntities::Projectile};
 
-    projectile.physics_->body_->SetTransform(
-      {player.physics_->body_->GetPosition().x, player.physics_->body_->GetPosition().y},
-       player.physics_->body_->GetAngle()
+    const auto sin {SDL_sinf(player.physics_->body_->GetAngle())};
+    const auto cos {SDL_cosf(player.physics_->body_->GetAngle())};
+
+    projectile.physics_->body_->SetTransform({
+      player.physics_->body_->GetPosition().x + ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5 * sin,
+      player.physics_->body_->GetPosition().y - ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5 * cos},
+      player.physics_->body_->GetAngle()
     );
 
     projectile.physics_->body_->SetLinearVelocity({
-       ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * SDL_sinf(player.physics_->body_->GetAngle()),
-      -ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * SDL_cosf(player.physics_->body_->GetAngle())
+       ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * sin,
+      -ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * cos
     });
 
     Game::projectiles_.push_back(std::move(projectile));

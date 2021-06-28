@@ -75,8 +75,6 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
   fixture_def.shape = &triangle;
   fixture_def.density = 1.5f;
   fixture_def.friction = 0.8f;
-  // https://www.iforce2d.net/b2dtut/collision-filtering
-  fixture_def.filter.groupIndex = -1;
 
   body_->CreateFixture(&fixture_def);
 }
@@ -223,7 +221,6 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(ProjectileGraphicsCo
   projectile_fixture_def.shape = &projectile_shape;
   projectile_fixture_def.density = 10.f;
   projectile_fixture_def.friction = 0.1f;
-  projectile_fixture_def.filter.groupIndex = -1;
   projectile_fixture_def.restitution = 0.35f;
 
   body_->CreateFixture(&projectile_fixture_def);
