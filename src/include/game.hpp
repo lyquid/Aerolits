@@ -1,7 +1,6 @@
 #ifndef AEROLITS_SRC_INCLUDE_GAME_HPP_
 #define AEROLITS_SRC_INCLUDE_GAME_HPP_
 
-//#include "aerolite.hpp"
 #include "background.hpp"
 #include "debug_draw.hpp"
 #include "game_entity.hpp"
@@ -29,7 +28,7 @@ class Game {
   bool init();
   inline void setFrameTime(double time) { frame_time_ = time; }
   inline bool quit() const { return quit_; }
-  inline void reset() { aerolites_.clear(); }
+  inline void reset() { aerolites_.clear(); projectiles_.clear(); }
   inline void update(float delta_time) { state_->update(*this, delta_time); }
 
  private:
@@ -39,7 +38,8 @@ class Game {
   friend class PausedState;
   friend class PlayingState;
   friend class TitleState;
- 
+  friend class InputComponent;
+
   void clean();
   bool initSDL2();
   bool loadResources();
@@ -73,7 +73,9 @@ class Game {
   /* Emitters */
   //std::vector<Emitter> emitters_ {};
   /* Aerolites */
-  std::vector<GameEntity> aerolites_ {};
+  static std::vector<GameEntity> aerolites_;
+  /* Projectiles */
+  static std::vector<GameEntity> projectiles_;
   /* Game texts */
   SDL2_Texture demo_text_ {};
   SDL2_Texture paused_text_ {};

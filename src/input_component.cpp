@@ -1,27 +1,31 @@
+#include "include/game.hpp"
 #include "include/game_entity.hpp"
 #include "include/input_component.hpp"
 #include <SDL.h>
+#include <utility> // std::move
 
 /* INPUT COMPONENT */
 
-/* void ktp::InputComponent::shoot(GameEntity& player) {
+void ktp::InputComponent::shoot(GameEntity& player) {
   if (SDL_GetTicks() - shooting_timer_ > shooting_interval_) {
-    Laser laser {};
-    // b2 body
-    laser.body_ = player.world_->CreateBody(&player.laser_body_def_);
-    laser.body_->CreateFixture(&player.laser_fixture_def_);
-    laser.body_->SetTransform({player.body_->GetPosition().x, player.body_->GetPosition().y}, player.body_->GetAngle());
-    laser.body_->SetLinearVelocity({laser_speed_ * SDL_sinf(player.body_->GetAngle()), -laser_speed_ * SDL_cosf(player.body_->GetAngle())});
+    GameEntity projectile {GameEntities::Projectile};
 
-    laser.render_shape_.resize(player.laser_shape_.size());
-    
-    player.lasers_.push_back(laser);
+    projectile.physics_->body_->SetTransform(
+      {player.physics_->body_->GetPosition().x, player.physics_->body_->GetPosition().y},
+       player.physics_->body_->GetAngle()
+    );
+
+    projectile.physics_->body_->SetLinearVelocity({
+       ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * SDL_sinf(player.physics_->body_->GetAngle()),
+      -ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * SDL_cosf(player.physics_->body_->GetAngle())
+    });
+
+    Game::projectiles_.push_back(std::move(projectile));
 
     shooting_timer_ = SDL2_Timer::getSDL2Ticks();
-
     // player.event_bus_.postEvent(kuge::EventTypes::LaserFired);
   }
-} */
+}
 
 void ktp::InputComponent::steer(float angular_impulse) {
   physics_->body_->SetAngularVelocity(angular_impulse);
@@ -74,12 +78,12 @@ void ktp::InputComponent::thrust(GameEntity& player, float delta_time) {
 
 void ktp::DemoInputComponent::update(GameEntity& player, float delta_time) {
   stopSteering(delta_time);
-  // shoot(player);
+  shoot(player);
 
   thrust_ ? thrust(player, delta_time) : stopThrusting(player);
 
   if (SDL2_Timer::getSDL2Ticks() - thrusting_timer_ > kThrustingInterval_) {
-    thrust_ = !thrust_; 
+    thrust_ = !thrust_;
     thrusting_timer_ = SDL2_Timer::getSDL2Ticks();
   }
 }
@@ -87,7 +91,6 @@ void ktp::DemoInputComponent::update(GameEntity& player, float delta_time) {
 /* PLAYER INPUT */
 
 void ktp::PlayerInputComponent::update(GameEntity& player, float delta_time) {
-
   stopSteering(delta_time);
 
   const auto state {SDL_GetKeyboardState(nullptr)};
@@ -109,6 +112,6 @@ void ktp::PlayerInputComponent::update(GameEntity& player, float delta_time) {
   }
 
   if (state[SDL_SCANCODE_SPACE]) {
-    // shoot(player);
+    shoot(player);
   }
 }

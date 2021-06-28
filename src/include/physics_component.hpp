@@ -13,6 +13,7 @@ class GameEntity;
 class AeroliteGraphicsComponent;
 class PlayerGraphicsComponent;
 class PlayerInputComponent;
+class ProjectileGraphicsComponent;
 
 class PhysicsComponent {
  public:
@@ -32,7 +33,7 @@ class PhysicsComponent {
   bool to_be_deleted_ {false};
 };
 
-class PlayerPhysicsComponent : public PhysicsComponent {
+class PlayerPhysicsComponent: public PhysicsComponent {
  public:
   PlayerPhysicsComponent(PlayerGraphicsComponent* graphics);
   virtual void update(const GameEntity& player, float delta_time) override;
@@ -55,7 +56,7 @@ class PlayerPhysicsComponent : public PhysicsComponent {
   float flame_max_lenght_ {kDefaultFlameMaxLength_};
 };
 
-class AerolitePhysicsComponent : public PhysicsComponent {
+class AerolitePhysicsComponent: public PhysicsComponent {
  public:
   AerolitePhysicsComponent(AeroliteGraphicsComponent* graphics);
   static GameEntity spawnAerolite();
@@ -70,6 +71,19 @@ class AerolitePhysicsComponent : public PhysicsComponent {
   static constexpr float kMaxSpeed_ {10.f};
   AeroliteGraphicsComponent* graphics_ {nullptr};
   b2AABB aabb_ {};
+};
+
+class ProjectilePhysicsComponent: public PhysicsComponent {
+ public:
+  ProjectilePhysicsComponent(ProjectileGraphicsComponent* graphics);
+  virtual void update(const GameEntity& projectile, float delta_time) override;
+ private:
+  friend class InputComponent;
+  static void generateProjectileShape(FPointsVector& shape, float size);
+  void transformRenderShape();
+  static constexpr float kDefaultProjectileSize_ {0.15f};
+  static constexpr float kDefaultProjectileSpeed_ {30.f};
+  ProjectileGraphicsComponent* graphics_ {nullptr};
 };
 
 } // namespace ktp

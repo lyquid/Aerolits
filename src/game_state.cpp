@@ -13,7 +13,7 @@ ktp::TitleState   ktp::GameState::title_ {};
 
 void ktp::GameState::setWindowTitle(Game& game) {
   game.main_window_.setTitle(
-    game.kGameTitle_ 
+    game.kGameTitle_
     + " - Frame time " + std::to_string(static_cast<int>(game.frame_time_ * 1000)) + "ms."
   );
 }
@@ -33,6 +33,10 @@ void ktp::DemoState::draw(Game& game) {
     aerolite.draw(game.renderer_);
   }
 
+  for (const auto& projectile: game.projectiles_) {
+    projectile.draw(game.renderer_);
+  }
+
   if (game.debug_draw_on_) game.world_.DebugDraw();
 
   if (blink_flag_) {
@@ -43,8 +47,8 @@ void ktp::DemoState::draw(Game& game) {
   if (SDL2_Timer::getSDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
     blink_timer_ = SDL2_Timer::getSDL2Ticks();
-  } 
-  
+  }
+
   game.renderer_.present();
 }
 
@@ -90,15 +94,15 @@ void ktp::DemoState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
 }
 
 void ktp::DemoState::update(Game& game, float delta_time) {
-  /* Window title */
+  // Window title
   setWindowTitle(game);
-  /* Box2D */
+  // Box2D
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
-  /* Background */
+  // Background
   game.background_.update(delta_time);
-  /* Player */
+  // Player
   game.player_->update(delta_time);
-  /* Emitters */
+  // Emitters
   /* auto iter = game.emitters_.begin();
   while (iter != game.emitters_.end()) {
     if (iter->canBeDeleted()) {
@@ -109,7 +113,7 @@ void ktp::DemoState::update(Game& game, float delta_time) {
       ++iter;
     }
   } */
-  /* Aerolites */
+  // Aerolites
   auto aerolite = game.aerolites_.begin();
   while (aerolite != game.aerolites_.end()) {
     if (aerolite->physics_->canBeDeleted()) {
@@ -122,7 +126,17 @@ void ktp::DemoState::update(Game& game, float delta_time) {
   if (game.aerolites_.size() < 4) {
     game.aerolites_.push_back(AerolitePhysicsComponent::spawnAerolite());
   }
-  /* Event bus */
+  // Projectiles
+  auto projectile = game.projectiles_.begin();
+  while (projectile != game.projectiles_.end()) {
+    if (projectile->physics_->canBeDeleted()) {
+      projectile = game.projectiles_.erase(projectile);
+    } else {
+      projectile->update(delta_time);
+      ++projectile;
+    }
+  }
+  // Event bus
   game.event_bus_.processEvents();
 }
 
@@ -141,6 +155,10 @@ void ktp::PausedState::draw(Game& game) {
     aerolite.draw(game.renderer_);
   }
 
+  for (const auto& projectile: game.projectiles_) {
+    projectile.draw(game.renderer_);
+  }
+
   if (game.debug_draw_on_) game.world_.DebugDraw();
 
   if (blink_flag_) {
@@ -151,8 +169,8 @@ void ktp::PausedState::draw(Game& game) {
   if (SDL2_Timer::getSDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
     blink_timer_ = SDL2_Timer::getSDL2Ticks();
-  }  
-    
+  }
+
   game.renderer_.present();
 }
 
@@ -193,7 +211,7 @@ void ktp::PausedState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
 }
 
 void ktp::PausedState::update(Game& game, float delta_time) {
-  /* Window title */
+  // Window title
   setWindowTitle(game);
 }
 
@@ -212,8 +230,12 @@ void ktp::PlayingState::draw(Game& game) {
     aerolite.draw(game.renderer_);
   }
 
+  for (const auto& projectile: game.projectiles_) {
+    projectile.draw(game.renderer_);
+  }
+
   if (game.debug_draw_on_) game.world_.DebugDraw();
-  
+
   game.renderer_.present();
 }
 
@@ -235,9 +257,9 @@ void ktp::PlayingState::handleEvents(Game& game) {
       case SDL_MOUSEBUTTONDOWN: {
         int x{0}, y{0};
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          //Emitter emi{"plasma", {static_cast<float>(x), static_cast<float>(y)}};
+          // Emitter emi{"plasma", {static_cast<float>(x), static_cast<float>(y)}};
           // emitters_.push_back(std::move({EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}}));
-          //game.emitters_.push_back(std::move(emi));
+          // game.emitters_.push_back(std::move(emi));
         }
         break;
       }
@@ -264,15 +286,15 @@ void ktp::PlayingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
 }
 
 void ktp::PlayingState::update(Game& game, float delta_time) {
-  /* Window title */
+  // Window title
   setWindowTitle(game);
-  /* Box2D */
+  // Box2D
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
-  /* Background */
+  // Background
   game.background_.update(delta_time);
-  /* Player */
+  // Player
   game.player_->update(delta_time);
-  /* Emitters */
+  // Emitters
   /* auto iter = game.emitters_.begin();
   while (iter != game.emitters_.end()) {
     if (iter->canBeDeleted()) {
@@ -283,7 +305,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
       ++iter;
     }
   } */
-  /* Aerolites */
+  // Aerolites
   auto aerolite = game.aerolites_.begin();
   while (aerolite != game.aerolites_.end()) {
     if (aerolite->physics_->canBeDeleted()) {
@@ -296,7 +318,17 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   if (game.aerolites_.size() < 4) {
     game.aerolites_.push_back(AerolitePhysicsComponent::spawnAerolite());
   }
-  /* Event bus */
+  // Projectiles
+  auto projectile = game.projectiles_.begin();
+  while (projectile != game.projectiles_.end()) {
+    if (projectile->physics_->canBeDeleted()) {
+      projectile = game.projectiles_.erase(projectile);
+    } else {
+      projectile->update(delta_time);
+      ++projectile;
+    }
+  }
+  // Event bus
   game.event_bus_.processEvents();
 }
 
@@ -310,7 +342,7 @@ void ktp::TitleState::draw(Game& game) {
   const int w = game.screen_size_.x * 0.75f;
   const int h = game.screen_size_.y * 0.50f;
   game.title_text_.render({static_cast<int>(game.screen_size_.x * 0.5f - w * 0.5f), static_cast<int>(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
-  
+
   game.renderer_.present();
 }
 
@@ -351,15 +383,15 @@ void ktp::TitleState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       demo_time_ = SDL2_Timer::getSDL2Ticks();
       game.state_ = goToState(game, GameState::playing_);
       break;
-  }  
+  }
 }
 
 void ktp::TitleState::update(Game& game, float delta_time) {
-  /* Window title */
+  // Window title
   setWindowTitle(game);
-  /* Background */
+  // Background
   game.background_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
-  /* Demo mode*/
+  // Demo mode
   if (SDL2_Timer::getSDL2Ticks() - demo_time_ > kWaitForDemo_) {
     game.state_ = goToState(game, GameState::demo_);
   }

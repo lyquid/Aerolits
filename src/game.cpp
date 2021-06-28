@@ -10,6 +10,9 @@ void ktp::loadConfigFiles() {
 
 /* GAME */
 
+std::vector<ktp::GameEntity> ktp::Game::aerolites_ {};
+std::vector<ktp::GameEntity> ktp::Game::projectiles_ {};
+
 ktp::Game::Game() {
   event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);
   //emitters_.reserve(60);

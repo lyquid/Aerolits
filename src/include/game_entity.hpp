@@ -17,6 +17,7 @@ enum class GameEntities {
   Aerolite,
   Player,
   PlayerDemo,
+  Projectile,
   count
 };
 
@@ -24,12 +25,12 @@ class SDL2_Renderer;
 
 class GameEntity {
  public:
-
+  GameEntity() = delete;
   GameEntity(/* kuge::EventBus& event_bus,  */GameEntities type)/* : event_bus_(event_bus)  */{
     switch (type) {
       case GameEntities::Aerolite:
         graphics_ = std::make_unique<AeroliteGraphicsComponent>();
-        physics_  = std::make_unique<AerolitePhysicsComponent>(static_cast<AeroliteGraphicsComponent*>(graphics_.get())); 
+        physics_  = std::make_unique<AerolitePhysicsComponent>(static_cast<AeroliteGraphicsComponent*>(graphics_.get()));
         break;
       case GameEntities::Player:
         graphics_ = std::make_unique<PlayerGraphicsComponent>();
@@ -41,6 +42,10 @@ class GameEntity {
         physics_  = std::make_unique<PlayerPhysicsComponent>(static_cast<PlayerGraphicsComponent*>(graphics_.get()));
         input_    = std::make_unique<DemoInputComponent>(static_cast<PlayerPhysicsComponent*>(physics_.get()));
         break;
+      case GameEntities::Projectile:
+        graphics_ = std::make_unique<ProjectileGraphicsComponent>();
+        physics_  = std::make_unique<ProjectilePhysicsComponent>(static_cast<ProjectileGraphicsComponent*>(graphics_.get()));
+        break;
       default:
         // boom!
         break;
@@ -51,7 +56,7 @@ class GameEntity {
     if (graphics_) graphics_->update(*this, renderer);
   }
 
-  void update(float delta_time) {
+  inline void update(float delta_time) {
     if (input_) input_->update(*this, delta_time);
     if (physics_) physics_->update(*this, delta_time);
   }

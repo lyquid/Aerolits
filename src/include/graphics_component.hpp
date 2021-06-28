@@ -20,22 +20,30 @@ class GraphicsComponent {
   FPointsVector render_shape_ {};
 };
 
-class PlayerGraphicsComponent : public GraphicsComponent {
- public:
-  virtual void update(const GameEntity& player, const SDL2_Renderer& renderer) override;
- private:
-  friend class PlayerPhysicsComponent;
-  static constexpr SDL_Color kDefaultPlayerColor_ {Colors::white};
-  FPointsVector render_flame_shape_ {};
-  bool thrusting_ {false};
-};
-
-class AeroliteGraphicsComponent : public GraphicsComponent {
+class AeroliteGraphicsComponent: public GraphicsComponent {
  public:
   virtual void update(const GameEntity& aerolite, const SDL2_Renderer& renderer) override;
  private:
   friend class AerolitePhysicsComponent;
   static constexpr SDL_Color kDefaultColor_ {Colors::orange};
+};
+
+class PlayerGraphicsComponent: public GraphicsComponent {
+ public:
+  virtual void update(const GameEntity& player, const SDL2_Renderer& renderer) override;
+ private:
+  friend class PlayerPhysicsComponent;
+  static constexpr SDL_Color kDefaultColor_ {Colors::white};
+  FPointsVector render_flame_shape_ {};
+  bool thrusting_ {false};
+};
+
+class ProjectileGraphicsComponent: public GraphicsComponent {
+ public:
+  virtual void update(const GameEntity& projectile, const SDL2_Renderer& renderer) override;
+ private:
+  friend class ProjectilePhysicsComponent;
+  static constexpr SDL_Color kDefaultColor_ {Colors::copper_green};
 };
 
 } // namespace ktp

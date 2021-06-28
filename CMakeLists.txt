@@ -59,7 +59,6 @@ add_executable(	Aerolits  main.cpp
 													src/game_state.cpp
 													src/particle.cpp
 													src/particle_system.cpp
-													#src/player.cpp
 													src/graphics_component.cpp
 													src/input_component.cpp
 													src/physics_component.cpp )
@@ -109,7 +108,7 @@ else()
 	include_directories(${SDL2_MIXER_INCLUDE_DIR})
 	set(box2d_DIR "H:/GRUPOS/ACREDITACIONES/TRABAJADORES_CA/ALEX/PrOG/repos/box2d-2.4.1/build/src/CMakeFiles/Export/lib/cmake/box2d")
 	find_package(box2d CONFIG REQUIRED)
-	target_link_libraries(Aerolits PRIVATE ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_MIXER_LIBRARY} box2d::box2d) 
+	target_link_libraries(Aerolits PRIVATE ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_MIXER_LIBRARY} box2d::box2d)
 endif()
 
 install(TARGETS Aerolits RUNTIME DESTINATION ${BIN_DIR})

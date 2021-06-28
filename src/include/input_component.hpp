@@ -22,7 +22,7 @@ class InputComponent {
   virtual void update(GameEntity&, float) = 0;
 
  protected:
-  // void shoot(GameEntity& player);
+  void shoot(GameEntity& player);
   void steer(float angular_impulse);
   void stopSteering(float delta_time);
   void stopThrusting(GameEntity& player);
@@ -41,12 +41,9 @@ class InputComponent {
   static constexpr float kDefaultShootingInterval_ {200.f};
   float shooting_interval_ {kDefaultShootingInterval_};
   double shooting_timer_ {};
-  /* lasers */
-  static constexpr float kDefaultLaserSpeed_ {30.f};
-  float laser_speed_ {kDefaultLaserSpeed_};
 };
 
-class DemoInputComponent : public InputComponent {
+class DemoInputComponent: public InputComponent {
  public:
   DemoInputComponent(PlayerPhysicsComponent* physics): InputComponent(physics) {}
   virtual void update(GameEntity& player, float delta_time) override;
@@ -56,7 +53,7 @@ class DemoInputComponent : public InputComponent {
   Uint32 thrusting_timer_ {SDL2_Timer::getSDL2Ticks()};
 };
 
-class PlayerInputComponent : public InputComponent {
+class PlayerInputComponent: public InputComponent {
  public:
   PlayerInputComponent(PlayerPhysicsComponent* physics): InputComponent(physics) {}
   virtual void update(GameEntity& player, float delta_time) override;

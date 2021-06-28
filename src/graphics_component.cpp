@@ -1,11 +1,18 @@
 #include "./include/graphics_component.hpp"
 #include "../sdl2_wrappers/sdl2_renderer.hpp"
 
-/* PLAYER RENDER */
+/* AEROLITE */
+
+void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite, const SDL2_Renderer& renderer) {
+  renderer.setDrawColor(kDefaultColor_);
+  renderer.drawLines(render_shape_);
+}
+
+/* PLAYER */
 
 void ktp::PlayerGraphicsComponent::update(const GameEntity& player, const SDL2_Renderer& renderer) {
   // player's shape
-  renderer.setDrawColor(kDefaultPlayerColor_);
+  renderer.setDrawColor(kDefaultColor_);
   renderer.drawLines(render_shape_);
   // player's thrust fx
   if (thrusting_) {
@@ -14,16 +21,11 @@ void ktp::PlayerGraphicsComponent::update(const GameEntity& player, const SDL2_R
   }
   // particles
   // player.exhaust_emitter_.draw();
-  // lasers
-  /* renderer.setDrawColor(Colors::copper_green);
-  for (const auto& laser: player.lasers_) {
-    renderer.drawLines(laser.render_shape_);
-  } */
 }
 
-/* AEROLITES */
+/* PROJECTILE */
 
-void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite, const SDL2_Renderer& renderer) {
+void ktp::ProjectileGraphicsComponent::update(const GameEntity& projectile, const SDL2_Renderer& renderer) {
   renderer.setDrawColor(kDefaultColor_);
   renderer.drawLines(render_shape_);
 }
