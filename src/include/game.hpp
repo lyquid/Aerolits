@@ -71,7 +71,7 @@ class Game {
   /* Background */
   Background background_ {screen_size_};
   /* Emitters */
-  //std::vector<Emitter> emitters_ {};
+  static std::vector<GameEntity> emitters_;
   /* Aerolites */
   static std::vector<GameEntity> aerolites_;
   /* Projectiles */

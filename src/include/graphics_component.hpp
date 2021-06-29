@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_INCLUDE_GRAPHICS_COMPONENT_HPP_
 
 #include "palette.hpp"
+
 #include <SDL.h>
 #include <vector>
 
@@ -11,6 +12,7 @@ using FPointsVector = std::vector<SDL_FPoint>;
 
 class GameEntity;
 class SDL2_Renderer;
+class Particle;
 
 class GraphicsComponent {
  public:
@@ -26,6 +28,17 @@ class AeroliteGraphicsComponent: public GraphicsComponent {
  private:
   friend class AerolitePhysicsComponent;
   static constexpr SDL_Color kDefaultColor_ {Colors::orange};
+};
+
+class EmitterGraphicsComponent: public GraphicsComponent {
+ public:
+  virtual void update(const GameEntity& emitter, const SDL2_Renderer& renderer) override;
+  ~EmitterGraphicsComponent() { delete[] particles_pool_; }
+ private:
+  friend class EmitterPhysicsComponent;
+  SDL_BlendMode blend_mode_ {};
+  Particle* particles_pool_ {nullptr};
+  unsigned int particles_pool_size_ {0};
 };
 
 class PlayerGraphicsComponent: public GraphicsComponent {

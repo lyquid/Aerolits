@@ -43,6 +43,8 @@ struct ParticleData {
 class Particle {
 
   friend class Emitter;
+  friend class EmitterGraphicsComponent;
+  friend class EmitterPhysicsComponent;
 
  public:
 
@@ -58,7 +60,7 @@ class Particle {
   Particle& operator=(Particle&& other) noexcept;
 
  private:
-  
+
   Particle() {}
   Particle(const Particle& other) noexcept { *this = other; }
   Particle(Particle&& other) noexcept { *this = std::move(other); }
@@ -75,7 +77,7 @@ class Particle {
   inline static T interpolateRange(T start, T end, U time_step) { return start + (end - start) * time_step; }
 
   template<typename T>
-  inline static T interpolateRange3(T start, T mid, T end, T time_step) { 
+  inline static T interpolateRange3(T start, T mid, T end, T time_step) {
     if (time_step < 0.5) {
       return (mid * time_step * 2.0) + start * (0.5 - time_step) * 2.0;
     } else {
@@ -84,7 +86,7 @@ class Particle {
   }
 
   template<typename T, typename U>
-  inline static T interpolateRange3(T start, T mid, T end, U time_step) { 
+  inline static T interpolateRange3(T start, T mid, T end, U time_step) {
     if (time_step < 0.5) {
       return (mid * time_step * 2.0) + start * (0.5 - time_step) * 2.0;
     } else {

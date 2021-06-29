@@ -15,6 +15,7 @@ using Physics  = std::unique_ptr<PhysicsComponent>;
 
 enum class GameEntities {
   Aerolite,
+  Emitter,
   Player,
   PlayerDemo,
   Projectile,
@@ -31,6 +32,10 @@ class GameEntity {
       case GameEntities::Aerolite:
         graphics_ = std::make_unique<AeroliteGraphicsComponent>();
         physics_  = std::make_unique<AerolitePhysicsComponent>(static_cast<AeroliteGraphicsComponent*>(graphics_.get()));
+        break;
+      case GameEntities::Emitter:
+        graphics_ = std::make_unique<EmitterGraphicsComponent>();
+        physics_  = std::make_unique<EmitterPhysicsComponent>(static_cast<EmitterGraphicsComponent*>(graphics_.get()));
         break;
       case GameEntities::Player:
         graphics_ = std::make_unique<PlayerGraphicsComponent>();
@@ -67,6 +72,8 @@ class GameEntity {
   friend class PlayingState;
   friend class InputComponent;
   friend class AerolitePhysicsComponent;
+  friend class EmitterPhysicsComponent;
+  friend class PlayerPhysicsComponent;
 
   SDL_FPoint      delta_ {};
   Graphics        graphics_ {nullptr};
