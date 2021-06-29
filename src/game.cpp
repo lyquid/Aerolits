@@ -14,6 +14,9 @@ std::vector<ktp::GameEntity> ktp::Game::aerolites_ {};
 std::vector<ktp::GameEntity> ktp::Game::emitters_ {};
 std::vector<ktp::GameEntity> ktp::Game::projectiles_ {};
 
+SDL_FPoint ktp::PhysicsComponent::b2_screen_size_ {};
+b2World* ktp::PhysicsComponent::world_ {nullptr};
+
 ktp::Game::Game() {
   event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);
   // emitters_.reserve(40);

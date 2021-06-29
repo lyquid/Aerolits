@@ -1,1 +1,1 @@
-Best if you can open an isue :)
+Best if you can open an issue :)

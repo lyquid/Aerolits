@@ -53,15 +53,17 @@ add_executable(	Aerolits  main.cpp
 													kuge/input_system.cpp
 													kuge/output_system.cpp
 													kuge/system.cpp
+                          src/aerolite.cpp
 													src/background.cpp
+                          src/emitter.cpp
 													src/emitter_parser.cpp
 													src/game.cpp
 													src/game_state.cpp
 													src/particle.cpp
 													src/particle_system.cpp
-													src/graphics_component.cpp
-													src/input_component.cpp
-													src/physics_component.cpp )
+                          src/player.cpp
+													src/projectile.cpp
+													src/input_component.cpp )
 
 target_compile_features(Aerolits PUBLIC cxx_std_17)
 set_target_properties(Aerolits PROPERTIES CXX_EXTENSIONS OFF)

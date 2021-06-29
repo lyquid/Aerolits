@@ -1,9 +1,13 @@
 #ifndef AEROLITS_SRC_INCLUDE_GAME_ENTITY_HPP_
 #define AEROLITS_SRC_INCLUDE_GAME_ENTITY_HPP_
 
+#include "aerolite.hpp"
+#include "emitter.hpp"
 #include "graphics_component.hpp"
 #include "input_component.hpp"
 #include "physics_component.hpp"
+#include "player.hpp"
+#include "projectile.hpp"
 #include "../../kuge/kuge.hpp"
 #include <memory>
 
