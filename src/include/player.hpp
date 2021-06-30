@@ -6,6 +6,7 @@
 #include "../../sdl2_wrappers/sdl2_timer.hpp"
 #include <SDL.h>
 #include <memory>
+#include <utility> // std::move
 #include <vector>
 
 namespace ktp {
@@ -22,7 +23,7 @@ class PlayerGraphicsComponent: public GraphicsComponent {
  private:
   static constexpr SDL_Color kDefaultColor_ {Colors::white};
   FPointsVector render_flame_shape_ {};
-  bool thrusting_ {false};
+  bool          thrusting_ {false};
 };
 
 class DemoInputComponent: public InputComponent {
@@ -31,7 +32,7 @@ class DemoInputComponent: public InputComponent {
   virtual void update(GameEntity& player, float delta_time) override;
  private:
   static constexpr int kThrustingInterval_ {5000};
-  bool thrust_ {};
+  bool   thrust_ {};
   Uint32 thrusting_timer_ {SDL2_Timer::getSDL2Ticks()};
 };
 
@@ -43,12 +44,23 @@ class PlayerInputComponent: public InputComponent {
 };
 
 class PlayerPhysicsComponent: public PhysicsComponent {
+
   friend class InputComponent;
+
  public:
-  PlayerPhysicsComponent(PlayerGraphicsComponent* graphics);
+
+  PlayerPhysicsComponent(PlayerGraphicsComponent* graphics) noexcept;
+  PlayerPhysicsComponent(const PlayerPhysicsComponent& other) = delete;
+  PlayerPhysicsComponent(PlayerPhysicsComponent&& other) { *this = std::move(other); }
+
+  PlayerPhysicsComponent& operator=(const PlayerPhysicsComponent& other) = delete;
+  PlayerPhysicsComponent& operator=(PlayerPhysicsComponent&& other) noexcept;
+
   virtual void setPosition(const SDL_FPoint& pos) override {}
   virtual void update(const GameEntity& player, float delta_time) override;
+
  private:
+
   // inline void generateParticles() { flame_emitter_->physics_-> }
   static void generatePlayerShape(FPointsVector& shape, FPointsVector& flame_shape, float size);
   void checkWrap();

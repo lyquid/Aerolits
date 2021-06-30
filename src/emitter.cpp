@@ -17,6 +17,24 @@ void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter, const SDL2
 
 /* PHYSICS */
 
+ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhysicsComponent&& other) noexcept {
+  if (this != &other) {
+    graphics_ = other.graphics_;
+    alive_particles_count_ = other.alive_particles_count_;
+    data_ = other.data_;
+    first_available_ = other.first_available_;
+    position_ = other.position_;
+    start_time_ = other.start_time_;
+    interval_time_ = other.interval_time_;
+
+    // just to be sure
+    other.graphics_ = nullptr;
+    other.data_ = nullptr;
+    other.first_available_ = nullptr;
+  }
+  return *this;
+}
+
 void ktp::EmitterPhysicsComponent::generateParticles() {
   if (first_available_ == nullptr) {
     logMessage("WARNING!! NO FIRST AVAILABLE!!!!!");

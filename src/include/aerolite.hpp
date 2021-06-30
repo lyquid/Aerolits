@@ -5,6 +5,7 @@
 #include "physics_component.hpp"
 #include <box2d/box2d.h>
 #include <SDL.h>
+#include <utility> // std::move
 #include <vector>
 
 namespace ktp {
@@ -23,19 +24,31 @@ class AeroliteGraphicsComponent: public GraphicsComponent {
 };
 
 class AerolitePhysicsComponent: public PhysicsComponent {
+
  public:
-  AerolitePhysicsComponent(AeroliteGraphicsComponent* graphics);
+
+  AerolitePhysicsComponent(AeroliteGraphicsComponent* graphics) noexcept;
+  AerolitePhysicsComponent(const AerolitePhysicsComponent& other) = delete;
+  AerolitePhysicsComponent(AerolitePhysicsComponent&& other) { *this = std::move(other); }
+
+  AerolitePhysicsComponent& operator=(const AerolitePhysicsComponent& other) = delete;
+  AerolitePhysicsComponent& operator=(AerolitePhysicsComponent&& other) noexcept;
+
   inline float getMaxSpeed() const { return kMaxSpeed_; }
   virtual void setPosition(const SDL_FPoint& pos) override {}
   static GameEntity spawnAerolite();
   virtual void update(const GameEntity& aerolite, float delta_time) override;
+
  private:
+
   static void generateAeroliteShape(FPointsVector& shape, float size);
   void transformRenderShape();
+
   static constexpr float kKgPerMeter2_ {20.f};
   static constexpr float kMaxRotationSpeed_ {2.f};
   static constexpr float kMaxSize_ {5.f};
   static constexpr float kMaxSpeed_ {10.f};
+
   AeroliteGraphicsComponent* graphics_ {nullptr};
   b2AABB aabb_ {};
 };

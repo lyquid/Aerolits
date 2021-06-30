@@ -63,7 +63,7 @@ void ktp::PlayerInputComponent::update(GameEntity& player, float delta_time) {
 
 /* PHYSICS */
 
-ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(PlayerGraphicsComponent* graphics):
+ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(PlayerGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
   size_ = kDefaultPlayerSize_;
   generatePlayerShape(shape_, flame_shape_, size_);
@@ -71,6 +71,20 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(PlayerGraphicsComponent* gra
   graphics_->render_flame_shape_.resize(flame_shape_.size());
   setBox2D();
   // flame_emitter_ = std::make_unique<GameEntity>(EmitterPhysicsComponent::makeEmitter("fire", {body_->GetPosition().x, body_->GetPosition().y}));
+}
+
+ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) noexcept {
+  if (this != &other) {
+    graphics_ = other.graphics_;
+    flame_shape_ = std::move(other.flame_shape_);
+    thrusting_ = other.thrusting_;
+    flame_growth_factor_ = other.flame_growth_factor_;
+    flame_max_lenght_ = other.flame_max_lenght_;
+    flame_emitter_ = std::move(other.flame_emitter_);
+
+    other.graphics_ = nullptr; // just in case
+  }
+  return *this;
 }
 
 void ktp::PlayerPhysicsComponent::checkWrap() {

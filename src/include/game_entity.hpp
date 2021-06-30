@@ -10,6 +10,7 @@
 #include "projectile.hpp"
 #include "../../kuge/kuge.hpp"
 #include <memory>
+#include <utility> // std::move
 
 namespace ktp {
 
@@ -59,6 +60,24 @@ class GameEntity {
         // boom!
         break;
     }
+  }
+
+  GameEntity(const GameEntity& other) = delete;
+  GameEntity(GameEntity&& other) { *this = std::move(other); }
+
+  GameEntity& operator=(const GameEntity& other) = delete;
+  GameEntity& operator=(GameEntity&& other) noexcept {
+    if (this != &other) {
+      delta_ = other.delta_;
+      graphics_ = std::move(other.graphics_);
+      input_ = std::move(other.input_);
+      physics_ = std::move(other.physics_);
+
+      other.graphics_ = nullptr;
+      other.input_ = nullptr;
+      other.physics_ = nullptr;
+    }
+    return *this;
   }
 
   inline void draw(const SDL2_Renderer& renderer) const {

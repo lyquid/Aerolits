@@ -72,8 +72,8 @@ set_target_properties(Aerolits PROPERTIES CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${Aerolits_SOURCE_DIR}/cmake")
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-	set(MY_DEBUG_OPTIONS /W4)
-	set(MY_RELEASE_OPTIONS /w3)
+	set(MY_DEBUG_OPTIONS /Wall /RTC)
+	set(MY_RELEASE_OPTIONS /w3 /O2)
 	target_compile_options(Aerolits PUBLIC "$<$<CONFIG:DEBUG>:${MY_DEBUG_OPTIONS}>")
 	target_compile_options(Aerolits PUBLIC "$<$<CONFIG:RELEASE>:${MY_RELEASE_OPTIONS}>")
 

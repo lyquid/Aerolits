@@ -20,6 +20,8 @@ b2World* ktp::PhysicsComponent::world_ {nullptr};
 ktp::Game::Game() {
   event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);
   // emitters_.reserve(40);
+  // aerolites_.reserve(200);
+  // projectiles_.reserve(200);
 }
 
 void ktp::Game::clean() {

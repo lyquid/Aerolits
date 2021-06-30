@@ -13,7 +13,7 @@ void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite, const SD
 
 /* PHYSICS */
 
-ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(AeroliteGraphicsComponent* graphics):
+ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(AeroliteGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
   size_ = kMaxSize_ * generateRand(0.3f, 1.f);
   generateAeroliteShape(shape_, size_);
@@ -37,6 +37,16 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(AeroliteGraphicsComponen
   body_->CreateFixture(&fixture_def);
 
   body_->SetAngularVelocity(kMaxRotationSpeed_ * generateRand(-1.f, 1.f));
+}
+
+ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) noexcept {
+  if (this != &other) {
+    graphics_ = other.graphics_;
+    aabb_ = std::move(other.aabb_);
+
+    other.graphics_ = nullptr; // just in case
+  }
+  return *this;
 }
 
 void ktp::AerolitePhysicsComponent::generateAeroliteShape(FPointsVector& shape, float size) {
@@ -74,7 +84,7 @@ ktp::GameEntity ktp::AerolitePhysicsComponent::spawnAerolite() {
       side = 0;
       break;
   }
-  return aerolite;
+  return std::move(aerolite);
 }
 
 void ktp::AerolitePhysicsComponent::transformRenderShape() {

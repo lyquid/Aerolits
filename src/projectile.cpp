@@ -13,7 +13,7 @@ void ktp::ProjectileGraphicsComponent::update(const GameEntity& projectile, cons
 
 /* PHYSICS */
 
-ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(ProjectileGraphicsComponent* graphics):
+ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(ProjectileGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
   size_ = kDefaultProjectileSize_;
   generateProjectileShape(shape_, size_);
@@ -42,6 +42,14 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(ProjectileGraphicsCo
   projectile_fixture_def.restitution = 0.35f;
 
   body_->CreateFixture(&projectile_fixture_def);
+}
+
+ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(ProjectilePhysicsComponent&& other) noexcept {
+  if (this != &other) {
+    graphics_ = other.graphics_;
+    other.graphics_ = nullptr; // just in case
+  }
+  return *this;
 }
 
 void ktp::ProjectilePhysicsComponent::generateProjectileShape(FPointsVector& shape, float size) {

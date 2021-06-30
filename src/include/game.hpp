@@ -19,10 +19,17 @@ class Emitter;
 void loadConfigFiles();
 
 class Game {
+
  public:
 
   Game();
   ~Game() { clean(); }
+  Game(const Game& other) = delete;
+  Game(Game&& other) = delete;
+
+  Game& operator=(const Game& other) = delete;
+  Game& operator=(Game&& other) = delete;
+
   inline void draw() { state_->draw(*this); }
   inline void handleEvents() { state_->handleEvents(*this); }
   bool init();
