@@ -74,6 +74,8 @@ class PlayerPhysicsComponent: public PhysicsComponent {
   PlayerGraphicsComponent* graphics_ {nullptr};
   FPointsVector flame_shape_ {};
   bool thrusting_ {false};
+  float cos_ {};
+  float sin_ {};
   // flame stuff
   static constexpr float kDefaultFlameGrowthFactor_ {0.02f};
   static constexpr float kDefaultFlameMaxLength_ {kDefaultPlayerSize_};

@@ -82,6 +82,8 @@ ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysic
     graphics_ = other.graphics_;
     flame_shape_ = std::move(other.flame_shape_);
     thrusting_ = other.thrusting_;
+    cos_ = other.cos_;
+    sin_ = other.sin_;
     flame_growth_factor_ = other.flame_growth_factor_;
     flame_max_lenght_ = other.flame_max_lenght_;
     exhaust_emitter_ = std::move(other.exhaust_emitter_);
@@ -148,13 +150,13 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
 
 void ktp::PlayerPhysicsComponent::transformRenderShape() {
   for (auto i = 0u; i < shape_.size(); ++i) {
-    graphics_->render_shape_[i].x = ((shape_[i].x * SDL_cosf(body_->GetAngle()) - shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
-    graphics_->render_shape_[i].y = ((shape_[i].x * SDL_sinf(body_->GetAngle()) + shape_[i].y * SDL_cosf(body_->GetAngle())) + body_->GetPosition().y) * kMetersToPixels;
+    graphics_->render_shape_[i].x = ((shape_[i].x * cos_ - shape_[i].y * sin_) + body_->GetPosition().x) * kMetersToPixels;
+    graphics_->render_shape_[i].y = ((shape_[i].x * sin_ + shape_[i].y * cos_) + body_->GetPosition().y) * kMetersToPixels;
   }
   if (thrusting_) {
     for (auto i = 0u; i < flame_shape_.size(); ++i) {
-      graphics_->render_flame_shape_[i].x = ((flame_shape_[i].x * SDL_cosf(body_->GetAngle()) - flame_shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
-      graphics_->render_flame_shape_[i].y = ((flame_shape_[i].x * SDL_sinf(body_->GetAngle()) + flame_shape_[i].y * SDL_cosf(body_->GetAngle())) + body_->GetPosition().y) * kMetersToPixels;
+      graphics_->render_flame_shape_[i].x = ((flame_shape_[i].x * cos_ - flame_shape_[i].y * sin_) + body_->GetPosition().x) * kMetersToPixels;
+      graphics_->render_flame_shape_[i].y = ((flame_shape_[i].x * sin_ + flame_shape_[i].y * cos_) + body_->GetPosition().y) * kMetersToPixels;
     }
   }
 }
@@ -162,8 +164,13 @@ void ktp::PlayerPhysicsComponent::transformRenderShape() {
 void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_time) {
   graphics_->thrusting_ = thrusting_;
   checkWrap();
+  cos_ = SDL_cosf(body_->GetAngle());
+  sin_ = SDL_sinf(body_->GetAngle());
   transformRenderShape();
-  exhaust_emitter_->setPosition({body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels});
+  exhaust_emitter_->setPosition({
+    (body_->GetPosition().x * kMetersToPixels) - kDefaultPlayerSize_ * 0.33f * kMetersToPixels * sin_,
+    (body_->GetPosition().y * kMetersToPixels) + kDefaultPlayerSize_ * 0.33f * kMetersToPixels * cos_
+  });
   exhaust_emitter_->update(player, delta_time);
   if (thrusting_) exhaust_emitter_->generateParticles();
 }
