@@ -16,7 +16,7 @@ class PhysicsComponent {
 
  public:
 
-  virtual ~PhysicsComponent() { world_->DestroyBody(body_); }
+  virtual ~PhysicsComponent() { if (body_) world_->DestroyBody(body_); }
 
   inline bool canBeDeleted() const { return to_be_deleted_; }
   inline b2Body* getBody() const { return body_; }

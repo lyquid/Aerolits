@@ -3,8 +3,8 @@
 #include "include/physics_component.hpp"
 #include <SDL.h>
 #include <memory>
-#include <utility> // std::move
 #include <string> // std::to_string
+#include <utility> // std::move
 
 ktp::DemoState    ktp::GameState::demo_ {};
 ktp::PausedState  ktp::GameState::paused_ {};
@@ -23,7 +23,7 @@ void ktp::GameState::setWindowTitle(Game& game) {
 void ktp::DemoState::draw(Game& game) {
   game.renderer_.clear();
 
-  game.background_.draw(game.renderer_);
+  game.background_->draw(game.renderer_);
 
   game.player_->draw(game.renderer_);
   /* for (const auto& emitter: game.emitters_) {
@@ -99,7 +99,7 @@ void ktp::DemoState::update(Game& game, float delta_time) {
   // Box2D
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Background
-  game.background_.update(delta_time);
+  game.background_->update(delta_time);
   // Player
   game.player_->update(delta_time);
   // Emitters
@@ -145,7 +145,7 @@ void ktp::DemoState::update(Game& game, float delta_time) {
 void ktp::PausedState::draw(Game& game) {
   game.renderer_.clear();
 
-  game.background_.draw(game.renderer_);
+  game.background_->draw(game.renderer_);
 
   game.player_->draw(game.renderer_);
   /* for (const auto& emitter: game.emitters_) {
@@ -220,7 +220,7 @@ void ktp::PausedState::update(Game& game, float delta_time) {
 void ktp::PlayingState::draw(Game& game) {
   game.renderer_.clear();
 
-  game.background_.draw(game.renderer_);
+  game.background_->draw(game.renderer_);
 
   game.player_->draw(game.renderer_);
   /* for (const auto& emitter: game.emitters_) {
@@ -291,7 +291,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   // Box2D
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Background
-  game.background_.update(delta_time);
+  game.background_->update(delta_time);
   // Player
   game.player_->update(delta_time);
   // Emitters
@@ -337,7 +337,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
 void ktp::TitleState::draw(Game& game) {
   game.renderer_.clear();
 
-  game.background_.draw(game.renderer_);
+  game.background_->draw(game.renderer_);
 
   const int w = game.screen_size_.x * 0.75f;
   const int h = game.screen_size_.y * 0.50f;
@@ -348,6 +348,7 @@ void ktp::TitleState::draw(Game& game) {
 
 ktp::GameState* ktp::TitleState::enter(Game& game) {
   game.reset();
+  game.background_ = std::make_unique<GameEntity>(GameEntities::Background);
   game.player_ = std::make_unique<GameEntity>(GameEntities::Player);
   demo_time_ = SDL2_Timer::getSDL2Ticks();
   return this;
@@ -390,7 +391,7 @@ void ktp::TitleState::update(Game& game, float delta_time) {
   // Window title
   setWindowTitle(game);
   // Background
-  game.background_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
+  game.background_->update(delta_time * kDefaultBackgroundDeltaInMenu_);
   // Demo mode
   if (SDL2_Timer::getSDL2Ticks() - demo_time_ > kWaitForDemo_) {
     game.state_ = goToState(game, GameState::demo_);

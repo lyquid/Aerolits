@@ -76,7 +76,7 @@ class Game {
   /* Player */
   std::unique_ptr<GameEntity> player_ {};
   /* Background */
-  Background background_ {screen_size_};
+  std::unique_ptr<GameEntity> background_ {};
   /* Emitters */
   static std::vector<GameEntity> emitters_;
   /* Aerolites */

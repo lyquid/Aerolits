@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_INCLUDE_GAME_ENTITY_HPP_
 
 #include "aerolite.hpp"
+#include "background.hpp"
 #include "emitter.hpp"
 #include "graphics_component.hpp"
 #include "input_component.hpp"
@@ -20,6 +21,7 @@ using Physics  = std::unique_ptr<PhysicsComponent>;
 
 enum class GameEntities {
   Aerolite,
+  Background,
   Emitter,
   Player,
   PlayerDemo,
@@ -37,6 +39,10 @@ class GameEntity {
       case GameEntities::Aerolite:
         graphics_ = std::make_unique<AeroliteGraphicsComponent>();
         physics_  = std::make_unique<AerolitePhysicsComponent>(static_cast<AeroliteGraphicsComponent*>(graphics_.get()));
+        break;
+      case GameEntities::Background:
+        graphics_ = std::make_unique<BackgroundGraphicsComponent>();
+        physics_  = std::make_unique<BackgroundPhysicsComponent>(static_cast<BackgroundGraphicsComponent*>(graphics_.get()));
         break;
       case GameEntities::Emitter:
         graphics_ = std::make_unique<EmitterGraphicsComponent>();

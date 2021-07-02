@@ -16,19 +16,19 @@ class TitleState;
 class GameState {
  public:
   virtual ~GameState() {}
-  virtual void draw(Game&) {}
-  virtual void handleEvents(Game&) {}
-  virtual void update(Game&, float) {}
+  virtual void draw(Game&) = 0;
+  virtual void handleEvents(Game&) = 0;
+  virtual void update(Game&, float) = 0;
   inline virtual GameState* enter(Game& game) { return this; }
 
   inline static GameState* goToState(Game& game, GameState& state) { return state.enter(game); }
-  
+
   static DemoState    demo_;
   static PausedState  paused_;
   static PlayingState playing_;
   static TitleState   title_;
  protected:
-  virtual void setWindowTitle(Game& game); // why virtual?
+  void setWindowTitle(Game& game);
 };
 
 class DemoState : public GameState {
