@@ -1,10 +1,15 @@
 #include "include/box2d_scale.hpp"
+#include "include/emitter.hpp"
 #include "include/game_entity.hpp"
 #include "include/player.hpp"
 #include "../sdl2_wrappers/sdl2_renderer.hpp"
 #include <box2d/box2d.h>
 
 /* GRAPHICS */
+
+ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept {
+  exhaust_emitter_ = std::make_unique<EmitterGraphicsComponent>();
+}
 
 void ktp::PlayerGraphicsComponent::update(const GameEntity& player, const SDL2_Renderer& renderer) {
   // player's shape
@@ -15,8 +20,7 @@ void ktp::PlayerGraphicsComponent::update(const GameEntity& player, const SDL2_R
     renderer.setDrawColor(Colors::red);
     renderer.drawLines(render_flame_shape_);
   }
-  // particles
-  // player.exhaust_emitter_.draw();
+  exhaust_emitter_->update(player, renderer);
 }
 
 /* DEMO INPUT */
@@ -70,7 +74,7 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(PlayerGraphicsComponent* gra
   graphics_->render_shape_.resize(shape_.size());
   graphics_->render_flame_shape_.resize(flame_shape_.size());
   setBox2D();
-  // flame_emitter_ = std::make_unique<GameEntity>(EmitterPhysicsComponent::makeEmitter("fire", {body_->GetPosition().x, body_->GetPosition().y}));
+  exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(EmitterPhysicsComponent::makeEmitter(graphics_->exhaust_emitter_.get(), "fire", {body_->GetPosition().x, body_->GetPosition().y}));
 }
 
 ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) noexcept {
@@ -80,7 +84,7 @@ ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysic
     thrusting_ = other.thrusting_;
     flame_growth_factor_ = other.flame_growth_factor_;
     flame_max_lenght_ = other.flame_max_lenght_;
-    flame_emitter_ = std::move(other.flame_emitter_);
+    exhaust_emitter_ = std::move(other.exhaust_emitter_);
 
     other.graphics_ = nullptr; // just in case
   }
@@ -159,6 +163,7 @@ void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_t
   graphics_->thrusting_ = thrusting_;
   checkWrap();
   transformRenderShape();
-  // flame_emitter_->physics_->setPosition({body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels});
-  // flame_emitter_->update(delta_time);
+  exhaust_emitter_->setPosition({body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels});
+  exhaust_emitter_->update(player, delta_time);
+  if (thrusting_) exhaust_emitter_->generateParticles();
 }

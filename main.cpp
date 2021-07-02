@@ -1,9 +1,8 @@
 #include "src/include/game.hpp"
-#include <stdlib.h>
-#include <time.h>
+#include <ctime>
 
 int main(int argv, char* args[]) {
-  
+
   using namespace ktp;
 
   loadConfigFiles();
@@ -35,7 +34,7 @@ int main(int argv, char* args[]) {
 
       game.draw();
     }
-    
+
     return 0;
 
   } else {

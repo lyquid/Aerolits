@@ -22,7 +22,6 @@ using Physics  = std::unique_ptr<PhysicsComponent>;
 enum class GameEntities {
   Aerolite,
   Background,
-  Emitter,
   Player,
   PlayerDemo,
   Projectile,
@@ -43,10 +42,6 @@ class GameEntity {
       case GameEntities::Background:
         graphics_ = std::make_unique<BackgroundGraphicsComponent>();
         physics_  = std::make_unique<BackgroundPhysicsComponent>(static_cast<BackgroundGraphicsComponent*>(graphics_.get()));
-        break;
-      case GameEntities::Emitter:
-        graphics_ = std::make_unique<EmitterGraphicsComponent>();
-        physics_  = std::make_unique<EmitterPhysicsComponent>(static_cast<EmitterGraphicsComponent*>(graphics_.get()));
         break;
       case GameEntities::Player:
         graphics_ = std::make_unique<PlayerGraphicsComponent>();

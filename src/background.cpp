@@ -1,8 +1,8 @@
 #include "include/background.hpp"
 #include "include/box2d_scale.hpp"
 #include "../sdl2_wrappers/sdl2_renderer.hpp"
+#include <ctime>
 #include <random>
-#include <time.h>
 
 /* GRAPHICS */
 

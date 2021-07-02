@@ -73,8 +73,4 @@ void ktp::InputComponent::thrust(GameEntity& player, float delta_time) {
     physics_->flame_shape_.front().y += physics_->flame_growth_factor_;
     physics_->flame_shape_.back().y += physics_->flame_growth_factor_;
   }
-
-  // physics_->
-  // player.exhaust_emitter_.generateParticles();
-  // player.event_bus_.postEvent(kuge::EventTypes::PlayerThrust);
 }

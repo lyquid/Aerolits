@@ -111,11 +111,11 @@ void ktp::EmitterPhysicsComponent::inflatePool() {
   graphics_->particles_pool_[graphics_->particles_pool_size_ - 1].setNext(nullptr);
 }
 
-ktp::GameEntity ktp::EmitterPhysicsComponent::makeEmitter(const std::string& type, const SDL_FPoint& pos) {
-  GameEntity emitter {GameEntities::Emitter};
-  setType(static_cast<EmitterPhysicsComponent*>(emitter.physics_.get()), type);
-  setPosition(static_cast<EmitterPhysicsComponent*>(emitter.physics_.get()), pos);
-  return emitter;
+ktp::EmitterPhysicsComponent ktp::EmitterPhysicsComponent::makeEmitter(EmitterGraphicsComponent* graphics, const std::string& type, const SDL_FPoint& pos) {
+  EmitterPhysicsComponent emitter {graphics};
+  emitter.setType(type);
+  emitter.setPosition(pos);
+  return std::move(emitter);
 }
 
 void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
@@ -135,25 +135,6 @@ void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
     return;
   }
   inflatePool();
-}
-
-void ktp::EmitterPhysicsComponent::setType(EmitterPhysicsComponent* physics, const std::string& type) {
-  bool emitter_found {false};
-  for (const auto& emitter_type: EmitterParser::emitter_types) {
-    if (emitter_type.type_ == type) {
-      physics->data_ = &emitter_type;
-      physics->graphics_->blend_mode_ = emitter_type.blend_mode_;
-      physics->graphics_->particles_pool_size_ = (emitter_type.max_particle_life_.value_ + 1u) * emitter_type.emission_rate_.value_;
-      physics->interval_time_ = emitter_type.emission_interval_.value_;
-      emitter_found = true;
-      break;
-    }
-  }
-  if (!emitter_found) {
-    logErrorMessage("Emitter type \"" + type + "\" not found! Check emitters.xml for spelling errors or missing emitters.");
-    return;
-  }
-  physics->inflatePool();
 }
 
 void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta_time) {

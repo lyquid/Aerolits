@@ -13,17 +13,21 @@ namespace ktp {
 
 using FPointsVector = std::vector<SDL_FPoint>;
 
+class EmitterGraphicsComponent;
+class EmitterPhysicsComponent;
 class GameEntity;
 class SDL2_Renderer;
 
 class PlayerGraphicsComponent: public GraphicsComponent {
   friend class PlayerPhysicsComponent;
  public:
+  PlayerGraphicsComponent() noexcept;
   virtual void update(const GameEntity& player, const SDL2_Renderer& renderer) override;
  private:
   static constexpr SDL_Color kDefaultColor_ {Colors::white};
   FPointsVector render_flame_shape_ {};
   bool          thrusting_ {false};
+  std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
 };
 
 class DemoInputComponent: public InputComponent {
@@ -61,7 +65,6 @@ class PlayerPhysicsComponent: public PhysicsComponent {
 
  private:
 
-  // inline void generateParticles() { flame_emitter_->physics_-> }
   static void generatePlayerShape(FPointsVector& shape, FPointsVector& flame_shape, float size);
   void checkWrap();
   void setBox2D();
@@ -78,7 +81,7 @@ class PlayerPhysicsComponent: public PhysicsComponent {
   float flame_growth_factor_ {kDefaultFlameGrowthFactor_};
   float flame_max_lenght_ {kDefaultFlameMaxLength_};
   // emitter stuff
-  std::unique_ptr<GameEntity> flame_emitter_ {};
+  std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
 };
 
 } // namespace ktp

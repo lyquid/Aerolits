@@ -35,7 +35,6 @@ class EmitterPhysicsComponent: public PhysicsComponent {
 
  public:
 
-  EmitterPhysicsComponent(EmitterGraphicsComponent* graphics) noexcept: graphics_(graphics) {}
   EmitterPhysicsComponent(const EmitterPhysicsComponent& other) = delete;
   EmitterPhysicsComponent(EmitterPhysicsComponent&& other) { *this = std::move(other); }
 
@@ -47,7 +46,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   inline auto getAliveParticlesCount() const { return alive_particles_count_; }
   inline SDL_FPoint getPosition() const { return position_; }
   inline bool lifeTimeOver() const { return SDL2_Timer::getSDL2Ticks() - start_time_ >= data_->life_time_; }
-  static GameEntity makeEmitter(const std::string& type, const SDL_FPoint& pos);
+  static EmitterPhysicsComponent makeEmitter(EmitterGraphicsComponent* graphics, const std::string& type, const SDL_FPoint& pos);
   inline bool particlesAlive() const { return alive_particles_count_ != 0u; }
   virtual void setPosition(const SDL_FPoint& pos) override { position_ = pos; }
   void setType(const std::string& type);
@@ -55,9 +54,9 @@ class EmitterPhysicsComponent: public PhysicsComponent {
 
  private:
 
+  EmitterPhysicsComponent(EmitterGraphicsComponent* graphics) noexcept: graphics_(graphics) {}
+
   void inflatePool(); // maybe static?
-  inline static void setPosition(EmitterPhysicsComponent* physics, const SDL_FPoint& pos) { physics->position_ = pos; }
-  static void setType(EmitterPhysicsComponent* physics, const std::string& type);
 
   EmitterGraphicsComponent* graphics_ {nullptr};
 
