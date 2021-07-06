@@ -132,18 +132,36 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
   body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
 
   body_ = world_->CreateBody(&body_def);
-  // triangle CCW
+  // middle triangle CCW
   b2Vec2 vertices[3];
   vertices[0].Set(           0.f, -size_ * 0.50f); // top
-  vertices[1].Set(-size_ * 0.33f,  size_ * 0.50f); // left
-  vertices[2].Set( size_ * 0.33f,  size_ * 0.50f); // right
+  vertices[1].Set(-size_ * 0.15f,  size_ * 0.33f); // left
+  vertices[2].Set( size_ * 0.15f,  size_ * 0.33f); // right
   b2PolygonShape triangle {};
   triangle.Set(vertices, 3);
 
   b2FixtureDef fixture_def {};
-  fixture_def.shape = &triangle;
   fixture_def.density = 1.5f;
   fixture_def.friction = 0.8f;
+  fixture_def.shape = &triangle;
+
+  body_->CreateFixture(&fixture_def);
+
+  // left triangle CCW
+  vertices[0].Set(           0.f, -size_ * 0.50f); // top
+  vertices[1].Set(-size_ * 0.33f,  size_ * 0.50f); // left
+  vertices[2].Set(-size_ * 0.15f,  size_ * 0.33f); // right
+  triangle.Set(vertices, 3);
+  fixture_def.shape = &triangle;
+
+  body_->CreateFixture(&fixture_def);
+
+  // right triangle CCW
+  vertices[0].Set(          0.f, -size_ * 0.50f); // top
+  vertices[1].Set(size_ * 0.15f,  size_ * 0.33f); // left
+  vertices[2].Set(size_ * 0.33f,  size_ * 0.50f); // right
+  triangle.Set(vertices, 3);
+  fixture_def.shape = &triangle;
 
   body_->CreateFixture(&fixture_def);
 }

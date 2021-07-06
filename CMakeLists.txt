@@ -37,7 +37,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
 add_executable(	Aerolits  main.cpp
-													./lib/pugixml1.11/pugixml.cpp
+													lib/pugixml1.11/pugixml.cpp
 													sdl2_wrappers/sdl2_audio.cpp
 													sdl2_wrappers/sdl2_font.cpp
 													sdl2_wrappers/sdl2_image.cpp
