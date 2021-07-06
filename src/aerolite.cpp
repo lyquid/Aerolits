@@ -41,10 +41,17 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(AeroliteGraphicsComponen
 
 ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) noexcept {
   if (this != &other) {
+    // inherited members
+    body_          = other.body_;
+    shape_         = std::move(other.shape_);
+    size_          = other.size_;
+    to_be_deleted_ = other.to_be_deleted_;
+    // own members
     graphics_ = other.graphics_;
-    aabb_ = std::move(other.aabb_);
-
-    other.graphics_ = nullptr; // just in case
+    aabb_     = std::move(other.aabb_);
+    // tidy
+    other.body_     = nullptr;
+    other.graphics_ = nullptr;
   }
   return *this;
 }

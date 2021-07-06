@@ -46,8 +46,15 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(ProjectileGraphicsCo
 
 ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(ProjectilePhysicsComponent&& other) noexcept {
   if (this != &other) {
+    // inherited members
+    body_          = other.body_;
+    shape_         = std::move(other.shape_);
+    size_          = other.size_;
+    to_be_deleted_ = other.to_be_deleted_;
+    // own members
     graphics_ = other.graphics_;
-    other.graphics_ = nullptr; // just in case
+    // tidy
+    other.graphics_ = nullptr;
   }
   return *this;
 }
