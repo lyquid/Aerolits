@@ -12,6 +12,7 @@
 namespace ktp {
 
 using FPointsVector = std::vector<SDL_FPoint>;
+using B2Vec2Vector = std::vector<b2Vec2>;
 
 class EmitterGraphicsComponent;
 class EmitterPhysicsComponent;
@@ -65,7 +66,7 @@ class PlayerPhysicsComponent: public PhysicsComponent {
 
  private:
 
-  static void generatePlayerShape(FPointsVector& shape, FPointsVector& flame_shape, float size);
+  static void generatePlayerShape(B2Vec2Vector& shape, FPointsVector& flame_shape, float size);
   void checkWrap();
   void setBox2D();
   void transformRenderShape();

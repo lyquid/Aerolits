@@ -8,7 +8,7 @@
 
 namespace ktp {
 
-using FPointsVector = std::vector<SDL_FPoint>;
+using B2Vec2Vector = std::vector<b2Vec2>;
 
 class PhysicsComponent {
 
@@ -34,10 +34,10 @@ class PhysicsComponent {
   static SDL_FPoint b2_screen_size_;
   static b2World*   world_;
 
-  b2Body*       body_ {nullptr};
-  FPointsVector shape_ {};
-  float         size_ {};
-  bool          to_be_deleted_ {false};
+  b2Body*      body_ {nullptr};
+  B2Vec2Vector shape_ {};
+  float        size_ {};
+  bool         to_be_deleted_ {false};
 };
 
 } // namespace ktp

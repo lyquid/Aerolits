@@ -107,7 +107,7 @@ void ktp::PlayerPhysicsComponent::checkWrap() {
   }
 }
 
-void ktp::PlayerPhysicsComponent::generatePlayerShape(FPointsVector& shape, FPointsVector& flame_shape, float size) {
+void ktp::PlayerPhysicsComponent::generatePlayerShape(B2Vec2Vector& shape, FPointsVector& flame_shape, float size) {
   shape.push_back({          0.f, -size * 0.50f}); // top
   shape.push_back({-size * 0.33f,  size * 0.50f}); // left
   shape.push_back({-size * 0.15f,  size * 0.33f}); // left flap

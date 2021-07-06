@@ -10,7 +10,7 @@
 
 namespace ktp {
 
-using FPointsVector = std::vector<SDL_FPoint>;
+using B2Vec2Vector = std::vector<b2Vec2>;
 
 class GameEntity;
 class SDL2_Renderer;
@@ -41,7 +41,7 @@ class AerolitePhysicsComponent: public PhysicsComponent {
 
  private:
 
-  static void generateAeroliteShape(FPointsVector& shape, float size);
+  static void generateAeroliteShape(B2Vec2Vector& shape, float size);
   void transformRenderShape();
 
   static constexpr float kKgPerMeter2_ {20.f};

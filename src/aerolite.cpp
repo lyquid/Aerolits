@@ -49,7 +49,7 @@ ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(Aerolite
   return *this;
 }
 
-void ktp::AerolitePhysicsComponent::generateAeroliteShape(FPointsVector& shape, float size) {
+void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, float size) {
   shape.push_back({-size * 0.5f, -size * 0.5f});
   shape.push_back({ size * 0.5f, -size * 0.5f});
   shape.push_back({ size * 0.5f,  size * 0.5f});

@@ -31,7 +31,7 @@ class GameState {
   void setWindowTitle(Game& game);
 };
 
-class DemoState : public GameState {
+class DemoState: public GameState {
  public:
   virtual void draw(Game& game) override;
   virtual void handleEvents(Game& game) override;
@@ -44,7 +44,7 @@ class DemoState : public GameState {
   bool blink_flag_ {true};
 };
 
-class PausedState : public GameState {
+class PausedState: public GameState {
  public:
   virtual void draw(Game& game) override;
   virtual void handleEvents(Game& game) override;
@@ -57,7 +57,7 @@ class PausedState : public GameState {
   bool blink_flag_ {true};
 };
 
-class PlayingState : public GameState {
+class PlayingState: public GameState {
  public:
   virtual void draw(Game& game) override;
   virtual void handleEvents(Game& game) override;
@@ -68,7 +68,7 @@ class PlayingState : public GameState {
   SDL_Event sdl_event_ {};
 };
 
-class TitleState : public GameState {
+class TitleState: public GameState {
  public:
   virtual void draw(Game& game) override;
   virtual void handleEvents(Game& game) override;

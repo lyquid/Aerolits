@@ -7,7 +7,7 @@
 
 namespace ktp {
 
-using FPointsVector = std::vector<SDL_FPoint>;
+using B2Vec2Vector = std::vector<b2Vec2>;
 
 class GameEntity;
 class SDL2_Renderer;
@@ -37,11 +37,11 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
 
  private:
 
-  static void generateProjectileShape(FPointsVector& shape, float size);
+  static void generateProjectileShape(B2Vec2Vector& shape, float size);
   void transformRenderShape();
   static constexpr float kDefaultProjectileSize_ {0.15f};
   static constexpr float kDefaultProjectileSpeed_ {30.f};
-  
+
   ProjectileGraphicsComponent* graphics_ {nullptr};
 };
 

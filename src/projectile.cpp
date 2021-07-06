@@ -52,7 +52,7 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
   return *this;
 }
 
-void ktp::ProjectilePhysicsComponent::generateProjectileShape(FPointsVector& shape, float size) {
+void ktp::ProjectilePhysicsComponent::generateProjectileShape(B2Vec2Vector& shape, float size) {
   shape.push_back({-size * 0.15f, -size}); // top left
   shape.push_back({-size * 0.15f,  size}); // down left
   shape.push_back({ size * 0.15f,  size}); // down right

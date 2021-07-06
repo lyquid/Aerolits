@@ -7,7 +7,7 @@
 
 namespace ktp {
 
-class DebugDraw : public b2Draw {
+class DebugDraw: public b2Draw {
  public:
 
   void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) {
@@ -68,7 +68,7 @@ class DebugDraw : public b2Draw {
 
     renderer_->setDrawColor(0, 255, 0, 0);
     p2 = p1 - axis_scale * xf.q.GetYAxis();
-    renderer_->drawLine(p1.x * kMetersToPixels, p1.y * kMetersToPixels, p2.x * kMetersToPixels, p2.y * kMetersToPixels);  
+    renderer_->drawLine(p1.x * kMetersToPixels, p1.y * kMetersToPixels, p2.x * kMetersToPixels, p2.y * kMetersToPixels);
   }
 
   inline void setRenderer(const SDL2_Renderer* ren) { renderer_ = ren; }
