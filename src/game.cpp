@@ -25,9 +25,9 @@ ktp::Game::Game() {
 }
 
 void ktp::Game::clean() {
-  ktp::SDL2_Audio::closeMixer();
-  ktp::SDL2_Font::closeTTF();
-  ktp::SDL2_Image::closeImage();
+  SDL2_Audio::closeMixer();
+  SDL2_Font::closeTTF();
+  SDL2_Image::closeImage();
 	SDL_Quit();
 }
 
@@ -59,12 +59,12 @@ bool ktp::Game::init() {
 
 bool ktp::Game::initSDL2() {
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-    ktp::logSDL2Error("SDL_Init");
+    logSDL2Error("SDL_Init");
     return false;
   }
-  if (!ktp::SDL2_Image::initImage()) return false;
-  if (!ktp::SDL2_Font::initTTF()) return false;
-  if (!ktp::SDL2_Audio::initMixer()) return false;
+  if (!SDL2_Image::initImage()) return false;
+  if (!SDL2_Font::initTTF()) return false;
+  if (!SDL2_Audio::initMixer()) return false;
 
   return true;
 }
