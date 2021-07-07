@@ -66,7 +66,7 @@ void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, f
 }
 
 ktp::GameEntity ktp::AerolitePhysicsComponent::spawnAerolite() {
-  GameEntity aerolite {GameEntities::Aerolite};
+  GameEntity aerolite {GameEntity::createEntity(GameEntities::Aerolite)};
   static int side {};
   const float delta {kMaxSpeed_ * generateRand(0.1f, 1.f)};
   switch (side) {

@@ -31,37 +31,15 @@ enum class GameEntities {
 class SDL2_Renderer;
 
 class GameEntity {
+
+  friend class DemoState;
+  friend class PlayingState;
+  friend class InputComponent;
+  friend class AerolitePhysicsComponent;
+  friend class EmitterPhysicsComponent;
+  friend class PlayerPhysicsComponent;
+
  public:
-  GameEntity() = delete;
-  GameEntity(/* kuge::EventBus& event_bus,  */GameEntities type)/* : event_bus_(event_bus)  */{
-    switch (type) {
-      case GameEntities::Aerolite:
-        graphics_ = std::make_unique<AeroliteGraphicsComponent>();
-        physics_  = std::make_unique<AerolitePhysicsComponent>(static_cast<AeroliteGraphicsComponent*>(graphics_.get()));
-        break;
-      case GameEntities::Background:
-        graphics_ = std::make_unique<BackgroundGraphicsComponent>();
-        physics_  = std::make_unique<BackgroundPhysicsComponent>(static_cast<BackgroundGraphicsComponent*>(graphics_.get()));
-        break;
-      case GameEntities::Player:
-        graphics_ = std::make_unique<PlayerGraphicsComponent>();
-        physics_  = std::make_unique<PlayerPhysicsComponent>(static_cast<PlayerGraphicsComponent*>(graphics_.get()));
-        input_    = std::make_unique<PlayerInputComponent>(static_cast<PlayerPhysicsComponent*>(physics_.get()));
-        break;
-      case GameEntities::PlayerDemo:
-        graphics_ = std::make_unique<PlayerGraphicsComponent>();
-        physics_  = std::make_unique<PlayerPhysicsComponent>(static_cast<PlayerGraphicsComponent*>(graphics_.get()));
-        input_    = std::make_unique<DemoInputComponent>(static_cast<PlayerPhysicsComponent*>(physics_.get()));
-        break;
-      case GameEntities::Projectile:
-        graphics_ = std::make_unique<ProjectileGraphicsComponent>();
-        physics_  = std::make_unique<ProjectilePhysicsComponent>(static_cast<ProjectileGraphicsComponent*>(graphics_.get()));
-        break;
-      default:
-        // boom!
-        break;
-    }
-  }
 
   GameEntity(const GameEntity& other) = delete;
   GameEntity(GameEntity&& other) { *this = std::move(other); }
@@ -69,16 +47,50 @@ class GameEntity {
   GameEntity& operator=(const GameEntity& other) = delete;
   GameEntity& operator=(GameEntity&& other) noexcept {
     if (this != &other) {
-      delta_ = other.delta_;
+      delta_    = other.delta_;
       graphics_ = std::move(other.graphics_);
-      input_ = std::move(other.input_);
-      physics_ = std::move(other.physics_);
+      input_    = std::move(other.input_);
+      physics_  = std::move(other.physics_);
 
       other.graphics_ = nullptr;
-      other.input_ = nullptr;
-      other.physics_ = nullptr;
+      other.input_    = nullptr;
+      other.physics_  = nullptr;
     }
     return *this;
+  }
+
+  static GameEntity createEntity(GameEntities type) {
+    GameEntity entity {};
+    switch (type) {
+      case GameEntities::Aerolite:
+        entity.graphics_ = std::make_unique<AeroliteGraphicsComponent>();
+        entity.physics_  = std::make_unique<AerolitePhysicsComponent>(static_cast<AeroliteGraphicsComponent*>(entity.graphics_.get()));
+        break;
+      case GameEntities::Background:
+        entity.graphics_ = std::make_unique<BackgroundGraphicsComponent>();
+        entity.physics_  = std::make_unique<BackgroundPhysicsComponent>(static_cast<BackgroundGraphicsComponent*>(entity.graphics_.get()));
+        break;
+      case GameEntities::Player:
+        entity.graphics_ = std::make_unique<PlayerGraphicsComponent>();
+        entity.physics_  = std::make_unique<PlayerPhysicsComponent>(static_cast<PlayerGraphicsComponent*>(entity.graphics_.get()));
+        entity.input_    = std::make_unique<PlayerInputComponent>(static_cast<PlayerPhysicsComponent*>(entity.physics_.get()));
+        break;
+      case GameEntities::PlayerDemo:
+        entity.graphics_ = std::make_unique<PlayerGraphicsComponent>();
+        entity.physics_  = std::make_unique<PlayerPhysicsComponent>(static_cast<PlayerGraphicsComponent*>(entity.graphics_.get()));
+        entity.input_    = std::make_unique<DemoInputComponent>(static_cast<PlayerPhysicsComponent*>(entity.physics_.get()));
+        break;
+      case GameEntities::Projectile:
+        entity.graphics_ = std::make_unique<ProjectileGraphicsComponent>();
+        entity.physics_  = std::make_unique<ProjectilePhysicsComponent>(static_cast<ProjectileGraphicsComponent*>(entity.graphics_.get()));
+        break;
+      case GameEntities::count:
+        [[fallthrought]]
+      default:
+        // boom!
+        break;
+    }
+    return std::move(entity);
   }
 
   inline void draw(const SDL2_Renderer& renderer) const {
@@ -92,12 +104,7 @@ class GameEntity {
 
  private:
 
-  friend class DemoState;
-  friend class PlayingState;
-  friend class InputComponent;
-  friend class AerolitePhysicsComponent;
-  friend class EmitterPhysicsComponent;
-  friend class PlayerPhysicsComponent;
+  GameEntity() {}
 
   SDL_FPoint      delta_ {};
   Graphics        graphics_ {nullptr};

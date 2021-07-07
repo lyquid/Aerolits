@@ -8,7 +8,7 @@
 
 void ktp::InputComponent::shoot(GameEntity& player) {
   if (SDL_GetTicks() - shooting_timer_ > shooting_interval_) {
-    GameEntity projectile {GameEntities::Projectile};
+    GameEntity projectile {GameEntity::createEntity(GameEntities::Projectile)};
 
     const auto sin {SDL_sinf(player.physics_->body_->GetAngle())};
     const auto cos {SDL_cosf(player.physics_->body_->GetAngle())};

@@ -53,7 +53,7 @@ void ktp::DemoState::draw(Game& game) {
 }
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
-  game.player_ = std::make_unique<GameEntity>(GameEntities::PlayerDemo);
+  game.player_ = std::make_unique<GameEntity>(GameEntity::createEntity(GameEntities::PlayerDemo));
   blink_flag_ = true;
   blink_timer_ = SDL2_Timer::getSDL2Ticks();
   return this;
@@ -348,8 +348,8 @@ void ktp::TitleState::draw(Game& game) {
 
 ktp::GameState* ktp::TitleState::enter(Game& game) {
   game.reset();
-  game.background_ = std::make_unique<GameEntity>(GameEntities::Background);
-  game.player_ = std::make_unique<GameEntity>(GameEntities::Player);
+  game.background_ = std::make_unique<GameEntity>(GameEntity::createEntity(GameEntities::Background));
+  game.player_ = std::make_unique<GameEntity>(GameEntity::createEntity(GameEntities::Player));
   demo_time_ = SDL2_Timer::getSDL2Ticks();
   return this;
 }
