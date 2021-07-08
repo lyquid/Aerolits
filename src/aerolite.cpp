@@ -27,7 +27,8 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(AeroliteGraphicsComponen
   body_ = world_->CreateBody(&body_def);
 
   b2PolygonShape dynamic_box {};
-  dynamic_box.SetAsBox(size_ * 0.5f, size_ * 0.5f);
+  // you need the -1 because shape_ is always sides + 1 due to the closing point
+  dynamic_box.Set(shape_.data(), shape_.size() - 1);
 
   b2FixtureDef fixture_def {};
   fixture_def.shape = &dynamic_box;
@@ -57,11 +58,16 @@ ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(Aerolite
 }
 
 void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, float size) {
-  shape.push_back({-size * 0.5f, -size * 0.5f});
-  shape.push_back({ size * 0.5f, -size * 0.5f});
-  shape.push_back({ size * 0.5f,  size * 0.5f});
-  shape.push_back({-size * 0.5f,  size * 0.5f});
-  shape.push_back({-size * 0.5f, -size * 0.5f});
+  const auto sides {generateRand(kMinSides_, kMaxSides_)};
+  constexpr auto kPI {3.14159265358979323846264338327950288};
+  b2Vec2 point {};
+  for (auto i = 0u; i < sides; ++i) {
+    point.x = size * SDL_cosf(2 * kPI * i / sides);
+    point.y = size * SDL_sinf(2 * kPI * i / sides);
+    shape.push_back(point);
+  }
+  // this is the closing point == first point
+  shape.push_back(shape.front());
   shape.shrink_to_fit();
 }
 

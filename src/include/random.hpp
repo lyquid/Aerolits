@@ -6,11 +6,11 @@
 namespace ktp {
 
 /**
- * @brief 
- * 
- * @param min 
- * @param max 
- * @return int 
+ * @brief
+ *
+ * @param min
+ * @param max
+ * @return int
  */
 inline int generateRand(int min, int max) {
   //const auto random {rand() / RAND_MAX};
@@ -19,11 +19,22 @@ inline int generateRand(int min, int max) {
 }
 
 /**
- * @brief 
- * 
- * @param min 
- * @param max 
- * @return float 
+ * @brief
+ *
+ * @param min
+ * @param max
+ * @return int
+ */
+inline auto generateRand(unsigned int min, unsigned int max) {
+  return min + (rand() % (max - min + 1));
+}
+
+/**
+ * @brief
+ *
+ * @param min
+ * @param max
+ * @return float
  */
 inline float generateRand(float min, float max) {
   const auto random {static_cast<float>(rand()) / static_cast<float>(RAND_MAX)};
@@ -31,11 +42,11 @@ inline float generateRand(float min, float max) {
 }
 
 /**
- * @brief 
- * 
- * @param min 
- * @param max 
- * @return double 
+ * @brief
+ *
+ * @param min
+ * @param max
+ * @return double
  */
 inline double generateRand(double min, double max) {
   const auto random{static_cast<double>(rand()) / static_cast<double>(RAND_MAX)};
