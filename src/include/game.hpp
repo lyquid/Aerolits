@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_INCLUDE_GAME_HPP_
 
 #include "background.hpp"
+#include "contact_listener.hpp"
 #include "debug_draw.hpp"
 #include "game_entity.hpp"
 #include "game_state.hpp"
@@ -14,11 +15,16 @@
 
 namespace ktp {
 
-class Emitter;
-
 void loadConfigFiles();
 
 class Game {
+
+  friend class DemoState;
+  friend class GameState;
+  friend class InputComponent;
+  friend class PausedState;
+  friend class PlayingState;
+  friend class TitleState;
 
  public:
 
@@ -39,13 +45,6 @@ class Game {
   inline void update(float delta_time) { state_->update(*this, delta_time); }
 
  private:
-
-  friend class GameState;
-  friend class DemoState;
-  friend class PausedState;
-  friend class PlayingState;
-  friend class TitleState;
-  friend class InputComponent;
 
   void clean();
   bool initSDL2();
@@ -73,6 +72,7 @@ class Game {
   int32 position_iterations_ {3};
   DebugDraw debug_draw_ {};
   bool debug_draw_on_ {false};
+  ContactListener contact_listener_ {};
   /* Player */
   std::unique_ptr<GameEntity> player_ {};
   /* Background */

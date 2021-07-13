@@ -123,7 +123,7 @@ void ktp::DemoState::update(Game& game, float delta_time) {
       ++aerolite;
     }
   }
-  if (game.aerolites_.size() < 4) {
+  if (game.aerolites_.size() < 1) {
     game.aerolites_.push_back(AerolitePhysicsComponent::spawnAerolite());
   }
   // Projectiles
@@ -315,7 +315,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
       ++aerolite;
     }
   }
-  if (game.aerolites_.size() < 4) {
+  if (game.aerolites_.size() < 1) {
     game.aerolites_.push_back(AerolitePhysicsComponent::spawnAerolite());
   }
   // Projectiles

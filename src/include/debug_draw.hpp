@@ -4,6 +4,7 @@
 #include "box2d_scale.hpp"
 #include "../../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <box2d/box2d.h>
+#include <vector>
 
 namespace ktp {
 
@@ -15,7 +16,7 @@ class DebugDraw: public b2Draw {
     renderer_->setDrawColor(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
   }
 
-  void DrawPoint (const b2Vec2 &p, float size, const b2Color &color) {
+  void DrawPoint(const b2Vec2 &p, float size, const b2Color &color) {
     // missing the size param
     renderer_->setDrawColor(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
     renderer_->drawPoint(p.x * kMetersToPixels, p.y * kMetersToPixels);
@@ -23,14 +24,13 @@ class DebugDraw: public b2Draw {
 
   void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) {
     renderer_->setDrawColor(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
-    SDL_FPoint* points = new SDL_FPoint[vertexCount + 1];
+    std::vector<SDL_FPoint> points(vertexCount + 1);
     for (auto i = 0; i < vertexCount; ++i) {
       points[i].x = vertices[i].x * kMetersToPixels;
       points[i].y = vertices[i].y * kMetersToPixels;
     }
     points[vertexCount] = points[0];
-    SDL_RenderDrawLinesF(renderer_->getRenderer(), points, vertexCount + 1);
-    delete[] points;
+    SDL_RenderDrawLinesF(renderer_->getRenderer(), points.data(), vertexCount + 1);
   }
 
   void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) {
@@ -41,14 +41,13 @@ class DebugDraw: public b2Draw {
   void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) {
     // not yet solid
     renderer_->setDrawColor(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
-    SDL_FPoint* points = new SDL_FPoint[vertexCount + 1];
+    std::vector<SDL_FPoint> points(vertexCount + 1);
     for (auto i = 0; i < vertexCount; ++i) {
       points[i].x = vertices[i].x * kMetersToPixels;
       points[i].y = vertices[i].y * kMetersToPixels;
     }
     points[vertexCount] = points[0];
-    SDL_RenderDrawLinesF(renderer_->getRenderer(), points, vertexCount + 1);
-    delete[] points;
+    SDL_RenderDrawLinesF(renderer_->getRenderer(), points.data(), vertexCount + 1);
   }
 
   void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) {
@@ -57,7 +56,7 @@ class DebugDraw: public b2Draw {
   }
 
   void DrawTransform(const b2Transform& xf) {
-    const float axis_scale {0.4f};
+    constexpr float axis_scale {0.4f};
 
     const b2Vec2 p1 {xf.p};
     b2Vec2 p2 {};

@@ -41,6 +41,7 @@ bool ktp::Game::init() {
   debug_draw_.setRenderer(&renderer_);
   world_.SetDebugDraw(&debug_draw_);
   debug_draw_.SetFlags(b2Draw::e_shapeBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
+  world_.SetContactListener(&contact_listener_);
 
   PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});
   PhysicsComponent::setWorld(&world_);
