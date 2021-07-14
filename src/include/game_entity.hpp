@@ -11,10 +11,11 @@
 #include "projectile.hpp"
 #include "../../kuge/kuge.hpp"
 #include <memory>
-#include <utility> // std::move
+#include <utility> // std::move std::exchange
 
 namespace ktp {
 
+using EntityId = unsigned int;
 using Graphics = std::unique_ptr<GraphicsComponent>;
 using Input    = std::unique_ptr<InputComponent>;
 using Physics  = std::unique_ptr<PhysicsComponent>;
@@ -42,25 +43,27 @@ class GameEntity {
  public:
 
   GameEntity(const GameEntity& other) = delete;
-  GameEntity(GameEntity&& other) { *this = std::move(other); }
+  GameEntity(GameEntity&& other):
+   id_(other.id_),
+   type_(other.type_) {
+    *this = std::move(other);
+    ++count_;
+  }
+  ~GameEntity() { --count_; }
 
   GameEntity& operator=(const GameEntity& other) = delete;
   GameEntity& operator=(GameEntity&& other) noexcept {
     if (this != &other) {
       delta_    = other.delta_;
-      graphics_ = std::move(other.graphics_);
-      input_    = std::move(other.input_);
-      physics_  = std::move(other.physics_);
-
-      other.graphics_ = nullptr;
-      other.input_    = nullptr;
-      other.physics_  = nullptr;
+      graphics_ = std::exchange(other.graphics_, nullptr);
+      input_    = std::exchange(other.input_, nullptr);
+      physics_  = std::exchange(other.physics_, nullptr);
     }
     return *this;
   }
 
   static GameEntity createEntity(GameEntities type) {
-    GameEntity entity {};
+    GameEntity entity {type};
     switch (type) {
       case GameEntities::Aerolite:
         entity.graphics_ = std::make_unique<AeroliteGraphicsComponent>();
@@ -93,9 +96,15 @@ class GameEntity {
     return std::move(entity);
   }
 
+  inline static auto count() { return count_; }
+
+  inline static auto currentId() { return current_id_; }
+
   inline void draw(const SDL2_Renderer& renderer) const {
     if (graphics_) graphics_->update(*this, renderer);
   }
+
+  inline EntityId id() const { return id_; }
 
   inline void update(float delta_time) {
     if (input_) input_->update(*this, delta_time);
@@ -104,9 +113,21 @@ class GameEntity {
 
  private:
 
-  GameEntity() {}
+  GameEntity(GameEntities type):
+   id_(getId()),
+   type_(type) {
+    ++count_;
+  }
 
-  SDL_FPoint      delta_ {};
+  inline static EntityId getId() { return current_id_++; }
+
+  // defined in game.cpp
+  static EntityId count_;
+  static EntityId current_id_;
+
+  const EntityId     id_;
+  const GameEntities type_;
+  SDL_FPoint      delta_ {}; // i dont like this here
   Graphics        graphics_ {nullptr};
   Input           input_ {nullptr};
   Physics         physics_ {nullptr};

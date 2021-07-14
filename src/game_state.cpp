@@ -14,7 +14,9 @@ ktp::TitleState   ktp::GameState::title_ {};
 void ktp::GameState::setWindowTitle(Game& game) {
   game.main_window_.setTitle(
     game.kGameTitle_
-    + " - Frame time " + std::to_string(static_cast<int>(game.frame_time_ * 1000)) + "ms."
+    + " - Frame time: " + std::to_string((int)(game.frame_time_ * 1000)) + "ms."
+    + " - GameEntities: " + std::to_string(GameEntity::count())
+    + " - Bodies: " + std::to_string(game.world_.GetBodyCount())
   );
 }
 
@@ -42,7 +44,7 @@ void ktp::DemoState::draw(Game& game) {
   if (blink_flag_) {
     const int w = game.screen_size_.x * 0.2f;
     const int h = game.screen_size_.y * 0.1f;
-    game.demo_text_.render({static_cast<int>(game.screen_size_.x * 0.5f - w * 0.5f), static_cast<int>(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
+    game.demo_text_.render({(int)(game.screen_size_.x * 0.5f - w * 0.5f), (int)(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
   }
   if (SDL2_Timer::getSDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
@@ -164,7 +166,7 @@ void ktp::PausedState::draw(Game& game) {
   if (blink_flag_) {
     const int w = game.screen_size_.x * 0.1f;
     const int h = game.screen_size_.y * 0.05f;
-    game.paused_text_.render({static_cast<int>(game.screen_size_.x * 0.5f - w * 0.5f), static_cast<int>(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
+    game.paused_text_.render({(int)(game.screen_size_.x * 0.5f - w * 0.5f), (int)(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
   }
   if (SDL2_Timer::getSDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
@@ -341,7 +343,7 @@ void ktp::TitleState::draw(Game& game) {
 
   const int w = game.screen_size_.x * 0.75f;
   const int h = game.screen_size_.y * 0.50f;
-  game.title_text_.render({static_cast<int>(game.screen_size_.x * 0.5f - w * 0.5f), static_cast<int>(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
+  game.title_text_.render({(int)(game.screen_size_.x * 0.5f - w * 0.5f), (int)(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
 
   game.renderer_.present();
 }

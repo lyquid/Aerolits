@@ -10,6 +10,9 @@ void ktp::loadConfigFiles() {
 
 /* GAME */
 
+ktp::EntityId ktp::GameEntity::count_ {0};
+ktp::EntityId ktp::GameEntity::current_id_ {0};
+
 std::vector<ktp::GameEntity> ktp::Game::aerolites_ {};
 std::vector<ktp::GameEntity> ktp::Game::emitters_ {};
 std::vector<ktp::GameEntity> ktp::Game::projectiles_ {};
