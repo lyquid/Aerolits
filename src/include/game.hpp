@@ -41,7 +41,7 @@ class Game {
   bool init();
   inline void setFrameTime(double time) { frame_time_ = time; }
   inline bool quit() const { return quit_; }
-  inline void reset() { aerolites_.clear(); projectiles_.clear(); }
+  inline void reset() { GameEntity::game_entities_.clear(); }
   inline void update(float delta_time) { state_->update(*this, delta_time); }
 
  private:
@@ -74,15 +74,15 @@ class Game {
   bool debug_draw_on_ {false};
   ContactListener contact_listener_ {};
   /* Player */
-  std::unique_ptr<GameEntity> player_ {};
+  //std::unique_ptr<GameEntity> player_ {};
   /* Background */
-  std::unique_ptr<GameEntity> background_ {};
+  //std::unique_ptr<GameEntity> background_ {};
   /* Emitters */
-  static std::vector<GameEntity> emitters_;
+  // static std::vector<GameEntity> emitters_;
   /* Aerolites */
-  static std::vector<GameEntity> aerolites_;
+  //static std::vector<GameEntity> aerolites_;
   /* Projectiles */
-  static std::vector<GameEntity> projectiles_;
+  //static std::vector<GameEntity> projectiles_;
   /* Game texts */
   SDL2_Texture demo_text_ {};
   SDL2_Texture paused_text_ {};

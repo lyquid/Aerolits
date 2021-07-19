@@ -43,16 +43,13 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(AeroliteGraphicsComponen
 ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) noexcept {
   if (this != &other) {
     // inherited members
-    body_          = other.body_;
+    body_          = std::exchange(other.body_, nullptr);
     shape_         = std::move(other.shape_);
     size_          = other.size_;
     to_be_deleted_ = other.to_be_deleted_;
     // own members
-    graphics_ = other.graphics_;
+    graphics_ = std::exchange(other.graphics_, nullptr);
     aabb_     = std::move(other.aabb_);
-    // tidy
-    other.body_     = nullptr;
-    other.graphics_ = nullptr;
   }
   return *this;
 }
@@ -71,33 +68,32 @@ void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, f
   shape.shrink_to_fit();
 }
 
-ktp::GameEntity ktp::AerolitePhysicsComponent::spawnAerolite() {
-  GameEntity aerolite {GameEntity::createEntity(GameEntities::Aerolite)};
+void ktp::AerolitePhysicsComponent::spawnAerolite() {
+  const auto aerolite {GameEntity::createEntity(EntityTypes::Aerolite)};
   static int side {};
   const float delta {kMaxSpeed_ * generateRand(0.1f, 1.f)};
   switch (side) {
     case 0: // up
-      aerolite.physics_->getBody()->SetTransform({b2_screen_size_.x * 0.5f, 0.f}, aerolite.physics_->getBody()->GetAngle());
-      aerolite.physics_->getBody()->SetLinearVelocity({0, delta});
+      aerolite->physics_->getBody()->SetTransform({b2_screen_size_.x * 0.5f, 0.f}, aerolite->physics_->getBody()->GetAngle());
+      aerolite->physics_->getBody()->SetLinearVelocity({0, delta});
       ++side;
       break;
     case 1: // right
-      aerolite.physics_->getBody()->SetTransform({b2_screen_size_.x, b2_screen_size_.y * 0.5f}, aerolite.physics_->getBody()->GetAngle());
-      aerolite.physics_->getBody()->SetLinearVelocity({-delta, 0});
+      aerolite->physics_->getBody()->SetTransform({b2_screen_size_.x, b2_screen_size_.y * 0.5f}, aerolite->physics_->getBody()->GetAngle());
+      aerolite->physics_->getBody()->SetLinearVelocity({-delta, 0});
       ++side;
       break;
     case 2: // down
-      aerolite.physics_->getBody()->SetTransform({b2_screen_size_.x * 0.5f, b2_screen_size_.y}, aerolite.physics_->getBody()->GetAngle());
-      aerolite.physics_->getBody()->SetLinearVelocity({0, -delta});
+      aerolite->physics_->getBody()->SetTransform({b2_screen_size_.x * 0.5f, b2_screen_size_.y}, aerolite->physics_->getBody()->GetAngle());
+      aerolite->physics_->getBody()->SetLinearVelocity({0, -delta});
       ++side;
       break;
     case 3: // left
-      aerolite.physics_->getBody()->SetTransform({0.f, b2_screen_size_.y * 0.5f}, aerolite.physics_->getBody()->GetAngle());
-      aerolite.physics_->getBody()->SetLinearVelocity({delta, 0});
+      aerolite->physics_->getBody()->SetTransform({0.f, b2_screen_size_.y * 0.5f}, aerolite->physics_->getBody()->GetAngle());
+      aerolite->physics_->getBody()->SetLinearVelocity({delta, 0});
       side = 0;
       break;
   }
-  return std::move(aerolite);
 }
 
 void ktp::AerolitePhysicsComponent::transformRenderShape() {

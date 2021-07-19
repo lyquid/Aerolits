@@ -5,7 +5,7 @@
 #include "physics_component.hpp"
 #include <box2d/box2d.h>
 #include <SDL.h>
-#include <utility> // std::move
+#include <utility> // std::move std::exchange
 #include <vector>
 
 namespace ktp {
@@ -36,7 +36,7 @@ class AerolitePhysicsComponent: public PhysicsComponent {
 
   inline float getMaxSpeed() const { return kMaxSpeed_; }
   virtual void setPosition(const SDL_FPoint& pos) override {}
-  static GameEntity spawnAerolite();
+  static void spawnAerolite();
   virtual void update(const GameEntity& aerolite, float delta_time) override;
 
  private:

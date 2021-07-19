@@ -10,6 +10,7 @@
 #include "player.hpp"
 #include "projectile.hpp"
 #include "../../kuge/kuge.hpp"
+#include <list>
 #include <memory>
 #include <utility> // std::move std::exchange
 
@@ -19,8 +20,9 @@ using EntityId = unsigned int;
 using Graphics = std::unique_ptr<GraphicsComponent>;
 using Input    = std::unique_ptr<InputComponent>;
 using Physics  = std::unique_ptr<PhysicsComponent>;
+using Entities = std::list<GameEntity>;
 
-enum class GameEntities {
+enum class EntityTypes {
   Aerolite,
   Background,
   Player,
@@ -48,8 +50,13 @@ class GameEntity {
    type_(other.type_) {
     *this = std::move(other);
     ++count_;
+    if (type_ == EntityTypes::Aerolite) ++aerolite_count_;
   }
-  ~GameEntity() { --count_; }
+  
+  ~GameEntity() {
+    --count_;
+    if (type_ == EntityTypes::Aerolite) --aerolite_count_;
+  }
 
   GameEntity& operator=(const GameEntity& other) = delete;
   GameEntity& operator=(GameEntity&& other) noexcept {
@@ -62,38 +69,39 @@ class GameEntity {
     return *this;
   }
 
-  static GameEntity createEntity(GameEntities type) {
+  static auto createEntity(EntityTypes type) {
     GameEntity entity {type};
     switch (type) {
-      case GameEntities::Aerolite:
+      case EntityTypes::Aerolite:
         entity.graphics_ = std::make_unique<AeroliteGraphicsComponent>();
         entity.physics_  = std::make_unique<AerolitePhysicsComponent>(static_cast<AeroliteGraphicsComponent*>(entity.graphics_.get()));
         break;
-      case GameEntities::Background:
+      case EntityTypes::Background:
         entity.graphics_ = std::make_unique<BackgroundGraphicsComponent>();
         entity.physics_  = std::make_unique<BackgroundPhysicsComponent>(static_cast<BackgroundGraphicsComponent*>(entity.graphics_.get()));
         break;
-      case GameEntities::Player:
+      case EntityTypes::Player:
         entity.graphics_ = std::make_unique<PlayerGraphicsComponent>();
         entity.physics_  = std::make_unique<PlayerPhysicsComponent>(static_cast<PlayerGraphicsComponent*>(entity.graphics_.get()));
         entity.input_    = std::make_unique<PlayerInputComponent>(static_cast<PlayerPhysicsComponent*>(entity.physics_.get()));
         break;
-      case GameEntities::PlayerDemo:
+      case EntityTypes::PlayerDemo:
         entity.graphics_ = std::make_unique<PlayerGraphicsComponent>();
         entity.physics_  = std::make_unique<PlayerPhysicsComponent>(static_cast<PlayerGraphicsComponent*>(entity.graphics_.get()));
         entity.input_    = std::make_unique<DemoInputComponent>(static_cast<PlayerPhysicsComponent*>(entity.physics_.get()));
         break;
-      case GameEntities::Projectile:
+      case EntityTypes::Projectile:
         entity.graphics_ = std::make_unique<ProjectileGraphicsComponent>();
         entity.physics_  = std::make_unique<ProjectilePhysicsComponent>(static_cast<ProjectileGraphicsComponent*>(entity.graphics_.get()));
         break;
-      case GameEntities::count:
+      case EntityTypes::count:
         [[fallthrought]]
       default:
         // boom!
         break;
     }
-    return std::move(entity);
+    game_entities_.push_back(std::move(entity));
+    return &game_entities_.back();
   }
 
   inline static auto count() { return count_; }
@@ -104,19 +112,26 @@ class GameEntity {
     if (graphics_) graphics_->update(*this, renderer);
   }
 
-  inline EntityId id() const { return id_; }
+  inline auto id() const { return id_; }
+
+  static inline bool isPlayer(const GameEntity& entity) { return entity.type_ == EntityTypes::Player; }
+
+  inline auto type() const { return type_; }
 
   inline void update(float delta_time) {
     if (input_) input_->update(*this, delta_time);
     if (physics_) physics_->update(*this, delta_time);
   }
 
+  static Entities game_entities_;
+
  private:
 
-  GameEntity(GameEntities type):
+  GameEntity(EntityTypes type):
    id_(getId()),
    type_(type) {
     ++count_;
+    if (type_ == EntityTypes::Aerolite) ++aerolite_count_;
   }
 
   inline static EntityId getId() { return current_id_++; }
@@ -124,9 +139,10 @@ class GameEntity {
   // defined in game.cpp
   static EntityId count_;
   static EntityId current_id_;
+  static EntityId aerolite_count_;
 
-  const EntityId     id_;
-  const GameEntities type_;
+  const EntityId    id_;
+  const EntityTypes type_;
   SDL_FPoint      delta_ {}; // i dont like this here
   Graphics        graphics_ {nullptr};
   Input           input_ {nullptr};

@@ -12,19 +12,15 @@ void ktp::loadConfigFiles() {
 
 ktp::EntityId ktp::GameEntity::count_ {0};
 ktp::EntityId ktp::GameEntity::current_id_ {0};
+ktp::EntityId ktp::GameEntity::aerolite_count_ {0};
 
-std::vector<ktp::GameEntity> ktp::Game::aerolites_ {};
-std::vector<ktp::GameEntity> ktp::Game::emitters_ {};
-std::vector<ktp::GameEntity> ktp::Game::projectiles_ {};
+ktp::Entities ktp::GameEntity::game_entities_ {};
 
 SDL_FPoint ktp::PhysicsComponent::b2_screen_size_ {};
-b2World* ktp::PhysicsComponent::world_ {nullptr};
+b2World*   ktp::PhysicsComponent::world_ {nullptr};
 
 ktp::Game::Game() {
   event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);
-  // emitters_.reserve(40);
-  // aerolites_.reserve(200);
-  // projectiles_.reserve(200);
 }
 
 void ktp::Game::clean() {
