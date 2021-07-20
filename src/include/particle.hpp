@@ -15,11 +15,11 @@ namespace ParticlesAtlas {
   void loadTexture(SDL2_Renderer& ren);
   extern SDL2_Texture particles_atlas;
 
-} // end namespace TextureAtlas
+} // end namespace ParticlesAtlas
 
-using ColorsVector = std::vector<SDL_Color>;
+using ColorsVector  = std::vector<SDL_Color>;
 using FPointsVector = std::vector<SDL_FPoint>;
-using SizeVector = std::vector<float>;
+using SizeVector    = std::vector<float>;
 
 struct Vortex;
 

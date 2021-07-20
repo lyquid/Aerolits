@@ -1,11 +1,11 @@
+#include "include/emitter.hpp"
 #include "include/particle.hpp"
-#include "include/particle_system.hpp"
 #include "include/resources_path.hpp"
 #include "../sdl2_wrappers/sdl2_renderer.hpp"
 #include "../sdl2_wrappers/sdl2_texture.hpp"
 #include <string>
 
-ktp::SDL2_Texture ktp::ParticlesAtlas::particles_atlas{};
+ktp::SDL2_Texture ktp::ParticlesAtlas::particles_atlas {};
 
 void ktp::ParticlesAtlas::loadTexture(SDL2_Renderer& ren) {
   particles_atlas.setRenderer(ren);

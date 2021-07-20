@@ -36,34 +36,33 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   endif()
 endif()
 
-add_executable(	Aerolits  main.cpp
-													lib/pugixml1.11/pugixml.cpp
-													sdl2_wrappers/sdl2_audio.cpp
-													sdl2_wrappers/sdl2_font.cpp
-													sdl2_wrappers/sdl2_image.cpp
-													sdl2_wrappers/sdl2_music.cpp
-													sdl2_wrappers/sdl2_renderer.cpp
-													sdl2_wrappers/sdl2_sound.cpp
-													sdl2_wrappers/sdl2_texture.cpp
-													sdl2_wrappers/sdl2_timer.cpp
-													sdl2_wrappers/sdl2_window.cpp
-													kuge/event_bus.cpp
-													kuge/event.cpp
-													kuge/audio_system.cpp
-													kuge/input_system.cpp
-													kuge/output_system.cpp
-													kuge/system.cpp
-                          src/aerolite.cpp
-													src/background.cpp
-                          src/emitter.cpp
-													src/emitter_parser.cpp
-													src/game.cpp
-													src/game_state.cpp
-													src/particle.cpp
-													src/particle_system.cpp
-                          src/player.cpp
-													src/projectile.cpp
-													src/input_component.cpp )
+add_executable(Aerolits main.cpp
+                        lib/pugixml1.11/pugixml.cpp
+                        sdl2_wrappers/sdl2_audio.cpp
+                        sdl2_wrappers/sdl2_font.cpp
+                        sdl2_wrappers/sdl2_image.cpp
+                        sdl2_wrappers/sdl2_music.cpp
+                        sdl2_wrappers/sdl2_renderer.cpp
+                        sdl2_wrappers/sdl2_sound.cpp
+                        sdl2_wrappers/sdl2_texture.cpp
+                        sdl2_wrappers/sdl2_timer.cpp
+                        sdl2_wrappers/sdl2_window.cpp
+                        kuge/event_bus.cpp
+                        kuge/event.cpp
+                        kuge/audio_system.cpp
+                        kuge/input_system.cpp
+                        kuge/output_system.cpp
+                        kuge/system.cpp
+                        src/aerolite.cpp
+                        src/background.cpp
+                        src/emitter.cpp
+                        src/emitter_parser.cpp
+                        src/game.cpp
+                        src/game_state.cpp
+                        src/particle.cpp
+                        src/player.cpp
+                        src/projectile.cpp
+                        src/input_component.cpp)
 
 target_compile_features(Aerolits PUBLIC cxx_std_17)
 set_target_properties(Aerolits PROPERTIES CXX_EXTENSIONS OFF)
