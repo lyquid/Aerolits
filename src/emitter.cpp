@@ -25,17 +25,13 @@ ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhy
     size_          = other.size_;
     to_be_deleted_ = other.to_be_deleted_;
     // own members
-    graphics_              = other.graphics_;
+    graphics_              = std::exchange(other.graphics_, nullptr);
     alive_particles_count_ = other.alive_particles_count_;
-    data_                  = other.data_;
-    first_available_       = other.first_available_;
+    data_                  = std::exchange(other.data_, nullptr);
+    first_available_       = std::exchange(other.first_available_, nullptr);
     position_              = other.position_;
     start_time_            = other.start_time_;
     interval_time_         = other.interval_time_;
-    // tidy
-    other.graphics_        = nullptr;
-    other.data_            = nullptr;
-    other.first_available_ = nullptr;
   }
   return *this;
 }

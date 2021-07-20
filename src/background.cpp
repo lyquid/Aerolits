@@ -44,9 +44,7 @@ ktp::BackgroundPhysicsComponent& ktp::BackgroundPhysicsComponent::operator=(Back
     size_          = other.size_;
     to_be_deleted_ = other.to_be_deleted_;
     // own members
-    graphics_ = other.graphics_;
-    // tidy
-    other.graphics_ = nullptr;
+    graphics_ = std::exchange(other.graphics_, nullptr);
   }
   return *this;
 }

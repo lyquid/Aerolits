@@ -85,7 +85,7 @@ ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysic
     size_          = other.size_;
     to_be_deleted_ = other.to_be_deleted_;
     // own members
-    graphics_            = other.graphics_;
+    graphics_            = std::exchange(other.graphics_, nullptr);
     flame_shape_         = std::move(other.flame_shape_);
     thrusting_           = other.thrusting_;
     cos_                 = other.cos_;
@@ -93,8 +93,6 @@ ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysic
     flame_growth_factor_ = other.flame_growth_factor_;
     flame_max_lenght_    = other.flame_max_lenght_;
     exhaust_emitter_     = std::move(other.exhaust_emitter_);
-    // tidy
-    other.graphics_ = nullptr;
   }
   return *this;
 }

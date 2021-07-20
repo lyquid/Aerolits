@@ -22,10 +22,8 @@ ktp::Particle& ktp::Particle::operator=(const Particle& other) noexcept {
 
 ktp::Particle& ktp::Particle::operator=(Particle&& other) noexcept {
   if (this != &other) {
-    life_ = other.life_;
+    life_ = std::exchange(other.life_, 0u);
     state_ = std::move(other.state_);
-
-    other.life_ = 0u;
   }
   return *this;
 }
@@ -39,10 +37,9 @@ ktp::Particle::State& ktp::Particle::State::operator=(const State& other) noexce
 ktp::Particle::State& ktp::Particle::State::operator=(State&& other) noexcept {
   if (this != &other) {
     live_ = std::move(other.live_);
-    next_ = other.next_;
+    next_ = std::exchange(other.next_, nullptr);
 
     other.live_ = {};
-    other.next_ = nullptr;
   }
   return *this;
 }
@@ -50,10 +47,10 @@ ktp::Particle::State& ktp::Particle::State::operator=(State&& other) noexcept {
 void ktp::Particle::draw() const {
   ParticlesAtlas::particles_atlas.setColorMod(state_.live_.current_color_);
   ParticlesAtlas::particles_atlas.setAlphaMod(state_.live_.current_color_.a);
-  ParticlesAtlas::particles_atlas.render(state_.live_.texture_rect_, 
-                                         {static_cast<int>(state_.live_.position_.x), 
-                                          static_cast<int>(state_.live_.position_.y), 
-                                          static_cast<int>(state_.live_.current_size_), 
+  ParticlesAtlas::particles_atlas.render(state_.live_.texture_rect_,
+                                         {static_cast<int>(state_.live_.position_.x),
+                                          static_cast<int>(state_.live_.position_.y),
+                                          static_cast<int>(state_.live_.current_size_),
                                           static_cast<int>(state_.live_.current_size_)},
                                          state_.live_.rotation_);
 }
@@ -62,7 +59,7 @@ void ktp::Particle::init(const ParticleData& data) {
   life_ = data.start_life_;
   state_.live_ = data;
   // position is set to center the texture on the emitter
-  state_.live_.position_ = {data.position_.x - data.current_size_ * 0.5f, 
+  state_.live_.position_ = {data.position_.x - data.current_size_ * 0.5f,
                             data.position_.y - data.current_size_ * 0.5f};
 }
 
@@ -119,7 +116,7 @@ bool ktp::Particle::update() {
   // position update
   state_.live_.position_.x += state_.live_.current_speed_.x;
   state_.live_.position_.y += state_.live_.current_speed_.y;
-  
+
   --life_;
   return life_ == 0;
 }
@@ -167,7 +164,7 @@ bool ktp::Particle::update(const Vortex& vortex) {
   // position update
   state_.live_.position_.x += (vx - state_.live_.current_speed_.x) * factor;
   state_.live_.position_.y += (vy - state_.live_.current_speed_.y) * factor;
-  
+
   --life_;
-  return life_ == 0; 
+  return life_ == 0;
 }
