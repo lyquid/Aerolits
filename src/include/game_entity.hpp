@@ -128,6 +128,19 @@ class GameEntity {
     if (graphics_) graphics_->update(*this, renderer);
   }
 
+  /**
+   * @return A pointer to the graphics component.
+   */
+  inline auto graphics() const { return graphics_.get(); }
+
+  /**
+   * @return A pointer to the input component.
+   */
+  inline auto input() const { return input_.get(); }
+
+  /**
+   * @return A pointer to the physics component.
+   */
   inline auto physics() const { return physics_.get(); }
 
   /**
