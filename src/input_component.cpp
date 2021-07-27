@@ -10,17 +10,18 @@ void ktp::InputComponent::shoot(GameEntity& player) {
   if (SDL_GetTicks() - shooting_timer_ > shooting_interval_) {
 
     const auto projectile {GameEntity::createEntity(EntityTypes::Projectile)};
+    if (!projectile) return;
 
-    const auto sin {SDL_sinf(player.physics_->body_->GetAngle())};
-    const auto cos {SDL_cosf(player.physics_->body_->GetAngle())};
+    const auto sin {SDL_sinf(physics_->body_->GetAngle())};
+    const auto cos {SDL_cosf(physics_->body_->GetAngle())};
 
-    projectile->physics_->body_->SetTransform({
-      player.physics_->body_->GetPosition().x + ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5 * sin,
-      player.physics_->body_->GetPosition().y - ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5 * cos},
-      player.physics_->body_->GetAngle()
+    projectile->physics()->body_->SetTransform({
+      physics_->body_->GetPosition().x + ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5 * sin,
+      physics_->body_->GetPosition().y - ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5 * cos},
+      physics_->body_->GetAngle()
     );
 
-    projectile->physics_->body_->SetLinearVelocity({
+    projectile->physics()->body_->SetLinearVelocity({
        ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * sin,
       -ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * cos
     });
@@ -44,27 +45,27 @@ void ktp::InputComponent::stopSteering(float delta_time) {
 }
 
 void ktp::InputComponent::stopThrusting(GameEntity& player) {
-  player.delta_ = {0.f, 0.f};
+  physics_->delta_ = {0.f, 0.f};
   physics_->flame_shape_.front().y = physics_->kDefaultFlameMinLength_;
   physics_->flame_shape_.back().y = physics_->kDefaultFlameMinLength_;
   physics_->thrusting_ = false;
 }
 
 void ktp::InputComponent::thrust(GameEntity& player, float delta_time) {
-  player.delta_.x += SDL_sinf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
-  if (player.delta_.x < -kMaxDelta_ ) {
-    player.delta_.x = -kMaxDelta_;
-  } else if (player.delta_.x > kMaxDelta_) {
-    player.delta_.x = kMaxDelta_;
+  physics_->delta_.x += SDL_sinf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
+  if (physics_->delta_.x < -kMaxDelta_ ) {
+    physics_->delta_.x = -kMaxDelta_;
+  } else if (physics_->delta_.x > kMaxDelta_) {
+    physics_->delta_.x = kMaxDelta_;
   }
-  player.delta_.y += -SDL_cosf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
-  if (player.delta_.y < -kMaxDelta_) {
-    player.delta_.y = -kMaxDelta_;
-  } else if (player.delta_.y > kMaxDelta_) {
-    player.delta_.y = kMaxDelta_;
+  physics_->delta_.y += -SDL_cosf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
+  if (physics_->delta_.y < -kMaxDelta_) {
+    physics_->delta_.y = -kMaxDelta_;
+  } else if (physics_->delta_.y > kMaxDelta_) {
+    physics_->delta_.y = kMaxDelta_;
   }
 
-  physics_->body_->ApplyLinearImpulseToCenter({player.delta_.x, player.delta_.y}, true);
+  physics_->body_->ApplyLinearImpulseToCenter({physics_->delta_.x, physics_->delta_.y}, true);
 
   physics_->thrusting_ = true;
 

@@ -8,16 +8,13 @@ void ktp::loadConfigFiles() {
   EmitterParser::initEmitters();
 }
 
-/* GAME */
-
-ktp::EntityId ktp::GameEntity::count_ {0};
-ktp::EntityId ktp::GameEntity::current_id_ {0};
-ktp::EntityId ktp::GameEntity::aerolite_count_ {0};
-
-ktp::Entities ktp::GameEntity::game_entities_ {};
+ktp::EntitiesPool ktp::GameEntity::game_entities_ {40};
+ktp::EntityId     ktp::GameEntity::aerolite_count_ {0};
 
 SDL_FPoint ktp::PhysicsComponent::b2_screen_size_ {};
 b2World*   ktp::PhysicsComponent::world_ {nullptr};
+
+/* GAME */
 
 ktp::Game::Game() {
   event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);

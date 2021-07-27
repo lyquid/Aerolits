@@ -35,6 +35,7 @@ class PhysicsComponent {
   static b2World*   world_;
 
   b2Body*      body_ {nullptr};
+  SDL_FPoint   delta_ {};
   B2Vec2Vector shape_ {};
   float        size_ {};
   bool         to_be_deleted_ {false};

@@ -39,7 +39,7 @@ class Game {
   bool init();
   inline void setFrameTime(double time) { frame_time_ = time; }
   inline bool quit() const { return quit_; }
-  inline void reset() { GameEntity::game_entities_.clear(); }
+  inline void reset() { GameEntity::reset(); }
   inline void update(float delta_time) { state_->update(*this, delta_time); }
 
  private:
