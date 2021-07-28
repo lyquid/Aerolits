@@ -227,9 +227,9 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   // Box2D
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
-  for (auto i = 0u; i < GameEntity::game_entities_.size(); ++i) {
+  for (std::size_t i = 0; i < GameEntity::game_entities_.size(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
-      if (GameEntity::game_entities_[i].object_.physics_->canBeDeleted()) {
+      if (GameEntity::game_entities_[i].object_.physics()->canBeDeleted()) {
         GameEntity::game_entities_[i].object_.disable();
         GameEntity::game_entities_.destroy(i);
       } else {
@@ -237,7 +237,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
       }
     }
   }
-  if (GameEntity::aerolite_count_ < 4) AerolitePhysicsComponent::spawnAerolite();
+  if (GameEntity::aeroliteCount() < 4) AerolitePhysicsComponent::spawnAerolite();
   // Event bus
   game.event_bus_.processEvents();
 }

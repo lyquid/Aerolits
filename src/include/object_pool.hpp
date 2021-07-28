@@ -34,6 +34,7 @@ class ObjectPool {
           for (std::size_t j = 0; j < size_; ++j) {
             if (other.pool_[i].next_ == &other.pool_[j]) {
               pool_[i].next_ = &pool_[j];
+              break;
             }
           }
         }

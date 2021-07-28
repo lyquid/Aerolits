@@ -36,11 +36,7 @@ class SDL2_Renderer;
 
 class GameEntity {
 
-  friend class DemoState;
-  friend class PlayingState;
-  friend class AerolitePhysicsComponent;
-  friend class EmitterPhysicsComponent;
-  friend class PlayerPhysicsComponent;
+  // this friend is needed b/c the constructor is private
   friend class ObjectPool<GameEntity>;
 
  public:
@@ -59,6 +55,11 @@ class GameEntity {
     }
     return *this;
   }
+
+  /**
+   * @return The number of Aerolite enitities active.
+   */
+  inline static auto aeroliteCount() { return aerolite_count_; }
 
   /**
    * @brief "Creates" a GameEntity object.
@@ -132,6 +133,12 @@ class GameEntity {
    * @return A pointer to the graphics component.
    */
   inline auto graphics() const { return graphics_.get(); }
+
+  /**
+   * @brief Increases (or decreases) the aerolites count.
+   * @param inc The amount to increase by. Negative to decrease.
+   */
+  inline static void increaseAeroliteCount(int inc) { aerolite_count_ = aerolite_count_ + inc; }
 
   /**
    * @return A pointer to the input component.

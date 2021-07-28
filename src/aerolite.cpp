@@ -71,28 +71,28 @@ void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, f
 void ktp::AerolitePhysicsComponent::spawnAerolite() {
   const auto aerolite {GameEntity::createEntity(EntityTypes::Aerolite)};
   if (!aerolite) return;
-  ++GameEntity::aerolite_count_;
+  GameEntity::increaseAeroliteCount(1);
   static int side {};
   const float delta {kMaxSpeed_ * generateRand(0.1f, 1.f)};
   switch (side) {
     case 0: // up
-      aerolite->physics_->getBody()->SetTransform({b2_screen_size_.x * 0.5f, 0.f}, aerolite->physics_->getBody()->GetAngle());
-      aerolite->physics_->getBody()->SetLinearVelocity({0, delta});
+      aerolite->physics()->getBody()->SetTransform({b2_screen_size_.x * 0.5f, 0.f}, aerolite->physics()->getBody()->GetAngle());
+      aerolite->physics()->getBody()->SetLinearVelocity({0, delta});
       ++side;
       break;
     case 1: // right
-      aerolite->physics_->getBody()->SetTransform({b2_screen_size_.x, b2_screen_size_.y * 0.5f}, aerolite->physics_->getBody()->GetAngle());
-      aerolite->physics_->getBody()->SetLinearVelocity({-delta, 0});
+      aerolite->physics()->getBody()->SetTransform({b2_screen_size_.x, b2_screen_size_.y * 0.5f}, aerolite->physics()->getBody()->GetAngle());
+      aerolite->physics()->getBody()->SetLinearVelocity({-delta, 0});
       ++side;
       break;
     case 2: // down
-      aerolite->physics_->getBody()->SetTransform({b2_screen_size_.x * 0.5f, b2_screen_size_.y}, aerolite->physics_->getBody()->GetAngle());
-      aerolite->physics_->getBody()->SetLinearVelocity({0, -delta});
+      aerolite->physics()->getBody()->SetTransform({b2_screen_size_.x * 0.5f, b2_screen_size_.y}, aerolite->physics()->getBody()->GetAngle());
+      aerolite->physics()->getBody()->SetLinearVelocity({0, -delta});
       ++side;
       break;
     case 3: // left
-      aerolite->physics_->getBody()->SetTransform({0.f, b2_screen_size_.y * 0.5f}, aerolite->physics_->getBody()->GetAngle());
-      aerolite->physics_->getBody()->SetLinearVelocity({delta, 0});
+      aerolite->physics()->getBody()->SetTransform({0.f, b2_screen_size_.y * 0.5f}, aerolite->physics()->getBody()->GetAngle());
+      aerolite->physics()->getBody()->SetLinearVelocity({delta, 0});
       side = 0;
       break;
   }
@@ -114,7 +114,7 @@ void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float del
   if (aabb_.upperBound.x < 0 || aabb_.lowerBound.x > b2_screen_size_.x + threshold
    || aabb_.upperBound.y < 0 || aabb_.lowerBound.y > b2_screen_size_.y + threshold) {
     to_be_deleted_ = true;
-    --GameEntity::aerolite_count_;
+    GameEntity::increaseAeroliteCount(-1);
   }
   // this will be usefull when the body_ has n fixtures
   /*
