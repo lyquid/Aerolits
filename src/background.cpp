@@ -28,11 +28,11 @@ void ktp::BackgroundGraphicsComponent::update(const GameEntity& background, cons
 
 ktp::BackgroundPhysicsComponent::BackgroundPhysicsComponent(BackgroundGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
-  graphics_->render_shape_.push_back({-kXtraSpace_, -kXtraSpace_}); // top left
-  graphics_->render_shape_.push_back({b2_screen_size_.x * kMetersToPixels + kXtraSpace_, -kXtraSpace_}); // top right
-  graphics_->render_shape_.push_back({b2_screen_size_.x * kMetersToPixels + kXtraSpace_, b2_screen_size_.y * kMetersToPixels + kXtraSpace_}); // bottom right
-  graphics_->render_shape_.push_back({-kXtraSpace_, b2_screen_size_.y * kMetersToPixels + kXtraSpace_}); // bottom left
-  graphics_->render_shape_.push_back({-kXtraSpace_, -kXtraSpace_}); // top left again
+  graphics_->renderShape().push_back({-kXtraSpace_, -kXtraSpace_}); // top left
+  graphics_->renderShape().push_back({b2_screen_size_.x * kMetersToPixels + kXtraSpace_, -kXtraSpace_}); // top right
+  graphics_->renderShape().push_back({b2_screen_size_.x * kMetersToPixels + kXtraSpace_, b2_screen_size_.y * kMetersToPixels + kXtraSpace_}); // bottom right
+  graphics_->renderShape().push_back({-kXtraSpace_, b2_screen_size_.y * kMetersToPixels + kXtraSpace_}); // bottom left
+  graphics_->renderShape().push_back({-kXtraSpace_, -kXtraSpace_}); // top left again
   generateStars();
 }
 
@@ -57,7 +57,7 @@ void ktp::BackgroundPhysicsComponent::generateStars() {
     std::mt19937 generator(seed());
   #endif
   std::uniform_int_distribution<unsigned int> distribution_stars(0u, 6000u);
-  std::uniform_int_distribution<unsigned int> distribution_colors(0u, graphics_->star_colors_.size() - 1);
+  std::uniform_int_distribution<unsigned int> distribution_colors(0u, graphics_->starColors().size() - 1);
   std::uniform_real_distribution<float> distribution_delta(0.001f, 0.1f);
   Star star;
 
@@ -67,19 +67,19 @@ void ktp::BackgroundPhysicsComponent::generateStars() {
         star.position_.x = (float)i;
         star.position_.y = (float)j;
         star.delta_ = {0.f, distribution_delta(generator)};
-        if (graphics_->stars_.size() % 2 == 0 && graphics_->stars_.size() % 3 == 0) {
-          star.color_ = graphics_->star_colors_[distribution_colors(generator)];
+        if (graphics_->stars().size() % 2 == 0 && graphics_->stars().size() % 3 == 0) {
+          star.color_ = graphics_->starColors().data()[distribution_colors(generator)];
         } else {
           star.color_ = Colors::white;
         }
-        graphics_->stars_.push_back(std::move(star));
+        graphics_->stars().push_back(std::move(star));
       }
     }
   }
 }
 
 void ktp::BackgroundPhysicsComponent::update(const GameEntity& background, float delta_time) {
-  for (auto& star: graphics_->stars_) {
+  for (auto& star: graphics_->stars()) {
     if (star.position_.y >= b2_screen_size_.y * kMetersToPixels) {
       star.position_.y = -kXtraSpace_;
     } else {

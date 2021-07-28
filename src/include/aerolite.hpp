@@ -16,7 +16,6 @@ class GameEntity;
 class SDL2_Renderer;
 
 class AeroliteGraphicsComponent: public GraphicsComponent {
-  friend class AerolitePhysicsComponent;
  public:
   virtual void update(const GameEntity& aerolite, const SDL2_Renderer& renderer) override;
  private:

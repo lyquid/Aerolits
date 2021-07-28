@@ -16,6 +16,7 @@ class GraphicsComponent {
  public:
 
   virtual ~GraphicsComponent() {}
+  inline auto& renderShape() { return render_shape_; }
   virtual void update(const GameEntity&, const SDL2_Renderer&) = 0;
 
  protected:

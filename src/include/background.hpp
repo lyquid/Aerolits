@@ -22,8 +22,9 @@ struct Star {
 };
 
 class BackgroundGraphicsComponent: public GraphicsComponent {
-  friend class BackgroundPhysicsComponent;
  public:
+  inline auto& stars() { return stars_; }
+  inline auto& starColors() const { return star_colors_; }
   virtual void update(const GameEntity& background, const SDL2_Renderer& renderer) override;
  private:
   static inline SDL_Rect shapeToRect(const FPointsVector& render_shape);

@@ -17,7 +17,7 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(AeroliteGraphicsComponen
  graphics_(graphics) {
   size_ = kMaxSize_ * generateRand(0.3f, 1.f);
   generateAeroliteShape(shape_, size_);
-  graphics_->render_shape_.resize(shape_.size());
+  graphics_->renderShape().resize(shape_.size());
 
   b2BodyDef body_def {};
   body_def.type = b2_dynamicBody;
@@ -76,23 +76,23 @@ void ktp::AerolitePhysicsComponent::spawnAerolite() {
   const float delta {kMaxSpeed_ * generateRand(0.1f, 1.f)};
   switch (side) {
     case 0: // up
-      aerolite->physics()->getBody()->SetTransform({b2_screen_size_.x * 0.5f, 0.f}, aerolite->physics()->getBody()->GetAngle());
-      aerolite->physics()->getBody()->SetLinearVelocity({0, delta});
+      aerolite->physics()->body()->SetTransform({b2_screen_size_.x * 0.5f, 0.f}, aerolite->physics()->body()->GetAngle());
+      aerolite->physics()->body()->SetLinearVelocity({0, delta});
       ++side;
       break;
     case 1: // right
-      aerolite->physics()->getBody()->SetTransform({b2_screen_size_.x, b2_screen_size_.y * 0.5f}, aerolite->physics()->getBody()->GetAngle());
-      aerolite->physics()->getBody()->SetLinearVelocity({-delta, 0});
+      aerolite->physics()->body()->SetTransform({b2_screen_size_.x, b2_screen_size_.y * 0.5f}, aerolite->physics()->body()->GetAngle());
+      aerolite->physics()->body()->SetLinearVelocity({-delta, 0});
       ++side;
       break;
     case 2: // down
-      aerolite->physics()->getBody()->SetTransform({b2_screen_size_.x * 0.5f, b2_screen_size_.y}, aerolite->physics()->getBody()->GetAngle());
-      aerolite->physics()->getBody()->SetLinearVelocity({0, -delta});
+      aerolite->physics()->body()->SetTransform({b2_screen_size_.x * 0.5f, b2_screen_size_.y}, aerolite->physics()->body()->GetAngle());
+      aerolite->physics()->body()->SetLinearVelocity({0, -delta});
       ++side;
       break;
     case 3: // left
-      aerolite->physics()->getBody()->SetTransform({0.f, b2_screen_size_.y * 0.5f}, aerolite->physics()->getBody()->GetAngle());
-      aerolite->physics()->getBody()->SetLinearVelocity({delta, 0});
+      aerolite->physics()->body()->SetTransform({0.f, b2_screen_size_.y * 0.5f}, aerolite->physics()->body()->GetAngle());
+      aerolite->physics()->body()->SetLinearVelocity({delta, 0});
       side = 0;
       break;
   }
@@ -100,8 +100,8 @@ void ktp::AerolitePhysicsComponent::spawnAerolite() {
 
 void ktp::AerolitePhysicsComponent::transformRenderShape() {
   for (auto i = 0u; i < shape_.size(); ++i) {
-    graphics_->render_shape_[i].x = ((shape_[i].x * SDL_cosf(body_->GetAngle()) - shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
-    graphics_->render_shape_[i].y = ((shape_[i].x * SDL_sinf(body_->GetAngle()) + shape_[i].y * SDL_cosf(body_->GetAngle())) + body_->GetPosition().y) * kMetersToPixels;
+    graphics_->renderShape().data()[i].x = ((shape_[i].x * SDL_cosf(body_->GetAngle()) - shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
+    graphics_->renderShape().data()[i].y = ((shape_[i].x * SDL_sinf(body_->GetAngle()) + shape_[i].y * SDL_cosf(body_->GetAngle())) + body_->GetPosition().y) * kMetersToPixels;
   }
 }
 

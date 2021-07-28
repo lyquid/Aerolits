@@ -15,13 +15,13 @@ void ktp::InputComponent::shoot(GameEntity& player) {
     const auto sin {SDL_sinf(physics_->body_->GetAngle())};
     const auto cos {SDL_cosf(physics_->body_->GetAngle())};
 
-    projectile->physics()->body_->SetTransform({
+    projectile->physics()->body()->SetTransform({
       physics_->body_->GetPosition().x + ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5 * sin,
       physics_->body_->GetPosition().y - ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5 * cos},
       physics_->body_->GetAngle()
     );
 
-    projectile->physics()->body_->SetLinearVelocity({
+    projectile->physics()->body()->SetLinearVelocity({
        ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * sin,
       -ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * cos
     });
