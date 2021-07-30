@@ -11,16 +11,11 @@
 #include "player.hpp"
 #include "projectile.hpp"
 // #include "../../kuge/kuge.hpp"
+#include <map>
 #include <memory>
 #include <utility> // std::move std::exchange
 
 namespace ktp {
-
-using EntitiesPool = ObjectPool<GameEntity>;
-using EntityId     = std::size_t;
-using Graphics     = std::unique_ptr<GraphicsComponent>;
-using Input        = std::unique_ptr<InputComponent>;
-using Physics      = std::unique_ptr<PhysicsComponent>;
 
 enum class EntityTypes {
   Undefined,
@@ -31,6 +26,13 @@ enum class EntityTypes {
   Projectile,
   count
 };
+
+using EntitiesCount = std::map<EntityTypes, std::size_t>;
+using EntitiesPool  = ObjectPool<GameEntity>;
+using EntityId      = std::size_t;
+using Graphics      = std::unique_ptr<GraphicsComponent>;
+using Input         = std::unique_ptr<InputComponent>;
+using Physics       = std::unique_ptr<PhysicsComponent>;
 
 class SDL2_Renderer;
 
@@ -43,7 +45,7 @@ class GameEntity {
 
   GameEntity(const GameEntity& other) = delete;
   GameEntity(GameEntity&& other) noexcept { *this = std::move(other); }
-  ~GameEntity() { if (type_ == EntityTypes::Aerolite) --aerolite_count_; }
+  ~GameEntity() { --entities_count_[type_]; }
 
   GameEntity& operator=(const GameEntity& other) = delete;
   GameEntity& operator=(GameEntity&& other) noexcept {
@@ -55,11 +57,6 @@ class GameEntity {
     }
     return *this;
   }
-
-  /**
-   * @return The number of Aerolite enitities active.
-   */
-  inline static auto aeroliteCount() { return aerolite_count_; }
 
   /**
    * @return The status of the deactivate flag.
@@ -75,7 +72,7 @@ class GameEntity {
       game_entities_[i].object_.reset();
     }
     game_entities_.clear();
-    aerolite_count_ = 0;
+    entities_count_.clear();
   }
 
   /**
@@ -118,6 +115,7 @@ class GameEntity {
         entity->type_ = EntityTypes::Undefined;
         break;
     }
+    ++entities_count_[entity->type_];
     return entity;
   }
 
@@ -136,6 +134,13 @@ class GameEntity {
   }
 
   /**
+   * @brief Use this to get the number of entities active of a given type.
+   * @param type The type of entity to look for.
+   * @return The number of active entities of the type requested.
+   */
+  inline static auto entitiesCount(EntityTypes type) { return entities_count_[type]; }
+
+  /**
    * @brief Resets the GameEntity and sets it the first available in the pool.
    * @param index The index of the GameEntity in the pool.
    */
@@ -150,12 +155,6 @@ class GameEntity {
   inline auto graphics() const { return graphics_.get(); }
 
   /**
-   * @brief Increases (or decreases) the aerolites count.
-   * @param inc The amount to increase by. Negative to decrease.
-   */
-  inline static void increaseAeroliteCount(int inc) { aerolite_count_ = aerolite_count_ + inc; }
-
-  /**
    * @return A pointer to the input component.
    */
   inline auto input() const { return input_.get(); }
@@ -164,18 +163,6 @@ class GameEntity {
    * @return A pointer to the physics component.
    */
   inline auto physics() const { return physics_.get(); }
-
-  /**
-   * @brief Puts the GameEntity at Undefined type/state and resets all the
-   *        components to nullptr.
-   */
-  void reset() {
-    deactivate_ = false;
-    graphics_ = nullptr;
-    input_    = nullptr;
-    physics_  = nullptr;
-    type_ = EntityTypes::Undefined;
-  }
 
   /**
    * @brief Sets the deactivate flag to true.
@@ -203,10 +190,27 @@ class GameEntity {
 
  private:
 
-  GameEntity(EntityTypes type = EntityTypes::Undefined) noexcept: type_(type) {}
+  GameEntity(EntityTypes type = EntityTypes::Undefined) noexcept: type_(type) {
+    ++entities_count_[type_];
+  }
+
+  /**
+   * @brief Puts the GameEntity at Undefined type/state and resets all the
+   *  components to nullptr, causing the smart pointer to invoke the deleter,
+   *  freeing the memory.
+   */
+  void reset() {
+    deactivate_ = false;
+    graphics_ = nullptr;
+    input_    = nullptr;
+    physics_  = nullptr;
+    --entities_count_[type_];
+    type_ = EntityTypes::Undefined;
+    ++entities_count_[type_];
+  }
 
   // defined in game.cpp
-  static EntityId aerolite_count_;
+  static EntitiesCount entities_count_;
 
   bool        deactivate_ {false};
   Graphics    graphics_ {nullptr};

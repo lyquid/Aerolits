@@ -15,8 +15,11 @@ void ktp::GameState::setWindowTitle(Game& game) {
   game.main_window_.setTitle(
     game.kGameTitle_
     + " | Frame time: " + std::to_string((int)(game.frame_time_ * 1000)) + "ms."
-    + " | Entities: " + std::to_string(GameEntity::count()) + '/' + std::to_string(GameEntity::game_entities_.capacity())
     + " | b2Bodies: " + std::to_string(game.world_.GetBodyCount())
+    + " | Entities: " + std::to_string(GameEntity::count()) + '/' + std::to_string(GameEntity::game_entities_.capacity())
+    + " (Player: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Player) + GameEntity::entitiesCount(EntityTypes::PlayerDemo))
+    + " Aerolites: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Aerolite))
+    + " Projectiles: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Projectile)) + ')'
   );
 }
 
@@ -49,7 +52,7 @@ void ktp::DemoState::draw(Game& game) {
 ktp::GameState* ktp::DemoState::enter(Game& game) {
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Player) {
-      GameEntity::game_entities_.destroy(i);
+      GameEntity::game_entities_[i].object_.free(i);
     }
   }
   GameEntity::createEntity(EntityTypes::PlayerDemo);
@@ -236,7 +239,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
       }
     }
   }
-  if (GameEntity::aeroliteCount() < 4) AerolitePhysicsComponent::spawnAerolite();
+  if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnAerolite();
   // Event bus
   game.event_bus_.processEvents();
 }

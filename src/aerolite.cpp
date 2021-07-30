@@ -71,7 +71,6 @@ void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, f
 void ktp::AerolitePhysicsComponent::spawnAerolite() {
   const auto aerolite {GameEntity::createEntity(EntityTypes::Aerolite)};
   if (!aerolite) return;
-  GameEntity::increaseAeroliteCount(1);
   static int side {};
   const float delta {kMaxSpeed_ * generateRand(0.1f, 1.f)};
   switch (side) {
@@ -114,7 +113,6 @@ void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float del
   if (aabb_.upperBound.x < 0 || aabb_.lowerBound.x > b2_screen_size_.x + threshold
    || aabb_.upperBound.y < 0 || aabb_.lowerBound.y > b2_screen_size_.y + threshold) {
     owner_->toBeDeactivated();
-    GameEntity::increaseAeroliteCount(-1);
   }
   // this will be usefull when the body_ has n fixtures
   /*
