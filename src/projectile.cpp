@@ -13,8 +13,9 @@ void ktp::ProjectileGraphicsComponent::update(const GameEntity& projectile, cons
 
 /* PHYSICS */
 
-ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(ProjectileGraphicsComponent* graphics) noexcept:
+ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, ProjectileGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
+  owner_ = owner;
   size_ = kDefaultProjectileSize_;
   generateProjectileShape(shape_, size_);
   graphics_->render_shape_.resize(shape_.size());
@@ -22,7 +23,7 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(ProjectileGraphicsCo
   b2BodyDef body_def {};
   body_def.type = b2_dynamicBody;
   body_def.bullet = true;
-  body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
+  body_def.userData.pointer = reinterpret_cast<uintptr_t>(owner_);
 
   body_ = world_->CreateBody(&body_def);
 
@@ -47,10 +48,10 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(ProjectileGraphicsCo
 ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(ProjectilePhysicsComponent&& other) noexcept {
   if (this != &other) {
     // inherited members
-    body_          = other.body_;
-    shape_         = std::move(other.shape_);
-    size_          = other.size_;
-    to_be_deleted_ = other.to_be_deleted_;
+    body_  = other.body_;
+    owner_ = std::exchange(other.owner_, nullptr);
+    shape_ = std::move(other.shape_);
+    size_  = other.size_;
     // own members
     graphics_ = std::exchange(other.graphics_, nullptr);
   }
@@ -78,7 +79,7 @@ void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float
   // check if laser is out of screen
   if (body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
       body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold) {
-    to_be_deleted_ = true;
+    owner_->toBeDeactivated();
   } else {
     transformRenderShape();
   }

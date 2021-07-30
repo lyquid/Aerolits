@@ -16,8 +16,8 @@ void ktp::InputComponent::shoot(GameEntity& player) {
     const auto cos {SDL_cosf(physics_->body_->GetAngle())};
 
     projectile->physics()->body()->SetTransform({
-      physics_->body_->GetPosition().x + ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5 * sin,
-      physics_->body_->GetPosition().y - ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5 * cos},
+      physics_->body_->GetPosition().x + ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5.2f * sin,
+      physics_->body_->GetPosition().y - ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5.2f * cos},
       physics_->body_->GetAngle()
     );
 

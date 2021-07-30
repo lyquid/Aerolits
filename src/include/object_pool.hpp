@@ -75,6 +75,11 @@ class ObjectPool {
   }
 
   /**
+   * @return The number of objects that can be stored in the pool.
+   */
+  inline auto capacity() const { return size_; }
+
+  /**
    * @brief Sets all the objects to inactive state and reconstruct the list
    *        of pointers. It doesn't free any memory at all.
    */
@@ -119,11 +124,6 @@ class ObjectPool {
       --active_count_;
     }
   }
-
-  /**
-   * @return The number of objects that can be stored in the pool.
-   */
-  inline auto size() const { return size_; }
 
  private:
 

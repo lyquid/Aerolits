@@ -1,6 +1,8 @@
 #pragma once
 
-// #include "../../sdl2_wrappers/sdl2_log.hpp"
+#include "../../sdl2_wrappers/sdl2_log.hpp"
+#include "aerolite.hpp"
+#include "game_entity.hpp"
 #include <box2d/box2d.h>
 
 namespace ktp {
@@ -15,18 +17,48 @@ class ContactListener: public b2ContactListener {
    * @param contact
    */
   virtual void BeginContact(b2Contact* contact) override {
-    auto user_data {contact->GetFixtureA()->GetBody()->GetUserData()};
-    //logMessage(typeid(user_data.pointer).name());
+    auto fixture_A = reinterpret_cast<GameEntity*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
+    auto fixture_B = reinterpret_cast<GameEntity*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
 
-    // auto p2 = reinterpret_cast<GameEntity*>(user_data.pointer)->getType();
-    /* switch(reinterpret_cast<GameEntity*>(user_data.pointer)->getType()) {
-    //switch(dynamic_cast<GameEntity*>(user_data.pointer)->getType()) {
-      case GameEntities::Aerolite:
-        //logMessage("aerolite");
+    /* switch (fixture_A->type()) {
+      case EntityTypes::Aerolite:
+        if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
+          // fixture_B->physics()->toBeDeleted();
+        } else if (fixture_B->type() == EntityTypes::Projectile) {
+          fixture_A->physics()->toBeDeleted();   // dont like this
+          fixture_A->increaseAeroliteCount(-1);
+          fixture_B->physics()->toBeDeleted();
+        }
         break;
+      case EntityTypes::Background:
+        break;
+      case EntityTypes::Player:
+        if (fixture_B->type() == EntityTypes::Aerolite) {
+          // fixture_A->physics()->toBeDeleted();
+        }
+        break;
+      case EntityTypes::PlayerDemo:
+        if (fixture_B->type() == EntityTypes::Aerolite) {
+          // fixture_A->physics()->toBeDeleted();
+        }
+        break;
+      case EntityTypes::Projectile:
+        if (fixture_B->type() == EntityTypes::Aerolite) {
+          fixture_A->physics()->toBeDeleted();
+          fixture_B->physics()->toBeDeleted();
+          fixture_B->increaseAeroliteCount(-1);
+        } else if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
+          //fixture_A->physics()->toBeDeleted();
+          //fixture_B->physics()->toBeDeleted();
+        } else if (fixture_B->type() == EntityTypes::Projectile) {
+          fixture_A->physics()->toBeDeleted();
+          fixture_B->physics()->toBeDeleted();
+        }
+        break;
+      case EntityTypes::Undefined:
+      case EntityTypes::count:
       default:
-        //logMessage("default");
-        break;
+        return;
     } */
   }
 
@@ -42,6 +74,26 @@ class ContactListener: public b2ContactListener {
 
  private:
 
+  std::string checkType(EntityTypes type) const {
+    switch (type) {
+      case EntityTypes::Aerolite:
+        return "Aerolite";
+        break;
+      case EntityTypes::Background:
+        return "Background";
+        break;
+      case EntityTypes::Player:
+        return "Player";
+        break;
+      case EntityTypes::PlayerDemo:
+        return "PlayerDemo";
+        break;
+      case EntityTypes::Projectile:
+        return "Projectile";
+        break;
+    }
+    return "nothing";
+  }
 };
 
 } // namespace ktp

@@ -26,8 +26,9 @@ void ktp::BackgroundGraphicsComponent::update(const GameEntity& background, cons
 
 /* PHYSICS */
 
-ktp::BackgroundPhysicsComponent::BackgroundPhysicsComponent(BackgroundGraphicsComponent* graphics) noexcept:
+ktp::BackgroundPhysicsComponent::BackgroundPhysicsComponent(GameEntity* owner, BackgroundGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
+  owner_ = owner;
   graphics_->renderShape().push_back({-kXtraSpace_, -kXtraSpace_}); // top left
   graphics_->renderShape().push_back({b2_screen_size_.x * kMetersToPixels + kXtraSpace_, -kXtraSpace_}); // top right
   graphics_->renderShape().push_back({b2_screen_size_.x * kMetersToPixels + kXtraSpace_, b2_screen_size_.y * kMetersToPixels + kXtraSpace_}); // bottom right
@@ -39,10 +40,10 @@ ktp::BackgroundPhysicsComponent::BackgroundPhysicsComponent(BackgroundGraphicsCo
 ktp::BackgroundPhysicsComponent& ktp::BackgroundPhysicsComponent::operator=(BackgroundPhysicsComponent&& other) noexcept {
   if (this != &other) {
     // inherited members
-    body_          = other.body_;
-    shape_         = std::move(other.shape_);
-    size_          = other.size_;
-    to_be_deleted_ = other.to_be_deleted_;
+    body_  = other.body_;
+    owner_ = std::exchange(other.owner_, nullptr);
+    shape_ = std::move(other.shape_);
+    size_  = other.size_;
     // own members
     graphics_ = std::exchange(other.graphics_, nullptr);
   }

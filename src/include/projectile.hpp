@@ -26,7 +26,7 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
 
  public:
 
-  ProjectilePhysicsComponent(ProjectileGraphicsComponent* graphics) noexcept;
+  ProjectilePhysicsComponent(GameEntity* owner, ProjectileGraphicsComponent* graphics) noexcept;
   ProjectilePhysicsComponent(const ProjectilePhysicsComponent& other) = delete;
   ProjectilePhysicsComponent(ProjectilePhysicsComponent&& other) { *this = std::move(other); }
 

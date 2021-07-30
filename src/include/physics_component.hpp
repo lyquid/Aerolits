@@ -16,7 +16,6 @@ class PhysicsComponent {
 
   virtual ~PhysicsComponent() { if (body_) world_->DestroyBody(body_); }
 
-  inline bool canBeDeleted() const { return to_be_deleted_; }
   inline b2Body* body() const { return body_; }
   virtual void setPosition(const SDL_FPoint& pos) = 0;
   static void setScreenSize(const SDL_FPoint& screen_size) {
@@ -34,9 +33,9 @@ class PhysicsComponent {
 
   b2Body*      body_ {nullptr};
   SDL_FPoint   delta_ {};
+  GameEntity*  owner_ {nullptr};
   B2Vec2Vector shape_ {};
   float        size_ {};
-  bool         to_be_deleted_ {false};
 };
 
 } // namespace ktp

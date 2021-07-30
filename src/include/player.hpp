@@ -54,7 +54,7 @@ class PlayerPhysicsComponent: public PhysicsComponent {
 
  public:
 
-  PlayerPhysicsComponent(PlayerGraphicsComponent* graphics) noexcept;
+  PlayerPhysicsComponent(GameEntity* owner, PlayerGraphicsComponent* graphics) noexcept;
   PlayerPhysicsComponent(const PlayerPhysicsComponent& other) = delete;
   PlayerPhysicsComponent(PlayerPhysicsComponent&& other) { *this = std::move(other); }
 

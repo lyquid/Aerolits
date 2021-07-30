@@ -26,7 +26,7 @@ class AerolitePhysicsComponent: public PhysicsComponent {
 
  public:
 
-  AerolitePhysicsComponent(AeroliteGraphicsComponent* graphics) noexcept;
+  AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics) noexcept;
   AerolitePhysicsComponent(const AerolitePhysicsComponent& other) = delete;
   AerolitePhysicsComponent(AerolitePhysicsComponent&& other) { *this = std::move(other); }
 

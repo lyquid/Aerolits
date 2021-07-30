@@ -38,7 +38,7 @@ class BackgroundPhysicsComponent: public PhysicsComponent {
 
  public:
 
-  BackgroundPhysicsComponent(BackgroundGraphicsComponent* graphics) noexcept;
+  BackgroundPhysicsComponent(GameEntity* owner, BackgroundGraphicsComponent* graphics) noexcept;
   BackgroundPhysicsComponent(const BackgroundPhysicsComponent& other) = delete;
   BackgroundPhysicsComponent(BackgroundPhysicsComponent&& other) { *this = std::move(other); }
 

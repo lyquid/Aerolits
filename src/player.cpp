@@ -67,8 +67,9 @@ void ktp::PlayerInputComponent::update(GameEntity& player, float delta_time) {
 
 /* PHYSICS */
 
-ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(PlayerGraphicsComponent* graphics) noexcept:
+ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner,PlayerGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
+  owner_ = owner;
   size_ = kDefaultPlayerSize_;
   generatePlayerShape(shape_, flame_shape_, size_);
   graphics_->render_shape_.resize(shape_.size());
@@ -80,10 +81,10 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(PlayerGraphicsComponent* gra
 ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) noexcept {
   if (this != &other) {
     // inherited members
-    body_          = other.body_;
-    shape_         = std::move(other.shape_);
-    size_          = other.size_;
-    to_be_deleted_ = other.to_be_deleted_;
+    body_  = other.body_;
+    owner_ = std::exchange(other.owner_, nullptr);
+    shape_ = std::move(other.shape_);
+    size_  = other.size_;
     // own members
     graphics_            = std::exchange(other.graphics_, nullptr);
     flame_shape_         = std::move(other.flame_shape_);
@@ -133,7 +134,7 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
   body_def.type = b2_dynamicBody;
   body_def.bullet = true;
   body_def.position.Set(b2_screen_size_.x * 0.5f, b2_screen_size_.y * 0.5f);
-  body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
+  body_def.userData.pointer = reinterpret_cast<uintptr_t>(owner_);
 
   body_ = world_->CreateBody(&body_def);
   // middle triangle CCW

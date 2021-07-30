@@ -13,16 +13,16 @@ void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite, const SD
 
 /* PHYSICS */
 
-ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(AeroliteGraphicsComponent* graphics) noexcept:
+ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
+  owner_ = owner;
   size_ = kMaxSize_ * generateRand(0.3f, 1.f);
   generateAeroliteShape(shape_, size_);
   graphics_->renderShape().resize(shape_.size());
 
   b2BodyDef body_def {};
   body_def.type = b2_dynamicBody;
-
-  body_def.userData.pointer = reinterpret_cast<uintptr_t>(this);
+  body_def.userData.pointer = reinterpret_cast<uintptr_t>(owner_);
 
   body_ = world_->CreateBody(&body_def);
 
@@ -43,10 +43,10 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(AeroliteGraphicsComponen
 ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) noexcept {
   if (this != &other) {
     // inherited members
-    body_          = std::exchange(other.body_, nullptr);
-    shape_         = std::move(other.shape_);
-    size_          = other.size_;
-    to_be_deleted_ = other.to_be_deleted_;
+    body_  = std::exchange(other.body_, nullptr);
+    owner_ = std::exchange(other.owner_, nullptr);
+    shape_ = std::move(other.shape_);
+    size_  = other.size_;
     // own members
     graphics_ = std::exchange(other.graphics_, nullptr);
     aabb_     = std::move(other.aabb_);
@@ -113,7 +113,7 @@ void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float del
   constexpr auto threshold {0.1f};
   if (aabb_.upperBound.x < 0 || aabb_.lowerBound.x > b2_screen_size_.x + threshold
    || aabb_.upperBound.y < 0 || aabb_.lowerBound.y > b2_screen_size_.y + threshold) {
-    to_be_deleted_ = true;
+    owner_->toBeDeactivated();
     GameEntity::increaseAeroliteCount(-1);
   }
   // this will be usefull when the body_ has n fixtures

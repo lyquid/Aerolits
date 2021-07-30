@@ -1,6 +1,7 @@
 #include "include/emitter.hpp"
 #include "include/game_entity.hpp"
 #include "include/random.hpp"
+#include "../sdl2_wrappers/sdl2_log.hpp"
 #include "../sdl2_wrappers/sdl2_renderer.hpp"
 #include "../sdl2_wrappers/sdl2_texture.hpp"
 
@@ -20,10 +21,9 @@ void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter, const SDL2
 ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhysicsComponent&& other) noexcept {
   if (this != &other) {
     // inherited members
-    body_          = other.body_;
-    shape_         = std::move(other.shape_);
-    size_          = other.size_;
-    to_be_deleted_ = other.to_be_deleted_;
+    body_  = other.body_;
+    shape_ = std::move(other.shape_);
+    size_  = other.size_;
     // own members
     graphics_              = std::exchange(other.graphics_, nullptr);
     alive_particles_count_ = other.alive_particles_count_;

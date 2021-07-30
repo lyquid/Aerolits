@@ -15,7 +15,7 @@ void ktp::GameState::setWindowTitle(Game& game) {
   game.main_window_.setTitle(
     game.kGameTitle_
     + " | Frame time: " + std::to_string((int)(game.frame_time_ * 1000)) + "ms."
-    + " | Entities: " + std::to_string(GameEntity::count()) + '/' + std::to_string(GameEntity::game_entities_.size())
+    + " | Entities: " + std::to_string(GameEntity::count()) + '/' + std::to_string(GameEntity::game_entities_.capacity())
     + " | b2Bodies: " + std::to_string(game.world_.GetBodyCount())
   );
 }
@@ -25,7 +25,7 @@ void ktp::GameState::setWindowTitle(Game& game) {
 void ktp::DemoState::draw(Game& game) {
   game.renderer_.clear();
 
-  for (auto i = 0u; i < GameEntity::game_entities_.size(); ++i) {
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
       GameEntity::game_entities_[i].object_.draw(game.renderer_);
     }
@@ -47,7 +47,7 @@ void ktp::DemoState::draw(Game& game) {
 }
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
-  for (auto i = 0u; i < GameEntity::game_entities_.size(); ++i) {
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Player) {
       GameEntity::game_entities_.destroy(i);
     }
@@ -101,7 +101,7 @@ void ktp::DemoState::update(Game& game, float delta_time) {
 void ktp::PausedState::draw(Game& game) {
   game.renderer_.clear();
 
-  for (auto i = 0u; i < GameEntity::game_entities_.size(); ++i) {
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
       GameEntity::game_entities_[i].object_.draw(game.renderer_);
     }
@@ -168,7 +168,7 @@ void ktp::PausedState::update(Game& game, float delta_time) {
 void ktp::PlayingState::draw(Game& game) {
   game.renderer_.clear();
 
-  for (auto i = 0u; i < GameEntity::game_entities_.size(); ++i) {
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
       GameEntity::game_entities_[i].object_.draw(game.renderer_);
     }
@@ -227,11 +227,10 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   // Box2D
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
-  for (std::size_t i = 0; i < GameEntity::game_entities_.size(); ++i) {
+  for (std::size_t i = 0; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
-      if (GameEntity::game_entities_[i].object_.physics()->canBeDeleted()) {
-        GameEntity::game_entities_[i].object_.disable();
-        GameEntity::game_entities_.destroy(i);
+      if (GameEntity::game_entities_[i].object_.canBeDeactivated()) {
+        GameEntity::game_entities_[i].object_.free(i);
       } else {
         GameEntity::game_entities_[i].object_.update(delta_time);
       }
@@ -247,7 +246,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
 void ktp::TitleState::draw(Game& game) {
   game.renderer_.clear();
 
-  for (auto i = 0u; i < GameEntity::game_entities_.size(); ++i) {
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Background) {
       GameEntity::game_entities_[i].object_.draw(game.renderer_);
       break;
@@ -306,7 +305,7 @@ void ktp::TitleState::update(Game& game, float delta_time) {
   // Window title
   setWindowTitle(game);
   // Background
-  for (auto i = 0u; i < GameEntity::game_entities_.size(); ++i) {
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     GameEntity::game_entities_[i].object_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
   }
   // enter Demo mode
