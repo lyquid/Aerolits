@@ -17,49 +17,53 @@ class ContactListener: public b2ContactListener {
    * @param contact
    */
   virtual void BeginContact(b2Contact* contact) override {
-    auto fixture_A = reinterpret_cast<GameEntity*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
-    auto fixture_B = reinterpret_cast<GameEntity*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
+    const auto fixture_A = reinterpret_cast<GameEntity*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
+    const auto fixture_B = reinterpret_cast<GameEntity*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
 
-    /* switch (fixture_A->type()) {
+    switch (fixture_A->type()) {
       case EntityTypes::Aerolite:
         if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
-          // fixture_B->physics()->toBeDeleted();
+          // fixture_B->toBeDeactivated();
         } else if (fixture_B->type() == EntityTypes::Projectile) {
-          fixture_A->physics()->toBeDeleted();   // dont like this
-          fixture_A->increaseAeroliteCount(-1);
-          fixture_B->physics()->toBeDeleted();
+          fixture_A->toBeDeactivated();
+          fixture_B->toBeDeactivated();
         }
         break;
       case EntityTypes::Background:
         break;
       case EntityTypes::Player:
         if (fixture_B->type() == EntityTypes::Aerolite) {
-          // fixture_A->physics()->toBeDeleted();
+          // fixture_A->toBeDeactivated();
+        } else if (fixture_B->type() == EntityTypes::Projectile) {
+          // fixture_A->toBeDeactivated();
+          // fixture_B->toBeDeactivated();
         }
         break;
       case EntityTypes::PlayerDemo:
         if (fixture_B->type() == EntityTypes::Aerolite) {
-          // fixture_A->physics()->toBeDeleted();
+          // fixture_A->toBeDeactivated();
+        } else if (fixture_B->type() == EntityTypes::Projectile) {
+          // fixture_A->toBeDeactivated();
+          // fixture_B->toBeDeactivated();
         }
         break;
       case EntityTypes::Projectile:
         if (fixture_B->type() == EntityTypes::Aerolite) {
-          fixture_A->physics()->toBeDeleted();
-          fixture_B->physics()->toBeDeleted();
-          fixture_B->increaseAeroliteCount(-1);
+          fixture_A->toBeDeactivated();
+          fixture_B->toBeDeactivated();
         } else if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
-          //fixture_A->physics()->toBeDeleted();
-          //fixture_B->physics()->toBeDeleted();
+          // fixture_A->toBeDeactivated();
+          // fixture_B->toBeDeactivated();
         } else if (fixture_B->type() == EntityTypes::Projectile) {
-          fixture_A->physics()->toBeDeleted();
-          fixture_B->physics()->toBeDeleted();
+          fixture_A->toBeDeactivated();
+          fixture_B->toBeDeactivated();
         }
         break;
       case EntityTypes::Undefined:
       case EntityTypes::count:
       default:
         return;
-    } */
+    }
   }
 
   /**
@@ -67,10 +71,7 @@ class ContactListener: public b2ContactListener {
    *
    * @param contact
    */
-  virtual void EndContact(b2Contact* contact) override {
-    //logMessage("end contact");
-    auto user_data {contact->GetFixtureA()->GetBody()->GetUserData()};
-  }
+  virtual void EndContact(b2Contact* contact) override {}
 
  private:
 
