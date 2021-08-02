@@ -82,6 +82,7 @@ ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysic
   if (this != &other) {
     // inherited members
     body_  = other.body_;
+    delta_ = std::move(other.delta_);
     owner_ = std::exchange(other.owner_, nullptr);
     shape_ = std::move(other.shape_);
     size_  = other.size_;

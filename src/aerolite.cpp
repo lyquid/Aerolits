@@ -44,6 +44,7 @@ ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(Aerolite
   if (this != &other) {
     // inherited members
     body_  = std::exchange(other.body_, nullptr);
+    delta_ = std::move(other.delta_);
     owner_ = std::exchange(other.owner_, nullptr);
     shape_ = std::move(other.shape_);
     size_  = other.size_;
