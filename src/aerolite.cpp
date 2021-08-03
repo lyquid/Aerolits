@@ -2,6 +2,7 @@
 #include "include/box2d_scale.hpp"
 #include "include/game_entity.hpp"
 #include "include/random.hpp"
+#include "../sdl2_wrappers/sdl2_log.hpp"
 #include "../sdl2_wrappers/sdl2_renderer.hpp"
 
 /* GRAPHICS */
@@ -16,27 +17,20 @@ void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite, const SD
 ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
   owner_ = owner;
-  size_ = kMaxSize_ * generateRand(0.3f, 1.f);
+  size_ = kMaxSize_ * generateRand(0.6f, 1.f);
   generateAeroliteShape(shape_, size_);
   graphics_->renderShape().resize(shape_.size());
+  createB2Body(*this);
+  body_->SetAngularVelocity(kMaxRotationSpeed_ * generateRand(-1.f, 1.f));
+}
 
-  b2BodyDef body_def {};
-  body_def.type = b2_dynamicBody;
-  body_def.userData.pointer = reinterpret_cast<uintptr_t>(owner_);
-
-  body_ = world_->CreateBody(&body_def);
-
-  b2PolygonShape dynamic_box {};
-  // you need the -1 because shape_ is always sides + 1 due to the closing point
-  dynamic_box.Set(shape_.data(), shape_.size() - 1);
-
-  b2FixtureDef fixture_def {};
-  fixture_def.shape = &dynamic_box;
-  fixture_def.density = kKgPerMeter2_ / (size_ * size_);
-  fixture_def.friction = 1.f;
-
-  body_->CreateFixture(&fixture_def);
-
+ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics, float size) noexcept:
+ graphics_(graphics) {
+  owner_ = owner;
+  size_ = size;
+  generateAeroliteShape(shape_, size_);
+  graphics_->renderShape().resize(shape_.size());
+  createB2Body(*this);
   body_->SetAngularVelocity(kMaxRotationSpeed_ * generateRand(-1.f, 1.f));
 }
 
@@ -51,12 +45,36 @@ ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(Aerolite
     // own members
     graphics_ = std::exchange(other.graphics_, nullptr);
     aabb_     = std::move(other.aabb_);
+    to_be_splited_ = other.to_be_splited_;
   }
   return *this;
 }
 
+void ktp::AerolitePhysicsComponent::createB2Body(AerolitePhysicsComponent& aerolite) {
+  if (aerolite.body_) world_->DestroyBody(aerolite.body_);
+
+  b2BodyDef body_def {};
+  body_def.type = b2_dynamicBody;
+  body_def.userData.pointer = reinterpret_cast<uintptr_t>(aerolite.owner_);
+  aerolite.body_ = world_->CreateBody(&body_def);
+
+  b2PolygonShape aerolite_shape {};
+  // you need the -1 because shape_ is always sides + 1 due to the closing point
+  aerolite_shape.Set(aerolite.shape_.data(), aerolite.shape_.size() - 1);
+
+  b2FixtureDef fixture_def {};
+  fixture_def.shape = &aerolite_shape;
+  fixture_def.density = kKgPerMeter2_ / (aerolite.size_ * aerolite.size_);
+  fixture_def.friction = 1.f;
+  aerolite.body_->CreateFixture(&fixture_def);
+}
+
 void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, float size) {
-  const auto sides {generateRand(kMinSides_, kMaxSides_)};
+  generateAeroliteShape(shape, size, generateRand(kMinSides_, kMaxSides_));
+}
+
+void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, float size, unsigned int sides) {
+  if (!shape.empty()) shape.clear();
   constexpr auto kPI {3.14159265358979323846264338327950288};
   b2Vec2 point {};
   for (auto i = 0u; i < sides; ++i) {
@@ -67,6 +85,22 @@ void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, f
   // this is the closing point == first point
   shape.push_back(shape.front());
   shape.shrink_to_fit();
+}
+
+void ktp::AerolitePhysicsComponent::resize(float size) {
+  size_ = size;
+  generateAeroliteShape(shape_, size_, shape_.size() - 1u);
+  graphics_->renderShape().clear();
+  graphics_->renderShape().resize(shape_.size());
+  // Box2D
+  const auto old_angle   {body_->GetAngle()};
+  const auto old_angular {body_->GetAngularVelocity()};
+  const auto old_delta   {body_->GetLinearVelocity()};
+  const auto old_pos     {body_->GetPosition()};
+  createB2Body(*this);
+  body_->SetAngularVelocity(old_angular);
+  body_->SetLinearVelocity(old_delta);
+  body_->SetTransform(old_pos, old_angle);
 }
 
 void ktp::AerolitePhysicsComponent::spawnAerolite() {
@@ -98,6 +132,72 @@ void ktp::AerolitePhysicsComponent::spawnAerolite() {
   }
 }
 
+void ktp::AerolitePhysicsComponent::split() {
+  to_be_splited_ = false;
+  if (size_ < kMinSize_) {
+    // very small, destroyed on impact
+    owner_->toBeDeactivated();
+    return;
+  }
+
+  const auto old_angle   {body_->GetAngle()};
+  const auto old_angular {body_->GetAngularVelocity()};
+  const auto old_delta   {body_->GetLinearVelocity()};
+  const auto old_pos     {body_->GetPosition()};  
+  unsigned int pieces;
+  float piece_size;
+  
+  if (size_ > 2) {
+    // big aerolite, can split in several small aerolites
+    const int scale = 10 * generateRand(0.f, 1.f);
+    switch (scale) {
+      case 0:
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+      case 5:
+      case 6:
+        pieces = 1;
+        piece_size = size_ * 0.25f;
+        resize(size_ * 0.75f);
+        break;
+      case 7:
+      case 8:
+      case 9:
+        pieces = 2;
+        piece_size = size_ * 0.25f;
+        resize(size_ * 0.5f);
+        break;
+      case 10:
+        pieces = 3;
+        piece_size = size_ * 0.25f;
+        resize(size_ * 0.25f);
+        break;
+    }
+  } else if (size_ > 1) {
+    // medium aerolite, can split in 1 small aerolite
+    pieces = 1;
+    piece_size = size_ * 0.33f;
+    resize(size_ * 0.66f);
+  } else {
+    // little aerolite, splits in half
+    pieces = 1;
+    piece_size = size_ * 0.5f;
+    resize(size_ * 0.5f);
+  }
+
+  GameEntity* aerolite {nullptr};
+  for (std::size_t i = 0; i < pieces; ++i) {
+    aerolite = GameEntity::createEntity(EntityTypes::Aerolite);
+    if (!aerolite) return;
+    static_cast<AerolitePhysicsComponent*>(aerolite->physics())->resize(piece_size); // need this until we can use the size constructor
+    aerolite->physics()->body()->SetAngularVelocity(-old_angular * generateRand(0.5f, 1.5f));
+    aerolite->physics()->body()->SetTransform(old_pos, old_angle);
+    aerolite->physics()->body()->SetLinearVelocity({old_delta.x * generateRand(0.5f, 1.5f), old_delta.y * generateRand(0.5f, 1.5f)});
+  }
+}
+
 void ktp::AerolitePhysicsComponent::transformRenderShape() {
   for (auto i = 0u; i < shape_.size(); ++i) {
     graphics_->renderShape().data()[i].x = ((shape_[i].x * SDL_cosf(body_->GetAngle()) - shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
@@ -106,6 +206,8 @@ void ktp::AerolitePhysicsComponent::transformRenderShape() {
 }
 
 void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float delta_time) {
+  if (to_be_splited_) split();
+
   transformRenderShape();
 
   aabb_ = body_->GetFixtureList()->GetAABB(0);

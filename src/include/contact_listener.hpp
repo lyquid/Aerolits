@@ -25,7 +25,7 @@ class ContactListener: public b2ContactListener {
         if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
           // fixture_B->toBeDeactivated();
         } else if (fixture_B->type() == EntityTypes::Projectile) {
-          fixture_A->toBeDeactivated();
+          static_cast<AerolitePhysicsComponent*>(fixture_A->physics())->toSplit();
           fixture_B->toBeDeactivated();
         }
         break;
@@ -50,7 +50,7 @@ class ContactListener: public b2ContactListener {
       case EntityTypes::Projectile:
         if (fixture_B->type() == EntityTypes::Aerolite) {
           fixture_A->toBeDeactivated();
-          fixture_B->toBeDeactivated();
+          static_cast<AerolitePhysicsComponent*>(fixture_B->physics())->toSplit();
         } else if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
           // fixture_A->toBeDeactivated();
           // fixture_B->toBeDeactivated();
