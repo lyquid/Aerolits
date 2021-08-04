@@ -44,16 +44,17 @@ class GameEntity {
  public:
 
   GameEntity(const GameEntity& other) = delete;
-  GameEntity(GameEntity&& other) noexcept { *this = std::move(other); }
+  GameEntity(GameEntity&& other) noexcept: type_(other.type_) { *this = std::move(other); }
   ~GameEntity() { --entities_count_[type_]; }
 
   GameEntity& operator=(const GameEntity& other) = delete;
   GameEntity& operator=(GameEntity&& other) noexcept {
     if (this != &other) {
-      graphics_ = std::exchange(other.graphics_, nullptr);
-      input_    = std::exchange(other.input_, nullptr);
-      physics_  = std::exchange(other.physics_, nullptr);
-      type_     = other.type_;
+      deactivate_ = other.deactivate_;
+      graphics_   = std::exchange(other.graphics_, nullptr);
+      input_      = std::exchange(other.input_, nullptr);
+      physics_    = std::exchange(other.physics_, nullptr);
+      type_       = other.type_;
     }
     return *this;
   }
@@ -125,6 +126,11 @@ class GameEntity {
   inline static auto count() { return game_entities_.activeCount(); }
 
   /**
+   * @brief Sets the deactivate flag to true.
+   */
+  inline void deactivate() { deactivate_ = true; }
+
+  /**
    * @brief Uses the graphics component to draw something hopefully ressembling
    *         what the user wants.
    * @param renderer A renderer to draw things on.
@@ -163,11 +169,6 @@ class GameEntity {
    * @return A pointer to the physics component.
    */
   inline auto physics() const { return physics_.get(); }
-
-  /**
-   * @brief Sets the deactivate flag to true.
-   */
-  inline void toBeDeactivated() { deactivate_ = true; }
 
   /**
    * @return The type of the GameEntity.

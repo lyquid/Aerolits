@@ -136,17 +136,17 @@ void ktp::AerolitePhysicsComponent::split() {
   to_be_splited_ = false;
   if (size_ < kMinSize_) {
     // very small, destroyed on impact
-    owner_->toBeDeactivated();
+    owner_->deactivate();
     return;
   }
 
   const auto old_angle   {body_->GetAngle()};
   const auto old_angular {body_->GetAngularVelocity()};
   const auto old_delta   {body_->GetLinearVelocity()};
-  const auto old_pos     {body_->GetPosition()};  
+  const auto old_pos     {body_->GetPosition()};
   unsigned int pieces;
   float piece_size;
-  
+
   if (size_ > 2) {
     // big aerolite, can split in several small aerolites
     const int scale = 10 * generateRand(0.f, 1.f);
@@ -215,7 +215,7 @@ void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float del
   constexpr auto threshold {0.1f};
   if (aabb_.upperBound.x < 0 || aabb_.lowerBound.x > b2_screen_size_.x + threshold
    || aabb_.upperBound.y < 0 || aabb_.lowerBound.y > b2_screen_size_.y + threshold) {
-    owner_->toBeDeactivated();
+    owner_->deactivate();
   }
   // this will be usefull when the body_ has n fixtures
   /*

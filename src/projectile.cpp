@@ -59,12 +59,43 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
   return *this;
 }
 
+void ktp::ProjectilePhysicsComponent::detonate() {
+  owner_->deactivate();
+  constexpr auto kPI {3.14159265358979323846264338327950288};
+  for (std::size_t i = 0; i < kExplosionRays_; ++i) {
+    float angle = (i / (float)kExplosionRays_) * 360 * (kPI / 180);
+    b2Vec2 rayDir( sinf(angle), cosf(angle) );
+
+    b2BodyDef bd;
+    bd.type = b2_dynamicBody;
+    bd.fixedRotation = true; // rotation not necessary
+    bd.bullet = true; // prevent tunneling at high speed
+    bd.linearDamping = 10; // drag due to moving through air
+    bd.gravityScale = 0; // ignore gravity
+    bd.position = body_->GetPosition(); // start at blast center
+    bd.linearVelocity = blast_power_ * rayDir;
+    b2Body* body = world_->CreateBody(&bd);
+
+    b2CircleShape circleShape;
+    circleShape.m_radius = 0.05; // very small
+
+    b2FixtureDef fd;
+    fd.shape = &circleShape;
+    fd.density = 60 / (float)kExplosionRays_; // very high - shared across all particles
+    fd.friction = 0; // friction not necessary
+    fd.restitution = 0.99f; // high restitution to reflect off obstacles
+    fd.filter.groupIndex = -1; // particles should not collide with each other
+    body->CreateFixture(&fd);
+  }
+}
+
 void ktp::ProjectilePhysicsComponent::generateProjectileShape(B2Vec2Vector& shape, float size) {
+  shape.push_back({0, -size - (size * 0.5f)}); // top
   shape.push_back({-size * 0.15f, -size}); // top left
   shape.push_back({-size * 0.15f,  size}); // down left
   shape.push_back({ size * 0.15f,  size}); // down right
   shape.push_back({ size * 0.15f, -size}); // top right
-  shape.push_back({-size * 0.15f, -size}); // top left again
+  shape.push_back(shape.front());          // top again
   shape.shrink_to_fit();
 }
 
@@ -77,10 +108,14 @@ void ktp::ProjectilePhysicsComponent::transformRenderShape() {
 
 void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float delta_time) {
   const auto threshold {size_};
+  if (detonate_) {
+    detonate();
+    return;
+  }
   // check if laser is out of screen
   if (body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
       body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold) {
-    owner_->toBeDeactivated();
+    owner_->deactivate();
   } else {
     transformRenderShape();
   }
