@@ -34,11 +34,11 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   AerolitePhysicsComponent& operator=(const AerolitePhysicsComponent& other) = delete;
   AerolitePhysicsComponent& operator=(AerolitePhysicsComponent&& other) noexcept;
 
+  inline void collide(GameEntity* other) override { collided_ = true; }
   inline float getMaxSpeed() const { return kMaxSpeed_; }
   void resize(float size);
   virtual void setPosition(const SDL_FPoint& pos) override {}
   static void spawnAerolite();
-  inline void toSplit() { to_be_splited_ = true; }
   virtual void update(const GameEntity& aerolite, float delta_time) override;
 
  private:
@@ -59,7 +59,6 @@ class AerolitePhysicsComponent: public PhysicsComponent {
 
   AeroliteGraphicsComponent* graphics_ {nullptr};
   b2AABB aabb_ {};
-  bool to_be_splited_ {false};
 };
 
 } // namespace ktp

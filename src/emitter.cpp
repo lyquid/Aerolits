@@ -21,11 +21,12 @@ void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter, const SDL2
 ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhysicsComponent&& other) noexcept {
   if (this != &other) {
     // inherited members
-    body_  = other.body_;
-    delta_ = std::move(other.delta_);
-    owner_ = std::exchange(other.owner_, nullptr);
-    shape_ = std::move(other.shape_);
-    size_  = other.size_;
+    body_     = other.body_;
+    collided_ = other.collided_;
+    delta_    = std::move(other.delta_);
+    owner_    = std::exchange(other.owner_, nullptr);
+    shape_    = std::move(other.shape_);
+    size_     = other.size_;
     // own members
     graphics_              = std::exchange(other.graphics_, nullptr);
     alive_particles_count_ = other.alive_particles_count_;

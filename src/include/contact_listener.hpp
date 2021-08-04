@@ -25,9 +25,8 @@ class ContactListener: public b2ContactListener {
         if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
           // fixture_B->toBeDeactivated();
         } else if (fixture_B->type() == EntityTypes::Projectile) {
-          static_cast<AerolitePhysicsComponent*>(fixture_A->physics())->toSplit();
-          // fixture_B->toBeDeactivated();
-          static_cast<ProjectilePhysicsComponent*>(fixture_B->physics())->toDetonate();
+          fixture_A->physics()->collide(fixture_B);
+          //static_cast<ProjectilePhysicsComponent*>(fixture_B->physics())->collide(fixture_A);
         }
         break;
       case EntityTypes::Background:
@@ -50,14 +49,14 @@ class ContactListener: public b2ContactListener {
         break;
       case EntityTypes::Projectile:
         if (fixture_B->type() == EntityTypes::Aerolite) {
-          static_cast<ProjectilePhysicsComponent*>(fixture_A->physics())->toDetonate();
-          static_cast<AerolitePhysicsComponent*>(fixture_B->physics())->toSplit();
+          //static_cast<ProjectilePhysicsComponent*>(fixture_A->physics())->collide(fixture_B);
+          fixture_B->physics()->collide(fixture_A);
         } else if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
           // fixture_A->toBeDeactivated();
           // fixture_B->toBeDeactivated();
         } else if (fixture_B->type() == EntityTypes::Projectile) {
-          static_cast<ProjectilePhysicsComponent*>(fixture_A->physics())->toDetonate();
-          static_cast<ProjectilePhysicsComponent*>(fixture_B->physics())->toDetonate();
+          //static_cast<ProjectilePhysicsComponent*>(fixture_A->physics())->collide(fixture_B);
+          //static_cast<ProjectilePhysicsComponent*>(fixture_B->physics())->collide(fixture_A);
         }
         break;
       case EntityTypes::Undefined:

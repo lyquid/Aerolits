@@ -32,10 +32,10 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
 
   ProjectilePhysicsComponent& operator=(const ProjectilePhysicsComponent& other) = delete;
   ProjectilePhysicsComponent& operator=(ProjectilePhysicsComponent&& other) noexcept;
-  
+
+  inline void collide(GameEntity* other) override { collided_ = true; }
   void detonate();
   virtual void setPosition(const SDL_FPoint& pos) override {}
-  inline void toDetonate() { detonate_ = true; }
   virtual void update(const GameEntity& projectile, float delta_time) override;
 
  private:
@@ -46,10 +46,8 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
   static constexpr float kDefaultProjectileSpeed_ {30.f};
   static constexpr std::size_t kExplosionRays_ {10};
 
-  ProjectileGraphicsComponent* graphics_ {nullptr};
-  // to be added in operators
   float blast_power_ {50};
-  bool detonate_ {false};
+  ProjectileGraphicsComponent* graphics_ {nullptr};
 };
 
 } // namespace ktp

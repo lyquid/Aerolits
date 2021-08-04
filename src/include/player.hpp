@@ -61,6 +61,7 @@ class PlayerPhysicsComponent: public PhysicsComponent {
   PlayerPhysicsComponent& operator=(const PlayerPhysicsComponent& other) = delete;
   PlayerPhysicsComponent& operator=(PlayerPhysicsComponent&& other) noexcept;
 
+  virtual void collide(GameEntity* other) override {}
   virtual void setPosition(const SDL_FPoint& pos) override {}
   virtual void update(const GameEntity& player, float delta_time) override;
 

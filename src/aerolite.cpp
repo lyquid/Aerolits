@@ -37,15 +37,15 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, Aerol
 ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) noexcept {
   if (this != &other) {
     // inherited members
-    body_  = std::exchange(other.body_, nullptr);
-    delta_ = std::move(other.delta_);
-    owner_ = std::exchange(other.owner_, nullptr);
-    shape_ = std::move(other.shape_);
-    size_  = other.size_;
+    body_     = std::exchange(other.body_, nullptr);
+    collided_ = other.collided_;
+    delta_    = std::move(other.delta_);
+    owner_    = std::exchange(other.owner_, nullptr);
+    shape_    = std::move(other.shape_);
+    size_     = other.size_;
     // own members
     graphics_ = std::exchange(other.graphics_, nullptr);
     aabb_     = std::move(other.aabb_);
-    to_be_splited_ = other.to_be_splited_;
   }
   return *this;
 }
@@ -133,7 +133,7 @@ void ktp::AerolitePhysicsComponent::spawnAerolite() {
 }
 
 void ktp::AerolitePhysicsComponent::split() {
-  to_be_splited_ = false;
+  collided_ = false;
   if (size_ < kMinSize_) {
     // very small, destroyed on impact
     owner_->deactivate();
@@ -206,7 +206,7 @@ void ktp::AerolitePhysicsComponent::transformRenderShape() {
 }
 
 void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float delta_time) {
-  if (to_be_splited_) split();
+  if (collided_) split();
 
   transformRenderShape();
 

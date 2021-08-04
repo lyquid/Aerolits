@@ -48,43 +48,48 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
 ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(ProjectilePhysicsComponent&& other) noexcept {
   if (this != &other) {
     // inherited members
-    body_  = other.body_;
-    delta_ = std::move(other.delta_);
-    owner_ = std::exchange(other.owner_, nullptr);
-    shape_ = std::move(other.shape_);
-    size_  = other.size_;
+    body_     = other.body_;
+    collided_ = other.collided_;
+    delta_    = std::move(other.delta_);
+    owner_    = std::exchange(other.owner_, nullptr);
+    shape_    = std::move(other.shape_);
+    size_     = other.size_;
     // own members
-    graphics_ = std::exchange(other.graphics_, nullptr);
+    blast_power_ = other.blast_power_;
+    graphics_    = std::exchange(other.graphics_, nullptr);
   }
   return *this;
 }
 
 void ktp::ProjectilePhysicsComponent::detonate() {
+  collided_ = false;
   owner_->deactivate();
   constexpr auto kPI {3.14159265358979323846264338327950288};
   for (std::size_t i = 0; i < kExplosionRays_; ++i) {
-    float angle = (i / (float)kExplosionRays_) * 360 * (kPI / 180);
-    b2Vec2 rayDir( sinf(angle), cosf(angle) );
+    float angle {(i / (float)kExplosionRays_) * 360 * (kPI / 180)};
+    b2Vec2 ray_dir {sinf(angle), cosf(angle)};
 
     b2BodyDef bd;
     bd.type = b2_dynamicBody;
     bd.fixedRotation = true; // rotation not necessary
     bd.bullet = true; // prevent tunneling at high speed
-    bd.linearDamping = 10; // drag due to moving through air
-    bd.gravityScale = 0; // ignore gravity
+    bd.linearDamping = 10.f; // drag due to moving through air
+    bd.gravityScale = 0.f; // ignore gravity
     bd.position = body_->GetPosition(); // start at blast center
-    bd.linearVelocity = blast_power_ * rayDir;
-    b2Body* body = world_->CreateBody(&bd);
+    bd.linearVelocity = blast_power_ * ray_dir;
 
-    b2CircleShape circleShape;
-    circleShape.m_radius = 0.05; // very small
+    auto body = world_->CreateBody(&bd);
+
+    b2CircleShape circle_shape;
+    circle_shape.m_radius = 0.05f; // very small
 
     b2FixtureDef fd;
-    fd.shape = &circleShape;
-    fd.density = 60 / (float)kExplosionRays_; // very high - shared across all particles
-    fd.friction = 0; // friction not necessary
+    fd.shape = &circle_shape;
+    fd.density = 60.f / (float)kExplosionRays_; // very high - shared across all particles
+    fd.friction = 0.f; // friction not necessary
     fd.restitution = 0.99f; // high restitution to reflect off obstacles
     fd.filter.groupIndex = -1; // particles should not collide with each other
+
     body->CreateFixture(&fd);
   }
 }
@@ -108,7 +113,7 @@ void ktp::ProjectilePhysicsComponent::transformRenderShape() {
 
 void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float delta_time) {
   const auto threshold {size_};
-  if (detonate_) {
+  if (collided_) {
     detonate();
     return;
   }

@@ -16,14 +16,22 @@ class PhysicsComponent {
 
   virtual ~PhysicsComponent() { if (body_) world_->DestroyBody(body_); }
 
-  inline b2Body* body() const { return body_; }
-  virtual void setPosition(const SDL_FPoint& pos) = 0;
+  inline auto body() const { return body_; }
+  inline auto collided() const { return collided_; }
+  inline auto delta() const { return delta_; }
+  inline auto owner() const { return owner_; }
+  inline auto& shape() { return shape_; }
+  inline auto size() const { return size_; }
+
+  virtual void collide(GameEntity*) = 0;
+  virtual void setPosition(const SDL_FPoint&) = 0;
+  virtual void update(const GameEntity&, float) = 0;
+
   static void setScreenSize(const SDL_FPoint& screen_size) {
     b2_screen_size_.x = screen_size.x / kMetersToPixels;
     b2_screen_size_.y = screen_size.y / kMetersToPixels;
   }
   static void setWorld(b2World* world) { world_ = world; }
-  virtual void update(const GameEntity&, float) = 0;
 
  protected:
 
@@ -32,6 +40,7 @@ class PhysicsComponent {
   static b2World*   world_;
 
   b2Body*      body_ {nullptr};
+  bool         collided_ {false};
   SDL_FPoint   delta_ {};
   GameEntity*  owner_ {nullptr};
   B2Vec2Vector shape_ {};
