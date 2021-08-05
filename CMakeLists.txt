@@ -39,7 +39,6 @@ endif()
 add_executable(Aerolits main.cpp
                         lib/pugixml1.11/pugixml.cpp
                         sdl2_wrappers/sdl2_audio.cpp
-                        sdl2_wrappers/sdl2_image.cpp
                         sdl2_wrappers/sdl2_music.cpp
                         sdl2_wrappers/sdl2_renderer.cpp
                         sdl2_wrappers/sdl2_sound.cpp
