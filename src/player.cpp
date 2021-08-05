@@ -81,11 +81,12 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner,PlayerGrap
 ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) noexcept {
   if (this != &other) {
     // inherited members
-    body_  = other.body_;
-    delta_ = std::move(other.delta_);
-    owner_ = std::exchange(other.owner_, nullptr);
-    shape_ = std::move(other.shape_);
-    size_  = other.size_;
+    body_     = other.body_;
+    collided_ = other.collided_;
+    delta_    = std::move(other.delta_);
+    owner_    = std::exchange(other.owner_, nullptr);
+    shape_    = std::move(other.shape_);
+    size_     = other.size_;
     // own members
     graphics_            = std::exchange(other.graphics_, nullptr);
     flame_shape_         = std::move(other.flame_shape_);
@@ -148,6 +149,7 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
 
   b2FixtureDef fixture_def {};
   fixture_def.density = 1.5f;
+  fixture_def.filter.groupIndex = -1;
   fixture_def.friction = 0.8f;
   fixture_def.shape = &triangle;
 

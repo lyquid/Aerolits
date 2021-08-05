@@ -4,6 +4,7 @@
 #include "palette.hpp"
 #include "physics_component.hpp"
 #include <SDL.h>
+#include <array>
 
 namespace ktp {
 
@@ -42,11 +43,17 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
 
   static void generateProjectileShape(B2Vec2Vector& shape, float size);
   void transformRenderShape();
-  static constexpr float kDefaultProjectileSize_ {0.15f};
-  static constexpr float kDefaultProjectileSpeed_ {30.f};
-  static constexpr std::size_t kExplosionRays_ {10};
+
+  static constexpr auto kDefaultProjectileSize_ {0.15f};
+  static constexpr auto kDefaultProjectileSpeed_ {30.f};
+  static constexpr auto kExplosionRays_ {100u};
+  static constexpr auto kExplosionDuration_ {500u};
+  static constexpr auto kPI {3.14159265358979323846264338327950288};
 
   float blast_power_ {50};
+  bool detonated_ {false};
+  std::array<b2Body*, kExplosionRays_> explosion_particles_ {};
+  Uint32 explosion_time_ {};
   ProjectileGraphicsComponent* graphics_ {nullptr};
 };
 

@@ -2,6 +2,7 @@
 #include "include/game_entity.hpp"
 #include "include/projectile.hpp"
 #include "../sdl2_wrappers/sdl2_renderer.hpp"
+#include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <box2d/box2d.h>
 
 /* GRAPHICS */
@@ -55,42 +56,46 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
     shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
-    blast_power_ = other.blast_power_;
-    graphics_    = std::exchange(other.graphics_, nullptr);
+    blast_power_         = other.blast_power_;
+    detonated_           = other.detonated_;
+    explosion_particles_ = std::move(other.explosion_particles_);
+    explosion_time_      = other.explosion_time_;
+    graphics_            = std::exchange(other.graphics_, nullptr);
   }
   return *this;
 }
 
 void ktp::ProjectilePhysicsComponent::detonate() {
-  collided_ = false;
-  owner_->deactivate();
-  constexpr auto kPI {3.14159265358979323846264338327950288};
+  detonated_ = true;
+  explosion_time_ = SDL2_Timer::getSDL2Ticks();
   for (std::size_t i = 0; i < kExplosionRays_; ++i) {
-    float angle {(i / (float)kExplosionRays_) * 360 * (kPI / 180)};
-    b2Vec2 ray_dir {sinf(angle), cosf(angle)};
+    float angle = (i / (float)kExplosionRays_) * 360 * (kPI / 180);
+    const b2Vec2 ray_dir {sinf(angle), cosf(angle)};
 
     b2BodyDef bd;
-    bd.type = b2_dynamicBody;
-    bd.fixedRotation = true; // rotation not necessary
-    bd.bullet = true; // prevent tunneling at high speed
-    bd.linearDamping = 10.f; // drag due to moving through air
-    bd.gravityScale = 0.f; // ignore gravity
-    bd.position = body_->GetPosition(); // start at blast center
+    bd.bullet = true;
+    bd.fixedRotation = true;
+    bd.linearDamping = 5.f;
     bd.linearVelocity = blast_power_ * ray_dir;
+    bd.position = body_->GetPosition();
+    bd.type = b2_dynamicBody;
+    bd.userData.pointer = 0;
 
-    auto body = world_->CreateBody(&bd);
+    auto body {world_->CreateBody(&bd)};
 
     b2CircleShape circle_shape;
-    circle_shape.m_radius = 0.05f; // very small
+    circle_shape.m_radius = 0.05f;
 
     b2FixtureDef fd;
+    fd.density = 60.f;
+    fd.filter.groupIndex = -1;
+    fd.friction = 0.f;
+    fd.restitution = 0.99f;
     fd.shape = &circle_shape;
-    fd.density = 60.f / (float)kExplosionRays_; // very high - shared across all particles
-    fd.friction = 0.f; // friction not necessary
-    fd.restitution = 0.99f; // high restitution to reflect off obstacles
-    fd.filter.groupIndex = -1; // particles should not collide with each other
 
     body->CreateFixture(&fd);
+
+    explosion_particles_[i] = body;
   }
 }
 
@@ -112,16 +117,22 @@ void ktp::ProjectilePhysicsComponent::transformRenderShape() {
 }
 
 void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float delta_time) {
-  const auto threshold {size_};
-  if (collided_) {
-    detonate();
-    return;
-  }
-  // check if laser is out of screen
-  if (body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
-      body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold) {
-    owner_->deactivate();
-  } else {
+  if (detonated_) {
+    if (SDL2_Timer::getSDL2Ticks() - kExplosionDuration_ > explosion_time_) {
+      for (auto& bodies: explosion_particles_) {
+        world_->DestroyBody(bodies);
+      }
+      owner_->deactivate();
+    }
     transformRenderShape();
+  } else {
+    const auto threshold {size_};
+    if (body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
+        body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold) {
+      owner_->deactivate();
+    } else {
+      transformRenderShape();
+      if (collided_) detonate();
+    }
   }
 }
