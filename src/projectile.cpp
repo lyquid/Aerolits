@@ -69,7 +69,7 @@ void ktp::ProjectilePhysicsComponent::detonate() {
   detonated_ = true;
   explosion_time_ = SDL2_Timer::getSDL2Ticks();
   for (std::size_t i = 0; i < kExplosionRays_; ++i) {
-    float angle = (i / (float)kExplosionRays_) * 360 * (kPI / 180);
+    const float angle = (i / (float)kExplosionRays_) * 360 * (kPI / 180);
     const b2Vec2 ray_dir {sinf(angle), cosf(angle)};
 
     b2BodyDef bd;
@@ -84,7 +84,7 @@ void ktp::ProjectilePhysicsComponent::detonate() {
     auto body {world_->CreateBody(&bd)};
 
     b2CircleShape circle_shape;
-    circle_shape.m_radius = 0.05f;
+    circle_shape.m_radius = 0.2f; // before 0.05f
 
     b2FixtureDef fd;
     fd.density = 60.f;

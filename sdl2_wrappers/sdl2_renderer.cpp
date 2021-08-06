@@ -1,14 +1,24 @@
 #include "sdl2_renderer.hpp"
 #include "sdl2_log.hpp"
-#include <cctype> // std::toupper
-#include <sstream> // stringstream
+#include <cctype>  // std::toupper
+#include <sstream> // std::stringstream
 
-bool ktp::SDL2_Renderer::clear() const {
-  if (SDL_RenderClear(renderer_.get()) == 0) {
-    return true;
-  }
-  return false;
+void ktp::b2ColorToSDL2Color(const b2Color& orig, SDL_Color& dest) {
+  dest.r = (Uint8)orig.r * 255;
+  dest.g = (Uint8)orig.g * 255;
+  dest.b = (Uint8)orig.b * 255;
+  dest.a = (Uint8)orig.a * 255;
 }
+
+void ktp::SDL2ColorToB2Color(const SDL_Color& orig, b2Color& dest) {
+  constexpr float inv {1.f / 255.f};
+  dest.r = orig.r * inv;
+  dest.g = orig.g * inv;
+  dest.b = orig.b * inv;
+  dest.a = orig.a * inv;
+}
+
+/* SDL2_Renderer */
 
 bool ktp::SDL2_Renderer::create(const SDL2_Window& window, Uint32 flags, const std::string& scale_q) {
   renderer_.reset(SDL_CreateRenderer(window.getWindow(), -1, flags));
@@ -38,17 +48,117 @@ bool ktp::SDL2_Renderer::create(const SDL2_Window& window, const SDL_Point& size
   return true;
 }
 
-void ktp::SDL2_Renderer::drawCross(const SDL_Color& color) const {
-  SDL_SetRenderDrawColor(renderer_.get(), color.r, color.g, color.b, color.a);
-  int w {}, h {};
-  SDL_GetRendererOutputSize(renderer_.get(), &w, &h);
-  SDL_RenderDrawLine(renderer_.get(), w / 2, 0, w / 2, h);
-  SDL_RenderDrawLine(renderer_.get(), 0, h / 2, w, h / 2);
+void ktp::SDL2_Renderer::drawCircle(const b2Vec2& center, float radius) const {
+  const int32_t diameter {radius * 2};
+
+  int32_t x = radius - 1;
+  int32_t y = 0;
+  int32_t tx = 1;
+  int32_t ty = 1;
+  int32_t error = tx - diameter;
+
+  while (x >= y) {
+    //  Each of the following renders an octant of the circle
+    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y - y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y + y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y - y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y + y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y - x);
+    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y + x);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y - x);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y + x);
+
+    if (error <= 0) {
+      ++y;
+      error += ty;
+      ty += 2;
+    }
+
+    if (error > 0) {
+      --x;
+      tx += 2;
+      error += (tx - diameter);
+    }
+  }
 }
 
-void ktp::SDL2_Renderer::drawGrid(int size, const SDL_Color& color) const {
-  SDL_SetRenderDrawColor(renderer_.get(), color.r, color.g, color.b, color.a);
-  int w {}, h {};
+void ktp::SDL2_Renderer::drawCircle(const SDL_Point& center, float radius) const {
+  const int32_t diameter {radius * 2};
+
+  int32_t x = radius - 1;
+  int32_t y = 0;
+  int32_t tx = 1;
+  int32_t ty = 1;
+  int32_t error = tx - diameter;
+
+  while (x >= y) {
+    //  Each of the following renders an octant of the circle
+    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y - y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y + y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y - y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y + y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y - x);
+    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y + x);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y - x);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y + x);
+
+    if (error <= 0) {
+      ++y;
+      error += ty;
+      ty += 2;
+    }
+
+    if (error > 0) {
+      --x;
+      tx += 2;
+      error += (tx - diameter);
+    }
+  }
+}
+
+void ktp::SDL2_Renderer::drawCircle(const SDL_FPoint& center, float radius) const {
+  const int32_t diameter {radius * 2};
+
+  int32_t x = radius - 1;
+  int32_t y = 0;
+  int32_t tx = 1;
+  int32_t ty = 1;
+  int32_t error = tx - diameter;
+
+  while (x >= y) {
+    //  Each of the following renders an octant of the circle
+    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y - y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y + y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y - y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y + y);
+    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y - x);
+    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y + x);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y - x);
+    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y + x);
+
+    if (error <= 0) {
+      ++y;
+      error += ty;
+      ty += 2;
+    }
+
+    if (error > 0) {
+      --x;
+      tx += 2;
+      error += (tx - diameter);
+    }
+  }
+}
+
+void ktp::SDL2_Renderer::drawCross() const {
+  int w, h;
+  SDL_GetRendererOutputSize(renderer_.get(), &w, &h);
+  SDL_RenderDrawLineF(renderer_.get(), w * 0.5f, 0, w * 0.5f, h);
+  SDL_RenderDrawLineF(renderer_.get(), 0, h * 0.5f, w, h * 0.5f);
+}
+
+void ktp::SDL2_Renderer::drawGrid(int size) const {
+  int w, h;
   SDL_GetRendererOutputSize(renderer_.get(), &w, &h);
   for (auto y = size; y < h; y += size) {
     SDL_RenderDrawLine(renderer_.get(), 0, y, w, y);
@@ -56,104 +166,6 @@ void ktp::SDL2_Renderer::drawGrid(int size, const SDL_Color& color) const {
   for (auto x = size; x < w; x += size) {
     SDL_RenderDrawLine(renderer_.get(), x, 0, x, h);
   }
-}
-
-bool ktp::SDL2_Renderer::drawLine(const SDL_Point& start, const SDL_Point& end) const {
-  if (SDL_RenderDrawLine(renderer_.get(), start.x, start.y, end.x, end.y) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawLine(const SDL_FPoint& start, const SDL_FPoint& end) const {
-  if (SDL_RenderDrawLine(renderer_.get(), start.x, start.y, end.x, end.y) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawLine(int x1, int y1, int x2, int y2) const {
-  if (SDL_RenderDrawLine(renderer_.get(), x1, y1, x2, y2) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawLine(float x1, float y1, float x2, float y2) const {
-  if (SDL_RenderDrawLine(renderer_.get(), x1, y1, x2, y2) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawLines(const std::vector<SDL_Point>& points) const {
-  if (SDL_RenderDrawLines(renderer_.get(), points.data(), points.size()) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawLines(const std::vector<SDL_FPoint>& points) const {
-  if (SDL_RenderDrawLinesF(renderer_.get(), points.data(), points.size()) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawPoint(const SDL_Point& point) const {
-  if (SDL_RenderDrawPoint(renderer_.get(), point.x, point.y) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawPoint(const SDL_FPoint& point) const {
-  if (SDL_RenderDrawPointF(renderer_.get(), point.x, point.y) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawPoint(int x, int y) const {
-  if (SDL_RenderDrawPoint(renderer_.get(), x, y) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawPoint(float x, float y) const {
-  if (SDL_RenderDrawPointF(renderer_.get(), x, y) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawPoints(const std::vector<SDL_Point>& points) const {
-  if (SDL_RenderDrawPoints(renderer_.get(), points.data(), points.size()) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawPoints(const std::vector<SDL_FPoint>& points) const {
-  if (SDL_RenderDrawPointsF(renderer_.get(), points.data(), points.size()) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawRect(const SDL_Rect& rect) const {
-  if (SDL_RenderDrawRect(renderer_.get(), &rect)) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::drawRectFill(const SDL_Rect& rect) const {
-  if (SDL_RenderFillRect(renderer_.get(), &rect) == 0) {
-    return true;
-  }
-  return false;
 }
 
 bool ktp::SDL2_Renderer::getRendererInfo() {
@@ -179,7 +191,7 @@ bool ktp::SDL2_Renderer::getRendererInfo() {
         case SDL_PIXELFORMAT_ABGR4444: texture_formats += "ABGR4444 "; break;
         case SDL_PIXELFORMAT_BGRA4444: texture_formats += "BGRA4444 "; break;
         case SDL_PIXELFORMAT_ARGB1555: texture_formats += "ARGB1555 "; break;
-        case SDL_PIXELFORMAT_RGBA5551: texture_formats += "RGBA5551 "; break;  
+        case SDL_PIXELFORMAT_RGBA5551: texture_formats += "RGBA5551 "; break;
         case SDL_PIXELFORMAT_ABGR1555: texture_formats += "ABGR1555 "; break;
         case SDL_PIXELFORMAT_BGRA5551: texture_formats += "BGRA5551 "; break;
         case SDL_PIXELFORMAT_RGB565: texture_formats += "RGB565 "; break;
@@ -224,7 +236,7 @@ bool ktp::SDL2_Renderer::getRendererInfo() {
     if ((flags & SDL_RENDERER_TARGETTEXTURE) == SDL_RENDERER_TARGETTEXTURE) {
       flags_in_text += "SDL_RENDERER_TARGETTEXTURE";
     }
-    
+
     std::string renderer_name{renderer_info_.name};
     for (auto& letter: renderer_name) letter = std::toupper(letter);
 
@@ -233,23 +245,9 @@ bool ktp::SDL2_Renderer::getRendererInfo() {
       << "Renderer flags: " << flags_in_text << '\n'
       << std::to_string(renderer_info_.num_texture_formats) << " available texture format(s): "
       << texture_formats << '\n'
-      << "Max texture size " << std::to_string(renderer_info_.max_texture_width) 
+      << "Max texture size " << std::to_string(renderer_info_.max_texture_width)
       << "x" << std::to_string(renderer_info_.max_texture_height);
     logMessage(os.str());
     return true;
   }
-}
-
-bool ktp::SDL2_Renderer::setDrawColor(const SDL_Color& color) const {
-  if (SDL_SetRenderDrawColor(renderer_.get(), color.r, color.g, color.b, color.a) == 0) {
-    return true;
-  }
-  return false;
-}
-
-bool ktp::SDL2_Renderer::setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
-  if (SDL_SetRenderDrawColor(renderer_.get(), r, g, b, a) == 0) {
-    return true;
-  }
-  return false;
 }

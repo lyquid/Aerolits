@@ -12,49 +12,21 @@ class DebugDraw: public b2Draw {
  public:
 
   void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) {
-    renderer_->setDrawColor(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
-
-    const int32_t diameter = radius * 2;
-
-    int32_t x = radius - 1;
-    int32_t y = 0;
-    int32_t tx = 1;
-    int32_t ty = 1;
-    int32_t error = tx - diameter;
-
-    while (x >= y) {
-      //  Each of the following renders an octant of the circle
-      renderer_->drawPoint((center.x + x) * kMetersToPixels, (center.y - y) * kMetersToPixels);
-      renderer_->drawPoint((center.x + x) * kMetersToPixels, (center.y + y) * kMetersToPixels);
-      renderer_->drawPoint((center.x - x) * kMetersToPixels, (center.y - y) * kMetersToPixels);
-      renderer_->drawPoint((center.x - x) * kMetersToPixels, (center.y + y) * kMetersToPixels);
-      renderer_->drawPoint((center.x + y) * kMetersToPixels, (center.y - x) * kMetersToPixels);
-      renderer_->drawPoint((center.x + y) * kMetersToPixels, (center.y + x) * kMetersToPixels);
-      renderer_->drawPoint((center.x - y) * kMetersToPixels, (center.y - x) * kMetersToPixels);
-      renderer_->drawPoint((center.x - y) * kMetersToPixels, (center.y + x) * kMetersToPixels);
-
-      if (error <= 0) {
-        ++y;
-        error += ty;
-        ty += 2;
-      }
-
-      if (error > 0) {
-        --x;
-        tx += 2;
-        error += (tx - diameter);
-      }
-    }
+    renderer_->setDrawColor(color);
+    renderer_->drawCircle(SDL_FPoint{center.x * kMetersToPixels, center.y * kMetersToPixels}, radius * kMetersToPixels);
   }
 
   void DrawPoint(const b2Vec2 &p, float size, const b2Color &color) {
-    // missing the size param
-    renderer_->setDrawColor(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
-    renderer_->drawPoint(p.x * kMetersToPixels, p.y * kMetersToPixels);
+    renderer_->setDrawColor(color);
+    if (size <= 1) {
+      renderer_->drawPoint(p.x * kMetersToPixels, p.y * kMetersToPixels);
+    } else {
+      renderer_->drawCircle(p, size * kMetersToPixels);
+    }
   }
 
   void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) {
-    renderer_->setDrawColor(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
+    renderer_->setDrawColor(color);
     std::vector<SDL_FPoint> points(vertexCount + 1);
     for (auto i = 0; i < vertexCount; ++i) {
       points[i].x = vertices[i].x * kMetersToPixels;
@@ -66,39 +38,8 @@ class DebugDraw: public b2Draw {
 
   void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) {
     //logMessage("DrawSolidCircle not implemented");
-    renderer_->setDrawColor(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
-
-    const int32_t diameter = radius * 2;
-
-    int32_t x = radius - 1;
-    int32_t y = 0;
-    int32_t tx = 1;
-    int32_t ty = 1;
-    int32_t error = tx - diameter;
-
-    while (x >= y) {
-      //  Each of the following renders an octant of the circle
-      renderer_->drawPoint((center.x + x) * kMetersToPixels, (center.y - y) * kMetersToPixels);
-      renderer_->drawPoint((center.x + x) * kMetersToPixels, (center.y + y) * kMetersToPixels);
-      renderer_->drawPoint((center.x - x) * kMetersToPixels, (center.y - y) * kMetersToPixels);
-      renderer_->drawPoint((center.x - x) * kMetersToPixels, (center.y + y) * kMetersToPixels);
-      renderer_->drawPoint((center.x + y) * kMetersToPixels, (center.y - x) * kMetersToPixels);
-      renderer_->drawPoint((center.x + y) * kMetersToPixels, (center.y + x) * kMetersToPixels);
-      renderer_->drawPoint((center.x - y) * kMetersToPixels, (center.y - x) * kMetersToPixels);
-      renderer_->drawPoint((center.x - y) * kMetersToPixels, (center.y + x) * kMetersToPixels);
-
-      if (error <= 0) {
-        ++y;
-        error += ty;
-        ty += 2;
-      }
-
-      if (error > 0) {
-        --x;
-        tx += 2;
-        error += (tx - diameter);
-      }
-    }
+    renderer_->setDrawColor(color);
+    renderer_->drawCircle(SDL_FPoint{center.x * kMetersToPixels, center.y * kMetersToPixels}, radius * kMetersToPixels);
   }
 
   void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) {
@@ -114,7 +55,7 @@ class DebugDraw: public b2Draw {
   }
 
   void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) {
-    renderer_->setDrawColor(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
+    renderer_->setDrawColor(color);
     renderer_->drawLine(p1.x * kMetersToPixels, p1.y * kMetersToPixels, p2.x * kMetersToPixels, p2.y * kMetersToPixels);
   }
 
