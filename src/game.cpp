@@ -16,6 +16,8 @@ b2World*   ktp::PhysicsComponent::world_ {nullptr};
 
 /* GAME */
 
+ktp::SDL2_Timer ktp::Game::gameplay_timer_ {};
+
 ktp::Game::Game() {
   event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);
 }

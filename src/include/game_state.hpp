@@ -62,6 +62,7 @@ class PlayingState: public GameState {
   virtual void draw(Game& game) override;
   virtual void handleEvents(Game& game) override;
   virtual void update(Game& game, float delta_time) override;
+  virtual GameState* enter(Game& game) override;
  private:
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
 };

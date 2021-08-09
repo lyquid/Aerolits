@@ -42,6 +42,11 @@ class Game {
   void reset();
   inline void update(float delta_time) { state_->update(*this, delta_time); }
 
+  /**
+   * @brief This timer only goes when playing or in demo state.
+   */
+  static SDL2_Timer gameplay_timer_;
+
  private:
 
   void clean();
@@ -49,8 +54,8 @@ class Game {
   bool loadResources();
 
   const std::string kGameTitle_ {"Aerolits"};
-  //SDL_Point screen_size_ {1366, 768};
-  SDL_Point screen_size_ {1920, 1080};
+  SDL_Point screen_size_ {1366, 768};
+  //SDL_Point screen_size_ {1920, 1080};
   bool paused_ {false};
   bool quit_ {false};
   SDL2_Window main_window_ {};

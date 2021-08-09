@@ -1,4 +1,5 @@
 #include "include/box2d_scale.hpp"
+#include "include/game.hpp"
 #include "include/game_entity.hpp"
 #include "include/projectile.hpp"
 #include "../sdl2_wrappers/sdl2_renderer.hpp"
@@ -67,7 +68,7 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
 
 void ktp::ProjectilePhysicsComponent::detonate() {
   detonated_ = true;
-  explosion_time_ = SDL2_Timer::getSDL2Ticks();
+  explosion_time_ = Game::gameplay_timer_.getTicks();
   for (std::size_t i = 0; i < kExplosionRays_; ++i) {
     const float angle = (i / (float)kExplosionRays_) * 360 * (kPI / 180);
     const b2Vec2 ray_dir {sinf(angle), cosf(angle)};
@@ -118,7 +119,7 @@ void ktp::ProjectilePhysicsComponent::transformRenderShape() {
 
 void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float delta_time) {
   if (detonated_) {
-    if (SDL2_Timer::getSDL2Ticks() - kExplosionDuration_ > explosion_time_) {
+    if (Game::gameplay_timer_.getTicks() - kExplosionDuration_ > explosion_time_) {
       for (auto& bodies: explosion_particles_) {
         world_->DestroyBody(bodies);
       }

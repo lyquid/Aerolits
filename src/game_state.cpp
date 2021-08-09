@@ -50,6 +50,7 @@ void ktp::DemoState::draw(Game& game) {
 }
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
+  Game::gameplay_timer_.isPaused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Player) {
       GameEntity::game_entities_[i].object_.free(i);
@@ -126,6 +127,7 @@ void ktp::PausedState::draw(Game& game) {
 }
 
 ktp::GameState* ktp::PausedState::enter(Game& game) {
+  Game::gameplay_timer_.pause();
   blink_flag_ = true;
   blink_timer_ = SDL2_Timer::getSDL2Ticks();
   return this;
@@ -180,6 +182,11 @@ void ktp::PlayingState::draw(Game& game) {
   if (game.debug_draw_on_) game.world_.DebugDraw();
 
   game.renderer_.present();
+}
+
+ktp::GameState* ktp::PlayingState::enter(Game& game) {
+  Game::gameplay_timer_.isPaused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
+  return this;
 }
 
 void ktp::PlayingState::handleEvents(Game& game) {
