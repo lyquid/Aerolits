@@ -26,19 +26,19 @@ void ktp::InputComponent::shoot(GameEntity& player) {
       -ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * cos
     });
 
-    shooting_timer_ = SDL2_Timer::getSDL2Ticks();
+    shooting_timer_ = SDL2_Timer::SDL2Ticks();
     // player.event_bus_.postEvent(kuge::EventTypes::LaserFired);
   }
 }
 
 void ktp::InputComponent::steer(float angular_impulse) {
   physics_->body_->SetAngularVelocity(angular_impulse);
-  stabilizer_time_ = SDL2_Timer::getSDL2Ticks();
+  stabilizer_time_ = SDL2_Timer::SDL2Ticks();
   steering_ = true;
 }
 
 void ktp::InputComponent::stopSteering(float delta_time) {
-  if (steering_ && SDL2_Timer::getSDL2Ticks() - stabilizer_time_ > delta_time) {
+  if (steering_ && SDL2_Timer::SDL2Ticks() - stabilizer_time_ > delta_time) {
     physics_->body_->SetAngularVelocity(0.f);
     steering_ = false;
   }

@@ -41,16 +41,16 @@ void ktp::DemoState::draw(Game& game) {
     const int h = game.screen_size_.y * 0.1f;
     game.demo_text_.render({(int)(game.screen_size_.x * 0.5f - w * 0.5f), (int)(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
   }
-  if (SDL2_Timer::getSDL2Ticks() - blink_timer_ > 500) {
+  if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
-    blink_timer_ = SDL2_Timer::getSDL2Ticks();
+    blink_timer_ = SDL2_Timer::SDL2Ticks();
   }
 
   game.renderer_.present();
 }
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
-  Game::gameplay_timer_.isPaused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
+  Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Player) {
       GameEntity::game_entities_[i].object_.free(i);
@@ -58,7 +58,7 @@ ktp::GameState* ktp::DemoState::enter(Game& game) {
   }
   GameEntity::createEntity(EntityTypes::PlayerDemo);
   blink_flag_ = true;
-  blink_timer_ = SDL2_Timer::getSDL2Ticks();
+  blink_timer_ = SDL2_Timer::SDL2Ticks();
   return this;
 }
 
@@ -118,9 +118,9 @@ void ktp::PausedState::draw(Game& game) {
     const int h = game.screen_size_.y * 0.05f;
     game.paused_text_.render({(int)(game.screen_size_.x * 0.5f - w * 0.5f), (int)(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
   }
-  if (SDL2_Timer::getSDL2Ticks() - blink_timer_ > 500) {
+  if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
-    blink_timer_ = SDL2_Timer::getSDL2Ticks();
+    blink_timer_ = SDL2_Timer::SDL2Ticks();
   }
 
   game.renderer_.present();
@@ -129,7 +129,7 @@ void ktp::PausedState::draw(Game& game) {
 ktp::GameState* ktp::PausedState::enter(Game& game) {
   Game::gameplay_timer_.pause();
   blink_flag_ = true;
-  blink_timer_ = SDL2_Timer::getSDL2Ticks();
+  blink_timer_ = SDL2_Timer::SDL2Ticks();
   return this;
 }
 
@@ -185,7 +185,7 @@ void ktp::PlayingState::draw(Game& game) {
 }
 
 ktp::GameState* ktp::PlayingState::enter(Game& game) {
-  Game::gameplay_timer_.isPaused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
+  Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
   return this;
 }
 
@@ -274,7 +274,7 @@ ktp::GameState* ktp::TitleState::enter(Game& game) {
   game.reset();
   GameEntity::createEntity(EntityTypes::Background);
   GameEntity::createEntity(EntityTypes::Player);
-  demo_time_ = SDL2_Timer::getSDL2Ticks();
+  demo_time_ = SDL2_Timer::SDL2Ticks();
   return this;
 }
 
@@ -290,7 +290,7 @@ void ktp::TitleState::handleEvents(Game& game) {
         handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN:
-        demo_time_ = SDL2_Timer::getSDL2Ticks();
+        demo_time_ = SDL2_Timer::SDL2Ticks();
         break;
       default:
         break;
@@ -305,7 +305,7 @@ void ktp::TitleState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.quit_ = true;
       break;
     default:
-      demo_time_ = SDL2_Timer::getSDL2Ticks();
+      demo_time_ = SDL2_Timer::SDL2Ticks();
       game.state_ = goToState(game, GameState::playing_);
       break;
   }
@@ -319,7 +319,7 @@ void ktp::TitleState::update(Game& game, float delta_time) {
     GameEntity::game_entities_[i].object_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
   }
   // enter Demo mode
-  if (SDL2_Timer::getSDL2Ticks() - demo_time_ > kWaitForDemo_) {
+  if (SDL2_Timer::SDL2Ticks() - demo_time_ > kWaitForDemo_) {
     game.state_ = goToState(game, GameState::demo_);
   }
 }

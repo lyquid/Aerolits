@@ -45,7 +45,7 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
     return;
   }
 
-  const auto current_time{SDL2_Timer::getSDL2Ticks()};
+  const auto current_time{SDL2_Timer::SDL2Ticks()};
   if (current_time - start_time_ > data_->life_time_) return;
   if (current_time - interval_time_ < data_->emission_interval_.value_) return;
 
@@ -101,7 +101,7 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
 
     if (first_available_ == nullptr) return;
   }
-  interval_time_ = SDL2_Timer::getSDL2Ticks();
+  interval_time_ = SDL2_Timer::SDL2Ticks();
 }
 
 void ktp::EmitterPhysicsComponent::inflatePool() {

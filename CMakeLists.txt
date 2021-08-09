@@ -42,7 +42,6 @@ add_executable(Aerolits main.cpp
                         sdl2_wrappers/sdl2_renderer.cpp
                         sdl2_wrappers/sdl2_sound.cpp
                         sdl2_wrappers/sdl2_texture.cpp
-                        sdl2_wrappers/sdl2_timer.cpp
                         sdl2_wrappers/sdl2_window.cpp
                         kuge/event_bus.cpp
                         kuge/event.cpp

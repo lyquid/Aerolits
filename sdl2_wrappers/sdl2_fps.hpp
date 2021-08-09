@@ -5,8 +5,8 @@
 
 namespace ktp {
 
-/* Just ++FPS every SDL_RenderPresent and 
-*  get your average fps calling "average()" */ 
+/* Just ++FPS every SDL_RenderPresent and
+*  get your average fps calling "average()" */
 class SDL2_FPS {
  public:
 
@@ -18,14 +18,14 @@ class SDL2_FPS {
 
   inline void addFrame(unsigned int inc = 1u) { counted_frames_ += inc; }
 
-  inline auto average() const { return counted_frames_ / (fps_timer_.getTicks() / 1000.f); }
+  inline auto average() const { return counted_frames_ / (fps_timer_.milliseconds() / 1000.f); }
 
   inline void start() { fps_timer_.start(); }
 
  private:
- 
+
   unsigned long long counted_frames_{0};
-  SDL2_Timer fps_timer_{}; 
+  SDL2_Timer fps_timer_{};
 };
 
 } // namespace ktp

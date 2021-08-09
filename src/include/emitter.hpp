@@ -47,7 +47,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   void generateParticles();
   inline auto getAliveParticlesCount() const { return alive_particles_count_; }
   inline SDL_FPoint getPosition() const { return position_; }
-  inline bool lifeTimeOver() const { return SDL2_Timer::getSDL2Ticks() - start_time_ >= data_->life_time_; }
+  inline bool lifeTimeOver() const { return SDL2_Timer::SDL2Ticks() - start_time_ >= data_->life_time_; }
   static EmitterPhysicsComponent makeEmitter(EmitterGraphicsComponent* graphics, const std::string& type, const SDL_FPoint& pos);
   inline bool particlesAlive() const { return alive_particles_count_ != 0u; }
   virtual void setPosition(const SDL_FPoint& pos) override { position_ = pos; }
@@ -66,7 +66,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   const EmitterType* data_ {nullptr};
   Particle*          first_available_ {nullptr};
   SDL_FPoint         position_ {0, 0};
-  Uint32             start_time_ {SDL2_Timer::getSDL2Ticks()};
+  Uint32             start_time_ {SDL2_Timer::SDL2Ticks()};
   Uint32             interval_time_ {};
 };
 

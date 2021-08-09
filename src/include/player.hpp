@@ -38,7 +38,7 @@ class DemoInputComponent: public InputComponent {
  private:
   static constexpr int kThrustingInterval_ {5000};
   bool   thrust_ {};
-  Uint32 thrusting_timer_ {SDL2_Timer::getSDL2Ticks()};
+  Uint32 thrusting_timer_ {SDL2_Timer::SDL2Ticks()};
 };
 
 class PlayerInputComponent: public InputComponent {

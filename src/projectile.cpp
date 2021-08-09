@@ -68,7 +68,7 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
 
 void ktp::ProjectilePhysicsComponent::detonate() {
   detonated_ = true;
-  explosion_time_ = Game::gameplay_timer_.getTicks();
+  explosion_time_ = Game::gameplay_timer_.milliseconds();
   for (std::size_t i = 0; i < kExplosionRays_; ++i) {
     const float angle = (i / (float)kExplosionRays_) * 360 * (kPI / 180);
     const b2Vec2 ray_dir {sinf(angle), cosf(angle)};
@@ -119,7 +119,7 @@ void ktp::ProjectilePhysicsComponent::transformRenderShape() {
 
 void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float delta_time) {
   if (detonated_) {
-    if (Game::gameplay_timer_.getTicks() - kExplosionDuration_ > explosion_time_) {
+    if (Game::gameplay_timer_.milliseconds() - kExplosionDuration_ > explosion_time_) {
       for (auto& bodies: explosion_particles_) {
         world_->DestroyBody(bodies);
       }

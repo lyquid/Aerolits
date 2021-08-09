@@ -31,9 +31,9 @@ void ktp::DemoInputComponent::update(GameEntity& player, float delta_time) {
 
   thrust_ ? thrust(player, delta_time) : stopThrusting(player);
 
-  if (SDL2_Timer::getSDL2Ticks() - thrusting_timer_ > kThrustingInterval_) {
+  if (SDL2_Timer::SDL2Ticks() - thrusting_timer_ > kThrustingInterval_) {
     thrust_ = !thrust_;
-    thrusting_timer_ = SDL2_Timer::getSDL2Ticks();
+    thrusting_timer_ = SDL2_Timer::SDL2Ticks();
   }
 }
 
