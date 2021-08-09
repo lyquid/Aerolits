@@ -39,7 +39,7 @@ class Game {
   bool init();
   inline void setFrameTime(double time) { frame_time_ = time; }
   inline bool quit() const { return quit_; }
-  inline void reset() { GameEntity::clear(); }
+  void reset();
   inline void update(float delta_time) { state_->update(*this, delta_time); }
 
  private:
@@ -49,8 +49,8 @@ class Game {
   bool loadResources();
 
   const std::string kGameTitle_ {"Aerolits"};
-  SDL_Point screen_size_ {1366, 768};
-  // SDL_Point screen_size_ {1920, 1080};
+  //SDL_Point screen_size_ {1366, 768};
+  SDL_Point screen_size_ {1920, 1080};
   bool paused_ {false};
   bool quit_ {false};
   SDL2_Window main_window_ {};

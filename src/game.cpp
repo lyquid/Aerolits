@@ -76,3 +76,18 @@ bool ktp::Game::loadResources() {
   ParticlesAtlas::loadTexture(renderer_);
   return true;
 }
+
+void ktp::Game::reset() {
+  GameEntity::clear();
+  // we need to do this to prevent some of the bodies not being destroyed
+  // ie: explosion particles if you pause and got to title
+  if (world_.GetBodyCount()) {
+    b2Body* body {world_.GetBodyList()};
+    b2Body* aux {nullptr};
+    while (body) {
+      aux = body->GetNext();
+      world_.DestroyBody(body);
+      body = aux;
+    }
+  }
+}

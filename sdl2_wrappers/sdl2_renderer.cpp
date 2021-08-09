@@ -49,7 +49,7 @@ bool ktp::SDL2_Renderer::create(const SDL2_Window& window, const SDL_Point& size
 }
 
 void ktp::SDL2_Renderer::drawCircle(const b2Vec2& center, float radius) const {
-  const int32_t diameter {radius * 2};
+  const int32_t diameter = radius * 2 ;
 
   int32_t x = radius - 1;
   int32_t y = 0;
@@ -83,7 +83,7 @@ void ktp::SDL2_Renderer::drawCircle(const b2Vec2& center, float radius) const {
 }
 
 void ktp::SDL2_Renderer::drawCircle(const SDL_Point& center, float radius) const {
-  const int32_t diameter {radius * 2};
+  const int32_t diameter = radius * 2;
 
   int32_t x = radius - 1;
   int32_t y = 0;
@@ -117,7 +117,7 @@ void ktp::SDL2_Renderer::drawCircle(const SDL_Point& center, float radius) const
 }
 
 void ktp::SDL2_Renderer::drawCircle(const SDL_FPoint& center, float radius) const {
-  const int32_t diameter {radius * 2};
+  const int32_t diameter = radius * 2;
 
   int32_t x = radius - 1;
   int32_t y = 0;
@@ -173,7 +173,7 @@ bool ktp::SDL2_Renderer::getRendererInfo() {
     logSDL2Error("SDL_GetRendererInfo");
     return false;
   } else {
-    std::string texture_formats{};
+    std::string texture_formats {};
     for (auto i = 0u; i < renderer_info_.num_texture_formats; ++i) {
       switch (renderer_info_.texture_formats[i]) {
         case SDL_PIXELFORMAT_UNKNOWN: texture_formats += "UNKNOWN "; break;
@@ -222,8 +222,8 @@ bool ktp::SDL2_Renderer::getRendererInfo() {
       }
     }
 
-    const auto flags{renderer_info_.flags};
-    std::string flags_in_text{};
+    const auto flags {renderer_info_.flags};
+    std::string flags_in_text {};
     if ((flags & SDL_RENDERER_SOFTWARE) == SDL_RENDERER_SOFTWARE) {
       flags_in_text += "SDL_RENDERER_SOFTWARE | ";
     }
@@ -240,7 +240,7 @@ bool ktp::SDL2_Renderer::getRendererInfo() {
     std::string renderer_name{renderer_info_.name};
     for (auto& letter: renderer_name) letter = std::toupper(letter);
 
-    std::stringstream os{};
+    std::stringstream os {};
     os << "SDL_Renderer is " << renderer_name << '\n'
       << "Renderer flags: " << flags_in_text << '\n'
       << std::to_string(renderer_info_.num_texture_formats) << " available texture format(s): "
