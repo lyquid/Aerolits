@@ -4,7 +4,7 @@
 #include "event.hpp"
 #include "system.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
-#include "../src/include/resources_path.hpp"
+#include "../src/include/paths.hpp"
 #include <array>
 #include <iterator>
 #include <random>

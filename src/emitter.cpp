@@ -1,3 +1,4 @@
+#include "include/config_parser.hpp"
 #include "include/emitter.hpp"
 #include "include/game_entity.hpp"
 #include "include/random.hpp"
@@ -124,7 +125,7 @@ ktp::EmitterPhysicsComponent ktp::EmitterPhysicsComponent::makeEmitter(EmitterGr
 
 void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
   bool emitter_found {false};
-  for (const auto& emitter_type: EmitterParser::emitter_types) {
+  for (const auto& emitter_type: ConfigParser::emitter_types) {
     if (emitter_type.type_ == type) {
       data_ = &emitter_type;
       graphics_->blend_mode_ = emitter_type.blend_mode_;

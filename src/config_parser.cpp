@@ -1,19 +1,20 @@
-#include "include/emitter_parser.hpp"
+#include "include/config_parser.hpp"
+#include "include/emitter.hpp"
 #include "include/palette.hpp"
-#include "include/resources_path.hpp"
+#include "include/paths.hpp"
+#include "../sdl2_wrappers/sdl2_log.hpp"
 #include <algorithm> // std::transform
 #include <sstream>
-#include <string>
 
-std::vector<ktp::EmitterType> ktp::EmitterParser::emitter_types{};
+std::vector<ktp::EmitterType> ktp::ConfigParser::emitter_types {};
 
-void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& doc) {
+void ktp::ConfigParser::constructEmitterTypesVector(const pugi::xml_document& doc) {
   const auto emitters{doc.child("emitterTypes")};
   std::string types_created{};
   for (const auto& emitter: emitters) {
-    EmitterType emi{};
+    EmitterType emi {};
     /* EMITTER TYPE */
-    std::string type{emitter.attribute("type").as_string()};
+    std::string type {emitter.attribute("type").as_string()};
     std::transform(type.begin(), type.end(), type.begin(), ::tolower);
     types_created += (type + ' ');
     emi.type_ = type;
@@ -58,9 +59,9 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     }
     emi.life_time_ = emitter.child("lifeTime").attribute("value").as_int();
     /* TEXTURE RECTANGLE */
-    if (emitter.child("textureRect").attribute("x").as_int() < 0 
-     || emitter.child("textureRect").attribute("y").as_int() < 0 
-     || emitter.child("textureRect").attribute("w").as_int() < 0 
+    if (emitter.child("textureRect").attribute("x").as_int() < 0
+     || emitter.child("textureRect").attribute("y").as_int() < 0
+     || emitter.child("textureRect").attribute("w").as_int() < 0
      || emitter.child("textureRect").attribute("h").as_int() < 0 ) {
         logMessage("WARNING! Emitter \"" + type + "\" has an imposible texture rectangle.");
     }
@@ -143,7 +144,7 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
     emi.start_rotation_speed_.value_    = emitter.child("startRotationSpeed").attribute("value").as_float();
     emi.start_rotation_speed_.rand_min_ = emitter.child("startRotationSpeed").attribute("randMin").as_float();
     emi.start_rotation_speed_.rand_max_ = emitter.child("startRotationSpeed").attribute("randMax").as_float();
-    /* END ROTATION SPEED */ 
+    /* END ROTATION SPEED */
     emi.end_rotation_speed_.value_    = emitter.child("endRotationSpeed").attribute("value").as_float();
     emi.end_rotation_speed_.rand_min_ = emitter.child("endRotationSpeed").attribute("randMin").as_float();
     emi.end_rotation_speed_.rand_max_ = emitter.child("endRotationSpeed").attribute("randMax").as_float();
@@ -153,29 +154,45 @@ void ktp::EmitterParser::constructEmitterTypesVector(const pugi::xml_document& d
   logMessage("Loaded " + std::to_string(emitter_types.size()) + " particle emitter configurations: " + types_created);
 }
 
-bool ktp::EmitterParser::initEmitters() {
-  loadEmitterTypes();
-  return true;
+bool ktp::ConfigParser::loadConfigFiles() {
+  return loadAerolitesConfig() && loadEmittersConfig()
+         && loadPlayerConfig() && loadProjectilesConfig();
 }
 
-void ktp::EmitterParser::loadEmitterTypes() {
-  const std::string file{"emitters.xml"};
-  const std::string path{getResourcesPath("particles") + file};
-  pugi::xml_document doc{};
-  const auto result{doc.load_file(path.c_str())};
+bool ktp::ConfigParser::loadPlayerConfig() {
+  const std::string path {getConfigPath() + kPlayerFile};
+  pugi::xml_document doc {};
+  const auto result {doc.load_file(path.c_str())};
   if (result) {
-    // printLoadedEmitterTypes(doc);
-    constructEmitterTypesVector(doc);
+    // do something!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   } else {
-    const std::string error_msg{
-            "WARNING! " + file + " parsed with errors\n"
+    const std::string error_msg {
+            "WARNING! " + kPlayerFile + " parsed with errors\n"
             + "Error description: " + result.description() + '\n'
             + "Error offset: " + std::to_string(result.offset)};
     logErrorMessage(error_msg, path);
   }
 }
 
-void ktp::EmitterParser::printLoadedEmitterTypes(const pugi::xml_document& doc) {
+bool ktp::ConfigParser::loadEmittersConfig() {
+  const std::string path {getConfigPath() + kEmittersFile};
+  pugi::xml_document doc {};
+  const auto result {doc.load_file(path.c_str())};
+  if (result) {
+    // printLoadedEmitterTypes(doc);
+    constructEmitterTypesVector(doc);
+    return true;
+  } else {
+    const std::string error_msg{
+            "WARNING! " + kEmittersFile + " parsed with errors\n"
+            + "Error description: " + result.description() + '\n'
+            + "Error offset: " + std::to_string(result.offset)};
+    logErrorMessage(error_msg, path);
+    return false;
+  }
+}
+
+void ktp::ConfigParser::printLoadedEmitterTypes(const pugi::xml_document& doc) {
   const auto emitters{doc.child("emitterTypes")};
   std::ostringstream final_string{};
   for (const auto& emitter: emitters) {

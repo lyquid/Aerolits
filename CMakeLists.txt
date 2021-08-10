@@ -51,8 +51,8 @@ add_executable(Aerolits main.cpp
                         kuge/system.cpp
                         src/aerolite.cpp
                         src/background.cpp
+                        src/config_parser.cpp
                         src/emitter.cpp
-                        src/emitter_parser.cpp
                         src/game.cpp
                         src/game_state.cpp
                         src/particle.cpp

@@ -13,8 +13,6 @@
 
 namespace ktp {
 
-void loadConfigFiles();
-
 class Game {
 
   friend class DemoState;

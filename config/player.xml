@@ -1,0 +1,9 @@
+<player>
+  <color r="0" g="0" b="255" a="255"/>
+  <size value="1.2"/>
+  <Box2D>
+    <density value="1.5"/>
+    <friction value="0.8"/>
+    <restitution value="0.0"/>
+  </Box2D>
+</player>

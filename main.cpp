@@ -1,3 +1,4 @@
+#include "src/include/config_parser.hpp"
 #include "src/include/game.hpp"
 #include <ctime>
 
@@ -5,7 +6,7 @@ int main(int argv, char* args[]) {
 
   using namespace ktp;
 
-  loadConfigFiles();
+  ConfigParser::loadConfigFiles();
 
   srand(time(nullptr));
 

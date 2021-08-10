@@ -1,12 +1,7 @@
-#include "include/emitter_parser.hpp"
 #include "include/game.hpp"
 #include "include/palette.hpp"
 #include "include/particle.hpp"
-#include "include/resources_path.hpp"
-
-void ktp::loadConfigFiles() {
-  EmitterParser::initEmitters();
-}
+#include "include/paths.hpp"
 
 ktp::EntitiesCount ktp::GameEntity::entities_count_ {};
 ktp::EntitiesPool  ktp::GameEntity::game_entities_ {40};
