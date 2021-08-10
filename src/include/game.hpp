@@ -19,7 +19,6 @@ class Game {
 
   friend class DemoState;
   friend class GameState;
-  friend class InputComponent;
   friend class PausedState;
   friend class PlayingState;
   friend class TitleState;
@@ -55,7 +54,7 @@ class Game {
 
   const std::string kGameTitle_ {"Aerolits"};
   SDL_Point screen_size_ {1366, 768};
-  //SDL_Point screen_size_ {1920, 1080};
+  // SDL_Point screen_size_ {1920, 1080};
   bool paused_ {false};
   bool quit_ {false};
   SDL2_Window main_window_ {};
