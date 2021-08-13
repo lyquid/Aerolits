@@ -9,13 +9,13 @@ void ktp::SDL2_Audio::closeMixer() {
 
 bool ktp::SDL2_Audio::initMixer(int freq, Uint16 format, int channels, int chunk_size) {
   queryMixerVersions();
-  logMessage("SDL_mixer compiled version: " +  
-              std::to_string(mixer_compiled_version_.major) + '.' + 
-              std::to_string(mixer_compiled_version_.minor) + '.' + 
+  logMessage("SDL_mixer compiled version: " +
+              std::to_string(mixer_compiled_version_.major) + '.' +
+              std::to_string(mixer_compiled_version_.minor) + '.' +
               std::to_string(mixer_compiled_version_.patch));
-  logMessage("SDL_mixer linked version: " + 
-              std::to_string(mixer_linked_version_->major) + '.' + 
-              std::to_string(mixer_linked_version_->minor) + '.' + 
+  logMessage("SDL_mixer linked version: " +
+              std::to_string(mixer_linked_version_->major) + '.' +
+              std::to_string(mixer_linked_version_->minor) + '.' +
               std::to_string(mixer_linked_version_->patch));
 
   constexpr auto audio_flags = MIX_INIT_OGG | MIX_INIT_MOD;
@@ -43,9 +43,9 @@ bool ktp::SDL2_Audio::initMixer(int freq, Uint16 format, int channels, int chunk
 }
 
 bool ktp::SDL2_Audio::queryMixerSpecs() {
-  mixer_specs_.times_opened = Mix_QuerySpec(&mixer_specs_.frequency, 
-                                            &mixer_specs_.format, 
-                                            &mixer_specs_.channels);          
+  mixer_specs_.times_opened = Mix_QuerySpec(&mixer_specs_.frequency,
+                                            &mixer_specs_.format,
+                                            &mixer_specs_.channels);
   if (mixer_specs_.times_opened) {
     const char* format_str;
     switch(mixer_specs_.format) {

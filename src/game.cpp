@@ -25,6 +25,7 @@ void ktp::Game::clean() {
 }
 
 bool ktp::Game::init() {
+  SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
   if (!initSDL2()) return false;
   logMessage("Box2D version: " + std::to_string(b2_version.major) + '.' + std::to_string(b2_version.minor) + '.' + std::to_string(b2_version.revision));
   if (!main_window_.create(kGameTitle_, screen_size_)) return false;
