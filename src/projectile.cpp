@@ -9,7 +9,7 @@
 /* GRAPHICS */
 
 void ktp::ProjectileGraphicsComponent::update(const GameEntity& projectile, const SDL2_Renderer& renderer) {
-  renderer.setDrawColor(kDefaultColor_);
+  renderer.setDrawColor(color_);
   renderer.drawLines(render_shape_);
 }
 
@@ -18,9 +18,12 @@ void ktp::ProjectileGraphicsComponent::update(const GameEntity& projectile, cons
 ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, ProjectileGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
   owner_ = owner;
-  size_ = kDefaultProjectileSize_;
+  size_ = ConfigParser::projectiles_config.size_;
   generateProjectileShape(shape_, size_);
   graphics_->render_shape_.resize(shape_.size());
+
+  explosion_config_ = ConfigParser::projectiles_config.explosion_config_;
+  explosion_particles_.reserve(explosion_config_.rays_);
 
   b2BodyDef body_def {};
   body_def.type = b2_dynamicBody;
@@ -40,9 +43,9 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
 
   b2FixtureDef projectile_fixture_def {};
   projectile_fixture_def.shape = &projectile_shape;
-  projectile_fixture_def.density = 10.f;
-  projectile_fixture_def.friction = 0.1f;
-  projectile_fixture_def.restitution = 0.35f;
+  projectile_fixture_def.density = ConfigParser::projectiles_config.density_;
+  projectile_fixture_def.friction = ConfigParser::projectiles_config.friction_;
+  projectile_fixture_def.restitution = ConfigParser::projectiles_config.restitution_;
 
   body_->CreateFixture(&projectile_fixture_def);
 }
@@ -57,27 +60,28 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
     shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
-    blast_power_         = other.blast_power_;
     detonated_           = other.detonated_;
     explosion_particles_ = std::move(other.explosion_particles_);
-    explosion_time_      = other.explosion_time_;
+    detonation_time_     = other.detonation_time_;
+    explosion_config_    = std::move(other.explosion_config_);
     graphics_            = std::exchange(other.graphics_, nullptr);
+    speed_               = other.speed_;
   }
   return *this;
 }
 
 void ktp::ProjectilePhysicsComponent::detonate() {
   detonated_ = true;
-  explosion_time_ = Game::gameplay_timer_.milliseconds();
-  for (std::size_t i = 0; i < kExplosionRays_; ++i) {
-    const float angle = (i / (float)kExplosionRays_) * 360 * (kPI / 180);
+  detonation_time_ = Game::gameplay_timer_.milliseconds();
+  for (std::size_t i = 0; i < explosion_config_.rays_; ++i) {
+    const float angle = (i / (float)explosion_config_.rays_) * 360 * (kPI / 180);
     const b2Vec2 ray_dir {sinf(angle), cosf(angle)};
 
     b2BodyDef bd;
     bd.bullet = true;
     bd.fixedRotation = true;
-    bd.linearDamping = 5.f;
-    bd.linearVelocity = blast_power_ * ray_dir;
+    bd.linearDamping = explosion_config_.linear_damping_;
+    bd.linearVelocity = explosion_config_.blast_power_ * ray_dir;
     bd.position = body_->GetPosition();
     bd.type = b2_dynamicBody;
     bd.userData.pointer = 0;
@@ -85,18 +89,18 @@ void ktp::ProjectilePhysicsComponent::detonate() {
     auto body {world_->CreateBody(&bd)};
 
     b2CircleShape circle_shape;
-    circle_shape.m_radius = 0.2f; // before 0.05f
+    circle_shape.m_radius = explosion_config_.particle_radius_;
 
     b2FixtureDef fd;
-    fd.density = 60.f;
+    fd.density = explosion_config_.density_;
     fd.filter.groupIndex = -1;
-    fd.friction = 0.f;
-    fd.restitution = 0.99f;
+    fd.friction = explosion_config_.friction_;
+    fd.restitution = explosion_config_.restitution_;
     fd.shape = &circle_shape;
 
     body->CreateFixture(&fd);
 
-    explosion_particles_[i] = body;
+    explosion_particles_.push_back(body);
   }
 }
 
@@ -119,7 +123,7 @@ void ktp::ProjectilePhysicsComponent::transformRenderShape() {
 
 void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float delta_time) {
   if (detonated_) {
-    if (Game::gameplay_timer_.milliseconds() - kExplosionDuration_ > explosion_time_) {
+    if (Game::gameplay_timer_.milliseconds() - explosion_config_.duration_ > detonation_time_) {
       for (auto& bodies: explosion_particles_) {
         world_->DestroyBody(bodies);
       }

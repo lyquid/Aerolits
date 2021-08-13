@@ -1,0 +1,14 @@
+<aerolites>
+  <Box2D>
+    <density value="5"/>
+    <friction value="0.8"/>
+    <restitution value="0.0"/>
+  </Box2D>
+  <colors>
+    <color r="255" g="120" b="50"/>
+    <color r="255" g="255" b="255"/>
+  </colors>
+  <rotationSpeed value="2.0" randMin="-1.0" randMax="1.0"/>
+  <size value="3.0" randMin="0.6" randMax="1.0"/>
+  <speed value="10.0" randMin="0.1" randMax="1.0"/>
+</aerolites>

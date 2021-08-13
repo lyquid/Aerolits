@@ -13,7 +13,7 @@ ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept {
 
 void ktp::PlayerGraphicsComponent::update(const GameEntity& player, const SDL2_Renderer& renderer) {
   // player's shape
-  renderer.setDrawColor(kDefaultColor_);
+  renderer.setDrawColor(color_);
   renderer.drawLines(render_shape_);
   // player's thrust fx
   if (thrusting_) {
@@ -70,7 +70,9 @@ void ktp::PlayerInputComponent::update(GameEntity& player, float delta_time) {
 ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner,PlayerGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
   owner_ = owner;
-  size_ = kDefaultPlayerSize_;
+  size_ = ConfigParser::player_config.size_;
+  flame_max_lenght_ = size_;
+  flame_min_lenght_ = size_ * 0.4f;
   generatePlayerShape(shape_, flame_shape_, size_);
   graphics_->render_shape_.resize(shape_.size());
   graphics_->render_flame_shape_.resize(flame_shape_.size());
@@ -95,6 +97,7 @@ ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysic
     sin_                 = other.sin_;
     flame_growth_factor_ = other.flame_growth_factor_;
     flame_max_lenght_    = other.flame_max_lenght_;
+    flame_min_lenght_    = other.flame_min_lenght_;
     exhaust_emitter_     = std::move(other.exhaust_emitter_);
   }
   return *this;
@@ -148,9 +151,9 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
   triangle.Set(vertices, 3);
 
   b2FixtureDef fixture_def {};
-  fixture_def.density = 1.5f;
+  fixture_def.density = ConfigParser::player_config.density_;
   fixture_def.filter.groupIndex = -1;
-  fixture_def.friction = 0.8f;
+  fixture_def.friction = ConfigParser::player_config.friction_;
   fixture_def.shape = &triangle;
 
   body_->CreateFixture(&fixture_def);
@@ -194,8 +197,8 @@ void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_t
   sin_ = SDL_sinf(body_->GetAngle());
   transformRenderShape();
   exhaust_emitter_->setPosition({
-    (body_->GetPosition().x * kMetersToPixels) - kDefaultPlayerSize_ * 0.33f * kMetersToPixels * sin_,
-    (body_->GetPosition().y * kMetersToPixels) + kDefaultPlayerSize_ * 0.33f * kMetersToPixels * cos_
+    (body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
+    (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_
   });
   exhaust_emitter_->update(player, delta_time);
   if (thrusting_) exhaust_emitter_->generateParticles();

@@ -1,16 +1,141 @@
 #include "include/config_parser.hpp"
 #include "include/emitter.hpp"
-#include "include/palette.hpp"
 #include "include/paths.hpp"
 #include "../sdl2_wrappers/sdl2_log.hpp"
 #include <algorithm> // std::transform
-#include <sstream>
+#include <sstream> // std::ostringstream
+
+void ktp::ConfigParser::loadConfigFiles() {
+  loadAerolitesConfig();
+  loadEmittersConfig();
+  loadGameConfig();
+  loadPlayerConfig();
+  loadProjectilesConfig();
+}
+
+// AEROLITES
+
+ktp::ConfigParser::AerolitesConfig ktp::ConfigParser::aerolites_config {};
+
+void ktp::ConfigParser::loadAerolitesConfig() {
+  const std::string path {getConfigPath() + kAerolitesFile};
+  pugi::xml_document doc {};
+  const auto result {doc.load_file(path.c_str())};
+  if (result) {
+    const auto aerolites {doc.child("aerolites")};
+    // Colors
+    if (!aerolites.child("colors").empty()) {
+      aerolites_config.colors_.clear();
+      auto color = aerolites.child("colors").begin();
+      while (color != aerolites.child("colors").end()) {
+        const SDL_Color requested_color {
+          (Uint8)color->attribute("r").as_uint(),
+          (Uint8)color->attribute("g").as_uint(),
+          (Uint8)color->attribute("b").as_uint(),
+          (Uint8)255
+        };
+        SDL_Color final_color {Colors::getNearestColor(requested_color)};
+        final_color.a = requested_color.a;
+        aerolites_config.colors_.push_back(final_color);
+        ++color;
+      }
+      aerolites_config.colors_.shrink_to_fit();
+    }
+    // Density
+    if (aerolites.child("Box2D").child("density")) {
+      const auto density {aerolites.child("Box2D").child("density").attribute("value").as_float()};
+      if (density >= 0.f) {
+        aerolites_config.density_ = density;
+      } else {
+        logMessage("Warning! Aerolites density less than 0. Using default density.");
+      }
+    } else {
+      logMessage("Warning! Aerolites density not set. Using default density.");
+    }
+    // Friction
+    if (aerolites.child("Box2D").child("friction")) {
+      const auto friction {aerolites.child("Box2D").child("friction").attribute("value").as_float()};
+      if (checkWithinRange(friction, 0.f, 1.f)) {
+        aerolites_config.friction_ = friction;
+      } else {
+        logMessage("Warning! Aerolites friction not in range [0, 1]. Using default friction.");
+      }
+    } else {
+      logMessage("Warning! Aerolites friction not set. Using default friction.");
+    }
+    // Restitution
+    if (aerolites.child("Box2D").child("restitution")) {
+      const auto restitution {aerolites.child("Box2D").child("restitution").attribute("value").as_float()};
+      if (checkWithinRange(restitution, 0.f, 1.f)) {
+        aerolites_config.restitution_ = restitution;
+      } else {
+        logMessage("Warning! Aerolites restitution not in range [0, 1]. Using default restitution.");
+      }
+    } else {
+      logMessage("Warning! Aerolites restitution not set. Using default restitution.");
+    }
+    // Rotation speed
+    if (aerolites.child("rotationSpeed")) {
+      const RRVFloat rotation_speed {
+        aerolites.child("rotationSpeed").attribute("value").as_float(),
+        aerolites.child("rotationSpeed").attribute("randMin").as_float(),
+        aerolites.child("rotationSpeed").attribute("randMax").as_float()
+      };
+      if (rotation_speed.value_ >= 0 && rotation_speed.rand_min_ <= rotation_speed.rand_max_ && checkWithinRange(rotation_speed.rand_min_, -1.f, 1.f) && checkWithinRange(rotation_speed.rand_max_, -1.f, 1.f)) {
+        aerolites_config.rotation_speed_ = rotation_speed;
+      } else {
+        logMessage("Warning! Aerolites rotation speed ill-formed. Using default rotation speed.");
+      }
+    } else {
+      logMessage("Warning! Aerolites rotation speed not set. Using default rotation speed.");
+    }
+    // Size
+    if (aerolites.child("size")) {
+      const RRVFloat size {
+        aerolites.child("size").attribute("value").as_float(),
+        aerolites.child("size").attribute("randMin").as_float(),
+        aerolites.child("size").attribute("randMax").as_float()
+      };
+      if (size.value_ > 0 && size.rand_min_ <= size.rand_max_ && checkWithinRange(size.rand_min_, 0.f, 1.f) && checkWithinRange(size.rand_max_, 0.f, 1.f)) {
+        aerolites_config.size_ = size;
+      } else {
+        logMessage("Warning! Aerolites size ill-formed. Using default size.");
+      }
+    } else {
+      logMessage("Warning! Aerolites size not set. Using default rotation size.");
+    }
+    // Speed
+    if (aerolites.child("speed")) {
+      const RRVFloat speed {
+        aerolites.child("speed").attribute("value").as_float(),
+        aerolites.child("speed").attribute("randMin").as_float(),
+        aerolites.child("speed").attribute("randMax").as_float()
+      };
+      if (speed.value_ > 0 && speed.rand_min_ <= speed.rand_max_ && checkWithinRange(speed.rand_min_, 0.f, 1.f) && checkWithinRange(speed.rand_max_, 0.f, 1.f)) {
+        aerolites_config.speed_ = speed;
+      } else {
+        logMessage("Warning! Aerolites speed ill-formed. Using default speed.");
+      }
+    } else {
+      logMessage("Warning! Aerolites speed not set. Using default rotation speed.");
+    }
+
+  } else {
+    const std::string error_msg {
+            "WARNING! " + kAerolitesFile + " parsed with errors\n"
+            + "Error description: " + result.description() + '\n'
+            + "Error offset: " + std::to_string(result.offset)};
+    logErrorMessage(error_msg, path);
+  }
+}
+
+// EMITTERS
 
 std::vector<ktp::EmitterType> ktp::ConfigParser::emitter_types {};
 
 void ktp::ConfigParser::constructEmitterTypesVector(const pugi::xml_document& doc) {
-  const auto emitters{doc.child("emitterTypes")};
-  std::string types_created{};
+  const auto emitters {doc.child("emitterTypes")};
+  std::string types_created {};
   for (const auto& emitter: emitters) {
     EmitterType emi {};
     /* EMITTER TYPE */
@@ -154,41 +279,19 @@ void ktp::ConfigParser::constructEmitterTypesVector(const pugi::xml_document& do
   logMessage("Loaded " + std::to_string(emitter_types.size()) + " particle emitter configurations: " + types_created);
 }
 
-bool ktp::ConfigParser::loadConfigFiles() {
-  return loadAerolitesConfig() && loadEmittersConfig()
-         && loadPlayerConfig() && loadProjectilesConfig();
-}
-
-bool ktp::ConfigParser::loadPlayerConfig() {
-  const std::string path {getConfigPath() + kPlayerFile};
-  pugi::xml_document doc {};
-  const auto result {doc.load_file(path.c_str())};
-  if (result) {
-    // do something!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  } else {
-    const std::string error_msg {
-            "WARNING! " + kPlayerFile + " parsed with errors\n"
-            + "Error description: " + result.description() + '\n'
-            + "Error offset: " + std::to_string(result.offset)};
-    logErrorMessage(error_msg, path);
-  }
-}
-
-bool ktp::ConfigParser::loadEmittersConfig() {
+void ktp::ConfigParser::loadEmittersConfig() {
   const std::string path {getConfigPath() + kEmittersFile};
   pugi::xml_document doc {};
   const auto result {doc.load_file(path.c_str())};
   if (result) {
     // printLoadedEmitterTypes(doc);
     constructEmitterTypesVector(doc);
-    return true;
   } else {
-    const std::string error_msg{
+    const std::string error_msg {
             "WARNING! " + kEmittersFile + " parsed with errors\n"
             + "Error description: " + result.description() + '\n'
             + "Error offset: " + std::to_string(result.offset)};
     logErrorMessage(error_msg, path);
-    return false;
   }
 }
 
@@ -245,4 +348,285 @@ void ktp::ConfigParser::printLoadedEmitterTypes(const pugi::xml_document& doc) {
     final_string << "</emitter>\n";
   }
   logMessage(final_string.str());
+}
+
+// GAME
+
+ktp::ConfigParser::GameConfig ktp::ConfigParser::game_config {};
+
+void ktp::ConfigParser::loadGameConfig() {
+  const std::string path {getConfigPath() + kGameFile};
+  pugi::xml_document doc {};
+  const auto result {doc.load_file(path.c_str())};
+  if (result) {
+    const auto game {doc.child("game")};
+    // Screen size
+    if (game.child("screenSize")) {
+      const SDL_Point size {game.child("screenSize").attribute("x").as_int(), game.child("screenSize").attribute("y").as_int()};
+      if (size.x < game_config.screen_size_.x || size.y < game_config.screen_size_.y) {
+        logMessage("Warning! screen size too low. Using default size.");
+      } else {
+        game_config.screen_size_ = size;
+      }
+      game_config.screen_size_.x = game.child("screenSize").attribute("x").as_int();
+      game_config.screen_size_.y = game.child("screenSize").attribute("y").as_int();
+    } else {
+      logMessage("Warning! screen size not set. Using default size.");
+    }
+  } else {
+    const std::string error_msg {
+            "WARNING! " + kGameFile + " parsed with errors\n"
+            + "Error description: " + result.description() + '\n'
+            + "Error offset: " + std::to_string(result.offset)};
+    logErrorMessage(error_msg, path);
+  }
+}
+
+// PLAYER
+
+ktp::ConfigParser::PlayerConfig ktp::ConfigParser::player_config {};
+
+void ktp::ConfigParser::loadPlayerConfig() {
+  const std::string path {getConfigPath() + kPlayerFile};
+  pugi::xml_document doc {};
+  const auto result {doc.load_file(path.c_str())};
+  if (result) {
+    const auto player {doc.child("player")};
+    // Color
+    if (player.child("color")) {
+      const SDL_Color requested_color {
+        (Uint8)player.child("color").attribute("r").as_uint(),
+        (Uint8)player.child("color").attribute("g").as_uint(),
+        (Uint8)player.child("color").attribute("b").as_uint(),
+        (Uint8)255
+      };
+      player_config.color_ = Colors::getNearestColor(requested_color);
+    } else {
+      logMessage("Warning! Player color not set. Using default color.");
+    }
+    // Density
+    if (player.child("Box2D").child("density")) {
+      const auto density {player.child("Box2D").child("density").attribute("value").as_float()};
+      if (density >= 0.f) {
+        player_config.density_ = density;
+      } else {
+        logMessage("Warning! Player's density less than 0. Using default density.");
+      }
+    } else {
+      logMessage("Warning! Player density not set. Using default density.");
+    }
+    // Friction
+    if (player.child("Box2D").child("friction")) {
+      const auto friction {player.child("Box2D").child("friction").attribute("value").as_float()};
+      if (checkWithinRange(friction, 0.f, 1.f)) {
+        player_config.friction_ = friction;
+      } else {
+        logMessage("Warning! Player's friction not in range [0, 1]. Using default friction.");
+      }
+    } else {
+      logMessage("Warning! Player friction not set. Using default friction.");
+    }
+    // Restitution
+    if (player.child("Box2D").child("restitution")) {
+      const auto restitution {player.child("Box2D").child("restitution").attribute("value").as_float()};
+      if (checkWithinRange(restitution, 0.f, 1.f)) {
+        player_config.restitution_ = restitution;
+      } else {
+        logMessage("Warning! Player's restitution not in range [0, 1]. Using default restitution.");
+      }
+    } else {
+      logMessage("Warning! Player restitution not set. Using default restitution.");
+    }
+    // Size
+    if (player.child("size")) {
+      const auto size {player.child("size").attribute("value").as_float()};
+      if (size > 0.f) {
+        player_config.size_ = size;
+      } else {
+        logMessage("Warning! Player's size 0 or less. Using default size.");
+      }
+    } else {
+      logMessage("Warning! Player size not set. Using default size.");
+    }
+  } else {
+    const std::string error_msg {
+            "WARNING! " + kPlayerFile + " parsed with errors\n"
+            + "Error description: " + result.description() + '\n'
+            + "Error offset: " + std::to_string(result.offset)};
+    logErrorMessage(error_msg, path);
+  }
+}
+
+// PROJECTILES
+
+ktp::ConfigParser::ProjectilesConfig ktp::ConfigParser::projectiles_config {};
+
+void ktp::ConfigParser::loadProjectilesConfig() {
+  const std::string path {getConfigPath() + kProjectilesFile};
+  pugi::xml_document doc {};
+  const auto result {doc.load_file(path.c_str())};
+  if (result) {
+    const auto projectiles {doc.child("projectiles")};
+    // Color
+    if (projectiles.child("color")) {
+      const SDL_Color requested_color {
+        (Uint8)projectiles.child("color").attribute("r").as_uint(),
+        (Uint8)projectiles.child("color").attribute("g").as_uint(),
+        (Uint8)projectiles.child("color").attribute("b").as_uint(),
+        (Uint8)255
+      };
+      projectiles_config.color_ = Colors::getNearestColor(requested_color);
+    } else {
+      logMessage("Warning! Projectiles color not set. Using default color.");
+    }
+    // Density
+    if (projectiles.child("Box2D").child("density")) {
+      const auto density {projectiles.child("Box2D").child("density").attribute("value").as_float()};
+      if (density > 0) {
+        projectiles_config.density_ = density;
+      } else {
+        logMessage("Warning! Projectiles density less than 0. Using default density.");
+      }
+    } else {
+      logMessage("Warning! Projectiles density not set. Using default density.");
+    }
+    // Friction
+    if (projectiles.child("Box2D").child("friction")) {
+      const auto friction {projectiles.child("Box2D").child("friction").attribute("value").as_float()};
+      if (checkWithinRange(friction, 0.f, 1.f)) {
+        projectiles_config.friction_ = friction;
+      } else {
+        logMessage("Warning! Projectiles friction not in range [0, 1]. Using default friction.");
+      }
+    } else {
+      logMessage("Warning! Projectiles friction not set. Using default friction.");
+    }
+    // Restitution
+    if (projectiles.child("Box2D").child("restitution")) {
+      const auto restitution {projectiles.child("Box2D").child("restitution").attribute("value").as_float()};
+      if (checkWithinRange(restitution, 0.f, 1.f)) {
+        projectiles_config.restitution_ = restitution;
+      } else {
+        logMessage("Warning! Projectiles restitution not in range [0, 1]. Using default restitution.");
+      }
+    } else {
+      logMessage("Warning! Projectiles restitution not set. Using default restitution.");
+    }
+    // Size
+    if (projectiles.child("size")) {
+      const auto size {projectiles.child("size").attribute("value").as_float()};
+      if (size > 0) {
+        projectiles_config.size_ = size;
+      } else {
+        logMessage("Warning! Projectiles size 0 or less. Using default size.");
+      }
+    } else {
+      logMessage("Warning! Projectiles size not set. Using default size.");
+    }
+    // Speed
+    if (projectiles.child("speed")) {
+      const auto speed {projectiles.child("speed").attribute("value").as_float()};
+      if (speed >= 0) {
+        projectiles_config.speed_ = speed;
+      } else {
+        logMessage("Warning! Projectiles speed less than 0. Using default speed.");
+      }
+    } else {
+      logMessage("Warning! Projectiles speed not set. Using default speed.");
+    }
+    // Blast power
+    if (projectiles.child("explosion").child("blastPower")) {
+      const auto blast_power {projectiles.child("explosion").child("blastPower").attribute("value").as_float()};
+      if (blast_power >= 0) {
+        projectiles_config.explosion_config_.blast_power_ = blast_power;
+      } else {
+        logMessage("Warning! Projectiles explosion blast power less than 0. Using default blast power.");
+      }
+    } else {
+      logMessage("Warning! Projectiles explosion blast power not set. Using default blast power.");
+    }
+    // Explosion density
+    if (projectiles.child("explosion").child("density")) {
+      const auto density {projectiles.child("explosion").child("density").attribute("value").as_float()};
+      if (density >= 0) {
+        projectiles_config.explosion_config_.density_ = density;
+      } else {
+        logMessage("Warning! Projectiles explosion density less than 0. Using default density.");
+      }
+    } else {
+      logMessage("Warning! Projectiles explosion density not set. Using default density.");
+    }
+    // Explosion duration
+    if (projectiles.child("explosion").child("duration")) {
+      const auto explosion_duration {projectiles.child("explosion").child("duration").attribute("value").as_uint()};
+      if (explosion_duration >= 0) {
+        projectiles_config.explosion_config_.duration_ = explosion_duration;
+      } else {
+        logMessage("Warning! Projectiles explosion duration less than 0. Using default duration.");
+      }
+    } else {
+      logMessage("Warning! Projectiles explosion duration not set. Using default duration.");
+    }
+    // Explosion friction
+    if (projectiles.child("explosion").child("friction")) {
+      const auto friction {projectiles.child("explosion").child("friction").attribute("value").as_float()};
+      if (checkWithinRange(friction, 0.f, 1.f)) {
+        projectiles_config.explosion_config_.friction_ = friction;
+      } else {
+        logMessage("Warning! Projectiles explosion friction not in range [0, 1]. Using default friction.");
+      }
+    } else {
+      logMessage("Warning! Projectiles explosion friction not set. Using default friction.");
+    }
+    // Explosion linear damping
+    if (projectiles.child("explosion").child("linearDamping")) {
+      const auto damping {projectiles.child("explosion").child("linearDamping").attribute("value").as_float()};
+      if (damping >= 0) {
+        projectiles_config.explosion_config_.linear_damping_ = damping;
+      } else {
+        logMessage("Warning! Projectiles explosion linear damping less than 0. Using default linear damping.");
+      }
+    } else {
+      logMessage("Warning! Projectiles explosion linear damping not set. Using default linear damping.");
+    }
+    // Explosion particle radius
+    if (projectiles.child("explosion").child("particleRadius")) {
+      const auto radius {projectiles.child("explosion").child("particleRadius").attribute("value").as_float()};
+      if (radius > 0) {
+        projectiles_config.explosion_config_.particle_radius_ = radius;
+      } else {
+        logMessage("Warning! Projectiles explosion particle radius 0 or less. Using default particle radius.");
+      }
+    } else {
+      logMessage("Warning! Projectiles explosion particle radius not set. Using default particle radius.");
+    }
+    // Explosion rays
+    if (projectiles.child("explosion").child("rays")) {
+      const auto rays {projectiles.child("explosion").child("rays").attribute("value").as_uint()};
+      if (rays >= 0) {
+        projectiles_config.explosion_config_.rays_ = rays;
+      } else {
+        logMessage("Warning! Projectiles explosion rays less than 0. Using default rays.");
+      }
+    } else {
+      logMessage("Warning! Projectiles explosion rays not set. Using default rays.");
+    }
+    // Explosion restitution
+    if (projectiles.child("explosion").child("restitution")) {
+      const auto restitution {projectiles.child("explosion").child("restitution").attribute("value").as_float()};
+      if (checkWithinRange(restitution, 0.f, 1.f)) {
+        projectiles_config.explosion_config_.restitution_ = restitution;
+      } else {
+        logMessage("Warning! Projectiles explosion restitution not in range [0, 1]. Using default restitution.");
+      }
+    } else {
+      logMessage("Warning! Projectiles explosion restitution not set. Using default restitution.");
+    }
+  } else {
+    const std::string error_msg {
+            "WARNING! " + kProjectilesFile + " parsed with errors\n"
+            + "Error description: " + result.description() + '\n'
+            + "Error offset: " + std::to_string(result.offset)};
+    logErrorMessage(error_msg, path);
+  }
 }

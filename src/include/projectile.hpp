@@ -1,10 +1,11 @@
 #pragma once
 
+#include "config_parser.hpp"
 #include "graphics_component.hpp"
 #include "palette.hpp"
 #include "physics_component.hpp"
 #include <SDL.h>
-#include <array>
+#include <vector>
 
 namespace ktp {
 
@@ -18,12 +19,10 @@ class ProjectileGraphicsComponent: public GraphicsComponent {
  public:
   virtual void update(const GameEntity& projectile, const SDL2_Renderer& renderer) override;
  private:
-  static constexpr SDL_Color kDefaultColor_ {Colors::copper_green};
+  SDL_Color color_ {ConfigParser::projectiles_config.color_};
 };
 
 class ProjectilePhysicsComponent: public PhysicsComponent {
-
-  friend class InputComponent;
 
  public:
 
@@ -37,6 +36,7 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
   inline void collide(GameEntity* other) override { collided_ = true; }
   void detonate();
   virtual void setPosition(const SDL_FPoint& pos) override {}
+  inline auto speed() const { return speed_; }
   virtual void update(const GameEntity& projectile, float delta_time) override;
 
  private:
@@ -44,17 +44,14 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
   static void generateProjectileShape(B2Vec2Vector& shape, float size);
   void transformRenderShape();
 
-  static constexpr auto kDefaultProjectileSize_ {0.15f};
-  static constexpr auto kDefaultProjectileSpeed_ {30.f};
-  static constexpr auto kExplosionRays_ {100u};
-  static constexpr auto kExplosionDuration_ {500u};
   static constexpr auto kPI {3.14159265358979323846264338327950288};
 
-  float blast_power_ {50};
   bool detonated_ {false};
-  std::array<b2Body*, kExplosionRays_> explosion_particles_ {};
-  Uint32 explosion_time_ {};
+  ConfigParser::ExplosionConfig explosion_config_ {};
+  std::vector<b2Body*> explosion_particles_ {};
+  Uint32 detonation_time_ {};
   ProjectileGraphicsComponent* graphics_ {nullptr};
+  float speed_ {ConfigParser::projectiles_config.speed_};
 };
 
 } // namespace ktp

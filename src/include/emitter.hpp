@@ -1,5 +1,6 @@
 #pragma once
 
+#include "config_parser.hpp"
 #include "graphics_component.hpp"
 #include "object_pool.hpp"
 #include "particle.hpp"
@@ -19,16 +20,6 @@ struct Vortex {
   float scale_ {};
   float speed_ {};
 };
-
-struct AngleRange { float max_{0}, min_{0}; };
-
-template <typename T>
-struct RandomRangeValue { T value_{0}; float rand_min_{0}, rand_max_{1}; };
-using RRVInt = RandomRangeValue<int>;
-using RRVUint = RandomRangeValue<unsigned int>;
-using RRVFloat = RandomRangeValue<float>;
-using ColorsVector = std::vector<SDL_Color>;
-using RRVFVector = std::vector<RRVFloat>;
 
 struct EmitterType {
   // Emitter properties

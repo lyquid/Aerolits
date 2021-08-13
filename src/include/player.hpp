@@ -1,5 +1,6 @@
 #pragma once
 
+#include "config_parser.hpp"
 #include "graphics_component.hpp"
 #include "palette.hpp"
 #include "physics_component.hpp"
@@ -25,7 +26,7 @@ class PlayerGraphicsComponent: public GraphicsComponent {
   PlayerGraphicsComponent() noexcept;
   virtual void update(const GameEntity& player, const SDL2_Renderer& renderer) override;
  private:
-  static constexpr SDL_Color kDefaultColor_ {Colors::white};
+  SDL_Color     color_ {ConfigParser::player_config.color_};
   FPointsVector render_flame_shape_ {};
   bool          thrusting_ {false};
   std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
@@ -72,7 +73,6 @@ class PlayerPhysicsComponent: public PhysicsComponent {
   void setBox2D();
   void transformRenderShape();
 
-  static constexpr float kDefaultPlayerSize_ {1.2f};
   PlayerGraphicsComponent* graphics_ {nullptr};
   FPointsVector flame_shape_ {};
   bool thrusting_ {false};
@@ -80,10 +80,9 @@ class PlayerPhysicsComponent: public PhysicsComponent {
   float sin_ {};
   // flame stuff
   static constexpr float kDefaultFlameGrowthFactor_ {0.02f};
-  static constexpr float kDefaultFlameMaxLength_ {kDefaultPlayerSize_};
-  static constexpr float kDefaultFlameMinLength_ {kDefaultPlayerSize_ * 0.4f};
   float flame_growth_factor_ {kDefaultFlameGrowthFactor_};
-  float flame_max_lenght_ {kDefaultFlameMaxLength_};
+  float flame_max_lenght_ {};
+  float flame_min_lenght_ {};
   // emitter stuff
   std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
 };

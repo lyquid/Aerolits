@@ -8,7 +8,7 @@
 /* GRAPHICS */
 
 void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite, const SDL2_Renderer& renderer) {
-  renderer.setDrawColor(kDefaultColor_);
+  renderer.setDrawColor(color_);
   renderer.drawLines(render_shape_);
 }
 
@@ -17,11 +17,11 @@ void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite, const SD
 ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
   owner_ = owner;
-  size_ = kMaxSize_ * generateRand(0.6f, 1.f);
+  size_ = ConfigParser::aerolites_config.size_.value_ * generateRand(ConfigParser::aerolites_config.size_.rand_min_, ConfigParser::aerolites_config.size_.rand_max_);
   generateAeroliteShape(shape_, size_);
   graphics_->renderShape().resize(shape_.size());
   createB2Body(*this);
-  body_->SetAngularVelocity(kMaxRotationSpeed_ * generateRand(-1.f, 1.f));
+  body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
 }
 
 ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics, float size) noexcept:
@@ -31,7 +31,7 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, Aerol
   generateAeroliteShape(shape_, size_);
   graphics_->renderShape().resize(shape_.size());
   createB2Body(*this);
-  body_->SetAngularVelocity(kMaxRotationSpeed_ * generateRand(-1.f, 1.f));
+  body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
 }
 
 ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) noexcept {
@@ -64,8 +64,9 @@ void ktp::AerolitePhysicsComponent::createB2Body(AerolitePhysicsComponent& aerol
 
   b2FixtureDef fixture_def {};
   fixture_def.shape = &aerolite_shape;
-  fixture_def.density = kKgPerMeter2_ / (aerolite.size_ * aerolite.size_);
-  fixture_def.friction = 1.f;
+  fixture_def.density = ConfigParser::aerolites_config.density_;
+  fixture_def.friction = ConfigParser::aerolites_config.friction_;
+  fixture_def.restitution = ConfigParser::aerolites_config.restitution_;
   aerolite.body_->CreateFixture(&fixture_def);
 }
 
@@ -107,7 +108,7 @@ void ktp::AerolitePhysicsComponent::spawnAerolite() {
   const auto aerolite {GameEntity::createEntity(EntityTypes::Aerolite)};
   if (!aerolite) return;
   static int side {};
-  const float delta {kMaxSpeed_ * generateRand(0.1f, 1.f)};
+  const float delta {ConfigParser::aerolites_config.speed_.value_ * generateRand(ConfigParser::aerolites_config.speed_.rand_min_, ConfigParser::aerolites_config.speed_.rand_max_)};
   switch (side) {
     case 0: // up
       aerolite->physics()->body()->SetTransform({b2_screen_size_.x * 0.5f, 0.f}, aerolite->physics()->body()->GetAngle());

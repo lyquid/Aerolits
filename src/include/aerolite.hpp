@@ -1,5 +1,6 @@
 #pragma once
 
+#include "config_parser.hpp"
 #include "graphics_component.hpp"
 #include "palette.hpp"
 #include "physics_component.hpp"
@@ -19,7 +20,7 @@ class AeroliteGraphicsComponent: public GraphicsComponent {
  public:
   virtual void update(const GameEntity& aerolite, const SDL2_Renderer& renderer) override;
  private:
-  static constexpr SDL_Color kDefaultColor_ {Colors::orange};
+  SDL_Color color_ {ConfigParser::aerolites_config.colors_.front()};
 };
 
 class AerolitePhysicsComponent: public PhysicsComponent {
@@ -35,7 +36,6 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   AerolitePhysicsComponent& operator=(AerolitePhysicsComponent&& other) noexcept;
 
   inline void collide(GameEntity* other) override { collided_ = true; }
-  inline float getMaxSpeed() const { return kMaxSpeed_; }
   void resize(float size);
   virtual void setPosition(const SDL_FPoint& pos) override {}
   static void spawnAerolite();
@@ -49,11 +49,7 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   void split();
   void transformRenderShape();
 
-  static constexpr float kKgPerMeter2_ {20.f};
-  static constexpr float kMaxRotationSpeed_ {2.f};
-  static constexpr float kMaxSize_ {3.f};
   static constexpr float kMinSize_ {0.5f};
-  static constexpr float kMaxSpeed_ {10.f};
   static constexpr unsigned int kMaxSides_ {b2_maxPolygonVertices};
   static constexpr unsigned int kMinSides_ {6u};
 

@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_INCLUDE_GAME_HPP_
 
 #include "background.hpp"
+#include "config_parser.hpp"
 #include "contact_listener.hpp"
 #include "debug_draw.hpp"
 #include "game_entity.hpp"
@@ -51,8 +52,7 @@ class Game {
   bool loadResources();
 
   const std::string kGameTitle_ {"Aerolits"};
-  SDL_Point screen_size_ {1366, 768};
-  // SDL_Point screen_size_ {1920, 1080};
+  SDL_Point screen_size_ {ConfigParser::game_config.screen_size_};
   bool paused_ {false};
   bool quit_ {false};
   SDL2_Window main_window_ {};

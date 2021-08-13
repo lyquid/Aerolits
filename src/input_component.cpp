@@ -16,14 +16,14 @@ void ktp::InputComponent::shoot(GameEntity& player) {
     const auto cos {SDL_cosf(physics_->body_->GetAngle())};
 
     projectile->physics()->body()->SetTransform({
-      physics_->body_->GetPosition().x + ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5.2f * sin,
-      physics_->body_->GetPosition().y - ProjectilePhysicsComponent::kDefaultProjectileSize_ * 5.2f * cos},
+      physics_->body_->GetPosition().x + projectile->physics()->size() * 5.2f * sin,
+      physics_->body_->GetPosition().y - projectile->physics()->size() * 5.2f * cos},
       physics_->body_->GetAngle()
     );
 
     projectile->physics()->body()->SetLinearVelocity({
-       ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * sin,
-      -ProjectilePhysicsComponent::kDefaultProjectileSpeed_ * cos
+       ConfigParser::projectiles_config.speed_ * sin,
+      -ConfigParser::projectiles_config.speed_ * cos
     });
 
     shooting_timer_ = SDL2_Timer::SDL2Ticks();
@@ -46,8 +46,8 @@ void ktp::InputComponent::stopSteering(float delta_time) {
 
 void ktp::InputComponent::stopThrusting(GameEntity& player) {
   physics_->delta_ = {0.f, 0.f};
-  physics_->flame_shape_.front().y = physics_->kDefaultFlameMinLength_;
-  physics_->flame_shape_.back().y = physics_->kDefaultFlameMinLength_;
+  physics_->flame_shape_.front().y = physics_->flame_min_lenght_;
+  physics_->flame_shape_.back().y = physics_->flame_min_lenght_;
   physics_->thrusting_ = false;
 }
 
