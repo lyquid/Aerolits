@@ -136,7 +136,7 @@ void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
     }
   }
   if (!emitter_found) {
-    logErrorMessage("Emitter type \"" + type + "\" not found! Check emitters.xml for spelling errors or missing emitters.");
+    logError("Emitter type \"" + type + "\" not found! Check emitters.xml for spelling errors or missing emitters.");
     return;
   }
   inflatePool();

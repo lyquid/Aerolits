@@ -11,73 +11,239 @@ namespace ktp {
 /* Check it here: https://github.com/Twinklebear/TwinklebearDev-Lessons */
 
 /**
-* Log a message to the standard error stream.
-* @param msg The message to write, format will be msg + '\n'.
-*/
-inline void logErrorMessage(std::string_view msg) {
-  std::cerr << msg << '\n';
+ * @brief Log a message with SDL_LOG_PRIORITY_CRITICAL.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logCritical(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogCritical(category, msg);
 }
 
 /**
-* Log a message to the standard error stream.
-* @param msg The message to write, format will be msg + '\n'.
-* @param src Source of the resource.
-*/
-inline void logErrorMessage(std::string_view msg, std::string_view src){
-	std::cerr << msg << " (" << src << ")\n";
+ * @brief Log a message with SDL_LOG_PRIORITY_CRITICAL.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logCritical(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogCritical(category, msg.data());
 }
 
 /**
-* Log a message to the standard output stream.
-* @param msg The message to write, format will be msg + '\n'.
-*/
-inline void logMessage(std::string_view msg) {
-  std::cout << msg << '\n';
+ * @brief Log a message with SDL_LOG_PRIORITY_DEBUG.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logDebug(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogDebug(category, msg);
 }
 
 /**
-* Log a message to the output stream of our choice.
-* @param os The output stream to write the message to.
-* @param msg The message to write, format will be msg + '\n'.
-*/
-inline void logMessage(std::ostream& os, std::string_view msg) {
-  os << msg << '\n';
+ * @brief Log a message with SDL_LOG_PRIORITY_DEBUG.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logDebug(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogDebug(category, msg.data());
 }
 
 /**
-* Log an SDL error with some error message to the standard output stream.
-* @param msg The error message to write, format will be msg error: SDL_GetError() + '\n'.
-*/
-inline void logSDL2Error(std::string_view msg){
-	std::cerr << msg << " error: " << SDL_GetError() << '\n';
+ * @brief Log a message with SDL_LOG_PRIORITY_ERROR.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logError(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogError(category, msg);
 }
 
 /**
-* Log an SDL error with some error message to the output stream of our choice.
-* @param os The output stream to write the message to.
-* @param msg The error message to write, format will be msg error: SDL_GetError() + '\n'.
-*/
-inline void logSDL2Error(std::ostream& os, std::string_view msg){
-	os << msg << " error: " << SDL_GetError() << '\n';
+ * @brief Log a message with SDL_LOG_PRIORITY_ERROR.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logError(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogError(category, msg.data());
 }
 
 /**
-* Log an SDL error with some error message to the standard output stream.
-* @param msg The error message to write, format will be msg error: SDL_GetError() + '\n'.
-* @param src Source of the resource.
-*/
-inline void logSDL2Error(std::string_view msg, std::string_view src){
-	std::cerr << msg << " error: " << SDL_GetError() << " (" << src << ")\n";
+ * @brief Log a message with SDL_LOG_PRIORITY_ERROR.
+ *
+ * @param msg The message to write.
+ * @param src The source of the file.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logError(const char* msg, const char* src, int category = SDL_LOG_CATEGORY_APPLICATION){
+  const auto fs {std::string{msg} + " (" + src + ")"};
+  SDL_LogError(category, fs.c_str());
 }
 
 /**
-* Log an SDL error with some error message to the output stream of our choice.
-* @param os The output stream to write the message to.
-* @param msg The error message to write, format will be msg error: SDL_GetError() + '\n'.
-* @param src Source of the resource.
-*/
-inline void logSDL2Error(std::ostream& os, std::string_view msg, std::string_view src){
-	os << msg << " error: " << SDL_GetError() << " (" << src << ")\n";
+ * @brief Log a message with SDL_LOG_PRIORITY_ERROR.
+ *
+ * @param msg The message to write.
+ * @param src The source of the file.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logError(std::string_view msg, std::string_view src, int category = SDL_LOG_CATEGORY_APPLICATION){
+  const auto fs {msg.data() + std::string{" ("} + src.data() + ')'};
+  SDL_LogError(category, fs.c_str());
+}
+
+/**
+ * @brief Log a message with SDL_LOG_PRIORITY_INFO.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logInfo(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogInfo(category, msg);
+}
+
+/**
+ * @brief Log a message with SDL_LOG_PRIORITY_INFO.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logInfo(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogInfo(category, msg.data());
+}
+
+/**
+ * @brief Log a message with the specified category and priority.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param priority The priority of the message. Defaults to SDL_LOG_PRIORITY_INFO.
+ */
+inline void logMessage(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION, SDL_LogPriority priority = SDL_LOG_PRIORITY_INFO) {
+  SDL_LogMessage(category, priority, msg);
+}
+
+/**
+ * @brief Log a message with the specified category and priority.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param priority The priority of the message. Defaults to SDL_LOG_PRIORITY_INFO.
+ */
+inline void logMessage(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION, SDL_LogPriority priority = SDL_LOG_PRIORITY_INFO) {
+  SDL_LogMessage(category, priority, msg.data());
+}
+
+/**
+ * @brief Log a message with the specified category and priority.
+ *
+ * @param msg The message to write.
+ * @param ap A variable argument list.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param priority The priority of the message. Defaults to SDL_LOG_PRIORITY_INFO.
+ */
+inline void logMessage(const char* msg, va_list ap, int category = SDL_LOG_CATEGORY_APPLICATION, SDL_LogPriority priority = SDL_LOG_PRIORITY_INFO) {
+  SDL_LogMessageV(category, priority, msg, ap);
+}
+
+/**
+ * @brief Log a message with the specified category and priority.
+ *
+ * @param msg The message to write.
+ * @param ap A variable argument list.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param priority The priority of the message. Defaults to SDL_LOG_PRIORITY_INFO.
+ */
+inline void logMessage(std::string_view msg, va_list ap, int category = SDL_LOG_CATEGORY_APPLICATION, SDL_LogPriority priority = SDL_LOG_PRIORITY_INFO) {
+  SDL_LogMessageV(category, priority, msg.data(), ap);
+}
+
+/**
+ * @brief Log a message with SDL_LOG_PRIORITY_VERBOSE.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logVerbose(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogVerbose(category, msg);
+}
+
+/**
+ * @brief Log a message with SDL_LOG_PRIORITY_VERBOSE.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logVerbose(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogVerbose(category, msg.data());
+}
+
+/**
+ * @brief Log a message with SDL_LOG_PRIORITY_WARN.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logWarn(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogWarn(category, msg);
+}
+
+/**
+ * @brief Log a message with SDL_LOG_PRIORITY_WARN.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logWarn(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+  SDL_LogWarn(category, msg.data());
+}
+
+/**
+ * @brief Log a message with SDL_LOG_PRIORITY_ERROR with the SDL_GetError() result.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logSDL2Error(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION){
+  const auto fs {msg + ' ' + std::string{SDL_GetError()}};
+  SDL_LogError(category, fs.c_str());
+}
+
+/**
+ * @brief Log a message with SDL_LOG_PRIORITY_ERROR with the SDL_GetError() result.
+ *
+ * @param msg The message to write.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logSDL2Error(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION){
+  const auto fs {msg.data() + ' ' + std::string{SDL_GetError()}};
+  SDL_LogError(category, fs.c_str());
+}
+
+/**
+ * @brief Log a message with SDL_LOG_PRIORITY_ERROR with the SDL_GetError() result.
+ *
+ * @param msg The message to write.
+ * @param src The source of the file.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logSDL2Error(const char* msg, const char* src, int category = SDL_LOG_CATEGORY_APPLICATION){
+  const auto fs {msg + ' ' + std::string{SDL_GetError()} + " (" + src + ')'};
+  SDL_LogError(category, fs.c_str());
+}
+
+/**
+ * @brief Log a message with SDL_LOG_PRIORITY_ERROR with the SDL_GetError() result.
+ *
+ * @param msg The message to write.
+ * @param src The source of the file.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ */
+inline void logSDL2Error(std::string_view msg, std::string_view src, int category = SDL_LOG_CATEGORY_APPLICATION){
+  const auto fs {msg.data() + ' ' + std::string{SDL_GetError()} + " (" + src.data() + ')'};
+  SDL_LogError(category, fs.c_str());
 }
 
 } // end namespace ktp

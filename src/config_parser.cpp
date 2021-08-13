@@ -125,7 +125,7 @@ void ktp::ConfigParser::loadAerolitesConfig() {
             "WARNING! " + kAerolitesFile + " parsed with errors\n"
             + "Error description: " + result.description() + '\n'
             + "Error offset: " + std::to_string(result.offset)};
-    logErrorMessage(error_msg, path);
+    logError(error_msg, path);
   }
 }
 
@@ -291,7 +291,7 @@ void ktp::ConfigParser::loadEmittersConfig() {
             "WARNING! " + kEmittersFile + " parsed with errors\n"
             + "Error description: " + result.description() + '\n'
             + "Error offset: " + std::to_string(result.offset)};
-    logErrorMessage(error_msg, path);
+    logError(error_msg, path);
   }
 }
 
@@ -378,7 +378,7 @@ void ktp::ConfigParser::loadGameConfig() {
             "WARNING! " + kGameFile + " parsed with errors\n"
             + "Error description: " + result.description() + '\n'
             + "Error offset: " + std::to_string(result.offset)};
-    logErrorMessage(error_msg, path);
+    logError(error_msg, path);
   }
 }
 
@@ -453,7 +453,7 @@ void ktp::ConfigParser::loadPlayerConfig() {
             "WARNING! " + kPlayerFile + " parsed with errors\n"
             + "Error description: " + result.description() + '\n'
             + "Error offset: " + std::to_string(result.offset)};
-    logErrorMessage(error_msg, path);
+    logError(error_msg, path);
   }
 }
 
@@ -627,6 +627,6 @@ void ktp::ConfigParser::loadProjectilesConfig() {
             "WARNING! " + kProjectilesFile + " parsed with errors\n"
             + "Error description: " + result.description() + '\n'
             + "Error offset: " + std::to_string(result.offset)};
-    logErrorMessage(error_msg, path);
+    logError(error_msg, path);
   }
 }
