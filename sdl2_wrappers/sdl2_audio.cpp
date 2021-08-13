@@ -9,35 +9,35 @@ void ktp::SDL2_Audio::closeMixer() {
 
 bool ktp::SDL2_Audio::initMixer(int freq, Uint16 format, int channels, int chunk_size) {
   queryMixerVersions();
-  logMessage("SDL_mixer compiled version: " +
+  logInfo("SDL_mixer compiled version: " +
               std::to_string(mixer_compiled_version_.major) + '.' +
               std::to_string(mixer_compiled_version_.minor) + '.' +
-              std::to_string(mixer_compiled_version_.patch));
-  logMessage("SDL_mixer linked version: " +
+              std::to_string(mixer_compiled_version_.patch), SDL_LOG_CATEGORY_AUDIO);
+  logInfo("SDL_mixer linked version: " +
               std::to_string(mixer_linked_version_->major) + '.' +
               std::to_string(mixer_linked_version_->minor) + '.' +
-              std::to_string(mixer_linked_version_->patch));
+              std::to_string(mixer_linked_version_->patch), SDL_LOG_CATEGORY_AUDIO);
 
   constexpr auto audio_flags = MIX_INIT_OGG | MIX_INIT_MOD;
   const auto initted = Mix_Init(audio_flags);
   if ((initted & audio_flags) != audio_flags) {
-    logSDL2Error("Mix_Init");
+    logSDL2Error("Mix_Init", SDL_LOG_CATEGORY_AUDIO);
     // return false; // this gives an error on my laptop, but it works fine
   }
   if (Mix_OpenAudio(freq, format, channels, chunk_size) == -1) {
-    logSDL2Error("Mix_OpenAudio");
+    logSDL2Error("Mix_OpenAudio", SDL_LOG_CATEGORY_AUDIO);
     while (Mix_Init(0)) Mix_Quit();
     return false;
   }
   if (!queryMixerSpecs()) {
     // can this crash if Mix_OpenAudio was correct?
-    logSDL2Error("Mix_QuerySpec");
+    logSDL2Error("Mix_QuerySpec", SDL_LOG_CATEGORY_AUDIO);
     // while (Mix_Init(0)) Mix_Quit();
     // return false;
   } else {
-    logMessage("Mixer Specs: " + mixer_specs_.format_str + " / " +
+    logInfo("Mixer Specs: " + mixer_specs_.format_str + " / " +
                 std::to_string(mixer_specs_.frequency) + "Hz / " +
-                std::to_string(mixer_specs_.channels) + " channels");
+                std::to_string(mixer_specs_.channels) + " channels", SDL_LOG_CATEGORY_AUDIO);
   }
   return true;
 }

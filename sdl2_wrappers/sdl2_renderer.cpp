@@ -1,7 +1,6 @@
 #include "sdl2_renderer.hpp"
 #include "sdl2_log.hpp"
 #include <cctype>  // std::toupper
-#include <sstream> // std::stringstream
 
 void ktp::b2ColorToSDL2Color(const b2Color& orig, SDL_Color& dest) {
   dest.r = (Uint8)orig.r * 255;
@@ -23,7 +22,7 @@ void ktp::SDL2ColorToB2Color(const SDL_Color& orig, b2Color& dest) {
 bool ktp::SDL2_Renderer::create(const SDL2_Window& window, Uint32 flags, const std::string& scale_q) {
   renderer_.reset(SDL_CreateRenderer(window.getWindow(), -1, flags));
   if (renderer_ == nullptr) {
-    logSDL2Error("SDL_CreateRenderer");
+    logSDL2Error("SDL_CreateRenderer", SDL_LOG_CATEGORY_RENDER);
     return false;
   }
   getRendererInfo();
@@ -37,7 +36,7 @@ bool ktp::SDL2_Renderer::create(const SDL2_Window& window, Uint32 flags, const s
 bool ktp::SDL2_Renderer::create(const SDL2_Window& window, const SDL_Point& size, Uint32 flags, const std::string& scale_q) {
   renderer_.reset(SDL_CreateRenderer(window.getWindow(), -1, flags));
   if (renderer_ == nullptr) {
-    logSDL2Error("SDL_CreateRenderer");
+    logSDL2Error("SDL_CreateRenderer", SDL_LOG_CATEGORY_RENDER);
     return false;
   }
   getRendererInfo();
@@ -170,7 +169,7 @@ void ktp::SDL2_Renderer::drawGrid(int size) const {
 
 bool ktp::SDL2_Renderer::getRendererInfo() {
   if (SDL_GetRendererInfo(renderer_.get(), &renderer_info_) != 0) {
-    logSDL2Error("SDL_GetRendererInfo");
+    logSDL2Error("SDL_GetRendererInfo", SDL_LOG_CATEGORY_RENDER);
     return false;
   } else {
     std::string texture_formats {};
@@ -237,17 +236,13 @@ bool ktp::SDL2_Renderer::getRendererInfo() {
       flags_in_text += "SDL_RENDERER_TARGETTEXTURE";
     }
 
-    std::string renderer_name{renderer_info_.name};
+    std::string renderer_name {renderer_info_.name};
     for (auto& letter: renderer_name) letter = std::toupper(letter);
 
-    std::stringstream os {};
-    os << "SDL_Renderer is " << renderer_name << '\n'
-      << "Renderer flags: " << flags_in_text << '\n'
-      << std::to_string(renderer_info_.num_texture_formats) << " available texture format(s): "
-      << texture_formats << '\n'
-      << "Max texture size " << std::to_string(renderer_info_.max_texture_width)
-      << "x" << std::to_string(renderer_info_.max_texture_height);
-    logMessage(os.str());
+    logInfo("SDL_Renderer is " + renderer_name, SDL_LOG_CATEGORY_RENDER);
+    logInfo(std::to_string(renderer_info_.num_texture_formats) + " available texture format(s): " + texture_formats, SDL_LOG_CATEGORY_RENDER);
+    logInfo("Max texture size " + std::to_string(renderer_info_.max_texture_width) + 'x' + std::to_string(renderer_info_.max_texture_height), SDL_LOG_CATEGORY_RENDER);
+
     return true;
   }
 }

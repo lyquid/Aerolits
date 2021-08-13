@@ -54,9 +54,9 @@ inline void logDebug(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLI
  * @brief Log a message with SDL_LOG_PRIORITY_ERROR.
  *
  * @param msg The message to write.
- * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logError(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+inline void logError(const char* msg, int category = SDL_LOG_CATEGORY_ERROR) {
   SDL_LogError(category, msg);
 }
 
@@ -64,9 +64,9 @@ inline void logError(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATIO
  * @brief Log a message with SDL_LOG_PRIORITY_ERROR.
  *
  * @param msg The message to write.
- * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logError(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+inline void logError(std::string_view msg, int category = SDL_LOG_CATEGORY_ERROR) {
   SDL_LogError(category, msg.data());
 }
 
@@ -75,9 +75,9 @@ inline void logError(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLI
  *
  * @param msg The message to write.
  * @param src The source of the file.
- * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logError(const char* msg, const char* src, int category = SDL_LOG_CATEGORY_APPLICATION){
+inline void logError(const char* msg, const char* src, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {std::string{msg} + " (" + src + ")"};
   SDL_LogError(category, fs.c_str());
 }
@@ -87,9 +87,9 @@ inline void logError(const char* msg, const char* src, int category = SDL_LOG_CA
  *
  * @param msg The message to write.
  * @param src The source of the file.
- * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logError(std::string_view msg, std::string_view src, int category = SDL_LOG_CATEGORY_APPLICATION){
+inline void logError(std::string_view msg, std::string_view src, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {msg.data() + std::string{" ("} + src.data() + ')'};
   SDL_LogError(category, fs.c_str());
 }
@@ -204,9 +204,9 @@ inline void logWarn(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLIC
  * @brief Log a message with SDL_LOG_PRIORITY_ERROR with the SDL_GetError() result.
  *
  * @param msg The message to write.
- * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logSDL2Error(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION){
+inline void logSDL2Error(const char* msg, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {msg + ' ' + std::string{SDL_GetError()}};
   SDL_LogError(category, fs.c_str());
 }
@@ -215,9 +215,9 @@ inline void logSDL2Error(const char* msg, int category = SDL_LOG_CATEGORY_APPLIC
  * @brief Log a message with SDL_LOG_PRIORITY_ERROR with the SDL_GetError() result.
  *
  * @param msg The message to write.
- * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logSDL2Error(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION){
+inline void logSDL2Error(std::string_view msg, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {msg.data() + ' ' + std::string{SDL_GetError()}};
   SDL_LogError(category, fs.c_str());
 }
@@ -227,9 +227,9 @@ inline void logSDL2Error(std::string_view msg, int category = SDL_LOG_CATEGORY_A
  *
  * @param msg The message to write.
  * @param src The source of the file.
- * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logSDL2Error(const char* msg, const char* src, int category = SDL_LOG_CATEGORY_APPLICATION){
+inline void logSDL2Error(const char* msg, const char* src, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {msg + ' ' + std::string{SDL_GetError()} + " (" + src + ')'};
   SDL_LogError(category, fs.c_str());
 }
@@ -239,9 +239,9 @@ inline void logSDL2Error(const char* msg, const char* src, int category = SDL_LO
  *
  * @param msg The message to write.
  * @param src The source of the file.
- * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
+ * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logSDL2Error(std::string_view msg, std::string_view src, int category = SDL_LOG_CATEGORY_APPLICATION){
+inline void logSDL2Error(std::string_view msg, std::string_view src, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {msg.data() + ' ' + std::string{SDL_GetError()} + " (" + src.data() + ')'};
   SDL_LogError(category, fs.c_str());
 }

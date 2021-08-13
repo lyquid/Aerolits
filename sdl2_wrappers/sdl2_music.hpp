@@ -33,7 +33,7 @@ class SDL2_Music {
   auto loadMusic(const std::string& path) {
     music_.reset(Mix_LoadMUS(path.c_str()));
     if (music_ == nullptr) {
-      logSDL2Error("Mix_LoadMUS", path);
+      logSDL2Error("Mix_LoadMUS", path, SDL_LOG_CATEGORY_AUDIO);
       return false;
     }
     return true;
@@ -49,7 +49,7 @@ class SDL2_Music {
   */
   auto play(int loops = -1) {
     if (Mix_PlayMusic(music_.get(), loops) != 0) {
-      logSDL2Error("Mix_PlayMusic");
+      logSDL2Error("Mix_PlayMusic", SDL_LOG_CATEGORY_AUDIO);
       return false;
     }
     return true;

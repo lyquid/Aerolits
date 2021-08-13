@@ -4,7 +4,7 @@
 bool ktp::SDL2_Sound::loadSound(const std::string& path) {
   sound_.reset(Mix_LoadWAV(path.c_str()));
   if (sound_ == nullptr) {
-    ktp::logSDL2Error("Mix_LoadWAV", path);
+    logSDL2Error("Mix_LoadWAV", path, SDL_LOG_CATEGORY_AUDIO);
     return false;
   }
   return true;

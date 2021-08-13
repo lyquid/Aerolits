@@ -45,11 +45,11 @@ class SDL2_Font {
       return false;
     } else {
       queryTTFVersions();
-      logMessage("SDL_ttf compiled version: " +
+      logInfo("SDL_ttf compiled version: " +
                   std::to_string(ttf_compiled_version_.major) + '.' +
                   std::to_string(ttf_compiled_version_.minor) + '.' +
                   std::to_string(ttf_compiled_version_.patch));
-      logMessage("SDL_ttf linked version: " +
+      logInfo("SDL_ttf linked version: " +
                   std::to_string(ttf_linked_version_->major) + '.' +
                   std::to_string(ttf_linked_version_->minor) + '.' +
                   std::to_string(ttf_linked_version_->patch));
