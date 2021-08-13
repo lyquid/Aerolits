@@ -3,6 +3,7 @@
 
 #include <SDL_mixer.h>
 #include <memory>
+#include <string>
 
 namespace ktp {
 
