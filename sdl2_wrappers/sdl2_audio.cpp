@@ -1,6 +1,5 @@
 #include "sdl2_audio.hpp"
 #include "sdl2_log.hpp"
-#include <string>
 
 void ktp::SDL2_Audio::closeMixer() {
   Mix_CloseAudio();

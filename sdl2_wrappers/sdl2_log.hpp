@@ -2,7 +2,6 @@
 #define KTP_SDL2_WRAPPERS_SDL2_LOG_HPP_
 
 #include <SDL.h>
-#include <iostream>
 #include <string>
 
 namespace ktp {
