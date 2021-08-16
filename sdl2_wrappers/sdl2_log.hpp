@@ -26,7 +26,7 @@ inline void logCritical(const char* msg, int category = SDL_LOG_CATEGORY_APPLICA
  * @param msg The message to write.
  * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
  */
-inline void logCritical(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+inline void logCritical(const std::string& msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
   SDL_LogCritical(category, msg.data());
 }
 
@@ -46,7 +46,7 @@ inline void logDebug(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATIO
  * @param msg The message to write.
  * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
  */
-inline void logDebug(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+inline void logDebug(const std::string& msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
   SDL_LogDebug(category, msg.data());
 }
 
@@ -66,7 +66,7 @@ inline void logError(const char* msg, int category = SDL_LOG_CATEGORY_ERROR) {
  * @param msg The message to write.
  * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logError(std::string_view msg, int category = SDL_LOG_CATEGORY_ERROR) {
+inline void logError(const std::string& msg, int category = SDL_LOG_CATEGORY_ERROR) {
   SDL_LogError(category, msg.data());
 }
 
@@ -79,7 +79,7 @@ inline void logError(std::string_view msg, int category = SDL_LOG_CATEGORY_ERROR
  */
 inline void logError(const char* msg, const char* src, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {std::string{msg} + " (" + src + ")"};
-  SDL_LogError(category, fs.c_str());
+  SDL_LogError(category, fs.data());
 }
 
 /**
@@ -89,9 +89,9 @@ inline void logError(const char* msg, const char* src, int category = SDL_LOG_CA
  * @param src The source of the file.
  * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logError(std::string_view msg, std::string_view src, int category = SDL_LOG_CATEGORY_ERROR){
+inline void logError(const std::string& msg, std::string_view src, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {msg.data() + std::string{" ("} + src.data() + ')'};
-  SDL_LogError(category, fs.c_str());
+  SDL_LogError(category, fs.data());
 }
 
 /**
@@ -110,7 +110,7 @@ inline void logInfo(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION
  * @param msg The message to write.
  * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
  */
-inline void logInfo(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+inline void logInfo(const std::string& msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
   SDL_LogInfo(category, msg.data());
 }
 
@@ -132,7 +132,7 @@ inline void logMessage(const char* msg, int category = SDL_LOG_CATEGORY_APPLICAT
  * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
  * @param priority The priority of the message. Defaults to SDL_LOG_PRIORITY_INFO.
  */
-inline void logMessage(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION, SDL_LogPriority priority = SDL_LOG_PRIORITY_INFO) {
+inline void logMessage(const std::string& msg, int category = SDL_LOG_CATEGORY_APPLICATION, SDL_LogPriority priority = SDL_LOG_PRIORITY_INFO) {
   SDL_LogMessage(category, priority, msg.data());
 }
 
@@ -156,7 +156,7 @@ inline void logMessage(const char* msg, va_list ap, int category = SDL_LOG_CATEG
  * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
  * @param priority The priority of the message. Defaults to SDL_LOG_PRIORITY_INFO.
  */
-inline void logMessage(std::string_view msg, va_list ap, int category = SDL_LOG_CATEGORY_APPLICATION, SDL_LogPriority priority = SDL_LOG_PRIORITY_INFO) {
+inline void logMessage(const std::string& msg, va_list ap, int category = SDL_LOG_CATEGORY_APPLICATION, SDL_LogPriority priority = SDL_LOG_PRIORITY_INFO) {
   SDL_LogMessageV(category, priority, msg.data(), ap);
 }
 
@@ -176,7 +176,7 @@ inline void logVerbose(const char* msg, int category = SDL_LOG_CATEGORY_APPLICAT
  * @param msg The message to write.
  * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
  */
-inline void logVerbose(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+inline void logVerbose(const std::string& msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
   SDL_LogVerbose(category, msg.data());
 }
 
@@ -196,7 +196,7 @@ inline void logWarn(const char* msg, int category = SDL_LOG_CATEGORY_APPLICATION
  * @param msg The message to write.
  * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_APPLICATION.
  */
-inline void logWarn(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
+inline void logWarn(const std::string& msg, int category = SDL_LOG_CATEGORY_APPLICATION) {
   SDL_LogWarn(category, msg.data());
 }
 
@@ -208,7 +208,7 @@ inline void logWarn(std::string_view msg, int category = SDL_LOG_CATEGORY_APPLIC
  */
 inline void logSDL2Error(const char* msg, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {msg + ' ' + std::string{SDL_GetError()}};
-  SDL_LogError(category, fs.c_str());
+  SDL_LogError(category, fs.data());
 }
 
 /**
@@ -217,9 +217,9 @@ inline void logSDL2Error(const char* msg, int category = SDL_LOG_CATEGORY_ERROR)
  * @param msg The message to write.
  * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logSDL2Error(std::string_view msg, int category = SDL_LOG_CATEGORY_ERROR){
+inline void logSDL2Error(const std::string& msg, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {msg.data() + ' ' + std::string{SDL_GetError()}};
-  SDL_LogError(category, fs.c_str());
+  SDL_LogError(category, fs.data());
 }
 
 /**
@@ -231,7 +231,7 @@ inline void logSDL2Error(std::string_view msg, int category = SDL_LOG_CATEGORY_E
  */
 inline void logSDL2Error(const char* msg, const char* src, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {msg + ' ' + std::string{SDL_GetError()} + " (" + src + ')'};
-  SDL_LogError(category, fs.c_str());
+  SDL_LogError(category, fs.data());
 }
 
 /**
@@ -241,9 +241,9 @@ inline void logSDL2Error(const char* msg, const char* src, int category = SDL_LO
  * @param src The source of the file.
  * @param category The category of the message. Defaults to SDL_LOG_CATEGORY_ERROR.
  */
-inline void logSDL2Error(std::string_view msg, std::string_view src, int category = SDL_LOG_CATEGORY_ERROR){
+inline void logSDL2Error(const std::string& msg, std::string_view src, int category = SDL_LOG_CATEGORY_ERROR){
   const auto fs {msg.data() + ' ' + std::string{SDL_GetError()} + " (" + src.data() + ')'};
-  SDL_LogError(category, fs.c_str());
+  SDL_LogError(category, fs.data());
 }
 
 } // end namespace ktp
