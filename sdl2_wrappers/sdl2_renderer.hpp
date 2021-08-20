@@ -23,6 +23,10 @@ void b2ColorToSDL2Color(const b2Color& orig, SDL_Color& dest);
 
 void SDL2ColorToB2Color(const SDL_Color& orig, b2Color& dest);
 
+namespace SDL2Video {
+  void logVideoDrivers();
+}
+
 class SDL2_Renderer {
  public:
 

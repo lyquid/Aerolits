@@ -1,5 +1,5 @@
-#include "sdl2_renderer.hpp"
 #include "sdl2_log.hpp"
+#include "sdl2_renderer.hpp"
 #include <cctype>  // std::toupper
 
 void ktp::b2ColorToSDL2Color(const b2Color& orig, SDL_Color& dest) {
@@ -15,6 +15,17 @@ void ktp::SDL2ColorToB2Color(const SDL_Color& orig, b2Color& dest) {
   dest.g = orig.g * inv;
   dest.b = orig.b * inv;
   dest.a = orig.a * inv;
+}
+
+void ktp::SDL2Video::logVideoDrivers() {
+  const auto num {SDL_GetNumVideoDrivers()};
+  if (num >= 1) {
+    for (auto i = 0; i < num; ++i) {
+      logInfo(SDL_GetVideoDriver(i));
+    }
+  } else {
+    logSDL2Error("SDL_GetNumVideoDrivers");
+  }
 }
 
 /* SDL2_Renderer */
