@@ -80,6 +80,7 @@ void ktp::ProjectilePhysicsComponent::detonate() {
 
     xphysics->setDuration(explosion_config_.duration_);
     xphysics->setDetonationTime(detonation_time_);
+    xphysics->setRadius(explosion_config_.particle_radius_ * kMetersToPixels);
 
     b2BodyDef bd;
     bd.bullet = true;

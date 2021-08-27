@@ -59,19 +59,12 @@ class Particle {
   Particle& operator=(const Particle& other) noexcept;
   Particle& operator=(Particle&& other) noexcept;
 
- private:
-
-  Particle() {}
-  Particle(const Particle& other) noexcept { *this = other; }
-  Particle(Particle&& other) noexcept { *this = std::move(other); }
-  ~Particle() {}
-
   inline static SDL_Color interpolate2Colors(const SDL_Color& start_color, const SDL_Color& end_color, float time_step);
 
   inline static SDL_Color interpolate3Colors(const SDL_Color& start_color, const SDL_Color& mid_color, const SDL_Color& end_color, float time_step);
 
   template<typename T>
-  inline static T interpolateRange(T start,T end, T time_step) { return start + (end - start) * time_step; }
+  inline static T interpolateRange(T start, T end, T time_step) { return start + (end - start) * time_step; }
 
   template<typename T, typename U>
   inline static T interpolateRange(T start, T end, U time_step) { return start + (end - start) * time_step; }
@@ -93,6 +86,13 @@ class Particle {
       return end * (time_step - 0.5) * 2.0 + mid * (1.0 - time_step) * 2.0;
     }
   }
+
+ private:
+
+  Particle() {}
+  Particle(const Particle& other) noexcept { *this = other; }
+  Particle(Particle&& other) noexcept { *this = std::move(other); }
+  ~Particle() {}
 
   unsigned int life_{};
   union State {

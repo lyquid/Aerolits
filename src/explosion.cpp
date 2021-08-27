@@ -10,7 +10,7 @@ void ktp::XParticleGraphicsComponent::update(const GameEntity& xparticle, const 
   // renderer.drawPoint(pos);
   ParticlesAtlas::particles_atlas.setColorMod(Colors::yellow);
   ParticlesAtlas::particles_atlas.setAlphaMod(255);
-  ParticlesAtlas::particles_atlas.render(texture_rect, {(int)position_.x, (int)position_.y, 30, 30}, 0);
+  ParticlesAtlas::particles_atlas.render(texture_rect_, {(int)position_.x, (int)position_.y, 30, 30}, 0);
 }
 
 // PHYSICS
@@ -33,6 +33,7 @@ ktp::XParticlePhysicsComponent& ktp::XParticlePhysicsComponent::operator=(XParti
     detonation_time_ = other.detonation_time_;
     duration_        = other.duration_;
     graphics_        = std::exchange(other.graphics_, nullptr);
+    radius_          = other.radius_;
   }
   return *this;
 }
@@ -41,7 +42,8 @@ void ktp::XParticlePhysicsComponent::update(const GameEntity& xparticle, float d
   if (Game::gameplay_timer_.milliseconds() - duration_ > detonation_time_) {
     owner_->deactivate();
   } else {
-    graphics_->position_.x = body_->GetPosition().x * kMetersToPixels;
-    graphics_->position_.y = body_->GetPosition().y * kMetersToPixels;
+    const auto magic_num {radius_ * 1.5f};
+    graphics_->position_.x = body_->GetPosition().x * kMetersToPixels - magic_num;
+    graphics_->position_.y = body_->GetPosition().y * kMetersToPixels - magic_num;
   }
 }

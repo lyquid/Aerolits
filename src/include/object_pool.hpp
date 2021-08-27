@@ -2,7 +2,7 @@
 
 #include <utility> // std::move, std::exchange
 
-namespace ktp{
+namespace ktp {
 
 template<class T>
 class ObjectPool {
