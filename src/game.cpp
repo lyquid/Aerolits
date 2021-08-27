@@ -4,7 +4,7 @@
 #include "include/paths.hpp"
 
 ktp::EntitiesCount ktp::GameEntity::entities_count_ {};
-ktp::EntitiesPool  ktp::GameEntity::game_entities_ {40};
+ktp::EntitiesPool  ktp::GameEntity::game_entities_ {2000};
 
 SDL_FPoint ktp::PhysicsComponent::b2_screen_size_ {};
 b2World*   ktp::PhysicsComponent::world_ {nullptr};

@@ -23,7 +23,6 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
   graphics_->render_shape_.resize(shape_.size());
 
   explosion_config_ = ConfigParser::projectiles_config.explosion_config_;
-  explosion_particles_.reserve(explosion_config_.rays_);
 
   b2BodyDef body_def {};
   body_def.type = b2_dynamicBody;
@@ -61,7 +60,6 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
     size_     = other.size_;
     // own members
     detonated_           = other.detonated_;
-    explosion_particles_ = std::move(other.explosion_particles_);
     detonation_time_     = other.detonation_time_;
     explosion_config_    = std::move(other.explosion_config_);
     graphics_            = std::exchange(other.graphics_, nullptr);
@@ -74,8 +72,14 @@ void ktp::ProjectilePhysicsComponent::detonate() {
   detonated_ = true;
   detonation_time_ = Game::gameplay_timer_.milliseconds();
   for (std::size_t i = 0; i < explosion_config_.rays_; ++i) {
+
     const float angle = (i / (float)explosion_config_.rays_) * 360 * (kPI / 180);
-    const b2Vec2 ray_dir {sinf(angle), cosf(angle)};
+    const b2Vec2 ray_dir {SDL_sinf(angle), SDL_cosf(angle)};
+
+    const auto xphysics {static_cast<XParticlePhysicsComponent*>(GameEntity::createEntity(EntityTypes::ExplosionParticle)->physics())};
+
+    xphysics->setDuration(explosion_config_.duration_);
+    xphysics->setDetonationTime(detonation_time_);
 
     b2BodyDef bd;
     bd.bullet = true;
@@ -84,9 +88,8 @@ void ktp::ProjectilePhysicsComponent::detonate() {
     bd.linearVelocity = explosion_config_.blast_power_ * ray_dir;
     bd.position = body_->GetPosition();
     bd.type = b2_dynamicBody;
-    bd.userData.pointer = 0;
-
-    auto body {world_->CreateBody(&bd)};
+    bd.userData.pointer = reinterpret_cast<uintptr_t>(xphysics->owner());
+    xphysics->setBody(world_->CreateBody(&bd));
 
     b2CircleShape circle_shape;
     circle_shape.m_radius = explosion_config_.particle_radius_;
@@ -98,9 +101,10 @@ void ktp::ProjectilePhysicsComponent::detonate() {
     fd.restitution = explosion_config_.restitution_;
     fd.shape = &circle_shape;
 
-    body->CreateFixture(&fd);
+    xphysics->body()->CreateFixture(&fd);
 
-    explosion_particles_.push_back(body);
+    xphysics->graphics_->position_.x = body_->GetPosition().x * kMetersToPixels;
+    xphysics->graphics_->position_.y = body_->GetPosition().y * kMetersToPixels;
   }
 }
 
@@ -122,22 +126,15 @@ void ktp::ProjectilePhysicsComponent::transformRenderShape() {
 }
 
 void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float delta_time) {
-  if (detonated_) {
-    if (Game::gameplay_timer_.milliseconds() - explosion_config_.duration_ > detonation_time_) {
-      for (auto& bodies: explosion_particles_) {
-        world_->DestroyBody(bodies);
-      }
-      owner_->deactivate();
-    }
-    transformRenderShape();
+  const auto threshold {size_};
+  if (body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
+      body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold) {
+    owner_->deactivate();
   } else {
-    const auto threshold {size_};
-    if (body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
-        body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold) {
+    transformRenderShape();
+    if (collided_) {
+      detonate();
       owner_->deactivate();
-    } else {
-      transformRenderShape();
-      if (collided_) detonate();
     }
   }
 }

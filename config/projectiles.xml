@@ -1,14 +1,14 @@
 <projectiles>
   <color r="41" g="255" b="95"/>
   <size value="0.15"/>
-  <speed value="30.0"/>
+  <speed value="3.0"/>
   <Box2D>
     <density value="10.0"/>
     <friction value="0.1"/>
     <restitution value="0.35"/>
   </Box2D>
   <explosion>
-    <blastPower value="50.0"/>
+    <blastPower value="25.0"/>
     <density value="6.0"/>
     <duration value="500"/>
     <friction value="0.0"/>

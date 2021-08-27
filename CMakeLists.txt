@@ -53,6 +53,7 @@ add_executable(Aerolits main.cpp
                         src/background.cpp
                         src/config_parser.cpp
                         src/emitter.cpp
+                        src/explosion.cpp
                         src/game.cpp
                         src/game_state.cpp
                         src/particle.cpp

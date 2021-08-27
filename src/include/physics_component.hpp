@@ -20,6 +20,7 @@ class PhysicsComponent {
   inline auto collided() const { return collided_; }
   inline auto delta() const { return delta_; }
   inline auto owner() const { return owner_; }
+  inline void setBody(b2Body* body) { body_ = body; }
   inline auto& shape() { return shape_; }
   inline auto size() const { return size_; }
 

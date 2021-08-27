@@ -4,6 +4,7 @@
 #include "aerolite.hpp"
 #include "background.hpp"
 #include "emitter.hpp"
+#include "explosion.hpp"
 #include "graphics_component.hpp"
 #include "input_component.hpp"
 #include "object_pool.hpp"
@@ -21,6 +22,7 @@ enum class EntityTypes {
   Undefined,
   Aerolite,
   Background,
+  ExplosionParticle,
   Player,
   PlayerDemo,
   Projectile,
@@ -94,6 +96,10 @@ class GameEntity {
       case EntityTypes::Background:
         entity->graphics_ = std::make_unique<BackgroundGraphicsComponent>();
         entity->physics_  = std::make_unique<BackgroundPhysicsComponent>(entity, static_cast<BackgroundGraphicsComponent*>(entity->graphics_.get()));
+        break;
+      case EntityTypes::ExplosionParticle:
+        entity->graphics_ = std::make_unique<XParticleGraphicsComponent>();
+        entity->physics_  = std::make_unique<XParticlePhysicsComponent>(entity, static_cast<XParticleGraphicsComponent*>(entity->graphics_.get()));
         break;
       case EntityTypes::Player:
         entity->graphics_ = std::make_unique<PlayerGraphicsComponent>();

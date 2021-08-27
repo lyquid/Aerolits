@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../../sdl2_wrappers/sdl2_log.hpp"
-#include "aerolite.hpp"
 #include "game_entity.hpp"
 #include <box2d/box2d.h>
 
@@ -26,7 +24,10 @@ class ContactListener: public b2ContactListener {
     switch (fixture_A->type()) {
       case EntityTypes::Aerolite:
         if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
-          // fixture_B->toBeDeactivated();
+          // kill player
+        } else if (fixture_B->type() == EntityTypes::ExplosionParticle) {
+          fixture_A->physics()->collide(fixture_B);
+          fixture_B->physics()->collide(fixture_A);
         } else if (fixture_B->type() == EntityTypes::Projectile) {
           fixture_A->physics()->collide(fixture_B);
           fixture_B->physics()->collide(fixture_A);
@@ -34,29 +35,28 @@ class ContactListener: public b2ContactListener {
         break;
       case EntityTypes::Background:
         break;
-      case EntityTypes::Player:
+      case EntityTypes::ExplosionParticle:
         if (fixture_B->type() == EntityTypes::Aerolite) {
-          // fixture_A->toBeDeactivated();
+          fixture_A->physics()->collide(fixture_B);
+          fixture_B->physics()->collide(fixture_A);
         } else if (fixture_B->type() == EntityTypes::Projectile) {
-          // fixture_A->toBeDeactivated();
-          // fixture_B->toBeDeactivated();
+          fixture_A->physics()->collide(fixture_B);
+          fixture_B->physics()->collide(fixture_A);
         }
         break;
+      case EntityTypes::Player:
+        break;
       case EntityTypes::PlayerDemo:
-        if (fixture_B->type() == EntityTypes::Aerolite) {
-          // fixture_A->toBeDeactivated();
-        } else if (fixture_B->type() == EntityTypes::Projectile) {
-          // fixture_A->toBeDeactivated();
-          // fixture_B->toBeDeactivated();
-        }
         break;
       case EntityTypes::Projectile:
         if (fixture_B->type() == EntityTypes::Aerolite) {
           fixture_A->physics()->collide(fixture_B);
           fixture_B->physics()->collide(fixture_A);
         } else if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
-          // fixture_A->toBeDeactivated();
-          // fixture_B->toBeDeactivated();
+          // kill player or something
+        } else if (fixture_B->type() == EntityTypes::ExplosionParticle) {
+          fixture_A->physics()->collide(fixture_B);
+          fixture_B->physics()->collide(fixture_A);
         } else if (fixture_B->type() == EntityTypes::Projectile) {
           fixture_A->physics()->collide(fixture_B);
           fixture_B->physics()->collide(fixture_A);

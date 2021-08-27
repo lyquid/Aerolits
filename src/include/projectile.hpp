@@ -47,9 +47,8 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
   static constexpr auto kPI {3.14159265358979323846264338327950288};
 
   bool detonated_ {false};
-  ConfigParser::ExplosionConfig explosion_config_ {};
-  std::vector<b2Body*> explosion_particles_ {};
   Uint32 detonation_time_ {};
+  ConfigParser::ExplosionConfig explosion_config_ {};
   ProjectileGraphicsComponent* graphics_ {nullptr};
   float speed_ {ConfigParser::projectiles_config.speed_};
 };

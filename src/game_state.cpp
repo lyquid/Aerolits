@@ -19,7 +19,8 @@ void ktp::GameState::setWindowTitle(Game& game) {
     + " | Entities: " + std::to_string(GameEntity::count()) + '/' + std::to_string(GameEntity::game_entities_.capacity())
     + " (Player: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Player) + GameEntity::entitiesCount(EntityTypes::PlayerDemo))
     + " Aerolites: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Aerolite))
-    + " Projectiles: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Projectile)) + ')'
+    + " Projectiles: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Projectile))
+    + " Explosions: " + std::to_string(GameEntity::entitiesCount(EntityTypes::ExplosionParticle)) + ')'
   );
 }
 

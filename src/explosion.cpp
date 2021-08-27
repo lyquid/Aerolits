@@ -1,0 +1,47 @@
+#include "include/explosion.hpp"
+#include "include/game.hpp"
+#include "include/particle.hpp" // for the texture
+
+// GRAPHICS
+
+void ktp::XParticleGraphicsComponent::update(const GameEntity& xparticle, const SDL2_Renderer& renderer) {
+  // renderer.setDrawColor(Colors::yellow);
+  // renderer.drawCircle(pos, 5);
+  // renderer.drawPoint(pos);
+  ParticlesAtlas::particles_atlas.setColorMod(Colors::yellow);
+  ParticlesAtlas::particles_atlas.setAlphaMod(255);
+  ParticlesAtlas::particles_atlas.render(texture_rect, {(int)position_.x, (int)position_.y, 30, 30}, 0);
+}
+
+// PHYSICS
+
+ktp::XParticlePhysicsComponent::XParticlePhysicsComponent(GameEntity* owner, XParticleGraphicsComponent* graphics) noexcept:
+ graphics_(graphics) {
+  owner_ = owner;
+}
+
+ktp::XParticlePhysicsComponent& ktp::XParticlePhysicsComponent::operator=(XParticlePhysicsComponent&& other) noexcept {
+  if (this != &other) {
+    // inherited members
+    body_     = other.body_;
+    collided_ = other.collided_;
+    delta_    = std::move(other.delta_);
+    owner_    = std::exchange(other.owner_, nullptr);
+    shape_    = std::move(other.shape_);
+    size_     = other.size_;
+    // own members
+    detonation_time_ = other.detonation_time_;
+    duration_        = other.duration_;
+    graphics_        = std::exchange(other.graphics_, nullptr);
+  }
+  return *this;
+}
+
+void ktp::XParticlePhysicsComponent::update(const GameEntity& xparticle, float delta_time) {
+  if (Game::gameplay_timer_.milliseconds() - duration_ > detonation_time_) {
+    owner_->deactivate();
+  } else {
+    graphics_->position_.x = body_->GetPosition().x * kMetersToPixels;
+    graphics_->position_.y = body_->GetPosition().y * kMetersToPixels;
+  }
+}
