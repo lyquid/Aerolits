@@ -44,11 +44,11 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
   static void generateProjectileShape(B2Vec2Vector& shape, float size);
   void transformRenderShape();
 
-  static constexpr auto kPI {3.14159265358979323846264338327950288};
-
+  bool armed_ {false};
+  unsigned int arm_time_ {ConfigParser::projectiles_config.arm_time_};
   bool detonated_ {false};
-  Uint32 detonation_time_ {};
   ConfigParser::ExplosionConfig explosion_config_ {};
+  unsigned int fired_time_ {};
   ProjectileGraphicsComponent* graphics_ {nullptr};
   float speed_ {ConfigParser::projectiles_config.speed_};
 };

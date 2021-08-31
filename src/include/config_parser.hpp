@@ -100,12 +100,13 @@ namespace ConfigParser {
   };
 
   struct ProjectilesConfig {
+    unsigned int arm_time_ {300u};
     SDL_Color color_ {Colors::copper_green};
     float density_ {10.f};
     float friction_ {0.1f};
     float restitution_ {0.35f};
     float size_ {0.15f};
-    float speed_ {30.f};
+    float speed_ {0.1f};
     // explosion
     ExplosionConfig explosion_config_ {};
   };

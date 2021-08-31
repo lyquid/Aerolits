@@ -29,7 +29,7 @@ class ContactListener: public b2ContactListener {
           fixture_A->physics()->collide(fixture_B);
           fixture_B->physics()->collide(fixture_A);
         } else if (fixture_B->type() == EntityTypes::Projectile) {
-          fixture_A->physics()->collide(fixture_B);
+          // fixture_A->physics()->collide(fixture_B);
           fixture_B->physics()->collide(fixture_A);
         }
         break;
@@ -51,7 +51,7 @@ class ContactListener: public b2ContactListener {
       case EntityTypes::Projectile:
         if (fixture_B->type() == EntityTypes::Aerolite) {
           fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
+          // fixture_B->physics()->collide(fixture_A);
         } else if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
           // kill player or something
         } else if (fixture_B->type() == EntityTypes::ExplosionParticle) {

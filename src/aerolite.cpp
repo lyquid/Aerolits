@@ -76,11 +76,10 @@ void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, f
 
 void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, float size, unsigned int sides) {
   if (!shape.empty()) shape.clear();
-  constexpr auto kPI {3.14159265358979323846264338327950288};
   b2Vec2 point {};
   for (auto i = 0u; i < sides; ++i) {
-    point.x = size * SDL_cosf(2 * kPI * i / sides);
-    point.y = size * SDL_sinf(2 * kPI * i / sides);
+    point.x = size * SDL_cosf(2 * b2_pi * i / sides);
+    point.y = size * SDL_sinf(2 * b2_pi * i / sides);
     shape.push_back(point);
   }
   // this is the closing point == first point

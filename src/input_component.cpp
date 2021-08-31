@@ -9,21 +9,21 @@
 void ktp::InputComponent::shoot(GameEntity& player) {
   if (SDL_GetTicks() - shooting_timer_ > shooting_interval_) {
 
-    const auto projectile {GameEntity::createEntity(EntityTypes::Projectile)};
-    if (!projectile) return;
+    const auto projectile_phy {static_cast<ProjectilePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Projectile)->physics())};
+    if (!projectile_phy) return;
 
     const auto sin {SDL_sinf(physics_->body_->GetAngle())};
     const auto cos {SDL_cosf(physics_->body_->GetAngle())};
 
-    projectile->physics()->body()->SetTransform({
-      physics_->body_->GetPosition().x + projectile->physics()->size() * 5.2f * sin,
-      physics_->body_->GetPosition().y - projectile->physics()->size() * 5.2f * cos},
+    projectile_phy->body()->SetTransform({
+      physics_->body_->GetPosition().x + projectile_phy->size() * 5.2f * sin,
+      physics_->body_->GetPosition().y - projectile_phy->size() * 5.2f * cos},
       physics_->body_->GetAngle()
     );
 
-    projectile->physics()->body()->SetLinearVelocity({
-       ConfigParser::projectiles_config.speed_ * sin,
-      -ConfigParser::projectiles_config.speed_ * cos
+    projectile_phy->body()->SetLinearVelocity({
+       projectile_phy->speed() * sin * 30,
+      -projectile_phy->speed() * cos * 30
     });
 
     shooting_timer_ = SDL2_Timer::SDL2Ticks();

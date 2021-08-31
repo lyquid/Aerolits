@@ -31,14 +31,15 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
 
   body_ = world_->CreateBody(&body_def);
 
-  b2Vec2 laser_vertices[4];
-  laser_vertices[0].Set(-size_ * 0.15f, -size_); // top left
-  laser_vertices[1].Set(-size_ * 0.15f,  size_); // down left
-  laser_vertices[2].Set( size_ * 0.15f,  size_); // down right
-  laser_vertices[3].Set( size_ * 0.15f, -size_); // up right
+  b2Vec2 laser_vertices[5];
+  laser_vertices[0].Set(0, -size_ - (size_ * 0.5f)); // top
+  laser_vertices[1].Set(-size_ * 0.15f, -size_); // top left
+  laser_vertices[2].Set(-size_ * 0.15f,  size_); // down left
+  laser_vertices[3].Set( size_ * 0.15f,  size_); // down right
+  laser_vertices[4].Set( size_ * 0.15f, -size_); // up right
 
   b2PolygonShape projectile_shape {};
-  projectile_shape.Set(laser_vertices, 4);
+  projectile_shape.Set(laser_vertices, 5);
 
   b2FixtureDef projectile_fixture_def {};
   projectile_fixture_def.shape = &projectile_shape;
@@ -47,6 +48,8 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
   projectile_fixture_def.restitution = ConfigParser::projectiles_config.restitution_;
 
   body_->CreateFixture(&projectile_fixture_def);
+
+  fired_time_ = Game::gameplay_timer_.milliseconds();
 }
 
 ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(ProjectilePhysicsComponent&& other) noexcept {
@@ -59,27 +62,29 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
     shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
-    detonated_           = other.detonated_;
-    detonation_time_     = other.detonation_time_;
-    explosion_config_    = std::move(other.explosion_config_);
-    graphics_            = std::exchange(other.graphics_, nullptr);
-    speed_               = other.speed_;
+    armed_            = other.armed_;
+    arm_time_         = other.arm_time_;
+    detonated_        = other.detonated_;
+    explosion_config_ = std::move(other.explosion_config_);
+    fired_time_       = other.fired_time_;
+    graphics_         = std::exchange(other.graphics_, nullptr);
+    speed_            = other.speed_;
   }
   return *this;
 }
 
 void ktp::ProjectilePhysicsComponent::detonate() {
   detonated_ = true;
-  detonation_time_ = Game::gameplay_timer_.milliseconds();
   for (std::size_t i = 0; i < explosion_config_.rays_; ++i) {
 
-    const float angle = (i / (float)explosion_config_.rays_) * 360 * (kPI / 180);
+    const float angle = (i / (float)explosion_config_.rays_) * 360 * (b2_pi / 180);
     const b2Vec2 ray_dir {SDL_sinf(angle), SDL_cosf(angle)};
 
     const auto xphysics {static_cast<XParticlePhysicsComponent*>(GameEntity::createEntity(EntityTypes::ExplosionParticle)->physics())};
+    if (!xphysics) return;
 
     xphysics->setDuration(explosion_config_.duration_);
-    xphysics->setDetonationTime(detonation_time_);
+    xphysics->setDetonationTime(Game::gameplay_timer_.milliseconds());
     xphysics->setRadius(explosion_config_.particle_radius_ * kMetersToPixels);
 
     b2BodyDef bd;
@@ -127,15 +132,26 @@ void ktp::ProjectilePhysicsComponent::transformRenderShape() {
 }
 
 void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float delta_time) {
+  if (collided_) {
+    if (armed_) {
+      detonate();
+      owner_->deactivate();
+      return;
+    } else {
+      collided_ = false;
+    }
+  }
   const auto threshold {size_};
   if (body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
       body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold) {
     owner_->deactivate();
   } else {
-    transformRenderShape();
-    if (collided_) {
-      detonate();
-      owner_->deactivate();
+    if (Game::gameplay_timer_.milliseconds() - fired_time_ > arm_time_) {
+      armed_ = true;
+      delta_.x +=  SDL_sinf(body_->GetAngle()) * speed_ * delta_time;
+      delta_.y += -SDL_cosf(body_->GetAngle()) * speed_ * delta_time;
+      body_->ApplyLinearImpulseToCenter({delta_.x, delta_.y}, true);
     }
+    transformRenderShape();
   }
 }

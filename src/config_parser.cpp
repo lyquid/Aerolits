@@ -467,6 +467,17 @@ void ktp::ConfigParser::loadProjectilesConfig() {
   const auto result {doc.load_file(path.c_str())};
   if (result) {
     const auto projectiles {doc.child("projectiles")};
+    // Arm time
+    if (projectiles.child("armTime")) {
+      const auto arm_time {projectiles.child("armTime").attribute("value").as_uint()};
+      if (arm_time >= 0) {
+        projectiles_config.arm_time_ = arm_time;
+      } else {
+        logMessage("Warning! Projectiles arm time less than 0. Using default arm time.");
+      }
+    } else {
+      logMessage("Warning! Projectiles arm time not set. Using default arm time.");
+    }
     // Color
     if (projectiles.child("color")) {
       const SDL_Color requested_color {
