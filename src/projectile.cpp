@@ -1,4 +1,5 @@
 #include "include/box2d_scale.hpp"
+#include "include/emitter.hpp"
 #include "include/game.hpp"
 #include "include/game_entity.hpp"
 #include "include/projectile.hpp"
@@ -8,9 +9,14 @@
 
 /* GRAPHICS */
 
+ktp::ProjectileGraphicsComponent::ProjectileGraphicsComponent() noexcept {
+  exhaust_emitter_ = std::make_unique<EmitterGraphicsComponent>();
+}
+
 void ktp::ProjectileGraphicsComponent::update(const GameEntity& projectile, const SDL2_Renderer& renderer) {
   renderer.setDrawColor(color_);
   renderer.drawLines(render_shape_);
+  exhaust_emitter_->update(projectile, renderer);
 }
 
 /* PHYSICS */
@@ -49,6 +55,8 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
 
   body_->CreateFixture(&projectile_fixture_def);
 
+  exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(EmitterPhysicsComponent::makeEmitter(graphics_->exhaust_emitter_.get(), "projectile_exhaust", {body_->GetPosition().x, body_->GetPosition().y}));
+
   fired_time_ = Game::gameplay_timer_.milliseconds();
 }
 
@@ -64,10 +72,13 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
     // own members
     armed_            = other.armed_;
     arm_time_         = other.arm_time_;
+    cos_              = other.cos_;
     detonated_        = other.detonated_;
+    exhaust_emitter_  = std::move(other.exhaust_emitter_);
     explosion_config_ = std::move(other.explosion_config_);
     fired_time_       = other.fired_time_;
     graphics_         = std::exchange(other.graphics_, nullptr);
+    sin_              = other.sin_;
     speed_            = other.speed_;
   }
   return *this;
@@ -126,8 +137,8 @@ void ktp::ProjectilePhysicsComponent::generateProjectileShape(B2Vec2Vector& shap
 
 void ktp::ProjectilePhysicsComponent::transformRenderShape() {
   for (auto i = 0u; i < shape_.size(); ++i) {
-    graphics_->render_shape_[i].x = ((shape_[i].x * SDL_cosf(body_->GetAngle()) - shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
-    graphics_->render_shape_[i].y = ((shape_[i].x * SDL_sinf(body_->GetAngle()) + shape_[i].y * SDL_cosf(body_->GetAngle())) + body_->GetPosition().y) * kMetersToPixels;
+    graphics_->render_shape_[i].x = ((shape_[i].x * cos_ - shape_[i].y * sin_) + body_->GetPosition().x) * kMetersToPixels;
+    graphics_->render_shape_[i].y = ((shape_[i].x * sin_ + shape_[i].y * cos_) + body_->GetPosition().y) * kMetersToPixels;
   }
 }
 
@@ -145,13 +156,25 @@ void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float
   if (body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
       body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold) {
     owner_->deactivate();
-  } else {
-    if (Game::gameplay_timer_.milliseconds() - fired_time_ > arm_time_) {
-      armed_ = true;
-      delta_.x +=  SDL_sinf(body_->GetAngle()) * speed_ * delta_time;
-      delta_.y += -SDL_cosf(body_->GetAngle()) * speed_ * delta_time;
-      body_->ApplyLinearImpulseToCenter({delta_.x, delta_.y}, true);
-    }
-    transformRenderShape();
+    return;
   }
+
+  cos_ = SDL_cosf(body_->GetAngle());
+  sin_ = SDL_sinf(body_->GetAngle());
+
+  if (Game::gameplay_timer_.milliseconds() - fired_time_ > arm_time_) {
+    armed_ = true;
+    delta_.x +=  sin_ * speed_ * delta_time;
+    delta_.y += -cos_ * speed_ * delta_time;
+    body_->ApplyLinearImpulseToCenter({delta_.x, delta_.y}, true);
+  }
+
+  transformRenderShape();
+
+  exhaust_emitter_->setPosition({
+    (body_->GetPosition().x * kMetersToPixels) - size_ * kMetersToPixels * sin_,
+    (body_->GetPosition().y * kMetersToPixels) + size_ * kMetersToPixels * cos_
+  });
+  exhaust_emitter_->update(projectile, delta_time);
+  if (armed_) exhaust_emitter_->generateParticles();
 }

@@ -1,7 +1,7 @@
 <emitterTypes>
   <emitter type="fire">
     <!-- Emitter properties -->
-    
+
     <angleRange min="0" max="360"/> <!-- Clockwise from the top -->
 
     <blendMode mode="add"/>
@@ -47,7 +47,7 @@
 
   <emitter type="plasma">
     <!-- Emitter properties -->
-    
+
     <angleRange min="0" max="360"/> <!-- Clockwise from the top -->
 
     <blendMode mode="add"/>
@@ -91,5 +91,50 @@
 
     <startRotationSpeed value="0"  randMin="-1" randMax="1"/>
     <endRotationSpeed   value="0"   randMin="-1" randMax="1"/>
+  </emitter>
+
+  <emitter type="projectile_exhaust">
+    <!-- Emitter properties -->
+
+    <angleRange min="0" max="360"/> <!-- Clockwise from the top -->
+
+    <blendMode mode="add"/>
+
+    <emissionInterval value="0" randMin="1" randMax="1"/> <!-- In miliseconds. 0 for continuous emission -->
+
+    <emissionRate value="2" randMin="1" randMax="1"/>
+
+    <lifeTime value="-1"/> <!-- In miliseconds. Negative for infinite -->
+
+    <textureRect x="256" y="64" w="128" h="128"/>
+
+    <vortex active="false">
+      <scale value="1000"/>
+      <speed value="0.1"/>
+    </vortex>
+
+    <!-- Particles properties -->
+
+    <maxParticleLife value="30" randMin="0.9" randMax="1"/>
+
+    <colors>
+      <color r="255" g="50" b="5"   a="200"/>
+      <color r="128" g="128"   b="128"   a="50"/>
+    </colors>
+
+    <sizes>
+      <size value="10" randMin="0.5" randMax="1"/>
+      <size value="50" randMin="0.8" randMax="1"/>
+    </sizes>
+
+    <speeds>
+      <speed value="0.1" randMin="0.1"  randMax="1"/>
+      <speed value="0.001" randMin="1"  randMax="1"/>
+    </speeds>
+
+    <rotation value="360" randMin="-1" randMax="1"/>
+
+    <startRotationSpeed value="1"  randMin="-1" randMax="1"/>
+    <endRotationSpeed   value="0.1"   randMin="-1" randMax="1"/>
   </emitter>
 </emitterTypes>
