@@ -34,6 +34,7 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
   body_def.type = b2_dynamicBody;
   body_def.bullet = true;
   body_def.userData.pointer = reinterpret_cast<uintptr_t>(owner_);
+  body_def.angularDamping = 1.f;
 
   body_ = world_->CreateBody(&body_def);
 
