@@ -27,8 +27,6 @@ class PlayerGraphicsComponent: public GraphicsComponent {
   virtual void update(const GameEntity& player, const SDL2_Renderer& renderer) override;
  private:
   SDL_Color     color_ {ConfigParser::player_config.color_};
-  FPointsVector render_flame_shape_ {};
-  bool          thrusting_ {false};
   std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
 };
 
@@ -68,22 +66,15 @@ class PlayerPhysicsComponent: public PhysicsComponent {
 
  private:
 
-  static void generatePlayerShape(B2Vec2Vector& shape, FPointsVector& flame_shape, float size);
+  static void generatePlayerShape(B2Vec2Vector& shape, float size);
   void checkWrap();
   void setBox2D();
   void transformRenderShape();
 
   PlayerGraphicsComponent* graphics_ {nullptr};
-  FPointsVector flame_shape_ {};
   bool thrusting_ {false};
   float cos_ {};
   float sin_ {};
-  // flame stuff
-  static constexpr float kDefaultFlameGrowthFactor_ {0.02f};
-  float flame_growth_factor_ {kDefaultFlameGrowthFactor_};
-  float flame_max_lenght_ {};
-  float flame_min_lenght_ {};
-  // emitter stuff
   std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
 };
 

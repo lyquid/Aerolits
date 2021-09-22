@@ -2,7 +2,7 @@
   <emitter type="fire">
     <!-- Emitter properties -->
 
-    <angleRange min="0" max="360"/> <!-- Clockwise from the top -->
+    <angleRange min="175" max="185"/> <!-- Clockwise from the top -->
 
     <blendMode mode="add"/>
 
@@ -15,28 +15,28 @@
     <textureRect x="256" y="64" w="128" h="128"/>
 
     <vortex active="false">
-      <scale value="1000"/>
-      <speed value="0.1"/>
+      <scale value="0"/>
+      <speed value="0"/>
     </vortex>
 
     <!-- Particles properties -->
 
-    <maxParticleLife value="180" randMin="0.9" randMax="1"/>
+    <maxParticleLife value="10" randMin="0.8" randMax="1"/>
 
     <colors>
-      <color r="0" g="0" b="255"   a="255"/>
-      <color r="255" g="0"   b="255"   a="255"/>
-      <color r="255" g="0"   b="0"   a="0"/>
+      <color r="255" g="0" b="255"  a="128"/>
+      <color r="255" g="0"   b=""   a="255"/>
+      <color r="255" g="0"   b="0"  a="0"/>
     </colors>
 
     <sizes>
-      <size value="10" randMin="0.5" randMax="1"/>
-      <size value="150" randMin="0.2" randMax="1"/>
+      <size value="50" randMin="0.8" randMax="1"/>
+      <size value="1" randMin="0.8" randMax="1"/>
     </sizes>
 
     <speeds>
-      <speed value="0.1" randMin="0.1"  randMax="1"/>
-      <speed value="0.001" randMin="1"  randMax="1"/>
+      <speed value="10" randMin="1"  randMax="1"/>
+      <speed value="1" randMin="0.1"  randMax="1"/>
     </speeds>
 
     <rotation value="360" randMin="0" randMax="1"/>

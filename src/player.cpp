@@ -12,14 +12,8 @@ ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept {
 }
 
 void ktp::PlayerGraphicsComponent::update(const GameEntity& player, const SDL2_Renderer& renderer) {
-  // player's shape
   renderer.setDrawColor(color_);
   renderer.drawLines(render_shape_);
-  // player's thrust fx
-  if (thrusting_) {
-    renderer.setDrawColor(Colors::red);
-    renderer.drawLines(render_flame_shape_);
-  }
   exhaust_emitter_->update(player, renderer);
 }
 
@@ -71,11 +65,8 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner,PlayerGrap
  graphics_(graphics) {
   owner_ = owner;
   size_ = ConfigParser::player_config.size_;
-  flame_max_lenght_ = size_;
-  flame_min_lenght_ = size_ * 0.4f;
-  generatePlayerShape(shape_, flame_shape_, size_);
+  generatePlayerShape(shape_, size_);
   graphics_->render_shape_.resize(shape_.size());
-  graphics_->render_flame_shape_.resize(flame_shape_.size());
   setBox2D();
   exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(EmitterPhysicsComponent::makeEmitter(graphics_->exhaust_emitter_.get(), "fire", {body_->GetPosition().x, body_->GetPosition().y}));
 }
@@ -90,15 +81,11 @@ ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysic
     shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
-    graphics_            = std::exchange(other.graphics_, nullptr);
-    flame_shape_         = std::move(other.flame_shape_);
-    thrusting_           = other.thrusting_;
-    cos_                 = other.cos_;
-    sin_                 = other.sin_;
-    flame_growth_factor_ = other.flame_growth_factor_;
-    flame_max_lenght_    = other.flame_max_lenght_;
-    flame_min_lenght_    = other.flame_min_lenght_;
-    exhaust_emitter_     = std::move(other.exhaust_emitter_);
+    graphics_        = std::exchange(other.graphics_, nullptr);
+    thrusting_       = other.thrusting_;
+    cos_             = other.cos_;
+    sin_             = other.sin_;
+    exhaust_emitter_ = std::move(other.exhaust_emitter_);
   }
   return *this;
 }
@@ -117,7 +104,7 @@ void ktp::PlayerPhysicsComponent::checkWrap() {
   }
 }
 
-void ktp::PlayerPhysicsComponent::generatePlayerShape(B2Vec2Vector& shape, FPointsVector& flame_shape, float size) {
+void ktp::PlayerPhysicsComponent::generatePlayerShape(B2Vec2Vector& shape, float size) {
   shape.push_back({          0.f, -size * 0.50f}); // top
   shape.push_back({-size * 0.33f,  size * 0.50f}); // left
   shape.push_back({-size * 0.15f,  size * 0.33f}); // left flap
@@ -125,12 +112,6 @@ void ktp::PlayerPhysicsComponent::generatePlayerShape(B2Vec2Vector& shape, FPoin
   shape.push_back({ size * 0.33f,  size * 0.50f}); // right
   shape.push_back({          0.f, -size * 0.50f}); // top again
   shape.shrink_to_fit();
-
-  flame_shape.push_back({          0.f, size * 0.40f}); // bottom           2 ____ 1
-  flame_shape.push_back({ size * 0.15f, size * 0.35f}); // right vertice      \  /
-  flame_shape.push_back({-size * 0.15f, size * 0.35f}); // left vertice        \/
-  flame_shape.push_back({          0.f, size * 0.40f}); // bottom again        3/0
-  flame_shape.shrink_to_fit();
 }
 
 void ktp::PlayerPhysicsComponent::setBox2D() {
@@ -182,20 +163,14 @@ void ktp::PlayerPhysicsComponent::transformRenderShape() {
     graphics_->render_shape_[i].x = ((shape_[i].x * cos_ - shape_[i].y * sin_) + body_->GetPosition().x) * kMetersToPixels;
     graphics_->render_shape_[i].y = ((shape_[i].x * sin_ + shape_[i].y * cos_) + body_->GetPosition().y) * kMetersToPixels;
   }
-  if (thrusting_) {
-    for (auto i = 0u; i < flame_shape_.size(); ++i) {
-      graphics_->render_flame_shape_[i].x = ((flame_shape_[i].x * cos_ - flame_shape_[i].y * sin_) + body_->GetPosition().x) * kMetersToPixels;
-      graphics_->render_flame_shape_[i].y = ((flame_shape_[i].x * sin_ + flame_shape_[i].y * cos_) + body_->GetPosition().y) * kMetersToPixels;
-    }
-  }
 }
 
 void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_time) {
-  graphics_->thrusting_ = thrusting_;
   checkWrap();
   cos_ = SDL_cosf(body_->GetAngle());
   sin_ = SDL_sinf(body_->GetAngle());
   transformRenderShape();
+  exhaust_emitter_->setAngle(body_->GetAngle());
   exhaust_emitter_->setPosition({
     (body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
     (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_

@@ -11,7 +11,7 @@
   <explosion>
     <blastPower value="15.0"/>
     <density value="6.0"/>
-    <duration value="500"/>
+    <duration value="150"/>
     <friction value="0.0"/>
     <linearDamping value="5.0"/>
     <particleRadius value="0.2"/>

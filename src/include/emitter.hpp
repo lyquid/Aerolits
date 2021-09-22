@@ -23,25 +23,24 @@ struct Vortex {
 
 struct EmitterType {
   // Emitter properties
-  std::string   type_{};
-  AngleRange    angle_range_{};
-  SDL_BlendMode blend_mode_{};
-  RRVUint       emission_interval_{};
-  RRVUint       emission_rate_{};
-  int           life_time_{};
-  SDL_Rect      texture_rect_{};
-  bool          vortex_{};
-  float         vortex_scale_{};
-  float         vortex_speed_{};
-
+  std::string   type_ {};
+  AngleRange    angle_range_ {};
+  SDL_BlendMode blend_mode_ {};
+  RRVUint       emission_interval_ {};
+  RRVUint       emission_rate_ {};
+  int           life_time_ {};
+  SDL_Rect      texture_rect_ {};
+  bool          vortex_ {};
+  float         vortex_scale_ {};
+  float         vortex_speed_ {};
   // Particles properties
-  RRVUint      max_particle_life_{};
-  ColorsVector colors_{};
-  RRVFVector   sizes_{};
-  RRVFVector   speeds_{};
-  RRVFloat     rotation_{};
-  RRVFloat     start_rotation_speed_{};
-  RRVFloat     end_rotation_speed_{};
+  RRVUint      max_particle_life_ {};
+  ColorsVector colors_ {};
+  RRVFVector   sizes_ {};
+  RRVFVector   speeds_ {};
+  RRVFloat     rotation_ {};
+  RRVFloat     start_rotation_speed_ {};
+  RRVFloat     end_rotation_speed_ {};
 };
 
 class EmitterGraphicsComponent: public GraphicsComponent {
@@ -73,6 +72,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   inline bool lifeTimeOver() const { return SDL2_Timer::SDL2Ticks() - start_time_ >= data_->life_time_; }
   static EmitterPhysicsComponent makeEmitter(EmitterGraphicsComponent* graphics, const std::string& type, const SDL_FPoint& pos);
   inline bool particlesAlive() const { return alive_particles_count_ != 0u; }
+  inline void setAngle(float angle) { angle_ = angle; }
   virtual void setPosition(const SDL_FPoint& pos) override { position_ = pos; }
   void setType(const std::string& type);
   virtual void update(const GameEntity& emitter, float delta_time) override;
@@ -83,14 +83,14 @@ class EmitterPhysicsComponent: public PhysicsComponent {
 
   void inflatePool(); // maybe static?
 
+  float                     angle_ {};
+  unsigned int              alive_particles_count_ {};
+  const EmitterType*        data_ {nullptr};
+  Particle*                 first_available_ {nullptr};
   EmitterGraphicsComponent* graphics_ {nullptr};
-
-  unsigned int       alive_particles_count_ {0};
-  const EmitterType* data_ {nullptr};
-  Particle*          first_available_ {nullptr};
-  SDL_FPoint         position_ {0, 0};
-  Uint32             start_time_ {SDL2_Timer::SDL2Ticks()};
-  Uint32             interval_time_ {};
+  Uint32                    interval_time_ {};
+  SDL_FPoint                position_ {0, 0};
+  Uint32                    start_time_ {SDL2_Timer::SDL2Ticks()};
 };
 
 } // namespace ktp

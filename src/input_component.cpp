@@ -46,8 +46,6 @@ void ktp::InputComponent::stopSteering(float delta_time) {
 
 void ktp::InputComponent::stopThrusting(GameEntity& player) {
   physics_->delta_ = {0.f, 0.f};
-  physics_->flame_shape_.front().y = physics_->flame_min_lenght_;
-  physics_->flame_shape_.back().y = physics_->flame_min_lenght_;
   physics_->thrusting_ = false;
 }
 
@@ -68,9 +66,4 @@ void ktp::InputComponent::thrust(GameEntity& player, float delta_time) {
   physics_->body_->ApplyLinearImpulseToCenter({physics_->delta_.x, physics_->delta_.y}, true);
 
   physics_->thrusting_ = true;
-
-  if (physics_->flame_shape_.front().y < physics_->flame_max_lenght_) {
-    physics_->flame_shape_.front().y += physics_->flame_growth_factor_;
-    physics_->flame_shape_.back().y += physics_->flame_growth_factor_;
-  }
 }

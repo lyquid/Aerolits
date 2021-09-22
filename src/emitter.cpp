@@ -29,30 +29,31 @@ ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhy
     shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
-    graphics_              = std::exchange(other.graphics_, nullptr);
+    angle_                 = other.angle_;
     alive_particles_count_ = other.alive_particles_count_;
     data_                  = std::exchange(other.data_, nullptr);
     first_available_       = std::exchange(other.first_available_, nullptr);
+    graphics_              = std::exchange(other.graphics_, nullptr);
+    interval_time_         = other.interval_time_;
     position_              = other.position_;
     start_time_            = other.start_time_;
-    interval_time_         = other.interval_time_;
   }
   return *this;
 }
 
 void ktp::EmitterPhysicsComponent::generateParticles() {
   if (first_available_ == nullptr) {
-    logMessage("WARNING!! NO FIRST AVAILABLE!!!!!");
+    logWarn("NO FIRST AVAILABLE!!!!!");
     return;
   }
 
-  const auto current_time{SDL2_Timer::SDL2Ticks()};
+  const auto current_time {SDL2_Timer::SDL2Ticks()};
   if (current_time - start_time_ > data_->life_time_) return;
   if (current_time - interval_time_ < data_->emission_interval_.value_) return;
 
-  const auto how_many{static_cast<unsigned int>(std::round(data_->emission_rate_.value_ * generateRand(data_->emission_rate_.rand_min_, data_->emission_rate_.rand_max_)))};
+  const auto how_many {static_cast<unsigned int>(std::round(data_->emission_rate_.value_ * generateRand(data_->emission_rate_.rand_min_, data_->emission_rate_.rand_max_)))};
   for (auto i = 0u; i < how_many; ++i) {
-    ParticleData new_data{};
+    ParticleData new_data {};
     new_data.start_life_ = std::round(data_->max_particle_life_.value_ * generateRand(data_->max_particle_life_.rand_min_, data_->max_particle_life_.rand_max_));
     // we need to do this in order for the particle to be update()d at least one time,
     // so we avoid the "not first available" plague
@@ -69,7 +70,7 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
     new_data.colors_ = data_->colors_;
     if (data_->colors_.size() == 0) {
       // no color specified in xml
-      new_data.current_color_ = ktp::Colors::white;
+      new_data.current_color_ = Colors::white;
     } else {
       new_data.current_color_ = data_->colors_.front();
     }
@@ -79,15 +80,15 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
     new_data.start_rotation_speed_ = data_->start_rotation_speed_.value_ * generateRand(data_->start_rotation_speed_.rand_min_, data_->start_rotation_speed_.rand_max_);
     new_data.end_rotation_speed_ = data_->end_rotation_speed_.value_ * generateRand(data_->end_rotation_speed_.rand_min_, data_->end_rotation_speed_.rand_max_);
 
-    const auto final_angle {generateRand(data_->angle_range_.min_, data_->angle_range_.max_)};
-    const auto final_angle_cosf {SDL_cosf(final_angle)};
-    const auto final_angle_sinf {SDL_sinf(final_angle)};
+    const auto final_angle {generateRand(data_->angle_range_.min_, data_->angle_range_.max_) + angle_};
+    const auto final_angle_cos {SDL_cosf(final_angle)};
+    const auto final_angle_sin {SDL_sinf(final_angle)};
 
     for (const auto& speed: data_->speeds_) {
       const auto speed_multiplier {speed.value_ * generateRand(speed.rand_min_, speed.rand_max_)};
       const SDL_FPoint final_speed {
-        (speed_multiplier * final_angle_cosf) - (speed_multiplier * final_angle_sinf),
-        (speed_multiplier * final_angle_sinf) + (speed_multiplier * final_angle_cosf)
+        (speed_multiplier * final_angle_cos) - (speed_multiplier * final_angle_sin),
+        (speed_multiplier * final_angle_sin) + (speed_multiplier * final_angle_cos)
       };
       new_data.speeds_.push_back(final_speed);
     }
@@ -95,7 +96,7 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
 
     new_data.position_ = position_;
 
-    Particle* new_particle{first_available_};
+    Particle* new_particle {first_available_};
     first_available_ = new_particle->getNext();
     new_particle->init(new_data);
     ++alive_particles_count_;
