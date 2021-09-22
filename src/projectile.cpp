@@ -172,6 +172,7 @@ void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float
 
   transformRenderShape();
 
+  exhaust_emitter_->setAngle(body_->GetAngle());
   exhaust_emitter_->setPosition({
     (body_->GetPosition().x * kMetersToPixels) - size_ * kMetersToPixels * sin_,
     (body_->GetPosition().y * kMetersToPixels) + size_ * kMetersToPixels * cos_
