@@ -14,12 +14,13 @@ class PlayingState;
 class TitleState;
 
 class GameState {
+
  public:
+
   virtual ~GameState() {}
   virtual void draw(Game&) = 0;
   virtual void handleEvents(Game&) = 0;
   virtual void update(Game&, float) = 0;
-  inline virtual GameState* enter(Game& game) { return this; }
 
   inline static GameState* goToState(Game& game, GameState& state) { return state.enter(game); }
 
@@ -27,8 +28,11 @@ class GameState {
   static PausedState  paused_;
   static PlayingState playing_;
   static TitleState   title_;
+
  protected:
-  virtual void handleSDL2KeyEvents(Game& game, SDL_Keycode key) = 0;
+
+  inline virtual GameState* enter(Game& game) { return this; }
+  virtual void handleSDL2KeyEvents(Game&, SDL_Keycode) = 0;
   void setWindowTitle(Game& game);
   SDL_Event sdl_event_ {};
 };
@@ -38,8 +42,8 @@ class DemoState: public GameState {
   virtual void draw(Game& game) override;
   virtual void handleEvents(Game& game) override;
   virtual void update(Game& game, float delta_time) override;
-  virtual GameState* enter(Game& game) override;
  private:
+  virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
   Uint32 blink_timer_ {};
   bool blink_flag_ {true};
@@ -50,8 +54,8 @@ class PausedState: public GameState {
   virtual void draw(Game& game) override;
   virtual void handleEvents(Game& game) override;
   virtual void update(Game& game, float delta_time) override;
-  virtual GameState* enter(Game& game) override;
  private:
+  virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
   Uint32 blink_timer_ {};
   bool blink_flag_ {true};
@@ -62,8 +66,8 @@ class PlayingState: public GameState {
   virtual void draw(Game& game) override;
   virtual void handleEvents(Game& game) override;
   virtual void update(Game& game, float delta_time) override;
-  virtual GameState* enter(Game& game) override;
  private:
+  virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
 };
 
@@ -72,8 +76,8 @@ class TitleState: public GameState {
   virtual void draw(Game& game) override;
   virtual void handleEvents(Game& game) override;
   virtual void update(Game& game, float delta_time) override;
-  virtual GameState* enter(Game& game) override;
  private:
+  virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
   static constexpr auto kDefaultBackgroundDeltaInMenu_ {500.f};
   static constexpr Uint32 kWaitForDemo_ {2000};
