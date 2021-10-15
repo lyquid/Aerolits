@@ -38,13 +38,13 @@ endif()
 
 add_executable(Aerolits main.cpp
                         lib/pugixml1.11/pugixml.cpp
-                        sdl2_wrappers/sdl2_audio.cpp
-                        sdl2_wrappers/sdl2_renderer.cpp
-                        sdl2_wrappers/sdl2_sound.cpp
-                        sdl2_wrappers/sdl2_texture.cpp
-                        sdl2_wrappers/sdl2_window.cpp
                         src/kuge/event.cpp
                         src/kuge/system.cpp
+                        src/sdl2_wrappers/sdl2_audio.cpp
+                        src/sdl2_wrappers/sdl2_renderer.cpp
+                        src/sdl2_wrappers/sdl2_sound.cpp
+                        src/sdl2_wrappers/sdl2_texture.cpp
+                        src/sdl2_wrappers/sdl2_window.cpp
                         src/aerolite.cpp
                         src/background.cpp
                         src/config_parser.cpp

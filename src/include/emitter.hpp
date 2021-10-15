@@ -5,7 +5,7 @@
 #include "object_pool.hpp"
 #include "particle.hpp"
 #include "physics_component.hpp"
-#include "../../sdl2_wrappers/sdl2_timer.hpp"
+#include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <SDL.h>
 #include <string>
 #include <utility> // std::move

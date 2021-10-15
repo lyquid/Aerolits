@@ -4,7 +4,7 @@
 #include "graphics_component.hpp"
 #include "palette.hpp"
 #include "physics_component.hpp"
-#include "../../sdl2_wrappers/sdl2_timer.hpp"
+#include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <SDL.h>
 #include <memory>
 #include <utility> // std::move

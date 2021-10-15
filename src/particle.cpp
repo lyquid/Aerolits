@@ -1,8 +1,8 @@
 #include "include/emitter.hpp"
 #include "include/particle.hpp"
 #include "include/paths.hpp"
-#include "../sdl2_wrappers/sdl2_renderer.hpp"
-#include "../sdl2_wrappers/sdl2_texture.hpp"
+#include "sdl2_wrappers/sdl2_renderer.hpp"
+#include "sdl2_wrappers/sdl2_texture.hpp"
 #include <string>
 
 ktp::SDL2_Texture ktp::ParticlesAtlas::particles_atlas {};

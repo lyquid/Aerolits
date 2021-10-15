@@ -3,8 +3,8 @@
 #include "include/game.hpp"
 #include "include/game_entity.hpp"
 #include "include/projectile.hpp"
-#include "../sdl2_wrappers/sdl2_renderer.hpp"
-#include "../sdl2_wrappers/sdl2_timer.hpp"
+#include "sdl2_wrappers/sdl2_renderer.hpp"
+#include "sdl2_wrappers/sdl2_timer.hpp"
 #include <box2d/box2d.h>
 
 /* GRAPHICS */

@@ -1,7 +1,7 @@
 #include "include/config_parser.hpp"
 #include "include/emitter.hpp"
 #include "include/paths.hpp"
-#include "../sdl2_wrappers/sdl2_log.hpp"
+#include "sdl2_wrappers/sdl2_log.hpp"
 #include <algorithm> // std::transform
 #include <sstream> // std::ostringstream
 

@@ -1,8 +1,8 @@
 #ifndef KUGE_HEADERS_SYSTEM_HPP_
 #define KUGE_HEADERS_SYSTEM_HPP_
 
-#include "../../sdl2_wrappers/sdl2_log.hpp"
-#include "../../sdl2_wrappers/sdl2_sound.hpp"
+#include "../sdl2_wrappers/sdl2_log.hpp"
+#include "../sdl2_wrappers/sdl2_sound.hpp"
 #include <array>
 #include <iterator>
 #include <random>

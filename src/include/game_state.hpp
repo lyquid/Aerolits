@@ -1,7 +1,7 @@
 #ifndef AEROLITS_SRC_INCLUDE_GAME_STATE_HPP_
 #define AEROLITS_SRC_INCLUDE_GAME_STATE_HPP_
 
-#include "../../sdl2_wrappers/sdl2_timer.hpp"
+#include "../sdl2_wrappers/sdl2_timer.hpp"
 
 // https://gameprogrammingpatterns.com/state.html
 

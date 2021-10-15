@@ -2,9 +2,9 @@
 #include "include/emitter.hpp"
 #include "include/game_entity.hpp"
 #include "include/random.hpp"
-#include "../sdl2_wrappers/sdl2_log.hpp"
-#include "../sdl2_wrappers/sdl2_renderer.hpp"
-#include "../sdl2_wrappers/sdl2_texture.hpp"
+#include "sdl2_wrappers/sdl2_log.hpp"
+#include "sdl2_wrappers/sdl2_renderer.hpp"
+#include "sdl2_wrappers/sdl2_texture.hpp"
 
 /* GRAPHICS */
 

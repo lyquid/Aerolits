@@ -1,7 +1,7 @@
 #ifndef AEROLITS_SRC_INCLUDE_PATHS_HPP_
 #define AEROLITS_SRC_INCLUDE_PATHS_HPP_
 
-#include "../../sdl2_wrappers/sdl2_wrappers.hpp"
+#include "../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <SDL.h>
 #include <string>
 

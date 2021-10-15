@@ -8,7 +8,7 @@
 #include "game_entity.hpp"
 #include "game_state.hpp"
 #include "../kuge/kuge.hpp"
-#include "../../sdl2_wrappers/sdl2_wrappers.hpp"
+#include "../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <box2d/box2d.h>
 #include <string>
 
