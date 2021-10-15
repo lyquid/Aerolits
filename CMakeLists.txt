@@ -43,12 +43,8 @@ add_executable(Aerolits main.cpp
                         sdl2_wrappers/sdl2_sound.cpp
                         sdl2_wrappers/sdl2_texture.cpp
                         sdl2_wrappers/sdl2_window.cpp
-                        kuge/event_bus.cpp
-                        kuge/event.cpp
-                        kuge/audio_system.cpp
-                        kuge/input_system.cpp
-                        kuge/output_system.cpp
-                        kuge/system.cpp
+                        src/kuge/event.cpp
+                        src/kuge/system.cpp
                         src/aerolite.cpp
                         src/background.cpp
                         src/config_parser.cpp

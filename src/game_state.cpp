@@ -67,7 +67,6 @@ void ktp::DemoState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
     switch (sdl_event_.type) {
       case SDL_QUIT:
-        game.input_sys_.postEvent(kuge::EventTypes::ExitGame);
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
@@ -85,7 +84,6 @@ void ktp::DemoState::handleEvents(Game& game) {
 void ktp::DemoState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
-      game.input_sys_.postEvent(kuge::EventTypes::ExitGame);
       game.quit_ = true;
       break;
     case SDLK_F1:
@@ -138,7 +136,6 @@ void ktp::PausedState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
     switch (sdl_event_.type) {
       case SDL_QUIT:
-        game.input_sys_.postEvent(kuge::EventTypes::ExitGame);
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
@@ -194,7 +191,6 @@ void ktp::PlayingState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
     switch (sdl_event_.type) {
       case SDL_QUIT:
-        game.input_sys_.postEvent(kuge::EventTypes::ExitGame);
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
@@ -283,7 +279,6 @@ void ktp::TitleState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
     switch (sdl_event_.type) {
       case SDL_QUIT:
-        game.input_sys_.postEvent(kuge::EventTypes::ExitGame);
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
@@ -302,7 +297,6 @@ void ktp::TitleState::handleEvents(Game& game) {
 void ktp::TitleState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
-      game.input_sys_.postEvent(kuge::EventTypes::ExitGame);
       game.quit_ = true;
       break;
     default:

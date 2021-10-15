@@ -1,20 +1,21 @@
-#include "event_bus.hpp"
-#include "audio_system.hpp"
+#include "../include/paths.hpp"
+#include "event.hpp"
+#include "system.hpp"
 
-std::vector<ktp::SDL2_Sound>           kuge::AudioSystem::lasers_{};
-kuge::AudioSystem::laser_randomizer    kuge::AudioSystem::lasers_sequence_{};
-kuge::AudioSystem::laser_randomizer_it kuge::AudioSystem::lasers_it_ = lasers_sequence_.cbegin();
+std::vector<ktp::SDL2_Sound>           kuge::AudioSystem::lasers_ {};
+kuge::AudioSystem::laser_randomizer    kuge::AudioSystem::lasers_sequence_ {};
+kuge::AudioSystem::laser_randomizer_it kuge::AudioSystem::lasers_it_ {lasers_sequence_.cbegin()};
 
 void kuge::AudioSystem::generateRandomSequence() {
   std::random_device seed;
   std::mt19937 generator(seed());
-  std::uniform_int_distribution<unsigned int> distribution(0u, lasers_.size() - 1u);
+  std::uniform_int_distribution<unsigned int> distribution(0, lasers_.size() - 1);
   for (auto& num: lasers_sequence_) {
     num = distribution(generator);
   }
 }
 
-void kuge::AudioSystem::handleEvent(const Event& event) {
+void kuge::AudioSystem::handleEvent(const KugeEvent& event) {
   /* switch (event.getType()) {
     case EventTypes::LaserFired:
       if (lasers_[*lasers_it_].play() == -1) {
@@ -22,7 +23,7 @@ void kuge::AudioSystem::handleEvent(const Event& event) {
       }
       (lasers_it_ < lasers_sequence_.cend() - 1) ? ++lasers_it_ : lasers_it_ = lasers_sequence_.cbegin();
       break;
-    
+
     default:
       break;
   } */
