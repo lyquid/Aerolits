@@ -66,7 +66,7 @@ class Game {
   kuge::EventBus event_bus_ {};
   kuge::AudioSystem audio_sys_ {event_bus_};
   kuge::InputSystem input_sys_ {event_bus_};
-  kuge::OutputSystem output_sys_ {event_bus_, true};
+  kuge::OutputSystem output_sys_ {event_bus_, ConfigParser::game_config.output_};
   // Box2D
   b2World world_ {b2Vec2{0.f, 0.f}};
   int32 velocity_iterations_ {8};

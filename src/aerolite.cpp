@@ -2,6 +2,7 @@
 #include "include/box2d_scale.hpp"
 #include "include/game_entity.hpp"
 #include "include/random.hpp"
+#include "kuge/kuge.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include "sdl2_wrappers/sdl2_renderer.hpp"
 
@@ -137,6 +138,12 @@ void ktp::AerolitePhysicsComponent::split() {
   if (size_ < kMinSize_) {
     // very small, destroyed on impact
     owner_->deactivate();
+    kuge::AeroliteDestroyedEvent ev {
+      kuge::KugeEventTypes::AeroliteDestroyed,
+      {owner_->physics()->body()->GetPosition().x * kMetersToPixels,
+       owner_->physics()->body()->GetPosition().y * kMetersToPixels}
+    };
+    owner_->event_bus_->postEvent(ev);
     return;
   }
 
@@ -196,6 +203,14 @@ void ktp::AerolitePhysicsComponent::split() {
     aerolite->physics()->body()->SetTransform(old_pos, old_angle);
     aerolite->physics()->body()->SetLinearVelocity({old_delta.x * generateRand(0.5f, 1.5f), old_delta.y * generateRand(0.5f, 1.5f)});
   }
+
+  kuge::AeroliteSplittedEvent ev {
+    kuge::KugeEventTypes::AeroliteSplitted,
+    {owner_->physics()->body()->GetPosition().x * kMetersToPixels,
+     owner_->physics()->body()->GetPosition().y * kMetersToPixels},
+    pieces
+  };
+  owner_->event_bus_->postEvent(ev);
 }
 
 void ktp::AerolitePhysicsComponent::transformRenderShape() {

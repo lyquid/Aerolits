@@ -360,18 +360,25 @@ void ktp::ConfigParser::loadGameConfig() {
   const auto result {doc.load_file(path.c_str())};
   if (result) {
     const auto game {doc.child("game")};
+    // Output system
+    if (game.child("output")) {
+      const auto output {game.child("output").attribute("value").as_bool()};
+      game_config.output_ = output;
+    } else {
+      logMessage("Warning! Output system not set. Using default value (true).");
+    }
     // Screen size
     if (game.child("screenSize")) {
       const SDL_Point size {game.child("screenSize").attribute("x").as_int(), game.child("screenSize").attribute("y").as_int()};
       if (size.x < game_config.screen_size_.x || size.y < game_config.screen_size_.y) {
-        logMessage("Warning! screen size too low. Using default size.");
+        logMessage("Warning! Screen size too low. Using default size.");
       } else {
         game_config.screen_size_ = size;
       }
       game_config.screen_size_.x = game.child("screenSize").attribute("x").as_int();
       game_config.screen_size_.y = game.child("screenSize").attribute("y").as_int();
     } else {
-      logMessage("Warning! screen size not set. Using default size.");
+      logMessage("Warning! Screen size not set. Using default size.");
     }
   } else {
     const std::string error_msg {

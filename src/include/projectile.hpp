@@ -40,7 +40,6 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
 
   inline void collide(GameEntity* other) override { collided_ = true; }
   void detonate();
-  virtual void setPosition(const SDL_FPoint& pos) override {}
   inline auto speed() const { return speed_; }
   virtual void update(const GameEntity& projectile, float delta_time) override;
 

@@ -1,6 +1,7 @@
 #ifndef AEROLITS_SRC_INCLUDE_GAME_ENTITY_HPP_
 #define AEROLITS_SRC_INCLUDE_GAME_ENTITY_HPP_
 
+#include "../kuge/kuge.hpp"
 #include "aerolite.hpp"
 #include "background.hpp"
 #include "emitter.hpp"
@@ -11,7 +12,6 @@
 #include "physics_component.hpp"
 #include "player.hpp"
 #include "projectile.hpp"
-// #include "../kuge/kuge.hpp"
 #include <map>
 #include <memory>
 #include <utility> // std::move std::exchange
@@ -194,6 +194,9 @@ class GameEntity {
    * @brief All the GameEntities are in this pool.
    */
   static EntitiesPool game_entities_;
+
+  // defined in game.cpp
+  static kuge::EventBus* event_bus_;
 
  private:
 

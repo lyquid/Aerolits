@@ -73,7 +73,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   static EmitterPhysicsComponent makeEmitter(EmitterGraphicsComponent* graphics, const std::string& type, const SDL_FPoint& pos);
   inline bool particlesAlive() const { return alive_particles_count_ != 0u; }
   inline void setAngle(float angle) { angle_ = angle; }
-  virtual void setPosition(const SDL_FPoint& pos) override { position_ = pos; }
+  inline void setPosition(const SDL_FPoint& pos) { position_ = pos; }
   void setType(const std::string& type);
   virtual void update(const GameEntity& emitter, float delta_time) override;
 

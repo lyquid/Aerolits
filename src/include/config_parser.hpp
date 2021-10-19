@@ -66,6 +66,7 @@ namespace ConfigParser {
   // GAME
 
   struct GameConfig {
+    bool output_ {true};
     SDL_Point screen_size_ {1366, 768};
   };
   extern GameConfig game_config;

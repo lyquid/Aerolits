@@ -36,7 +36,6 @@ class XParticlePhysicsComponent: public PhysicsComponent {
   inline auto radius() const { return radius_; }
   inline void setDetonationTime(unsigned int time) { detonation_time_ = time; }
   inline void setDuration(unsigned int duration) { duration_ = duration; }
-  virtual void setPosition(const SDL_FPoint& pos) override {}
   inline void setRadius(float radius) { radius_ = radius; }
   virtual void update(const GameEntity& xparticle, float delta_time) override;
 

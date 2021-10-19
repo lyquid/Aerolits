@@ -19,7 +19,7 @@ class System {
 
   System(EventBus& bus): event_bus_(bus) {}
   virtual ~System() {}
-  virtual void handleEvent(const KugeEvent&) = 0;
+  virtual void handleEvent(KugeEvent*) = 0;
 
   /* inline void postEvent(KugeEvent& event) const {
     event_bus_.postEvent(event);
@@ -38,7 +38,7 @@ class AudioSystem: public System {
  public:
 
   AudioSystem(EventBus& bus): System(bus) {}
-  virtual void handleEvent(const KugeEvent& event) override;
+  virtual void handleEvent(KugeEvent* event) override;
   static bool loadResources();
 
  private:
@@ -55,19 +55,15 @@ class InputSystem: public System {
  public:
 
   InputSystem(EventBus& bus): System(bus) {}
-  virtual void handleEvent(const KugeEvent& event) override {}
+  virtual void handleEvent(KugeEvent* event) override {}
 };
 
 class OutputSystem: public System {
 
  public:
 
-  OutputSystem(EventBus& bus): System(bus), log_(false) {}
   OutputSystem(EventBus& bus, bool log): System(bus), log_(log) {}
-  virtual void handleEvent(const KugeEvent& event) override {
-    if (log_) ktp::logInfo(event.name());
-  }
-
+  virtual inline void handleEvent(KugeEvent* event) override { if (log_) event->print(); }
   inline void setLog(bool status) { log_ = status; }
 
  private:

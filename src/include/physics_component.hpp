@@ -25,7 +25,6 @@ class PhysicsComponent {
   inline auto size() const { return size_; }
 
   virtual void collide(GameEntity*) = 0;
-  virtual void setPosition(const SDL_FPoint&) = 0;
   virtual void update(const GameEntity&, float) = 0;
 
   static void setScreenSize(const SDL_FPoint& screen_size) {

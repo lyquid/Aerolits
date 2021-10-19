@@ -37,7 +37,6 @@ class AerolitePhysicsComponent: public PhysicsComponent {
 
   inline void collide(GameEntity* other) override { collided_ = true; }
   void resize(float size);
-  virtual void setPosition(const SDL_FPoint& pos) override {}
   static void spawnAerolite();
   virtual void update(const GameEntity& aerolite, float delta_time) override;
 

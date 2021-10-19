@@ -3,6 +3,10 @@
 #include "include/particle.hpp"
 #include "include/paths.hpp"
 
+/* kuge/event.cpp */
+const ktp::SDL2_Timer& kuge::KugeEvent::gameplay_timer_ {ktp::Game::gameplay_timer_};
+
+kuge::EventBus*    ktp::GameEntity::event_bus_ {nullptr};
 ktp::EntitiesCount ktp::GameEntity::entities_count_ {};
 ktp::EntitiesPool  ktp::GameEntity::game_entities_ {2000};
 
@@ -15,6 +19,7 @@ ktp::SDL2_Timer ktp::Game::gameplay_timer_ {};
 
 ktp::Game::Game() {
   event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);
+  GameEntity::event_bus_ = &event_bus_;
 }
 
 void ktp::Game::clean() {
