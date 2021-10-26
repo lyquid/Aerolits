@@ -13,8 +13,7 @@ namespace ktp {
 
 class SDL2_Texture {
  public:
-  SDL2_Texture() = default; // to be deleted
-  SDL2_Texture(SDL_Renderer* ren): renderer_(ren) {}
+  SDL2_Texture() = default;
   SDL2_Texture(const SDL2_Texture&) = delete;
   SDL2_Texture(SDL2_Texture&& other) noexcept { *this = std::move(other); }
   ~SDL2_Texture() { if (texture_) SDL_DestroyTexture(texture_); }
@@ -22,7 +21,7 @@ class SDL2_Texture {
   SDL2_Texture& operator=(const SDL2_Texture&) = delete;
   SDL2_Texture& operator=(SDL2_Texture&& other) noexcept;
 
-  bool create(Uint32 format, int access, const SDL_Point& size);
+  bool create(const SDL2_Renderer& ren, Uint32 format, int access, const SDL_Point& size);
 
   inline auto getAccess() const { return access_; }
 
@@ -34,15 +33,16 @@ class SDL2_Texture {
 
   inline SDL_Point getSize() const { return {width_, height_}; }
 
-  inline SDL_Texture* getTexture() const { return texture_; }
+  inline auto getTexture() const { return texture_; }
 
   /**
   * Load an image file to an SDL_Surface and then calls createTextureFromSurface()
   * to create a texture from it.
+  * @param ren The renderer to use.
   * @param path The path to the image file.
   * @return True on success, or false on errors.
   */
-  bool loadFromFile(const std::string& path);
+  bool loadFromFile(const SDL2_Renderer& ren, const std::string& path);
 
   /*
   Slow Slow Slow, but Ultra Nice over another image
@@ -51,7 +51,7 @@ class SDL2_Texture {
   solid colored box around the text. The text is antialiased. This will render slower than Solid, but in
   about the same time as Shaded mode. The resulting surface will blit slower than if you had used Solid or Shaded.
   Use this when you want high quality, and the text isn't changing too fast. */
-  bool loadFromTextBlended(const SDL2_Font& font, const std::string& text, const SDL_Color& color);
+  bool loadFromTextBlended(const SDL2_Renderer& ren, const SDL2_Font& font, const std::string& text, const SDL_Color& color);
 
   /*
   Slow and Nice, but with a Solid Box
@@ -60,7 +60,7 @@ class SDL2_Texture {
   background color. This results in a box of the background color around the text in the foreground color.
   The text is antialiased. This will render slower than Solid, but in about the same time as Blended mode.
   The resulting surface should blit as fast as Solid, once it is made. Use this when you need nice text, and can live with a box. */
-  bool loadFromTextShaded(const SDL2_Font& font, const std::string& text, const SDL_Color& fg_color, const SDL_Color& bg_color);
+  bool loadFromTextShaded(const SDL2_Renderer& ren, const SDL2_Font& font, const std::string& text, const SDL_Color& fg_color, const SDL_Color& bg_color);
 
   /*
   Quick and Dirty
@@ -72,7 +72,7 @@ class SDL2_Texture {
   This is the fastest rendering speed of all the rendering modes. This results in no box around the text, but the
   text is not as smooth. The resulting surface should blit faster than the Blended one. Use this mode for FPS and
   other fast changing updating text displays. */
-  bool loadFromTextSolid(const SDL2_Font& font, const std::string& text, const SDL_Color& color);
+  bool loadFromTextSolid(const SDL2_Renderer& ren, const SDL2_Font& font, const std::string& text, const SDL_Color& color);
 
   /**
    * Lock a texture for write-only pixel access.
@@ -99,57 +99,55 @@ class SDL2_Texture {
   }
 
   /**
-  * Renders the whole texture to the renderer member.
+  * Renders the whole texture to the renderer.
+  * @param ren The renderer to use.
   * @return True on success, or false on errors.
   */
-  bool render() const;
+  bool render(const SDL2_Renderer& ren) const;
 
   /**
-  * Renders the whole texture to the renderer member.
+  * Renders the whole texture to the renderer.
+  * @param ren The renderer to use.
   * @param where The coordinates to render the texture at.
   * @return True on success, or false on errors.
   */
-  bool render(const SDL_Point& where) const;
+  bool render(const SDL2_Renderer& ren, const SDL_Point& where) const;
 
   /**
-  * Renders the whole texture to the renderer member.
+  * Renders the whole texture to the renderer.
+  * @param ren The renderer to use.
   * @param where The coordinates to render the texture at.
   * @return True on success, or false on errors.
   */
-  bool render(const SDL_FPoint& where) const;
+  bool render(const SDL2_Renderer& ren, const SDL_FPoint& where) const;
 
   /**
-  * Renders the whole texture to the renderer member.
+  * Renders the whole texture to the renderer.
+  * @param ren The renderer to use.
   * @param dest_rect The destination rectangle.
   * @return True on success, or false on errors.
   */
-  bool render(const SDL_Rect& dest_rect) const;
+  bool render(const SDL2_Renderer& ren, const SDL_Rect& dest_rect) const;
 
   /**
    * Use this function to copy a portion of the texture to the current rendering target.
+   * @param ren The renderer to use.
    * @param src_rect The source rectangle of the texture atlas.
    * @param dest_rect The destination rectangle.
    * @return True on success, or false on errors.
    */
-  bool render(const SDL_Rect& src_rect, const SDL_Rect& dest_rect) const;
+  bool render(const SDL2_Renderer& ren, const SDL_Rect& src_rect, const SDL_Rect& dest_rect) const;
 
   /**
    * Use this function to copy a portion of the texture to the current rendering target,
    * optionally rotating it by angle.
+   * @param ren The renderer to use.
    * @param src_rect The source rectangle of the texture atlas.
    * @param dest_rect The destination rectangle.
    * @param angle The angle in degrees. Clockwise.
    * @return True on success, or false on errors.
    */
-  bool render(const SDL_Rect& src_rect, const SDL_Rect& dest_rect, float angle) const;
-
-  /**
-  * Renders the whole texture to the renderer member.
-  * @param where The coordinates to render the texture at.
-  * @param ren The renderer to use.
-  * @return True on success, or false on errors.
-  */
-  bool render(const SDL_FPoint& where, const SDL2_Renderer& ren) const;
+  bool render(const SDL2_Renderer& ren, const SDL_Rect& src_rect, const SDL_Rect& dest_rect, float angle) const;
 
   /**
    * Use this function to set an additional alpha value multiplied into render copy operations.
@@ -180,13 +178,6 @@ class SDL2_Texture {
    * @return Returns 0 on success or a negative error code on failure.
    */
   inline int setColorMod(const SDL_Color& color) const { return SDL_SetTextureColorMod(texture_, color.r, color.g, color.b); }
-
-  /**
-  * Sets a pointer to the renderer where the texture will be rendered in.
-  * Don't try to render the texture without having called this function.
-  * @param ren The address of the renderer in which the texture shall be rendered in.
-  */
-  inline void setRenderer(SDL_Renderer* ren) { renderer_ = ren; }
 
   /**
    * Updates the given texture rectangle with new pixel data.
@@ -222,7 +213,7 @@ class SDL2_Texture {
   * @param surface The SDL_Surface structure containing pixel data used to fill
   *                the texture.
   */
-  void createTextureFromSurface(SDL_Surface& surface);
+  void createTextureFromSurface(const SDL2_Renderer& ren, SDL_Surface& surface);
 
   /**
    * Query the attributes of a texture.
@@ -241,7 +232,6 @@ class SDL2_Texture {
   int           access_ {};
   Uint32        format_ {};
   int           height_ {};
-  SDL_Renderer* renderer_ {nullptr}; // to static!
   SDL_Texture*  texture_ {nullptr};
   int           width_ {};
 };

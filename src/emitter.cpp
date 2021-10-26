@@ -8,11 +8,11 @@
 
 /* GRAPHICS */
 
-void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter, const SDL2_Renderer& renderer) {
+void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter, const SDL2_Renderer& ren) {
   ParticlesAtlas::particles_atlas.setBlendMode(blend_mode_);
   for (auto i = 0u; i < particles_pool_size_; ++i) {
     if (particles_pool_[i].inUse()) {
-      particles_pool_[i].draw();
+      particles_pool_[i].draw(ren);
     }
   }
 }

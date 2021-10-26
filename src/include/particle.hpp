@@ -48,7 +48,7 @@ class Particle {
 
  public:
 
-  void draw() const;
+  void draw(const SDL2_Renderer& ren) const;
   inline Particle* getNext() const { return state_.next_; }
   void init(const ParticleData& data);
   inline bool inUse() const { return life_ > 0; }

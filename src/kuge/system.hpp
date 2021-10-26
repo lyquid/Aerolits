@@ -53,7 +53,7 @@ class AudioSystem: public System {
 
 class GUIString {
  public:
-  inline void render() const { texture_.render(rectangle_); }
+  inline void render(const ktp::SDL2_Renderer& ren) const { texture_.render(ren, rectangle_); }
   ktp::SDL2_Texture texture_ {};
   SDL_Rect rectangle_ {};
 };
@@ -62,7 +62,7 @@ class GUISystem: public System {
 
  public:
 
-  GUISystem(ktp::SDL2_Renderer* ren, SDL_Point screen_size): renderer_(ren), screen_size_(screen_size) {}
+  GUISystem(SDL_Point screen_size): screen_size_(screen_size) {}
   GUISystem(const GUISystem&) = delete;
   GUISystem(GUISystem&& other) { *this = std::move(other); }
 
@@ -70,7 +70,7 @@ class GUISystem: public System {
   GUISystem& operator=(GUISystem&& other) noexcept;
 
   virtual void handleEvent(const KugeEvent*) override {}
-  bool init();
+  bool init(const ktp::SDL2_Renderer& ren);
   inline auto& demo() const { return demo_text_; }
   inline auto& paused() const { return paused_text_; }
   inline auto& title() const { return title_text_; }
@@ -82,7 +82,6 @@ class GUISystem: public System {
  private:
 
   ktp::SDL2_Font font_ {};
-  ktp::SDL2_Renderer* renderer_ {};
   SDL_Point screen_size_ {};
 
   GUIString demo_text_ {};

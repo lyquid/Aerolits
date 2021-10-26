@@ -47,7 +47,7 @@ class EmitterGraphicsComponent: public GraphicsComponent {
   friend class EmitterPhysicsComponent;
  public:
   ~EmitterGraphicsComponent() { delete[] particles_pool_; }
-  virtual void update(const GameEntity& emitter, const SDL2_Renderer& renderer) override;
+  virtual void update(const GameEntity& emitter, const SDL2_Renderer& ren) override;
  private:
   SDL_BlendMode blend_mode_ {};
   Particle*     particles_pool_ {nullptr};

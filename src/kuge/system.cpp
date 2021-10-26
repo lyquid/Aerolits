@@ -63,7 +63,6 @@ kuge::GUISystem& kuge::GUISystem::operator=(GUISystem&& other) noexcept {
     // inherited members
     event_bus_ = std::exchange(other.event_bus_, nullptr);
     // own members
-    renderer_    = std::exchange(other.renderer_, nullptr);
     screen_size_ = std::move(other.screen_size_);
     font_        = std::move(other.font_);
     demo_text_   = std::move(other.demo_text_);
@@ -73,26 +72,23 @@ kuge::GUISystem& kuge::GUISystem::operator=(GUISystem&& other) noexcept {
   return *this;
 }
 
-bool kuge::GUISystem::init() {
+bool kuge::GUISystem::init(const ktp::SDL2_Renderer& ren) {
   if (!font_.loadFont(ktp::getResourcesPath("fonts") + "Future n0t Found.ttf", 18)) return false;
 
   int w = screen_size_.x * 0.2f;
   int h = screen_size_.y * 0.1f;
   demo_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
-  demo_text_.texture_.setRenderer(renderer_->renderer());
-  demo_text_.texture_.loadFromTextSolid(font_, kDemoModeText_, ktp::Colors::white);
+  demo_text_.texture_.loadFromTextSolid(ren, font_, kDemoModeText_, ktp::Colors::white);
 
   w = screen_size_.x * 0.1f;
   h = screen_size_.y * 0.05f;
   paused_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
-  paused_text_.texture_.setRenderer(renderer_->renderer());
-  paused_text_.texture_.loadFromTextSolid(font_, kPausedText_, ktp::Colors::white);
+  paused_text_.texture_.loadFromTextSolid(ren, font_, kPausedText_, ktp::Colors::white);
 
   w = screen_size_.x * 0.75f;
   h = screen_size_.y * 0.50f;
   title_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
-  title_text_.texture_.setRenderer(renderer_->renderer());
-  title_text_.texture_.loadFromTextSolid(font_, kTitleText_, ktp::Colors::white);
+  title_text_.texture_.loadFromTextSolid(ren, font_, kTitleText_, ktp::Colors::white);
 
   return true;
 }

@@ -38,7 +38,7 @@ void ktp::DemoState::draw(Game& game) {
 
   if (game.debug_draw_on_) game.world_.DebugDraw();
 
-  if (blink_flag_) game.gui_sys_.demo().render();
+  if (blink_flag_) game.gui_sys_.demo().render(game.renderer_);
 
   if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
@@ -110,7 +110,7 @@ void ktp::PausedState::draw(Game& game) {
 
   if (game.debug_draw_on_) game.world_.DebugDraw();
 
-  if (blink_flag_) game.gui_sys_.paused().render();
+  if (blink_flag_) game.gui_sys_.paused().render(game.renderer_);
 
   if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
@@ -255,7 +255,7 @@ void ktp::TitleState::draw(Game& game) {
     }
   }
 
-  game.gui_sys_.title().render();
+  game.gui_sys_.title().render(game.renderer_);
 
   game.renderer_.present();
 }

@@ -8,10 +8,9 @@
 ktp::SDL2_Texture ktp::ParticlesAtlas::particles_atlas {};
 
 void ktp::ParticlesAtlas::loadTexture(SDL2_Renderer& ren) {
-  particles_atlas.setRenderer(ren.renderer());
   const std::string file{"particles2.png"};
   const std::string path{getResourcesPath("textures") + file};
-  particles_atlas.loadFromFile(path);
+  particles_atlas.loadFromFile(ren, path);
 }
 
 ktp::Particle& ktp::Particle::operator=(const Particle& other) noexcept {
@@ -44,10 +43,10 @@ ktp::Particle::State& ktp::Particle::State::operator=(State&& other) noexcept {
   return *this;
 }
 
-void ktp::Particle::draw() const {
+void ktp::Particle::draw(const SDL2_Renderer& ren) const {
   ParticlesAtlas::particles_atlas.setColorMod(state_.live_.current_color_);
   ParticlesAtlas::particles_atlas.setAlphaMod(state_.live_.current_color_.a);
-  ParticlesAtlas::particles_atlas.render(state_.live_.texture_rect_,
+  ParticlesAtlas::particles_atlas.render(ren, state_.live_.texture_rect_,
                                          {static_cast<int>(state_.live_.position_.x),
                                           static_cast<int>(state_.live_.position_.y),
                                           static_cast<int>(state_.live_.current_size_),

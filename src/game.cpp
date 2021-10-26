@@ -41,7 +41,7 @@ bool ktp::Game::init() {
   if (!main_window_.create(kuge::GUISystem::kTitleText_ , screen_size_)) return false;
   if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;
   if (!loadResources()) return false;
-  if (!gui_sys_.init()) return false;
+  if (!gui_sys_.init(renderer_)) return false;
 
   debug_draw_.setRenderer(&renderer_);
   world_.SetDebugDraw(&debug_draw_);

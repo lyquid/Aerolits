@@ -4,14 +4,11 @@
 
 // GRAPHICS
 
-void ktp::XParticleGraphicsComponent::update(const GameEntity& xparticle, const SDL2_Renderer& renderer) {
-  // renderer.setDrawColor(Colors::yellow);
-  // renderer.drawCircle(pos, 5);
-  // renderer.drawPoint(pos);
+void ktp::XParticleGraphicsComponent::update(const GameEntity& xparticle, const SDL2_Renderer& ren) {
   ParticlesAtlas::particles_atlas.setBlendMode(SDL_BlendMode::SDL_BLENDMODE_ADD);
   ParticlesAtlas::particles_atlas.setColorMod(Colors::yellow);
   ParticlesAtlas::particles_atlas.setAlphaMod(255);
-  ParticlesAtlas::particles_atlas.render(texture_rect_, {(int)position_.x, (int)position_.y, 30, 30}, 0);
+  ParticlesAtlas::particles_atlas.render(ren, texture_rect_, {(int)position_.x, (int)position_.y, 30, 30}, 0);
 }
 
 // PHYSICS
