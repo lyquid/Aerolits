@@ -3,13 +3,18 @@
 #include "include/particle.hpp"
 #include "include/paths.hpp"
 
+/* kuge/system.hpp */
+const kuge::EventBus* kuge::System::event_bus_ {event_bus_};
+
 /* kuge/event.cpp */
 const ktp::SDL2_Timer& kuge::KugeEvent::gameplay_timer_ {ktp::Game::gameplay_timer_};
 
+/* include/game_entity.hpp */
 kuge::EventBus*    ktp::GameEntity::event_bus_ {nullptr};
 ktp::EntitiesCount ktp::GameEntity::entities_count_ {};
 ktp::EntitiesPool  ktp::GameEntity::game_entities_ {2000};
 
+/* include/physics_component.hpp */
 SDL_FPoint ktp::PhysicsComponent::b2_screen_size_ {};
 b2World*   ktp::PhysicsComponent::world_ {nullptr};
 
@@ -18,7 +23,7 @@ b2World*   ktp::PhysicsComponent::world_ {nullptr};
 ktp::SDL2_Timer ktp::Game::gameplay_timer_ {};
 
 ktp::Game::Game() {
-  event_bus_.setSystems(audio_sys_, input_sys_, output_sys_);
+  event_bus_.setSystems(&audio_sys_, &input_sys_, &gui_sys_, &output_sys_);
   GameEntity::event_bus_ = &event_bus_;
 }
 
@@ -33,9 +38,10 @@ bool ktp::Game::init() {
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
   if (!initSDL2()) return false;
   logMessage("Box2D version: " + std::to_string(b2_version.major) + '.' + std::to_string(b2_version.minor) + '.' + std::to_string(b2_version.revision));
-  if (!main_window_.create(kGameTitle_, screen_size_)) return false;
+  if (!main_window_.create(kuge::GUISystem::kTitleText_ , screen_size_)) return false;
   if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;
   if (!loadResources()) return false;
+  if (!gui_sys_.init()) return false;
 
   debug_draw_.setRenderer(&renderer_);
   world_.SetDebugDraw(&debug_draw_);
@@ -44,13 +50,6 @@ bool ktp::Game::init() {
 
   PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});
   PhysicsComponent::setWorld(&world_);
-
-  paused_text_.setRenderer(renderer_);
-  paused_text_.loadFromTextSolid(font_, "PAUSED", Colors::white);
-  title_text_.setRenderer(renderer_);
-  title_text_.loadFromTextSolid(font_, kGameTitle_, Colors::white);
-  demo_text_.setRenderer(renderer_);
-  demo_text_.loadFromTextSolid(font_, "DEMO MODE", Colors::white);
 
   state_ = GameState::goToState(*this, GameState::title_);
 
@@ -70,9 +69,6 @@ bool ktp::Game::initSDL2() {
 }
 
 bool ktp::Game::loadResources() {
-  if (!font_.loadFont(getResourcesPath("fonts") + "Future n0t Found.ttf", 18)) {
-    return false;
-  }
   if (!audio_sys_.loadResources()) {
     return false;
   }

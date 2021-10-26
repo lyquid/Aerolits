@@ -30,32 +30,45 @@ void ktp::SDL2Video::logVideoDrivers() {
 
 /* SDL2_Renderer */
 
+ktp::SDL2_Renderer& ktp::SDL2_Renderer::operator=(SDL2_Renderer&& other) noexcept {
+  if (this != &other) {
+    if (renderer_) SDL_DestroyRenderer(renderer_);
+    renderer_      = std::exchange(other.renderer_, nullptr);
+    renderer_info_ = std::move(other.renderer_info_);
+  }
+  return *this;
+}
+
 bool ktp::SDL2_Renderer::create(const SDL2_Window& window, Uint32 flags, const std::string& scale_q) {
-  renderer_.reset(SDL_CreateRenderer(window.getWindow(), -1, flags));
-  if (renderer_ == nullptr) {
+  if (renderer_) SDL_DestroyRenderer(renderer_);
+  renderer_= SDL_CreateRenderer(window.getWindow(), -1, flags);
+  if (!renderer_) {
     logSDL2Error("SDL_CreateRenderer", SDL_LOG_CATEGORY_RENDER);
     return false;
+  } else {
+    getRendererInfo();
+    if (scale_q == std::string{"linear"} || scale_q == std::string{"best"}) {
+      SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scale_q.c_str());
+    }
+    SDL_RenderSetLogicalSize(renderer_, window.getSize().x, window.getSize().y);
+    return true;
   }
-  getRendererInfo();
-  if (scale_q == std::string{"linear"} || scale_q == std::string{"best"}) {
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scale_q.c_str());
-  }
-  SDL_RenderSetLogicalSize(renderer_.get(), window.getSize().x, window.getSize().y);
-  return true;
 }
 
 bool ktp::SDL2_Renderer::create(const SDL2_Window& window, const SDL_Point& size, Uint32 flags, const std::string& scale_q) {
-  renderer_.reset(SDL_CreateRenderer(window.getWindow(), -1, flags));
-  if (renderer_ == nullptr) {
+  if (renderer_) SDL_DestroyRenderer(renderer_);
+  renderer_ = SDL_CreateRenderer(window.getWindow(), -1, flags);
+  if (!renderer_) {
     logSDL2Error("SDL_CreateRenderer", SDL_LOG_CATEGORY_RENDER);
     return false;
+  } else {
+    getRendererInfo();
+    if (scale_q == std::string{"linear"} || scale_q == std::string{"best"}) {
+      SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scale_q.c_str());
+    }
+    SDL_RenderSetLogicalSize(renderer_, size.x, size.y);
+    return true;
   }
-  getRendererInfo();
-  if (scale_q == std::string{"linear"} || scale_q == std::string{"best"}) {
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scale_q.c_str());
-  }
-  SDL_RenderSetLogicalSize(renderer_.get(), size.x, size.y);
-  return true;
 }
 
 void ktp::SDL2_Renderer::drawCircle(const b2Vec2& center, float radius) const {
@@ -69,14 +82,14 @@ void ktp::SDL2_Renderer::drawCircle(const b2Vec2& center, float radius) const {
 
   while (x >= y) {
     //  Each of the following renders an octant of the circle
-    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y - y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y + y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y - y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y + y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y - x);
-    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y + x);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y - x);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y + x);
+    SDL_RenderDrawPoint(renderer_, center.x + x, center.y - y);
+    SDL_RenderDrawPoint(renderer_, center.x + x, center.y + y);
+    SDL_RenderDrawPoint(renderer_, center.x - x, center.y - y);
+    SDL_RenderDrawPoint(renderer_, center.x - x, center.y + y);
+    SDL_RenderDrawPoint(renderer_, center.x + y, center.y - x);
+    SDL_RenderDrawPoint(renderer_, center.x + y, center.y + x);
+    SDL_RenderDrawPoint(renderer_, center.x - y, center.y - x);
+    SDL_RenderDrawPoint(renderer_, center.x - y, center.y + x);
 
     if (error <= 0) {
       ++y;
@@ -103,14 +116,14 @@ void ktp::SDL2_Renderer::drawCircle(const SDL_Point& center, float radius) const
 
   while (x >= y) {
     //  Each of the following renders an octant of the circle
-    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y - y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y + y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y - y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y + y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y - x);
-    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y + x);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y - x);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y + x);
+    SDL_RenderDrawPoint(renderer_, center.x + x, center.y - y);
+    SDL_RenderDrawPoint(renderer_, center.x + x, center.y + y);
+    SDL_RenderDrawPoint(renderer_, center.x - x, center.y - y);
+    SDL_RenderDrawPoint(renderer_, center.x - x, center.y + y);
+    SDL_RenderDrawPoint(renderer_, center.x + y, center.y - x);
+    SDL_RenderDrawPoint(renderer_, center.x + y, center.y + x);
+    SDL_RenderDrawPoint(renderer_, center.x - y, center.y - x);
+    SDL_RenderDrawPoint(renderer_, center.x - y, center.y + x);
 
     if (error <= 0) {
       ++y;
@@ -137,14 +150,14 @@ void ktp::SDL2_Renderer::drawCircle(const SDL_FPoint& center, float radius) cons
 
   while (x >= y) {
     //  Each of the following renders an octant of the circle
-    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y - y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x + x, center.y + y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y - y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - x, center.y + y);
-    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y - x);
-    SDL_RenderDrawPoint(renderer_.get(), center.x + y, center.y + x);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y - x);
-    SDL_RenderDrawPoint(renderer_.get(), center.x - y, center.y + x);
+    SDL_RenderDrawPoint(renderer_, center.x + x, center.y - y);
+    SDL_RenderDrawPoint(renderer_, center.x + x, center.y + y);
+    SDL_RenderDrawPoint(renderer_, center.x - x, center.y - y);
+    SDL_RenderDrawPoint(renderer_, center.x - x, center.y + y);
+    SDL_RenderDrawPoint(renderer_, center.x + y, center.y - x);
+    SDL_RenderDrawPoint(renderer_, center.x + y, center.y + x);
+    SDL_RenderDrawPoint(renderer_, center.x - y, center.y - x);
+    SDL_RenderDrawPoint(renderer_, center.x - y, center.y + x);
 
     if (error <= 0) {
       ++y;
@@ -162,24 +175,24 @@ void ktp::SDL2_Renderer::drawCircle(const SDL_FPoint& center, float radius) cons
 
 void ktp::SDL2_Renderer::drawCross() const {
   int w, h;
-  SDL_GetRendererOutputSize(renderer_.get(), &w, &h);
-  SDL_RenderDrawLineF(renderer_.get(), w * 0.5f, 0, w * 0.5f, h);
-  SDL_RenderDrawLineF(renderer_.get(), 0, h * 0.5f, w, h * 0.5f);
+  SDL_GetRendererOutputSize(renderer_, &w, &h);
+  SDL_RenderDrawLineF(renderer_, w * 0.5f, 0, w * 0.5f, h);
+  SDL_RenderDrawLineF(renderer_, 0, h * 0.5f, w, h * 0.5f);
 }
 
 void ktp::SDL2_Renderer::drawGrid(int size) const {
   int w, h;
-  SDL_GetRendererOutputSize(renderer_.get(), &w, &h);
+  SDL_GetRendererOutputSize(renderer_, &w, &h);
   for (auto y = size; y < h; y += size) {
-    SDL_RenderDrawLine(renderer_.get(), 0, y, w, y);
+    SDL_RenderDrawLine(renderer_, 0, y, w, y);
   }
   for (auto x = size; x < w; x += size) {
-    SDL_RenderDrawLine(renderer_.get(), x, 0, x, h);
+    SDL_RenderDrawLine(renderer_, x, 0, x, h);
   }
 }
 
 bool ktp::SDL2_Renderer::getRendererInfo() {
-  if (SDL_GetRendererInfo(renderer_.get(), &renderer_info_) != 0) {
+  if (SDL_GetRendererInfo(renderer_, &renderer_info_) != 0) {
     logSDL2Error("SDL_GetRendererInfo", SDL_LOG_CATEGORY_RENDER);
     return false;
   } else {

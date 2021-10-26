@@ -4,20 +4,11 @@
 #include "sdl2_window.hpp"
 #include <SDL.h>
 #include <box2d/box2d.h>
-#include <memory>
 #include <string>
+#include <utility> // std::exchange, std::move
 #include <vector>
 
 namespace ktp {
-
-template <typename T> struct deleter;
-
-template <> struct deleter<SDL_Renderer> {
-  void operator()(SDL_Renderer* ren) {
-    SDL_DestroyRenderer(ren);
-    ren = nullptr;
-  }
-};
 
 void b2ColorToSDL2Color(const b2Color& orig, SDL_Color& dest);
 
@@ -30,6 +21,14 @@ namespace SDL2Video {
 class SDL2_Renderer {
  public:
 
+  SDL2_Renderer() = default;
+  SDL2_Renderer(const SDL2_Renderer&) = delete;
+  SDL2_Renderer(SDL2_Renderer&& other) noexcept { *this = std::move(other); }
+  ~SDL2_Renderer() { SDL_DestroyRenderer(renderer_); }
+
+  SDL2_Renderer& operator=(const SDL2_Renderer&) = delete;
+  SDL2_Renderer& operator=(SDL2_Renderer&& other) noexcept;
+
   /**
   * Use this function to clear the current rendering target with the drawing color.
   * This function clears the entire rendering target, ignoring the viewport
@@ -37,7 +36,7 @@ class SDL2_Renderer {
   * @return True on success, or false on errors.
   */
   inline auto clear() const {
-    return SDL_RenderClear(renderer_.get()) == 0 ? true : false;
+    return SDL_RenderClear(renderer_) == 0 ? true : false;
   }
 
   /**
@@ -105,7 +104,7 @@ class SDL2_Renderer {
    * @return true
    */
   inline auto drawLine(const SDL_Point& start, const SDL_Point& end) const {
-    return SDL_RenderDrawLine(renderer_.get(), start.x, start.y, end.x, end.y) == 0 ? true : false;
+    return SDL_RenderDrawLine(renderer_, start.x, start.y, end.x, end.y) == 0 ? true : false;
   }
 
   /**
@@ -115,7 +114,7 @@ class SDL2_Renderer {
    * @return true
    */
   inline auto drawLine(const SDL_FPoint& start, const SDL_FPoint& end) const {
-    return SDL_RenderDrawLineF(renderer_.get(), start.x, start.y, end.x, end.y) == 0 ? true : false;
+    return SDL_RenderDrawLineF(renderer_, start.x, start.y, end.x, end.y) == 0 ? true : false;
   }
 
   /**
@@ -129,7 +128,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawLine(int x1, int y1, int x2, int y2) const {
-    return SDL_RenderDrawLine(renderer_.get(), x1, y1, x2, y2) == 0 ? true : false;
+    return SDL_RenderDrawLine(renderer_, x1, y1, x2, y2) == 0 ? true : false;
   }
 
   /**
@@ -143,7 +142,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawLine(float x1, float y1, float x2, float y2) const {
-    return SDL_RenderDrawLine(renderer_.get(), x1, y1, x2, y2) == 0 ? true : false;
+    return SDL_RenderDrawLine(renderer_, x1, y1, x2, y2) == 0 ? true : false;
   }
 
   /**
@@ -154,7 +153,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawLines(const std::vector<SDL_Point>& points) const {
-    return SDL_RenderDrawLines(renderer_.get(), points.data(), points.size()) == 0 ? true : false;
+    return SDL_RenderDrawLines(renderer_, points.data(), points.size()) == 0 ? true : false;
   }
 
   /**
@@ -165,7 +164,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawLines(const std::vector<SDL_FPoint>& points) const {
-    return SDL_RenderDrawLinesF(renderer_.get(), points.data(), points.size()) == 0 ? true : false;
+    return SDL_RenderDrawLinesF(renderer_, points.data(), points.size()) == 0 ? true : false;
   }
 
   /**
@@ -176,7 +175,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawPoint(const b2Vec2& point) const {
-    return SDL_RenderDrawPointF(renderer_.get(), point.x, point.y) == 0 ? true : false;
+    return SDL_RenderDrawPointF(renderer_, point.x, point.y) == 0 ? true : false;
   }
 
   /**
@@ -187,7 +186,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawPoint(const SDL_Point& point) const {
-    return SDL_RenderDrawPoint(renderer_.get(), point.x, point.y) == 0 ? true : false;
+    return SDL_RenderDrawPoint(renderer_, point.x, point.y) == 0 ? true : false;
   }
 
   /**
@@ -198,7 +197,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawPoint(const SDL_FPoint& point) const {
-    return SDL_RenderDrawPointF(renderer_.get(), point.x, point.y) == 0 ? true : false;
+    return SDL_RenderDrawPointF(renderer_, point.x, point.y) == 0 ? true : false;
   }
 
   /**
@@ -210,7 +209,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawPoint(int x, int y) const {
-    return SDL_RenderDrawPoint(renderer_.get(), x, y) == 0 ? true : false;
+    return SDL_RenderDrawPoint(renderer_, x, y) == 0 ? true : false;
   }
 
   /**
@@ -222,7 +221,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawPoint(float x, float y) const {
-    return SDL_RenderDrawPointF(renderer_.get(), x, y) == 0 ? true : false;
+    return SDL_RenderDrawPointF(renderer_, x, y) == 0 ? true : false;
   }
 
   /**
@@ -233,7 +232,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawPoints(const std::vector<SDL_Point>& points) const {
-    return SDL_RenderDrawPoints(renderer_.get(), points.data(), points.size()) == 0 ? true : false;
+    return SDL_RenderDrawPoints(renderer_, points.data(), points.size()) == 0 ? true : false;
   }
 
   /**
@@ -244,7 +243,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawPoints(const std::vector<SDL_FPoint>& points) const {
-    return SDL_RenderDrawPointsF(renderer_.get(), points.data(), points.size()) == 0 ? true : false;
+    return SDL_RenderDrawPointsF(renderer_, points.data(), points.size()) == 0 ? true : false;
   }
 
   /**
@@ -255,7 +254,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawRect(const SDL_Rect& rect) const {
-    return SDL_RenderDrawRect(renderer_.get(), &rect) ? true : false;
+    return SDL_RenderDrawRect(renderer_, &rect) ? true : false;
   }
 
   /**
@@ -266,7 +265,7 @@ class SDL2_Renderer {
    * @return false
    */
   inline auto drawRectFill(const SDL_Rect& rect) const {
-    return SDL_RenderFillRect(renderer_.get(), &rect) == 0 ? true : false;
+    return SDL_RenderFillRect(renderer_, &rect) == 0 ? true : false;
   }
 
   /**
@@ -274,7 +273,7 @@ class SDL2_Renderer {
    *
    * @return auto
    */
-  inline auto getRenderer() const { return renderer_.get(); }
+  inline auto renderer() const { return renderer_; }
 
   /**
   * Use this function to update the screen with any rendering performed since
@@ -295,7 +294,7 @@ class SDL2_Renderer {
   * encouraged to call SDL_RenderClear() to initialize the backbuffer before
   * starting each new frame's drawing, even if you plan to overwrite every pixel.
   */
-  inline void present() const { SDL_RenderPresent(renderer_.get()); }
+  inline void present() const { SDL_RenderPresent(renderer_); }
 
   /**
    * Use this function to set the blend mode used for drawing operations (Fill and Line).
@@ -304,7 +303,7 @@ class SDL2_Renderer {
    * @return Returns true on success or false on failure.
    */
   inline auto setBlendMode(const SDL_BlendMode& mode) const {
-    return SDL_SetRenderDrawBlendMode(renderer_.get(), mode) == 0 ? true : false;
+    return SDL_SetRenderDrawBlendMode(renderer_, mode) == 0 ? true : false;
   }
 
   /**
@@ -315,7 +314,7 @@ class SDL2_Renderer {
   * @return True on success, or false on errors.
   */
   inline auto setDrawColor(const b2Color& color) const {
-    return SDL_SetRenderDrawColor(renderer_.get(), color.r * 255, color.g * 255, color.b * 255, color.a * 255) == 0 ? true : false;
+    return SDL_SetRenderDrawColor(renderer_, color.r * 255, color.g * 255, color.b * 255, color.a * 255) == 0 ? true : false;
   }
 
   /**
@@ -326,7 +325,7 @@ class SDL2_Renderer {
   * @return True on success, or false on errors.
   */
   inline auto setDrawColor(const SDL_Color& color) const {
-    return SDL_SetRenderDrawColor(renderer_.get(), color.r, color.g, color.b, color.a) == 0 ? true : false;
+    return SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, color.a) == 0 ? true : false;
   }
 
   /**
@@ -342,7 +341,7 @@ class SDL2_Renderer {
   * @return True on success, or false on errors.
   */
   inline auto setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
-    return SDL_SetRenderDrawColor(renderer_.get(), r, g, b, a) == 0 ? true : false;
+    return SDL_SetRenderDrawColor(renderer_, r, g, b, a) == 0 ? true : false;
   }
 
  private:
@@ -353,10 +352,7 @@ class SDL2_Renderer {
    */
   bool getRendererInfo();
 
-  template <typename T>
-  using unique_ptr_deleter = std::unique_ptr<T, deleter<T>>;
-
-  unique_ptr_deleter<SDL_Renderer> renderer_ {nullptr};
+  SDL_Renderer*    renderer_ {nullptr};
   SDL_RendererInfo renderer_info_ {};
 };
 

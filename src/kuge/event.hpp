@@ -4,7 +4,6 @@
 #include "../sdl2_wrappers/sdl2_log.hpp"
 #include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <SDL.h>
-#include <iostream>
 #include <memory>
 #include <queue>
 #include <string>
@@ -45,20 +44,20 @@ class EventBus {
   void processEvents();
 
   template<typename T>
-  void setSystems(const T& t) {
-    systems_.push_back(std::make_unique<T>(t));
+  void setSystems(T* t) {
+    systems_.push_back(t);
   }
 
   template<typename T, typename... Args>
-  void setSystems(const T& t, Args... args) {
-    systems_.push_back(std::make_unique<T>(t));
+  void setSystems(T* t, Args... args) {
+    systems_.push_back(t);
     setSystems(args...) ;
   }
 
  private:
 
   std::queue<std::unique_ptr<KugeEvent>> events_ {};
-  std::vector<std::unique_ptr<System>> systems_ {};
+  std::vector<System*> systems_ {};
 };
 
 /* KUGE EVENTS */
@@ -74,7 +73,7 @@ class KugeEvent {
  public:
   virtual ~KugeEvent() {}
   inline auto name() const { return name_; }
-  virtual void print() = 0;
+  virtual void print() const = 0;
   inline auto timestamp() const { return timestamp_; }
   inline auto type() const { return type_; }
  protected:
@@ -90,7 +89,7 @@ class AeroliteDestroyedEvent: public KugeEvent {
   AeroliteDestroyedEvent(KugeEventTypes type, SDL_FPoint pos):
     KugeEvent(type, "Aerolite destroyed"), position_(pos) {}
 
-  virtual void print() override;
+  virtual void print() const override;
   inline auto position() const { return position_; }
  private:
   const SDL_FPoint position_;
@@ -102,7 +101,7 @@ class AeroliteSplittedEvent: public KugeEvent {
     KugeEvent(type, "Aerolite splitted"), pieces_(pieces), position_(pos) {}
 
   inline auto pieces() const { return pieces_; }
-  virtual void print() override;
+  virtual void print() const override;
   inline auto position() const { return position_; }
  private:
   const Uint32 pieces_;
@@ -112,7 +111,7 @@ class AeroliteSplittedEvent: public KugeEvent {
 class EnterDemoStateEvent: public KugeEvent {
  public:
   EnterDemoStateEvent(KugeEventTypes type): KugeEvent(type, "Enter demo state") {}
-  virtual inline void print() override { ktp::logInfo(std::to_string(timestamp_) + "ms. " + name_); }
+  virtual inline void print() const override { ktp::logInfo(std::to_string(timestamp_) + "ms. " + name_); }
  private:
 };
 

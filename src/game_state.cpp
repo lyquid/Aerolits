@@ -1,6 +1,7 @@
 #include "include/game.hpp"
 #include "include/game_state.hpp"
 #include "include/physics_component.hpp"
+#include "kuge/system.hpp" // GUISystem
 #include <SDL.h>
 #include <memory>
 #include <string> // std::to_string
@@ -13,7 +14,7 @@ ktp::TitleState   ktp::GameState::title_ {};
 
 void ktp::GameState::setWindowTitle(Game& game) {
   game.main_window_.setTitle(
-    game.kGameTitle_
+    kuge::GUISystem::kTitleText_
     + " | Frame time: " + std::to_string((int)(game.frame_time_ * 1000)) + "ms."
     + " | b2Bodies: " + std::to_string(game.world_.GetBodyCount())
     + " | Entities: " + std::to_string(GameEntity::count()) + '/' + std::to_string(GameEntity::game_entities_.capacity())
@@ -37,11 +38,8 @@ void ktp::DemoState::draw(Game& game) {
 
   if (game.debug_draw_on_) game.world_.DebugDraw();
 
-  if (blink_flag_) {
-    const int w = game.screen_size_.x * 0.2f;
-    const int h = game.screen_size_.y * 0.1f;
-    game.demo_text_.render({(int)(game.screen_size_.x * 0.5f - w * 0.5f), (int)(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
-  }
+  if (blink_flag_) game.gui_sys_.demo().render();
+
   if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
     blink_timer_ = SDL2_Timer::SDL2Ticks();
@@ -112,11 +110,8 @@ void ktp::PausedState::draw(Game& game) {
 
   if (game.debug_draw_on_) game.world_.DebugDraw();
 
-  if (blink_flag_) {
-    const int w = game.screen_size_.x * 0.1f;
-    const int h = game.screen_size_.y * 0.05f;
-    game.paused_text_.render({(int)(game.screen_size_.x * 0.5f - w * 0.5f), (int)(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
-  }
+  if (blink_flag_) game.gui_sys_.paused().render();
+
   if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
     blink_timer_ = SDL2_Timer::SDL2Ticks();
@@ -244,7 +239,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
     }
   }
   if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnAerolite();
-  // Event bus
+
   game.event_bus_.processEvents();
 }
 
@@ -260,9 +255,7 @@ void ktp::TitleState::draw(Game& game) {
     }
   }
 
-  const int w = game.screen_size_.x * 0.75f;
-  const int h = game.screen_size_.y * 0.50f;
-  game.title_text_.render({(int)(game.screen_size_.x * 0.5f - w * 0.5f), (int)(game.screen_size_.y * 0.5f - h * 0.5f), w, h});
+  game.gui_sys_.title().render();
 
   game.renderer_.present();
 }

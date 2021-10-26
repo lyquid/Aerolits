@@ -16,7 +16,7 @@ class DebugDraw: public b2Draw {
     renderer_->drawCircle(SDL_FPoint{center.x * kMetersToPixels, center.y * kMetersToPixels}, radius * kMetersToPixels);
   }
 
-  void DrawPoint(const b2Vec2 &p, float size, const b2Color &color) {
+  void DrawPoint(const b2Vec2& p, float size, const b2Color &color) {
     renderer_->setDrawColor(color);
     if (size <= 1) {
       renderer_->drawPoint(p.x * kMetersToPixels, p.y * kMetersToPixels);
@@ -33,7 +33,7 @@ class DebugDraw: public b2Draw {
       points[i].y = vertices[i].y * kMetersToPixels;
     }
     points[vertexCount] = points[0];
-    SDL_RenderDrawLinesF(renderer_->getRenderer(), points.data(), vertexCount + 1);
+    SDL_RenderDrawLinesF(renderer_->renderer(), points.data(), vertexCount + 1);
   }
 
   void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) {
@@ -51,7 +51,7 @@ class DebugDraw: public b2Draw {
       points[i].y = vertices[i].y * kMetersToPixels;
     }
     points[vertexCount] = points[0];
-    SDL_RenderDrawLinesF(renderer_->getRenderer(), points.data(), vertexCount + 1);
+    SDL_RenderDrawLinesF(renderer_->renderer(), points.data(), vertexCount + 1);
   }
 
   void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) {

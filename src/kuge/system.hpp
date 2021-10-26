@@ -2,10 +2,13 @@
 #define KUGE_HEADERS_SYSTEM_HPP_
 
 #include "../sdl2_wrappers/sdl2_log.hpp"
+#include "../sdl2_wrappers/sdl2_renderer.hpp"
 #include "../sdl2_wrappers/sdl2_sound.hpp"
+#include "../sdl2_wrappers/sdl2_texture.hpp"
 #include <array>
 #include <iterator>
-#include <random>
+#include <string>
+#include <utility> // std::move
 #include <vector>
 
 namespace kuge {
@@ -17,17 +20,16 @@ class System {
 
  public:
 
-  System(EventBus& bus): event_bus_(bus) {}
   virtual ~System() {}
-  virtual void handleEvent(KugeEvent*) = 0;
+  virtual void handleEvent(const KugeEvent*) = 0;
 
   /* inline void postEvent(KugeEvent& event) const {
     event_bus_.postEvent(event);
   } */
 
- private:
+ protected:
 
-  EventBus& event_bus_;
+  static const EventBus* event_bus_;
 };
 
 class AudioSystem: public System {
@@ -37,8 +39,7 @@ class AudioSystem: public System {
 
  public:
 
-  AudioSystem(EventBus& bus): System(bus) {}
-  virtual void handleEvent(KugeEvent* event) override;
+  virtual void handleEvent(const KugeEvent* event) override;
   static bool loadResources();
 
  private:
@@ -50,20 +51,58 @@ class AudioSystem: public System {
   static laser_randomizer_it          lasers_it_;
 };
 
+class GUIString {
+ public:
+  inline void render() const { texture_.render(rectangle_); }
+  ktp::SDL2_Texture texture_ {};
+  SDL_Rect rectangle_ {};
+};
+
+class GUISystem: public System {
+
+ public:
+
+  GUISystem(ktp::SDL2_Renderer* ren, SDL_Point screen_size): renderer_(ren), screen_size_(screen_size) {}
+  GUISystem(const GUISystem&) = delete;
+  GUISystem(GUISystem&& other) { *this = std::move(other); }
+
+  GUISystem& operator=(const GUISystem&) = delete;
+  GUISystem& operator=(GUISystem&& other) noexcept;
+
+  virtual void handleEvent(const KugeEvent*) override {}
+  bool init();
+  inline auto& demo() const { return demo_text_; }
+  inline auto& paused() const { return paused_text_; }
+  inline auto& title() const { return title_text_; }
+
+  inline static const std::string kDemoModeText_ {"DEMO MODE"};
+  inline static const std::string kPausedText_ {"PAUSED"};
+  inline static const std::string kTitleText_ {"Aerolits"};
+
+ private:
+
+  ktp::SDL2_Font font_ {};
+  ktp::SDL2_Renderer* renderer_ {};
+  SDL_Point screen_size_ {};
+
+  GUIString demo_text_ {};
+  GUIString paused_text_ {};
+  GUIString title_text_ {};
+};
+
 class InputSystem: public System {
 
  public:
 
-  InputSystem(EventBus& bus): System(bus) {}
-  virtual void handleEvent(KugeEvent* event) override {}
+  virtual void handleEvent(const KugeEvent* event) override {}
 };
 
 class OutputSystem: public System {
 
  public:
 
-  OutputSystem(EventBus& bus, bool log): System(bus), log_(log) {}
-  virtual inline void handleEvent(KugeEvent* event) override { if (log_) event->print(); }
+  OutputSystem(bool log): log_(log) {}
+  virtual inline void handleEvent(const KugeEvent* event) override { if (log_) event->print(); }
   inline void setLog(bool status) { log_ = status; }
 
  private:

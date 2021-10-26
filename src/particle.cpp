@@ -8,7 +8,7 @@
 ktp::SDL2_Texture ktp::ParticlesAtlas::particles_atlas {};
 
 void ktp::ParticlesAtlas::loadTexture(SDL2_Renderer& ren) {
-  particles_atlas.setRenderer(ren);
+  particles_atlas.setRenderer(ren.renderer());
   const std::string file{"particles2.png"};
   const std::string path{getResourcesPath("textures") + file};
   particles_atlas.loadFromFile(path);

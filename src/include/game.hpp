@@ -51,22 +51,21 @@ class Game {
   bool initSDL2();
   bool loadResources();
 
-  const std::string kGameTitle_ {"Aerolits"};
   SDL_Point screen_size_ {ConfigParser::game_config.screen_size_};
   bool paused_ {false};
   bool quit_ {false};
   SDL2_Window main_window_ {};
   SDL2_Renderer renderer_ {};
-  SDL2_Font font_ {};
   // State
   GameState* state_ {nullptr};
   // FPS
   double frame_time_ {};
   // KUGE engine
   kuge::EventBus event_bus_ {};
-  kuge::AudioSystem audio_sys_ {event_bus_};
-  kuge::InputSystem input_sys_ {event_bus_};
-  kuge::OutputSystem output_sys_ {event_bus_, ConfigParser::game_config.output_};
+  kuge::AudioSystem audio_sys_ {};
+  kuge::GUISystem gui_sys_ {&renderer_, screen_size_};
+  kuge::InputSystem input_sys_ {};
+  kuge::OutputSystem output_sys_ {ConfigParser::game_config.output_};
   // Box2D
   b2World world_ {b2Vec2{0.f, 0.f}};
   int32 velocity_iterations_ {8};
@@ -74,10 +73,6 @@ class Game {
   DebugDraw debug_draw_ {};
   bool debug_draw_on_ {false};
   ContactListener contact_listener_ {};
-  // Game texts
-  SDL2_Texture demo_text_ {};
-  SDL2_Texture paused_text_ {};
-  SDL2_Texture title_text_ {};
 };
 
 } // end namespace ktp

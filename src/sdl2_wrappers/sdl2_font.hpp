@@ -6,17 +6,9 @@
 #include <SDL_ttf.h>
 #include <memory>
 #include <string>
+#include <utility> // std::move
 
 namespace ktp {
-
-template <typename T> struct deleter;
-
-template <> struct deleter<TTF_Font> {
-  void operator()(TTF_Font* font) {
-    TTF_CloseFont(font);
-    font = nullptr;
-  }
-};
 
 struct FontInfo {
   std::string face_family_name_ {};
@@ -29,11 +21,27 @@ struct FontInfo {
   int max_height_ {};
   bool monospaced_ {};
   int outline_ {};
+  std::string path_ {};
+  int size_ {};
   int style_ {};
 };
 
 class SDL2_Font {
  public:
+  SDL2_Font() = default;
+  SDL2_Font(const SDL2_Font&) = delete;
+  SDL2_Font(SDL2_Font&& other) noexcept { *this = std::move(other); }
+  ~SDL2_Font() { if (font_) TTF_CloseFont(font_); }
+
+  SDL2_Font& operator=(const SDL2_Font&) = delete;
+  SDL2_Font& operator=(SDL2_Font&& other) noexcept {
+    if (this != &other) {
+      if (font_) TTF_CloseFont(font_);
+      font_ = std::exchange(other.font_, nullptr);
+      font_info_ = std::move(other.font_info_);
+    }
+    return *this;
+  }
 
   /**
    * Initializes SDL_ttf and queries for the versions used (linked and compiled).
@@ -66,7 +74,7 @@ class SDL2_Font {
    * @brief Get the Font object.
    * @return A pointer to the font object.
    */
-  auto getFont() const { return font_.get(); }
+  inline auto getFont() const { return font_; }
 
  /**
   * Get the current font face family name from the loaded font. This function
@@ -168,7 +176,7 @@ class SDL2_Font {
    * @param ch The unicode character to test glyph availability of.
    * @return The index of the glyph for ch in font, or 0 for an undefined character code.
    */
-  inline auto isGlyphProvided(Uint16 ch) const { return TTF_GlyphIsProvided(font_.get(), ch); }
+  inline auto isGlyphProvided(Uint16 ch) const { return TTF_GlyphIsProvided(font_, ch); }
 
   /**
    * Test if the current font face of the loaded font is a fixed width font.
@@ -188,14 +196,18 @@ class SDL2_Font {
   *             translates to pixel height.
   * @return True on success, or false on errors.
   */
-  auto loadFont(const std::string& path, int size) {
-    font_.reset(TTF_OpenFont(path.c_str(), size));
-    if (font_ == nullptr) {
+  bool loadFont(const std::string& path, int size) {
+    if (font_) TTF_CloseFont(font_);
+    font_ = TTF_OpenFont(path.c_str(), size);
+    if (font_) {
+      queryFontInfo();
+      font_info_.path_ = path;
+      font_info_.size_ = size;
+      return true;
+    } else {
       logSDL2Error("TTF_OpenFont");
       return false;
     }
-    queryFontInfo();
-    return true;
   }
 
   /**
@@ -220,7 +232,7 @@ class SDL2_Font {
    */
   void setHinting(int hinting) {
     if (font_info_.hinting_ != hinting) {
-      TTF_SetFontHinting(font_.get(), hinting);
+      TTF_SetFontHinting(font_, hinting);
       queryFontInfo();
     }
   }
@@ -235,7 +247,7 @@ class SDL2_Font {
    */
   void setKerning(bool allowed) {
     if (font_info_.kerning_ != allowed) {
-      allowed ? TTF_SetFontKerning(font_.get(), 1) : TTF_SetFontKerning(font_.get(), 0);
+      allowed ? TTF_SetFontKerning(font_, 1) : TTF_SetFontKerning(font_, 0);
       queryFontInfo();
     }
   }
@@ -247,7 +259,7 @@ class SDL2_Font {
    */
   void setOutline(int pixels) {
     if (font_info_.outline_ != pixels) {
-      TTF_SetFontOutline(font_.get(), pixels);
+      TTF_SetFontOutline(font_, pixels);
       queryFontInfo();
     }
   }
@@ -263,37 +275,34 @@ class SDL2_Font {
    */
   void setStyle(int style) {
     if (font_info_.style_ != style) {
-      TTF_SetFontStyle(font_.get(), style);
+      TTF_SetFontStyle(font_, style);
       queryFontInfo();
     }
   }
 
  private:
 
-  template <typename T>
-  using unique_ptr_deleter = std::unique_ptr<T, deleter<T>>;
-
   /**
    * Gathers useful information about the current font.
    */
   void queryFontInfo() {
-    font_info_.face_family_name_ = TTF_FontFaceFamilyName(font_.get());
-    font_info_.face_style_name_  = TTF_FontFaceStyleName(font_.get());
-    font_info_.hinting_          = TTF_GetFontHinting(font_.get());
-    font_info_.kerning_          = TTF_GetFontKerning(font_.get()) != 0;
-    font_info_.line_skip_        = TTF_FontLineSkip(font_.get());
-    font_info_.max_ascent_       = TTF_FontAscent(font_.get());
-    font_info_.max_descent_      = TTF_FontDescent(font_.get());
-    font_info_.max_height_       = TTF_FontHeight(font_.get());
-    font_info_.monospaced_       = TTF_FontFaceIsFixedWidth(font_.get()) != 0;
-    font_info_.outline_          = TTF_GetFontOutline(font_.get());
-    font_info_.style_            = TTF_GetFontStyle(font_.get());
+    font_info_.face_family_name_ = TTF_FontFaceFamilyName(font_);
+    font_info_.face_style_name_  = TTF_FontFaceStyleName(font_);
+    font_info_.hinting_          = TTF_GetFontHinting(font_);
+    font_info_.kerning_          = TTF_GetFontKerning(font_) != 0;
+    font_info_.line_skip_        = TTF_FontLineSkip(font_);
+    font_info_.max_ascent_       = TTF_FontAscent(font_);
+    font_info_.max_descent_      = TTF_FontDescent(font_);
+    font_info_.max_height_       = TTF_FontHeight(font_);
+    font_info_.monospaced_       = TTF_FontFaceIsFixedWidth(font_) != 0;
+    font_info_.outline_          = TTF_GetFontOutline(font_);
+    font_info_.style_            = TTF_GetFontStyle(font_);
   }
 
   inline static SDL_version ttf_compiled_version_ {};
   inline static const SDL_version* ttf_linked_version_ {nullptr};
 
-  unique_ptr_deleter<TTF_Font> font_ {nullptr};
+  TTF_Font* font_ {nullptr};
   FontInfo font_info_ {};
 };
 
