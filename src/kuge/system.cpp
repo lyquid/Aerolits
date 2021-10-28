@@ -58,6 +58,8 @@ bool kuge::AudioSystem::loadResources() {
 
 /* GUI SYSTEM */
 
+const ktp::SDL2_Renderer* kuge::GUISystem::renderer_ {nullptr};
+
 kuge::GUISystem& kuge::GUISystem::operator=(GUISystem&& other) noexcept {
   if (this != &other) {
     // inherited members
@@ -67,28 +69,66 @@ kuge::GUISystem& kuge::GUISystem::operator=(GUISystem&& other) noexcept {
     font_        = std::move(other.font_);
     demo_text_   = std::move(other.demo_text_);
     paused_text_ = std::move(other.paused_text_);
+    score_text_  = std::move(other.score_text_);
     title_text_  = std::move(other.title_text_);
   }
   return *this;
 }
 
+void kuge::GUISystem::handleEvent(const KugeEvent* event) {
+  switch(event->type()) {
+    case KugeEventTypes::AeroliteDestroyed:
+      updateScore(static_cast<const AeroliteDestroyedEvent*>(event)->score());
+      break;
+    case KugeEventTypes::AeroliteSplitted:
+      updateScore(static_cast<const AeroliteSplittedEvent*>(event)->score());
+      break;
+    default: break;
+  }
+}
+
 bool kuge::GUISystem::init(const ktp::SDL2_Renderer& ren) {
   if (!font_.loadFont(ktp::getResourcesPath("fonts") + "Future n0t Found.ttf", 18)) return false;
 
-  int w = screen_size_.x * 0.2f;
-  int h = screen_size_.y * 0.1f;
-  demo_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
+  renderer_ = &ren; // we need this in order to create new score textures
+
+  int w, h;
+
   demo_text_.texture_.loadFromTextSolid(ren, font_, kDemoModeText_, ktp::Colors::white);
+  w = demo_text_.texture_.getWidth()  * screen_size_.x * 0.0025f;
+  h = demo_text_.texture_.getHeight() * screen_size_.y * 0.0050f;
+  demo_text_.rectangle_ = {screen_size_.x * 0.5f - w * 0.5f, screen_size_.y * 0.5f - h * 0.5f, w, h};
 
-  w = screen_size_.x * 0.1f;
-  h = screen_size_.y * 0.05f;
-  paused_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
   paused_text_.texture_.loadFromTextSolid(ren, font_, kPausedText_, ktp::Colors::white);
+  w = paused_text_.texture_.getWidth()  * screen_size_.x * 0.0025f;
+  h = paused_text_.texture_.getHeight() * screen_size_.y * 0.0050f;
+  paused_text_.rectangle_ = {screen_size_.x * 0.5f - w * 0.5f, screen_size_.y * 0.5f - h * 0.5f, w, h};
 
-  w = screen_size_.x * 0.75f;
-  h = screen_size_.y * 0.50f;
-  title_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
+  score_text_.texture_.loadFromTextSolid(ren, font_, kScoreText_ + std::to_string(score_), ktp::Colors::white);
+  w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
+  h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
+  score_text_.rectangle_ = {0, 0, w, h};
+
   title_text_.texture_.loadFromTextSolid(ren, font_, kTitleText_, ktp::Colors::white);
+  w = title_text_.texture_.getWidth()  * screen_size_.x * 0.0125f;
+  h = title_text_.texture_.getHeight() * screen_size_.y * 0.0250f;
+  title_text_.rectangle_ = {screen_size_.x * 0.5f - w * 0.5f, screen_size_.y * 0.5f - h * 0.5f, w, h};
 
   return true;
+}
+
+void kuge::GUISystem::resetScore() {
+  score_ = 0;
+  score_text_.texture_.loadFromTextSolid(*renderer_, font_, kScoreText_, ktp::Colors::white);
+  int w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
+  int h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
+  score_text_.rectangle_ = {0, 0, w, h};
+}
+
+void kuge::GUISystem::updateScore(Uint32 points) {
+  score_ += points;
+  score_text_.texture_.loadFromTextSolid(*renderer_, font_, kScoreText_ + std::to_string(score_), ktp::Colors::white);
+  int w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
+  int h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
+  score_text_.rectangle_ = {0, 0, w, h};
 }

@@ -66,7 +66,8 @@ enum class KugeEventTypes {
   AeroliteDestroyed,
   AeroliteSplitted,
   EnterDemoState,
-  PlayerDead
+  PlayerDead,
+  count
 };
 
 class KugeEvent {
@@ -86,32 +87,36 @@ class KugeEvent {
 
 class AeroliteDestroyedEvent: public KugeEvent {
  public:
-  AeroliteDestroyedEvent(KugeEventTypes type, SDL_FPoint pos):
-    KugeEvent(type, "Aerolite destroyed"), position_(pos) {}
+  AeroliteDestroyedEvent(KugeEventTypes type, SDL_FPoint pos, int score):
+    KugeEvent(type, "Aerolite destroyed"), position_(pos), score_(score) {}
 
   virtual void print() const override;
   inline auto position() const { return position_; }
+  inline auto score() const { return score_; }
  private:
   const SDL_FPoint position_;
+  int score_;
 };
 
 class AeroliteSplittedEvent: public KugeEvent {
  public:
-  AeroliteSplittedEvent(KugeEventTypes type, SDL_FPoint pos, Uint32 pieces):
-    KugeEvent(type, "Aerolite splitted"), pieces_(pieces), position_(pos) {}
+  AeroliteSplittedEvent(KugeEventTypes type, SDL_FPoint pos, Uint32 pieces, int score):
+    KugeEvent(type, "Aerolite splitted"), pieces_(pieces), position_(pos), score_(score) {}
 
   inline auto pieces() const { return pieces_; }
   virtual void print() const override;
   inline auto position() const { return position_; }
+  inline auto score() const { return score_; }
  private:
   const Uint32 pieces_;
   const SDL_FPoint position_;
+  int score_;
 };
 
 class EnterDemoStateEvent: public KugeEvent {
  public:
   EnterDemoStateEvent(KugeEventTypes type): KugeEvent(type, "Enter demo state") {}
-  virtual inline void print() const override { ktp::logInfo(std::to_string(timestamp_) + "ms. " + name_); }
+  virtual inline void print() const override { ktp::logInfo('[' + std::to_string(timestamp_) + "ms] " + name_); }
  private:
 };
 

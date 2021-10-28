@@ -36,14 +36,16 @@ void ktp::DemoState::draw(Game& game) {
     }
   }
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  game.gui_sys_.scoreText().render(game.renderer_);
 
-  if (blink_flag_) game.gui_sys_.demo().render(game.renderer_);
+  if (blink_flag_) game.gui_sys_.demoText().render(game.renderer_);
 
   if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
     blink_timer_ = SDL2_Timer::SDL2Ticks();
   }
+
+  if (game.debug_draw_on_) game.world_.DebugDraw();
 
   game.renderer_.present();
 }
@@ -108,14 +110,16 @@ void ktp::PausedState::draw(Game& game) {
     }
   }
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  game.gui_sys_.scoreText().render(game.renderer_);
 
-  if (blink_flag_) game.gui_sys_.paused().render(game.renderer_);
+  if (blink_flag_) game.gui_sys_.pausedText().render(game.renderer_);
 
   if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
     blink_timer_ = SDL2_Timer::SDL2Ticks();
   }
+
+  if (game.debug_draw_on_) game.world_.DebugDraw();
 
   game.renderer_.present();
 }
@@ -171,6 +175,8 @@ void ktp::PlayingState::draw(Game& game) {
       GameEntity::game_entities_[i].object_.draw(game.renderer_);
     }
   }
+
+  game.gui_sys_.scoreText().render(game.renderer_);
 
   if (game.debug_draw_on_) game.world_.DebugDraw();
 
@@ -255,7 +261,7 @@ void ktp::TitleState::draw(Game& game) {
     }
   }
 
-  game.gui_sys_.title().render(game.renderer_);
+  game.gui_sys_.titleText().render(game.renderer_);
 
   game.renderer_.present();
 }
@@ -265,6 +271,7 @@ ktp::GameState* ktp::TitleState::enter(Game& game) {
   GameEntity::createEntity(EntityTypes::Background);
   GameEntity::createEntity(EntityTypes::Player);
   demo_time_ = SDL2_Timer::SDL2Ticks();
+  game.gui_sys_.resetScore();
   return this;
 }
 

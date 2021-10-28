@@ -16,8 +16,8 @@ void kuge::EventBus::processEvents() {
 
 void kuge::AeroliteDestroyedEvent::print() const {
   ktp::logInfo(
-    std::to_string(timestamp_) + "ms. "
-    + name_ + " at "
+    '[' + std::to_string(timestamp_) + "ms] "
+    + name_ + " (" + std::to_string(score_) + "pts) at "
     + std::to_string((int)position_.x) + ", "
     + std::to_string((int)position_.y)
   );
@@ -27,8 +27,9 @@ void kuge::AeroliteDestroyedEvent::print() const {
 
 void kuge::AeroliteSplittedEvent::print() const {
   ktp::logInfo(
-    std::to_string(timestamp_) + "ms. "
-    + name_ + " in " + std::to_string(pieces_ + 1) + " at "
+    '[' + std::to_string(timestamp_) + "ms] "
+    + name_ + " in " + std::to_string(pieces_ + 1)
+    + " (" + std::to_string(score_) + "pts) at "
     + std::to_string((int)position_.x) + ", "
     + std::to_string((int)position_.y)
   );

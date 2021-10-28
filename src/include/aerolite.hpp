@@ -51,6 +51,7 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   static constexpr float kMinSize_ {0.5f};
   static constexpr unsigned int kMaxSides_ {b2_maxPolygonVertices};
   static constexpr unsigned int kMinSides_ {6u};
+  static constexpr unsigned int kScore_ {1000u};
 
   AeroliteGraphicsComponent* graphics_ {nullptr};
   b2AABB aabb_ {};
