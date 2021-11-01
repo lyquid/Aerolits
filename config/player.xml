@@ -6,4 +6,7 @@
   </Box2D>
   <color r="255" g="255" b="255"/>
   <size value="1.2"/>
+  <angularImpulse value="5"/>
+  <linearImpulse value="0.05"/>
+  <maxDelta value="0.1"/>
 </player>

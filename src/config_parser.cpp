@@ -439,7 +439,7 @@ void ktp::ConfigParser::loadPlayerConfig() {
       if (checkWithinRange(restitution, 0.f, 1.f)) {
         player_config.restitution_ = restitution;
       } else {
-        logMessage("Warning! Player's restitution not in range [0, 1]. Using default restitution.");
+        logMessage("Warning! Player restitution not in range [0, 1]. Using default restitution.");
       }
     } else {
       logMessage("Warning! Player restitution not set. Using default restitution.");
@@ -450,10 +450,43 @@ void ktp::ConfigParser::loadPlayerConfig() {
       if (size > 0.f) {
         player_config.size_ = size;
       } else {
-        logMessage("Warning! Player's size 0 or less. Using default size.");
+        logMessage("Warning! Player size 0 or less. Using default size.");
       }
     } else {
       logMessage("Warning! Player size not set. Using default size.");
+    }
+    // Angular impulse
+    if (player.child("angularImpulse")) {
+      const auto angular_impulse {player.child("angularImpulse").attribute("value").as_float()};
+      if (angular_impulse) {
+        player_config.angular_impulse_ = angular_impulse;
+      } else {
+        logMessage("Warning! Player angular impulse is 0. Using default angular impulse.");
+      }
+    } else {
+      logMessage("Warning! Player angular impulse not set. Using default angular impulse.");
+    }
+    // Linear impulse
+    if (player.child("linearImpulse")) {
+      const auto linear_impulse {player.child("linearImpulse").attribute("value").as_float()};
+      if (linear_impulse) {
+        player_config.linear_impulse_ = linear_impulse;
+      } else {
+        logMessage("Warning! Player linear impulse is 0. Using default linear impulse.");
+      }
+    } else {
+      logMessage("Warning! Player linear impulse not set. Using default linear impulse.");
+    }
+    // Max delta
+    if (player.child("maxDelta")) {
+      const auto max_delta {player.child("maxDelta").attribute("value").as_float()};
+      if (max_delta > 0) {
+        player_config.max_delta_ = max_delta;
+      } else {
+        logMessage("Warning! Player maximun delta is 0 or less. Using default maximun delta.");
+      }
+    } else {
+      logMessage("Warning! Player maximun delta not set. Using default maximun delta.");
     }
   } else {
     const std::string error_msg {

@@ -142,7 +142,7 @@ void ktp::AerolitePhysicsComponent::split() {
       kuge::KugeEventTypes::AeroliteDestroyed,
       {owner_->physics()->body()->GetPosition().x * kMetersToPixels,
        owner_->physics()->body()->GetPosition().y * kMetersToPixels},
-       kScore_ / size_};
+       (int)(kScore_ / size_)};
     owner_->event_bus_->postEvent(ev);
     return;
   }
@@ -209,7 +209,7 @@ void ktp::AerolitePhysicsComponent::split() {
     {owner_->physics()->body()->GetPosition().x * kMetersToPixels,
      owner_->physics()->body()->GetPosition().y * kMetersToPixels},
     pieces,
-    ((kScore_ / 10u) / size_) * (pieces + 1u)
+    (int)(((kScore_ / 10u) / size_) * (pieces + 1u))
   };
   owner_->event_bus_->postEvent(ev);
 }

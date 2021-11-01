@@ -1,6 +1,8 @@
 #ifndef AEROLITS_SRC_INCLUDE_INPUT_COMPONENT_HPP_
 #define AEROLITS_SRC_INCLUDE_INPUT_COMPONENT_HPP_
 
+#include "config_parser.hpp"
+
 namespace ktp {
 
 class GameEntity;
@@ -30,12 +32,9 @@ class InputComponent {
 
   PlayerPhysicsComponent* physics_ {nullptr};
 
-  static constexpr float kDefaultAngularImpulse_ {5.f};
-  static constexpr float kDefaultLinearImpulse_ {0.05f};
-  static constexpr float kMaxDelta_ {0.1f};
-
-  float  angular_impulse_ {kDefaultAngularImpulse_};
-  float  linear_impulse_ {kDefaultLinearImpulse_};
+  float  angular_impulse_ {ConfigParser::player_config.angular_impulse_};
+  float  linear_impulse_ {ConfigParser::player_config.linear_impulse_};
+  float max_delta_ {ConfigParser::player_config.max_delta_};
   Uint32 stabilizer_time_ {};
   bool   steering_ {true};
 

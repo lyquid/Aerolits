@@ -26,7 +26,7 @@ class PlayerGraphicsComponent: public GraphicsComponent {
   PlayerGraphicsComponent() noexcept;
   virtual void update(const GameEntity& player, const SDL2_Renderer& renderer) override;
  private:
-  SDL_Color     color_ {ConfigParser::player_config.color_};
+  SDL_Color color_ {ConfigParser::player_config.color_};
   std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
 };
 
