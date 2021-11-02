@@ -11,6 +11,7 @@ class Game;
 class DemoState;
 class PausedState;
 class PlayingState;
+class TestingState;
 class TitleState;
 
 class GameState {
@@ -27,6 +28,7 @@ class GameState {
   static DemoState    demo_;
   static PausedState  paused_;
   static PlayingState playing_;
+  static TestingState testing_;
   static TitleState   title_;
 
  protected:
@@ -68,6 +70,15 @@ class PlayingState: public GameState {
   virtual void update(Game& game, float delta_time) override;
  private:
   virtual GameState* enter(Game& game) override;
+  void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
+};
+
+class TestingState: public GameState {
+ public:
+  virtual void draw(Game& game) override;
+  virtual void handleEvents(Game& game) override;
+  virtual void update(Game& game, float delta_time) override;
+ private:
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
 };
 

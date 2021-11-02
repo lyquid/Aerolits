@@ -54,6 +54,9 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   static constexpr unsigned int kScore_ {1000u};
 
   AeroliteGraphicsComponent* graphics_ {nullptr};
+  /**
+   * @brief This is used to know when an aerolite has left the screen.
+   */
   b2AABB aabb_ {};
 };
 

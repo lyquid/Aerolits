@@ -10,6 +10,7 @@
 ktp::DemoState    ktp::GameState::demo_ {};
 ktp::PausedState  ktp::GameState::paused_ {};
 ktp::PlayingState ktp::GameState::playing_ {};
+ktp::TestingState ktp::GameState::testing_ {};
 ktp::TitleState   ktp::GameState::title_ {};
 
 void ktp::GameState::setWindowTitle(Game& game) {
@@ -246,6 +247,51 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   }
   if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnAerolite();
 
+  game.event_bus_.processEvents();
+}
+
+/* TESTING STATE */
+
+void ktp::TestingState::draw(Game& game) {
+  game.renderer_.clear();
+  game.renderer_.present();
+}
+
+void ktp::TestingState::handleEvents(Game& game) {
+    while (SDL_PollEvent(&sdl_event_)) {
+    switch (sdl_event_.type) {
+      case SDL_QUIT:
+        game.quit_ = true;
+        break;
+      case SDL_KEYDOWN:
+        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        break;
+      default: break;
+    }
+  }
+}
+
+void ktp::TestingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
+  switch (key) {
+    case SDLK_ESCAPE:
+      game.state_ = goToState(game, GameState::paused_);
+      break;
+    case SDLK_F1:
+      game.debug_draw_on_ = !game.debug_draw_on_;
+      break;
+    case SDLK_p:
+      game.state_ = goToState(game, GameState::paused_);
+      break;
+    default:
+      break;
+  }
+}
+
+void ktp::TestingState::update(Game& game, float delta_time) {
+  // Window title
+  setWindowTitle(game);
+  // Box2D
+  game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   game.event_bus_.processEvents();
 }
 

@@ -20,6 +20,7 @@ class Game {
   friend class GameState;
   friend class PausedState;
   friend class PlayingState;
+  friend class TestingState;
   friend class TitleState;
 
  public:
