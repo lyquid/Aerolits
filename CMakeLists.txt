@@ -52,10 +52,11 @@ add_executable(Aerolits main.cpp
                         src/explosion.cpp
                         src/game.cpp
                         src/game_state.cpp
+                        src/input_component.cpp
                         src/particle.cpp
                         src/player.cpp
                         src/projectile.cpp
-                        src/input_component.cpp)
+                        src/testing.cpp)
 
 target_compile_features(Aerolits PUBLIC cxx_std_17)
 set_target_properties(Aerolits PROPERTIES CXX_EXTENSIONS OFF)

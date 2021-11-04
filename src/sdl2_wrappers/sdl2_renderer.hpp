@@ -146,7 +146,7 @@ class SDL2_Renderer {
   }
 
   /**
-   * @brief
+   * @brief 
    *
    * @param points
    * @return true

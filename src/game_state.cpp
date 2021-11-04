@@ -254,7 +254,22 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
 
 void ktp::TestingState::draw(Game& game) {
   game.renderer_.clear();
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+    if (GameEntity::game_entities_[i].active_) {
+      GameEntity::game_entities_[i].object_.draw(game.renderer_);
+    }
+  }
+  game.test_.draw(game.renderer_);
+  if (game.debug_draw_on_) game.world_.DebugDraw();
   game.renderer_.present();
+}
+
+ktp::GameState* ktp::TestingState::enter(Game& game) {
+  game.reset();
+  GameEntity::createEntity(EntityTypes::Background);
+  game.gui_sys_.resetScore();
+  game.test_.generateShape(100);
+  return this;
 }
 
 void ktp::TestingState::handleEvents(Game& game) {
@@ -274,14 +289,13 @@ void ktp::TestingState::handleEvents(Game& game) {
 void ktp::TestingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
-      game.state_ = goToState(game, GameState::paused_);
+      game.quit_ = true;
       break;
     case SDLK_F1:
       game.debug_draw_on_ = !game.debug_draw_on_;
       break;
-    case SDLK_p:
-      game.state_ = goToState(game, GameState::paused_);
-      break;
+    case SDLK_SPACE:
+      game.test_.generateShape(100);
     default:
       break;
   }
@@ -292,6 +306,17 @@ void ktp::TestingState::update(Game& game, float delta_time) {
   setWindowTitle(game);
   // Box2D
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
+  // Entities
+  for (std::size_t i = 0; i < GameEntity::game_entities_.capacity(); ++i) {
+    if (GameEntity::game_entities_[i].active_) {
+      if (GameEntity::game_entities_[i].object_.canBeDeactivated()) {
+        GameEntity::game_entities_[i].object_.free(i);
+      } else {
+        GameEntity::game_entities_[i].object_.update(delta_time);
+      }
+    }
+  }
+  // if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnAerolite();
   game.event_bus_.processEvents();
 }
 

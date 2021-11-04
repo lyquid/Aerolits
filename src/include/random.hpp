@@ -1,5 +1,5 @@
-#ifndef AEROLITS_SRC_INCLUDE_RANDOM_HPP_
-#define AEROLITS_SRC_INCLUDE_RANDOM_HPP_
+#ifndef KTP_RANDOM_HPP_
+#define KTP_RANDOM_HPP_
 
 #include <random> // std::rand
 
@@ -55,4 +55,4 @@ inline double generateRand(double min, double max) {
 
 } // namespace ktp
 
-#endif // AEROLITS_SRC_INCLUDE_RANDOM_HPP_
+#endif // KTP_RANDOM_HPP_
