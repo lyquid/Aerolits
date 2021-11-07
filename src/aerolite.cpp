@@ -3,6 +3,7 @@
 #include "include/game_entity.hpp"
 #include "include/random.hpp"
 #include "kuge/kuge.hpp"
+#include "sdl2_wrappers/sdl2_geometry.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include "sdl2_wrappers/sdl2_renderer.hpp"
 

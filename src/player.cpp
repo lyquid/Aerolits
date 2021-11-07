@@ -2,6 +2,7 @@
 #include "include/emitter.hpp"
 #include "include/game_entity.hpp"
 #include "include/player.hpp"
+#include "sdl2_wrappers/sdl2_geometry.hpp" // to be deleted
 #include "sdl2_wrappers/sdl2_renderer.hpp"
 #include <box2d/box2d.h>
 

@@ -294,6 +294,9 @@ void ktp::TestingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
     case SDLK_F1:
       game.debug_draw_on_ = !game.debug_draw_on_;
       break;
+    case SDLK_F2:
+      game.test_.drawTriangles();
+      break;
     case SDLK_SPACE:
       game.test_.generateShape(100);
     default:
