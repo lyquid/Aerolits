@@ -1,3 +1,3 @@
 # Aeròlits
 
-![CMake badge](https://github.com/lyquid/Aerolits/actions/workflows/cmake.yml/badge.svg)
+![CMake badge](https://github.com/lyquid/Aerolits/actions/workflows/build.yml/badge.svg)
