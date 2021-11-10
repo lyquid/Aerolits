@@ -1,16 +1,5 @@
 #include "sdl2_geometry.hpp"
 
-float ktp::Geometry::area(const Polygon& polygon) {
-  const auto points {polygon.size()};
-  auto area {0.f};
-
-  for (std::size_t p = points - 1, q = 0; q < points; p = q++) {
-    area += polygon[p].x * polygon[q].y - polygon[q].x * polygon[p].y;
-  }
-
-  return area * 0.5f;
-}
-
 bool ktp::Geometry::insideTriangle(const Triangle& triangle, Point point) {
   const Point a {triangle.c.x - triangle.b.x, triangle.c.y - triangle.b.y};
   const Point b {triangle.a.x - triangle.c.x, triangle.a.y - triangle.c.y};

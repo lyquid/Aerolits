@@ -32,10 +32,21 @@ struct Triangle {
 
 /**
  * @brief Calculates the area of a given polygon.
+ * @tparam T Some type resembling a point.
  * @param polygon The polygon to calculate the area.
  * @return The area of the polygon.
  */
-float area(const Polygon& polygon);
+template<typename T>
+float area(const std::vector<T>& polygon) {
+  const auto points {polygon.size()};
+  auto area {0.f};
+
+  for (std::size_t p = points - 1, q = 0; q < points; p = q++) {
+    area += polygon[p].x * polygon[q].y - polygon[q].x * polygon[p].y;
+  }
+
+  return area * 0.5f;
+}
 
 /**
  * @brief Returns the distance between 2 points.
@@ -58,22 +69,23 @@ inline auto distanceBetweenPoints(T a, T b) {
 bool insideTriangle(const Triangle& triangle, Point point);
 
 /**
- * @brief
- * @tparam T
- * @tparam U
- * @tparam V
- * @tparam W
- * @tparam X
- * @param polygon
- * @param u
- * @param v
- * @param w
- * @param n
- * @param vec
- * @return true
+ * @brief 
+ * @tparam T 
+ * @tparam U 
+ * @tparam V 
+ * @tparam W 
+ * @tparam X 
+ * @tparam Y 
+ * @param polygon 
+ * @param u 
+ * @param v 
+ * @param w 
+ * @param n 
+ * @param vec 
+ * @return true 
  */
-template<typename T, typename U, typename V, typename W, typename X>
-bool snip(const Polygon& polygon, T u, U v, V w, W n, const std::vector<X>& vec) {
+template<typename T, typename U, typename V, typename W, typename X, typename Y>
+bool snip(const std::vector<T>& polygon, U u, V v, W w, X n, const std::vector<Y>& vec) {
   constexpr auto kEpsilon {0.0000000001f};
 
   const Point a {polygon[vec[u]].x, polygon[vec[u]].y};
@@ -159,6 +171,65 @@ bool triangulate(const std::vector<T>& polygon, std::vector<T>& result) {
       result.push_back(polygon[a]);
       result.push_back(polygon[b]);
       result.push_back(polygon[c]);
+      // remove v from remaining polygon
+      for (s = v, t = v + 1; t < nv; ++s, ++t) V[s] = V[t];
+      --nv;
+      // reset error detection counter
+      count = 2 * nv;
+    }
+  }
+  return true;
+}
+
+/**
+ * @brief Divides a polygon in triangles. **Doesn't work with polygons with inner holes.**
+ * @tparam T Some object resembling a point (x, y), ie: SDL_Point, SDL_FPoint, ktp::Point.
+ * @param polygon The polygon to triangularize, or tessellate.
+ * @param result Where to store the resulting triangles.
+ * @return True if all went ok.
+ */
+template<typename T>
+bool triangulate(const std::vector<T>& polygon, std::vector<std::vector<T>>& result, bool close = false) {
+  const auto vertices {polygon.size()};
+  if (vertices < 3) return false;
+
+  std::vector<std::size_t> V {};
+  V.resize(vertices);
+
+  // we want a counter-clockwise polygon in V
+  if (area(polygon) > 0.f) {
+    for (auto i = 0u; i < vertices; ++i)
+      V[i] = i;
+  }
+  else {
+    for (auto i = 0u; i < vertices; ++i)
+      V[i] = (vertices - 1) - i;
+  }
+
+  auto nv {vertices};
+  // remove nv-2 Vertices, creating 1 triangle every time
+  auto count {2 * nv};   // error detection
+
+  for (std::size_t i = 0, v = nv - 1; nv > 2; ++i) {
+    // if we loop, it is probably a non-simple polygon
+    if (0 >= (count--)) return false; // Triangulate: ERROR - probable bad polygon!
+
+    // three consecutive vertices in current polygon, <u,v,w>
+    auto u {v};
+    if (nv <= u) u = 0; // previous
+    v = u + 1u;
+    if (nv <= v) v = 0; // new v
+    auto w {v + 1u};
+    if (nv <= w) w = 0; // next
+
+    if (snip(polygon, u, v, w, nv, V)) {
+      std::size_t a{V[u]}, b{V[v]}, c{V[w]}, s{}, t{};
+      // output Triangle
+      if (close) {
+        result.push_back({polygon[a], polygon[b], polygon[c], polygon[a]});
+      } else {
+        result.push_back({polygon[a], polygon[b], polygon[c]});
+      }
       // remove v from remaining polygon
       for (s = v, t = v + 1; t < nv; ++s, ++t) V[s] = V[t];
       --nv;

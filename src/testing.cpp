@@ -19,7 +19,7 @@ ktp::Testing::Testing() {
   test_polygon_.push_back( {6 * test_center_.x,6 * test_center_.y});
   test_polygon_.push_back( {4 * test_center_.x,3 * test_center_.y});
   test_polygon_.push_back( {2 * test_center_.x,6 * test_center_.y});
-  Geometry::triangulate(test_polygon_, test_triangles_);
+  Geometry::triangulate(test_polygon_, test_triangles_, true);
   test_polygon_.push_back(test_polygon_.front());
 }
 

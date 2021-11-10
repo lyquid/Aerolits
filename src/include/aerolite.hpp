@@ -49,15 +49,25 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   void transformRenderShape();
 
   static constexpr float kMinSize_ {0.5f};
-  static constexpr unsigned int kMaxSides_ {b2_maxPolygonVertices};
-  static constexpr unsigned int kMinSides_ {6u};
+  static constexpr unsigned int kMaxSides_ {30u};
+  static constexpr unsigned int kMinSides_ {25u};
   static constexpr unsigned int kScore_ {1000u};
+  static constexpr unsigned int kNewBornTime_ {10000u}; // 10 seconds
 
   AeroliteGraphicsComponent* graphics_ {nullptr};
   /**
    * @brief This is used to know when an aerolite has left the screen.
    */
   b2AABB aabb_ {};
+  /**
+   * @brief When the aerolite was born.
+   */
+  Uint32 born_time_ {};
+  /**
+   * @brief Flag that indictes if an aerolite has entered the screen.
+   * Usefull to know when an aerolite must be removed for leaving the screen.
+   */
+  bool new_born_ {true};
 };
 
 } // namespace ktp

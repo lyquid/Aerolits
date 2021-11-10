@@ -51,8 +51,8 @@ bool ktp::Game::init() {
   PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});
   PhysicsComponent::setWorld(&world_);
 
-  //state_ = GameState::goToState(*this, GameState::title_);
-  state_ = GameState::goToState(*this, GameState::testing_);
+  state_ = GameState::goToState(*this, GameState::title_);
+  //state_ = GameState::goToState(*this, GameState::testing_);
 
   return true;
 }
