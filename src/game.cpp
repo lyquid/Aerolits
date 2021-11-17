@@ -74,6 +74,7 @@ bool ktp::Game::loadResources() {
     return false;
   }
   ParticlesAtlas::loadTexture(renderer_);
+  AerolitesTextures::loadTexture(renderer_);
   return true;
 }
 

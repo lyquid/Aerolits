@@ -17,6 +17,14 @@ using B2Line = Geometry::Line<b2Vec2>;
 
 class GameEntity;
 class SDL2_Renderer;
+class SDL2_Texture;
+
+namespace AerolitesTextures {
+
+  void loadTexture(SDL2_Renderer& ren);
+  extern SDL2_Texture aerolites_textures;
+
+} // end namespace AerolitesTextures
 
 class AeroliteGraphicsComponent: public GraphicsComponent {
  public:

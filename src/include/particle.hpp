@@ -42,7 +42,6 @@ struct ParticleData {
 
 class Particle {
 
-  friend class Emitter;
   friend class EmitterGraphicsComponent;
   friend class EmitterPhysicsComponent;
 

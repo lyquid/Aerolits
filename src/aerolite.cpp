@@ -2,11 +2,23 @@
 #include "include/box2d_scale.hpp"
 #include "include/game.hpp"
 #include "include/game_entity.hpp"
+#include "include/paths.hpp"
 #include "include/random.hpp"
 #include "kuge/kuge.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include "sdl2_wrappers/sdl2_renderer.hpp"
+#include "sdl2_wrappers/sdl2_texture.hpp"
 #include <limits>
+
+/* TEXTURES */
+
+ktp::SDL2_Texture ktp::AerolitesTextures::aerolites_textures {};
+
+void ktp::AerolitesTextures::loadTexture(SDL2_Renderer& ren) {
+  const std::string file {"asteroid.png"};
+  const std::string path {getResourcesPath("textures") + file};
+  aerolites_textures.loadFromFile(ren, path);
+}
 
 /* GRAPHICS */
 
