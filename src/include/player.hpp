@@ -60,7 +60,7 @@ class PlayerPhysicsComponent: public PhysicsComponent {
   PlayerPhysicsComponent& operator=(const PlayerPhysicsComponent& other) = delete;
   PlayerPhysicsComponent& operator=(PlayerPhysicsComponent&& other) noexcept;
 
-  virtual void collide(GameEntity* other) override {}
+  virtual void collide(const GameEntity* other) override {}
   virtual void update(const GameEntity& player, float delta_time) override;
 
  private:

@@ -65,7 +65,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   EmitterPhysicsComponent& operator=(EmitterPhysicsComponent&& other) noexcept;
 
   inline bool canBeDeleted() const { return lifeTimeOver() && !alive_particles_count_; }
-  virtual void collide(GameEntity* other) override {}
+  virtual void collide(const GameEntity* other) override {}
   void generateParticles();
   inline auto getAliveParticlesCount() const { return alive_particles_count_; }
   inline SDL_FPoint getPosition() const { return position_; }

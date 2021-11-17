@@ -22,6 +22,27 @@ using Point = SDL_FPoint;
 using Polygon = std::vector<Point>;
 
 /**
+ * @brief 2 points representing a line.
+ * @tparam T Some type resembling a point.
+ */
+template<typename T>
+struct Line {
+  Line() = default;
+  Line(const T& a, const T& b): begin(a), end(b) {}
+  Line(float ax, float ay, float bx, float by) {
+    begin.x = ax; begin.y = ay;
+    end.x   = bx; end.y   = by;
+  }
+  T begin{}, end{};
+};
+
+template<typename T>
+Line<T> operator*(const Line<T>& line, float num) {
+  return {line.begin.x * num, line.begin.y * num,
+          line.end.x   * num, line.end.y   * num};
+}
+
+/**
  * @brief A struct representing a triangle.
  */
 struct Triangle {
@@ -69,20 +90,91 @@ inline auto distanceBetweenPoints(T a, T b) {
 bool insideTriangle(const Triangle& triangle, Point point);
 
 /**
- * @brief 
- * @tparam T 
- * @tparam U 
- * @tparam V 
- * @tparam W 
- * @tparam X 
- * @tparam Y 
- * @param polygon 
- * @param u 
- * @param v 
- * @param w 
- * @param n 
- * @param vec 
- * @return true 
+ * @brief Calculates a perpendicular line to the given one that passes by the specified point.
+ * @tparam T A point type, ie: SDL_Point, ktp::Point.
+ * @tparam U A point type, ie: SDL_Point, ktp::Point.
+ * @tparam V A point type, ie: SDL_Point, ktp::Point.
+ * @param begin The starting point of the line to calculate the perpendicular from.
+ * @param end The ending point of the line to calculate the perpendicular from.
+ * @param p_begin The starting point of the perpendicular.
+ * @param p_end The starting point of the perpendicular.
+ * @param passes_by A point that the perpendicular must cross.
+ */
+template<typename T, typename U, typename V>
+void perpendicular(const T& begin, const T& end, U& p_begin, U& p_end, const V& passes_by) {
+  p_begin.x = passes_by.x - (end.y - begin.y);
+  p_begin.y = passes_by.y + (end.x - begin.x);
+  p_end.x   = passes_by.x + (end.y - begin.y);
+  p_end.y   = passes_by.y - (end.x - begin.x);
+}
+
+/**
+ * @brief Calculates a perpendicular line to the given one.
+ * @tparam T A point type, ie: SDL_Point, ktp::Point.
+ * @tparam U A point type, ie: SDL_Point, ktp::Point.
+ * @param begin The starting point of the line to calculate the perpendicular from.
+ * @param end The ending point of the line to calculate the perpendicular from.
+ * @param p_begin The starting point of the perpendicular.
+ * @param p_end The starting point of the perpendicular.
+ */
+template<typename T, typename U>
+inline void perpendicular(const T& begin, const T& end, U& p_begin, U& p_end) {
+  perpendicular(begin, end, p_begin, p_end, SDL_FPoint{0.f, 0.f});
+}
+
+template<typename T, typename U>
+auto perpendicular(const T& begin, const T& end, const U& passes_by) {
+  Line<T> pp_line {};
+  perpendicular(begin, end, pp_line.begin, pp_line.end, passes_by);
+  return pp_line;
+}
+
+template<typename T>
+auto perpendicular(const T& begin, const T& end) {
+  Line<T> pp_line {};
+  perpendicular(begin, end, pp_line.begin, pp_line.end, SDL_FPoint{0.f, 0.f});
+  return pp_line;
+}
+
+template<typename T, typename U>
+inline void perpendicular(const Line<T>& line, Line<T>& pp_line, const U& passes_by) {
+  perpendicular(line.begin, line.end, pp_line.begin, pp_line.end, passes_by);
+}
+
+template<typename T>
+inline void perpendicular(const Line<T>& line, Line<T>& pp_line) {
+  perpendicular(line.begin, line.end, pp_line.begin, pp_line.end, SDL_FPoint{0.f, 0.f});
+}
+
+template<typename T, typename U>
+auto perpendicular(const Line<T>& line, const U& passes_by) {
+  Line<T> pp_line {};
+  perpendicular(line.begin, line.end, pp_line.begin, pp_line.end, passes_by);
+  return pp_line;
+}
+
+template<typename T>
+auto perpendicular(const Line<T>& line) {
+  Line<T> pp_line {};
+  perpendicular(line.begin, line.end, pp_line.begin, pp_line.end, SDL_FPoint{0.f, 0.f});
+  return pp_line;
+}
+
+/**
+ * @brief
+ * @tparam T
+ * @tparam U
+ * @tparam V
+ * @tparam W
+ * @tparam X
+ * @tparam Y
+ * @param polygon
+ * @param u
+ * @param v
+ * @param w
+ * @param n
+ * @param vec
+ * @return true
  */
 template<typename T, typename U, typename V, typename W, typename X, typename Y>
 bool snip(const std::vector<T>& polygon, U u, V v, W w, X n, const std::vector<Y>& vec) {

@@ -30,7 +30,7 @@ class XParticlePhysicsComponent: public PhysicsComponent {
   XParticlePhysicsComponent& operator=(const XParticlePhysicsComponent& other) = delete;
   XParticlePhysicsComponent& operator=(XParticlePhysicsComponent&& other) noexcept;
 
-  virtual void collide(GameEntity* other) override { collided_ = true; }
+  virtual void collide(const GameEntity* other) override { collided_ = true; }
   inline auto detonationTime() const { return detonation_time_; }
   inline auto duration() const { return duration_; }
   inline auto radius() const { return radius_; }

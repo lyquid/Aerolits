@@ -24,14 +24,15 @@ class PhysicsComponent {
   inline auto& shape() { return shape_; }
   inline auto size() const { return size_; }
 
-  virtual void collide(GameEntity*) = 0;
+  virtual void collide(const GameEntity*) = 0;
   virtual void update(const GameEntity&, float) = 0;
 
-  static void setScreenSize(const SDL_FPoint& screen_size) {
-    b2_screen_size_.x = screen_size.x / kMetersToPixels;
-    b2_screen_size_.y = screen_size.y / kMetersToPixels;
+  static inline auto& b2ScreenSize() { return b2_screen_size_; }
+  static inline void setScreenSize(const SDL_FPoint& screen_size) {
+    b2_screen_size_.x = screen_size.x * kPixelsToMeters;
+    b2_screen_size_.y = screen_size.y * kPixelsToMeters;
   }
-  static void setWorld(b2World* world) { world_ = world; }
+  static inline void setWorld(b2World* world) { world_ = world; }
 
  protected:
 

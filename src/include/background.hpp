@@ -45,7 +45,7 @@ class BackgroundPhysicsComponent: public PhysicsComponent {
   BackgroundPhysicsComponent& operator=(const BackgroundPhysicsComponent& other) = delete;
   BackgroundPhysicsComponent& operator=(BackgroundPhysicsComponent&& other) noexcept;
 
-  virtual void collide(GameEntity* other) override {}
+  virtual void collide(const GameEntity* other) override {}
   virtual void update(const GameEntity& background, float delta_time) override;
 
  private:

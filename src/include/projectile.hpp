@@ -38,7 +38,7 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
   ProjectilePhysicsComponent& operator=(const ProjectilePhysicsComponent& other) = delete;
   ProjectilePhysicsComponent& operator=(ProjectilePhysicsComponent&& other) noexcept;
 
-  inline void collide(GameEntity* other) override { collided_ = true; }
+  inline void collide(const GameEntity* other) override { collided_ = true; }
   void detonate();
   inline auto speed() const { return speed_; }
   virtual void update(const GameEntity& projectile, float delta_time) override;

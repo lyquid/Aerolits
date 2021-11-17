@@ -1,103 +1,63 @@
 #pragma once
 
-#include "game_entity.hpp"
 #include <box2d/box2d.h>
 
 namespace ktp {
 
+/**
+ * @brief Implement this class to get contact information.
+ * You can use these results for things like sounds and game logic.
+ * You can also get contact results by traversing the contact lists
+ * after the time step. However, you might miss some contacts because
+ * continuous physics leads to sub-stepping. Additionally you may
+ * receive multiple callbacks for the same contact in a single time
+ * step. You should strive to make your callbacks efficient because
+ * there may be many callbacks per time step.
+ */
 class ContactListener: public b2ContactListener {
 
  public:
 
   /**
    * @brief Called when two fixtures begin to touch.
-   *
    * @param contact
    */
-  virtual void BeginContact(b2Contact* contact) override {
-    if (!contact->GetFixtureA()->GetBody()->GetUserData().pointer
-     || !contact->GetFixtureB()->GetBody()->GetUserData().pointer) return;
-
-    const auto fixture_A = reinterpret_cast<GameEntity*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
-    const auto fixture_B = reinterpret_cast<GameEntity*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
-
-    switch (fixture_A->type()) {
-      case EntityTypes::Aerolite:
-        if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
-          // kill player
-        } else if (fixture_B->type() == EntityTypes::ExplosionParticle) {
-          fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
-        } else if (fixture_B->type() == EntityTypes::Projectile) {
-          // fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
-        }
-        break;
-      case EntityTypes::Background:
-        break;
-      case EntityTypes::ExplosionParticle:
-        if (fixture_B->type() == EntityTypes::Aerolite) {
-          fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
-        } else if (fixture_B->type() == EntityTypes::Projectile) {
-          fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
-        }
-        break;
-      case EntityTypes::Player:
-        break;
-      case EntityTypes::PlayerDemo:
-        break;
-      case EntityTypes::Projectile:
-        if (fixture_B->type() == EntityTypes::Aerolite) {
-          fixture_A->physics()->collide(fixture_B);
-          // fixture_B->physics()->collide(fixture_A);
-        } else if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
-          // kill player or something
-        } else if (fixture_B->type() == EntityTypes::ExplosionParticle) {
-          fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
-        } else if (fixture_B->type() == EntityTypes::Projectile) {
-          fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
-        }
-        break;
-      case EntityTypes::Undefined:
-      case EntityTypes::count:
-      default:
-        return;
-    }
-  }
+  virtual void BeginContact(b2Contact* contact) override;
 
   /**
    * @brief Called when two fixtures cease to touch.
-   *
    * @param contact
    */
   virtual void EndContact(b2Contact* contact) override {}
 
- private:
+  /**
+   * @brief This lets you inspect a contact after the solver is finished.
+   * This is useful for inspecting impulses. Note: the contact manifold
+   * does not include time of impact impulses, which can be arbitrarily
+   * large if the sub-step is small. Hence the impulse is provided explicitly
+   * in a separate data structure. Note: this is only called for contacts that
+   * are touching, solid, and awake.
+   * @param contact
+   * @param impulse
+   */
+  virtual void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override {}
 
-  std::string checkType(EntityTypes type) const {
-    switch (type) {
-      case EntityTypes::Aerolite:
-        return "Aerolite";
-        break;
-      case EntityTypes::Background:
-        return "Background";
-        break;
-      case EntityTypes::Player:
-        return "Player";
-        break;
-      case EntityTypes::PlayerDemo:
-        return "PlayerDemo";
-        break;
-      case EntityTypes::Projectile:
-        return "Projectile";
-        break;
-    }
-    return "nothing";
-  }
+  /**
+   * @brief This is called after a contact is updated. This allows you to
+   * inspect a contact before it goes to the solver. If you are careful,
+   * you can modify the contact manifold (e.g. disable contact). A copy
+   * of the old manifold is provided so that you can detect changes.
+   * Note: this is called only for awake bodies.
+   * Note: this is called even when the number of contact points is zero.
+   * Note: this is not called for sensors. Note: if you set the number of
+   * contact points to zero, you will not get an EndContact callback.
+   * However, you may get a BeginContact callback the next step.
+   * @param contact
+   * @param oldManifold
+   */
+  virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override {}
+
+ private:
 };
 
 } // namespace ktp

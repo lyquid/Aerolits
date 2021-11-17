@@ -49,6 +49,7 @@ add_executable(Aerolits main.cpp
                         src/aerolite.cpp
                         src/background.cpp
                         src/config_parser.cpp
+                        src/contact_listener.cpp
                         src/emitter.cpp
                         src/explosion.cpp
                         src/game.cpp

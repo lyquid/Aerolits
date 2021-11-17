@@ -1,6 +1,7 @@
 #ifndef KTP_SDL2_WRAPPERS_SDL2_RENDERER_HPP_
 #define KTP_SDL2_WRAPPERS_SDL2_RENDERER_HPP_
 
+#include "sdl2_geometry.hpp"
 #include "sdl2_window.hpp"
 #include <SDL.h>
 #include <box2d/box2d.h>
@@ -119,7 +120,6 @@ class SDL2_Renderer {
 
   /**
    * @brief
-   *
    * @param x1
    * @param y1
    * @param x2
@@ -133,7 +133,6 @@ class SDL2_Renderer {
 
   /**
    * @brief
-   *
    * @param x1
    * @param y1
    * @param x2
@@ -143,6 +142,17 @@ class SDL2_Renderer {
    */
   inline auto drawLine(float x1, float y1, float x2, float y2) const {
     return SDL_RenderDrawLine(renderer_, x1, y1, x2, y2) == 0 ? true : false;
+  }
+
+  /**
+   * @brief
+   * @tparam T
+   * @param line
+   * @return auto
+   */
+  template<typename T>
+  inline auto drawLine(Geometry::Line<T> line) const {
+    return SDL_RenderDrawLine(renderer_, line.begin.x, line.begin.y, line.end.x, line.end.y) == 0 ? true : false;
   }
 
   /**

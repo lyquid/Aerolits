@@ -4,6 +4,7 @@
 #include "graphics_component.hpp"
 #include "palette.hpp"
 #include "physics_component.hpp"
+#include "../sdl2_wrappers/sdl2_geometry.hpp"
 #include <box2d/box2d.h>
 #include <SDL.h>
 #include <utility> // std::move std::exchange
@@ -12,6 +13,7 @@
 namespace ktp {
 
 using B2Vec2Vector = std::vector<b2Vec2>;
+using B2Line = Geometry::Line<b2Vec2>;
 
 class GameEntity;
 class SDL2_Renderer;
@@ -35,10 +37,12 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   AerolitePhysicsComponent& operator=(const AerolitePhysicsComponent& other) = delete;
   AerolitePhysicsComponent& operator=(AerolitePhysicsComponent&& other) noexcept;
 
-  inline void collide(GameEntity* other) override { collided_ = true; }
-  void resize(float size);
-  static void spawnAerolite();
+  inline void collide(const GameEntity* other) override { collided_ = true; }
+  void reshape(float size);
+  static GameEntity* spawnAerolite(const b2Vec2& where);
+  static GameEntity* spawnMovingAerolite();
   virtual void update(const GameEntity& aerolite, float delta_time) override;
+  inline auto worldManifold() { return &world_manifold_; }
 
  private:
 
@@ -48,7 +52,7 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   void split();
   void transformRenderShape();
 
-  static constexpr float kMinSize_ {0.5f};
+  static constexpr float kMinSize_ {0.8f};
   static constexpr unsigned int kMaxSides_ {30u};
   static constexpr unsigned int kMinSides_ {25u};
   static constexpr unsigned int kScore_ {1000u};
@@ -68,6 +72,10 @@ class AerolitePhysicsComponent: public PhysicsComponent {
    * Usefull to know when an aerolite must be removed for leaving the screen.
    */
   bool new_born_ {true};
+  /**
+   * @brief Used for contacts information.
+   */
+  b2WorldManifold world_manifold_ {};
 };
 
 } // namespace ktp

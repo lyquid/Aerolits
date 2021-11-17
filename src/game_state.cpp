@@ -245,7 +245,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
       }
     }
   }
-  if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnAerolite();
+  if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnMovingAerolite();
 
   game.event_bus_.processEvents();
 }
@@ -266,9 +266,12 @@ void ktp::TestingState::draw(Game& game) {
 
 ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
+  Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
   GameEntity::createEntity(EntityTypes::Background);
+  const auto player {GameEntity::createEntity(EntityTypes::Player)};
+  player->physics()->body()->SetTransform({PhysicsComponent::b2ScreenSize().x * 0.25f, PhysicsComponent::b2ScreenSize().y * 0.5f}, 1.5707963268f);
+  AerolitePhysicsComponent::spawnAerolite({PhysicsComponent::b2ScreenSize().x * 0.75f, PhysicsComponent::b2ScreenSize().y * 0.5f});
   game.gui_sys_.resetScore();
-  game.test_.generateShape(100);
   return this;
 }
 
@@ -281,6 +284,13 @@ void ktp::TestingState::handleEvents(Game& game) {
       case SDL_KEYDOWN:
         handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
+      case SDL_MOUSEBUTTONDOWN: {
+        int x{0}, y{0};
+        if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+          AerolitePhysicsComponent::spawnAerolite({(float)x * kPixelsToMeters, (float)y * kPixelsToMeters});
+        }
+        break;
+      }
       default: break;
     }
   }
@@ -295,10 +305,14 @@ void ktp::TestingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.debug_draw_on_ = !game.debug_draw_on_;
       break;
     case SDLK_F2:
-      game.test_.drawTriangles();
+      // game.test_.drawTriangles();
       break;
     case SDLK_SPACE:
-      game.test_.generateShape(100);
+      // game.test_.generateShape(100);
+      break;
+    case SDLK_r:
+      game.state_ = goToState(game, GameState::testing_);
+      break;
     default:
       break;
   }
@@ -319,7 +333,7 @@ void ktp::TestingState::update(Game& game, float delta_time) {
       }
     }
   }
-  // if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnAerolite();
+  //if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnMovingAerolite();
   game.event_bus_.processEvents();
 }
 
