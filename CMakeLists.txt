@@ -40,21 +40,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   endif()
 endif()
 
-add_executable(Aerolits main.cpp
-                        lib/pugixml1.11/pugixml.cpp
-                        src/aerolite.cpp
-                        src/background.cpp
-                        src/config_parser.cpp
-                        src/contact_listener.cpp
-                        src/emitter.cpp
-                        src/explosion.cpp
-                        src/game.cpp
-                        src/game_state.cpp
-                        src/input_component.cpp
-                        src/particle.cpp
-                        src/player.cpp
-                        src/projectile.cpp
-                        src/testing.cpp)
+add_executable(Aerolits main.cpp lib/pugixml1.11/pugixml.cpp)
 
 target_compile_features(Aerolits PUBLIC cxx_std_17)
 set_target_properties(Aerolits PROPERTIES CXX_EXTENSIONS OFF)
@@ -85,12 +71,7 @@ if(DEFINED CMAKE_TOOLCHAIN_FILE)
 	find_package(sdl2-ttf CONFIG REQUIRED)
 	find_package(sdl2-mixer CONFIG REQUIRED)
 	find_package(box2d CONFIG REQUIRED)
-	target_link_libraries(Aerolits PRIVATE box2d::box2d KUGE)
-  target_include_directories(Aerolits PRIVATE
-                          "${Aerolits_SOURCE_DIR}/src/include"
-                          "${Aerolits_SOURCE_DIR}/src/kuge"
-                          "${Aerolits_SOURCE_DIR}/src/sdl2_wrappers"
-  )
+	target_link_libraries(Aerolits PRIVATE box2d::box2d Aerolits_src)
 else()
 	message(STATUS "Using cmake find modules")
 	find_package(SDL2 REQUIRED)
@@ -100,14 +81,10 @@ else()
 	include_directories(${SDL2_MIXER_INCLUDE_DIR})
 	set(box2d_DIR "H:/GRUPOS/ACREDITACIONES/TRABAJADORES_CA/ALEX/PrOG/repos/box2d-2.4.1/build/src/CMakeFiles/Export/lib/cmake/box2d")
 	find_package(box2d CONFIG REQUIRED)
-  target_link_libraries(Aerolits PRIVATE box2d::box2d KUGE)
-  target_include_directories(Aerolits PRIVATE
-                          "${Aerolits_SOURCE_DIR}/src/include"
-                          "${Aerolits_SOURCE_DIR}/src/kuge"
-                          "${Aerolits_SOURCE_DIR}/src/sdl2_wrappers"
-  )
+  target_link_libraries(Aerolits PRIVATE box2d::box2d Aerolits_src)
 endif()
 
+add_subdirectory(src)
 add_subdirectory(src/kuge)
 add_subdirectory(src/sdl2_wrappers)
 
