@@ -42,8 +42,6 @@ endif()
 
 add_executable(Aerolits main.cpp
                         lib/pugixml1.11/pugixml.cpp
-                        src/kuge/event.cpp
-                        src/kuge/system.cpp
                         src/aerolite.cpp
                         src/background.cpp
                         src/config_parser.cpp
@@ -87,7 +85,7 @@ if(DEFINED CMAKE_TOOLCHAIN_FILE)
 	find_package(sdl2-ttf CONFIG REQUIRED)
 	find_package(sdl2-mixer CONFIG REQUIRED)
 	find_package(box2d CONFIG REQUIRED)
-	target_link_libraries(Aerolits PRIVATE box2d::box2d SDL2_wrappers)
+	target_link_libraries(Aerolits PRIVATE box2d::box2d KUGE)
   target_include_directories(Aerolits PRIVATE
                           "${Aerolits_SOURCE_DIR}/src/include"
                           "${Aerolits_SOURCE_DIR}/src/kuge"
@@ -102,7 +100,7 @@ else()
 	include_directories(${SDL2_MIXER_INCLUDE_DIR})
 	set(box2d_DIR "H:/GRUPOS/ACREDITACIONES/TRABAJADORES_CA/ALEX/PrOG/repos/box2d-2.4.1/build/src/CMakeFiles/Export/lib/cmake/box2d")
 	find_package(box2d CONFIG REQUIRED)
-  target_link_libraries(Aerolits PRIVATE box2d::box2d SDL2_wrappers)
+  target_link_libraries(Aerolits PRIVATE box2d::box2d KUGE)
   target_include_directories(Aerolits PRIVATE
                           "${Aerolits_SOURCE_DIR}/src/include"
                           "${Aerolits_SOURCE_DIR}/src/kuge"
@@ -110,6 +108,7 @@ else()
   )
 endif()
 
+add_subdirectory(src/kuge)
 add_subdirectory(src/sdl2_wrappers)
 
 install(TARGETS Aerolits RUNTIME DESTINATION ${BIN_DIR})
