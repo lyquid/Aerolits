@@ -14,6 +14,10 @@ project(
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+# Use our modified FindSDL2* modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${Aerolits_SOURCE_DIR}/cmake")
+# Set an output directory for our binaries
+set(BIN_DIR ${Aerolits_SOURCE_DIR}/bin)
 
 # Let's nicely support folders in IDEs
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -40,12 +44,6 @@ add_executable(Aerolits main.cpp
                         lib/pugixml1.11/pugixml.cpp
                         src/kuge/event.cpp
                         src/kuge/system.cpp
-                        src/sdl2_wrappers/sdl2_audio.cpp
-                        src/sdl2_wrappers/sdl2_geometry.cpp
-                        src/sdl2_wrappers/sdl2_renderer.cpp
-                        src/sdl2_wrappers/sdl2_sound.cpp
-                        src/sdl2_wrappers/sdl2_texture.cpp
-                        src/sdl2_wrappers/sdl2_window.cpp
                         src/aerolite.cpp
                         src/background.cpp
                         src/config_parser.cpp
@@ -62,9 +60,6 @@ add_executable(Aerolits main.cpp
 
 target_compile_features(Aerolits PUBLIC cxx_std_17)
 set_target_properties(Aerolits PROPERTIES CXX_EXTENSIONS OFF)
-
-# Use our modified FindSDL2* modules
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${Aerolits_SOURCE_DIR}/cmake")
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 	set(MY_DEBUG_OPTIONS /Wall /RTC)
@@ -85,9 +80,6 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
 	target_compile_options(Aerolits PUBLIC "$<$<CONFIG:RELEASE>:${MY_RELEASE_OPTIONS}>")
 endif()
 
-# Set an output directory for our binaries
-set(BIN_DIR ${Aerolits_SOURCE_DIR}/bin)
-
 if(DEFINED CMAKE_TOOLCHAIN_FILE)
 	message(STATUS "Using vcpkg toolchain file")
 	find_package(SDL2 CONFIG REQUIRED)
@@ -95,7 +87,12 @@ if(DEFINED CMAKE_TOOLCHAIN_FILE)
 	find_package(sdl2-ttf CONFIG REQUIRED)
 	find_package(sdl2-mixer CONFIG REQUIRED)
 	find_package(box2d CONFIG REQUIRED)
-	target_link_libraries(Aerolits PRIVATE SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_ttf SDL2::SDL2_mixer box2d::box2d)
+	target_link_libraries(Aerolits PRIVATE box2d::box2d SDL2_wrappers)
+  target_include_directories(Aerolits PRIVATE
+                          "${Aerolits_SOURCE_DIR}/src/include"
+                          "${Aerolits_SOURCE_DIR}/src/kuge"
+                          "${Aerolits_SOURCE_DIR}/src/sdl2_wrappers"
+  )
 else()
 	message(STATUS "Using cmake find modules")
 	find_package(SDL2 REQUIRED)
@@ -105,8 +102,15 @@ else()
 	include_directories(${SDL2_MIXER_INCLUDE_DIR})
 	set(box2d_DIR "H:/GRUPOS/ACREDITACIONES/TRABAJADORES_CA/ALEX/PrOG/repos/box2d-2.4.1/build/src/CMakeFiles/Export/lib/cmake/box2d")
 	find_package(box2d CONFIG REQUIRED)
-	target_link_libraries(Aerolits PRIVATE ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_MIXER_LIBRARY} box2d::box2d)
+  target_link_libraries(Aerolits PRIVATE box2d::box2d SDL2_wrappers)
+  target_include_directories(Aerolits PRIVATE
+                          "${Aerolits_SOURCE_DIR}/src/include"
+                          "${Aerolits_SOURCE_DIR}/src/kuge"
+                          "${Aerolits_SOURCE_DIR}/src/sdl2_wrappers"
+  )
 endif()
+
+add_subdirectory(src/sdl2_wrappers)
 
 install(TARGETS Aerolits RUNTIME DESTINATION ${BIN_DIR})
 
