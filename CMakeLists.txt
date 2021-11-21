@@ -42,6 +42,8 @@ endif()
 
 if(DEFINED CMAKE_TOOLCHAIN_FILE)
 	message(STATUS "Using vcpkg toolchain file")
+  # For Windows: Prevent overriding the parent project's compiler/linker settings
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 	find_package(SDL2 CONFIG REQUIRED)
 	find_package(sdl2-image CONFIG REQUIRED)
 	find_package(sdl2-ttf CONFIG REQUIRED)
@@ -61,6 +63,7 @@ endif()
 add_subdirectory(src)
 add_subdirectory(src/kuge)
 add_subdirectory(src/sdl2_wrappers)
+add_subdirectory(tests)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

@@ -6,6 +6,7 @@
       "sdl2-image",
       "sdl2-mixer",
       "sdl2-ttf",
-      "box2d"
+      "box2d",
+      "gtest"
   ]
 }
