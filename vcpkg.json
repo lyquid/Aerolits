@@ -7,5 +7,9 @@
       "sdl2-mixer",
       "sdl2-ttf",
       "box2d"
+  ],
+  "builtin-baseline": "59a3f35e7e5a3281e59863a4a0123c325899f8f9",
+  "overrides": [
+    { "name": "freetype", "version": "2.10.4" }
   ]
 }
