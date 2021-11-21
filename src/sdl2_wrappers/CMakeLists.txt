@@ -24,3 +24,5 @@ else()
     box2d::box2d
   )
 endif()
+
+add_subdirectory(tests)

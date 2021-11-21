@@ -5,6 +5,8 @@ add_library(KUGE
 
 target_link_libraries(KUGE PRIVATE SDL2::SDL2 SDL2_wrappers box2d::box2d)
 
+add_subdirectory(tests)
+
 # if(DEFINED CMAKE_TOOLCHAIN_FILE)
 #   target_link_libraries(KUGE PRIVATE
 #     SDL2::SDL2

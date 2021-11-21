@@ -63,7 +63,6 @@ endif()
 add_subdirectory(src)
 add_subdirectory(src/kuge)
 add_subdirectory(src/sdl2_wrappers)
-add_subdirectory(tests)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

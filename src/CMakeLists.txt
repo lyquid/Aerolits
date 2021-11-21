@@ -41,3 +41,5 @@ target_link_libraries(Aerolits PRIVATE SDL2::SDL2 box2d::box2d KUGE)
 target_include_directories(Aerolits PRIVATE "${Aerolits_SOURCE_DIR}/src/include")
 
 install(TARGETS Aerolits RUNTIME DESTINATION ${BIN_DIR})
+
+add_subdirectory(tests)
