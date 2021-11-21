@@ -60,6 +60,7 @@ struct Triangle {
 template<typename T>
 float area(const std::vector<T>& polygon) {
   const auto points {polygon.size()};
+  if (points < 3) return 0.f;
   auto area {0.f};
 
   for (std::size_t p = points - 1, q = 0; q < points; p = q++) {
@@ -78,7 +79,7 @@ float area(const std::vector<T>& polygon) {
  */
 template<typename T>
 inline auto distanceBetweenPoints(T a, T b) {
-  return SDL_sqrtf((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
+  return SDL_sqrtf(((b.x - a.x) * (b.x - a.x)) + ((b.y - a.y) * (b.y - a.y)));
 }
 
 /**
