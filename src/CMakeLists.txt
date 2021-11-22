@@ -37,7 +37,20 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
 	target_compile_options(Aerolits PUBLIC "$<$<CONFIG:RELEASE>:${MY_RELEASE_OPTIONS}>")
 endif()
 
-target_link_libraries(Aerolits PRIVATE SDL2::SDL2 box2d::box2d KUGE)
+if(DEFINED CMAKE_TOOLCHAIN_FILE)
+  target_link_libraries(Aerolits PRIVATE
+    SDL2::SDL2
+    box2d::box2d
+    KUGE)
+else()
+  target_link_libraries(Aerolits PRIVATE
+    ${SDL2_LIBRARY}
+    box2d::box2d
+    KUGE
+  )
+endif()
+
+#target_link_libraries(Aerolits PRIVATE SDL2::SDL2 box2d::box2d KUGE)
 target_include_directories(Aerolits PRIVATE "${Aerolits_SOURCE_DIR}/src/include")
 
 install(TARGETS Aerolits RUNTIME DESTINATION ${BIN_DIR})

@@ -58,6 +58,7 @@ else()
 	include_directories(${SDL2_MIXER_INCLUDE_DIR})
 	set(box2d_DIR "H:/GRUPOS/ACREDITACIONES/TRABAJADORES_CA/ALEX/PrOG/repos/box2d-2.4.1/build/src/CMakeFiles/Export/lib/cmake/box2d")
 	find_package(box2d CONFIG REQUIRED)
+  set(GTEST_INCLUDE_DIR "H:/GRUPOS/ACREDITACIONES/TRABAJADORES_CA/ALEX/PrOG/repos/googletest-release-1.11.0/googletest/include/gtest")
 endif()
 
 add_subdirectory(src)
