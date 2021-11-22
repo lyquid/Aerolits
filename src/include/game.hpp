@@ -77,6 +77,8 @@ class Game {
   ContactListener contact_listener_ {};
   // Testing
   Testing test_ {};
+
+  SDL2_GLEW glew_ {};
 };
 
 } // end namespace ktp

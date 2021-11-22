@@ -38,7 +38,8 @@ bool ktp::Game::init() {
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
   if (!initSDL2()) return false;
   logMessage("Box2D version: " + std::to_string(b2_version.major) + '.' + std::to_string(b2_version.minor) + '.' + std::to_string(b2_version.revision));
-  if (!main_window_.create(kuge::GUISystem::kTitleText_ , screen_size_)) return false;
+  if (!main_window_.create(kuge::GUISystem::kTitleText_ , screen_size_, SDL_WINDOW_OPENGL)) return false;
+  glew_.init(main_window_.getWindow());
   if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;
   if (!loadResources()) return false;
   if (!gui_sys_.init(renderer_)) return false;
@@ -51,8 +52,8 @@ bool ktp::Game::init() {
   PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});
   PhysicsComponent::setWorld(&world_);
 
-  state_ = GameState::goToState(*this, GameState::title_);
-  //state_ = GameState::goToState(*this, GameState::testing_);
+  //state_ = GameState::goToState(*this, GameState::title_);
+  state_ = GameState::goToState(*this, GameState::testing_);
 
   return true;
 }

@@ -4,6 +4,8 @@
 #include "sdl2_audio.hpp"
 #include "sdl2_font.hpp"
 #include "sdl2_fps.hpp"
+#include "sdl2_geometry.hpp"
+#include "sdl2_glew.hpp"
 #include "sdl2_image.hpp"
 #include "sdl2_log.hpp"
 #include "sdl2_music.hpp"
