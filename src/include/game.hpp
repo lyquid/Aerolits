@@ -78,7 +78,7 @@ class Game {
   // Testing
   Testing test_ {};
 
-  SDL2_GLEW glew_ {};
+  SDL2_GLContext context_ {};
 };
 
 } // end namespace ktp

@@ -1,32 +1,25 @@
 #pragma once
 
-#include "random.hpp"
 #include "../sdl2_wrappers/sdl2_geometry.hpp"
-#include "../sdl2_wrappers/sdl2_renderer.hpp"
-#include <SDL.h>
-#include <vector>
+#include "../sdl2_wrappers/sdl2_opengl.hpp"
 
 namespace ktp {
 
 class Testing {
  public:
   Testing();
-  void draw(const SDL2_Renderer& ren) const;
-  inline void generateShape(float max_size) { generateShape(max_size, generateRand(15, 20)); }
-  void generateShape(float max_size, int sides);
-  // inline void drawTriangles() { draw_triangles_ = !draw_triangles_; }
+  ~Testing() { glDeleteProgram(gProgramID_); }
+  void draw() const;
+  bool initGL();
 
  private:
 
-  // Geometry::Polygon polygon_ {};
-  // Geometry::Polygon test_polygon_ {};
-  // std::vector<Geometry::Polygon> triangles_ {};
-  // std::vector<Geometry::Polygon> test_triangles_ {};
+  GLuint gProgramID_ = 0;
+  GLint gVertexPos2DLocation_ = -1;
+  GLuint gVBO_ = 0;
+  GLuint gIBO_ = 0;
 
-  // static constexpr auto kPI {3.14159265359};
-  // const SDL_FPoint center_ {683, 384};
-  // const SDL_FPoint test_center_ {50, 50};
-  // bool draw_triangles_ {};
+  bool gRenderQuad_ = true;
 };
 
 } // namespace ktp

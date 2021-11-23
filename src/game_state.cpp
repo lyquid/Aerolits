@@ -253,30 +253,19 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
 /* TESTING STATE */
 
 void ktp::TestingState::draw(Game& game) {
-  game.renderer_.clear();
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-    if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw(game.renderer_);
-    }
-  }
-  game.test_.draw(game.renderer_);
-  if (game.debug_draw_on_) game.world_.DebugDraw();
-  game.renderer_.present();
+  glClear(GL_COLOR_BUFFER_BIT);
+  game.test_.draw();
+  SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
 ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
-  GameEntity::createEntity(EntityTypes::Background);
-  const auto player {GameEntity::createEntity(EntityTypes::Player)};
-  player->physics()->body()->SetTransform({PhysicsComponent::b2ScreenSize().x * 0.25f, PhysicsComponent::b2ScreenSize().y * 0.5f}, 1.5707963268f);
-  AerolitePhysicsComponent::spawnAerolite({PhysicsComponent::b2ScreenSize().x * 0.75f, PhysicsComponent::b2ScreenSize().y * 0.5f});
-  game.gui_sys_.resetScore();
   return this;
 }
 
 void ktp::TestingState::handleEvents(Game& game) {
-    while (SDL_PollEvent(&sdl_event_)) {
+  while (SDL_PollEvent(&sdl_event_)) {
     switch (sdl_event_.type) {
       case SDL_QUIT:
         game.quit_ = true;
@@ -287,7 +276,7 @@ void ktp::TestingState::handleEvents(Game& game) {
       case SDL_MOUSEBUTTONDOWN: {
         int x{0}, y{0};
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          AerolitePhysicsComponent::spawnAerolite({(float)x * kPixelsToMeters, (float)y * kPixelsToMeters});
+          // AerolitePhysicsComponent::spawnAerolite({(float)x * kPixelsToMeters, (float)y * kPixelsToMeters});
         }
         break;
       }
@@ -324,15 +313,15 @@ void ktp::TestingState::update(Game& game, float delta_time) {
   // Box2D
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
-  for (std::size_t i = 0; i < GameEntity::game_entities_.capacity(); ++i) {
-    if (GameEntity::game_entities_[i].active_) {
-      if (GameEntity::game_entities_[i].object_.canBeDeactivated()) {
-        GameEntity::game_entities_[i].object_.free(i);
-      } else {
-        GameEntity::game_entities_[i].object_.update(delta_time);
-      }
-    }
-  }
+  // for (std::size_t i = 0; i < GameEntity::game_entities_.capacity(); ++i) {
+  //   if (GameEntity::game_entities_[i].active_) {
+  //     if (GameEntity::game_entities_[i].object_.canBeDeactivated()) {
+  //       GameEntity::game_entities_[i].object_.free(i);
+  //     } else {
+  //       GameEntity::game_entities_[i].object_.update(delta_time);
+  //     }
+  //   }
+  // }
   //if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnMovingAerolite();
   game.event_bus_.processEvents();
 }
