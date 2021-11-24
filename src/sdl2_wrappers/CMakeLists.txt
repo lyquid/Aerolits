@@ -10,6 +10,7 @@ add_library(SDL2_wrappers
 
 if(DEFINED CMAKE_TOOLCHAIN_FILE)
   target_link_libraries(SDL2_wrappers PRIVATE
+    OpenGL::GL
     GLEW::GLEW
     SDL2::SDL2
     SDL2::SDL2main
