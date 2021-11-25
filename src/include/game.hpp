@@ -57,7 +57,7 @@ class Game {
   bool paused_ {false};
   bool quit_ {false};
   SDL2_Window main_window_ {};
-  SDL2_Renderer renderer_ {};
+  //SDL2_Renderer renderer_ {};
   // State
   GameState* state_ {nullptr};
   // FPS

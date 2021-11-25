@@ -1,3 +1,4 @@
+#include "include/paths.hpp"
 #include "include/testing.hpp"
 #include "sdl2_wrappers/sdl2_geometry.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
@@ -5,7 +6,7 @@
 
 ktp::Testing::Testing() {}
 
-void ktp::Testing::draw() const {
+void ktp::Testing::draw_OLD() const {
   // Clear color buffer
   // glClear(GL_COLOR_BUFFER_BIT);
   // Render quad
@@ -25,6 +26,25 @@ void ktp::Testing::draw() const {
     // Unbind program
     glUseProgram(NULL);
   }
+}
+
+void ktp::Testing::draw() const {
+  // 1st attribute buffer : vertices
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
+  glVertexAttribPointer(
+    0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+    3,                  // size
+    GL_FLOAT,           // type
+    GL_FALSE,           // normalized?
+    0,                  // stride
+    (void*)0            // array buffer offset
+  );
+  // Use our shader
+  glUseProgram(program_id_);
+  // Draw the triangle !
+  glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+  glDisableVertexAttribArray(0);
 }
 
 bool ktp::Testing::initGL() {
@@ -111,4 +131,25 @@ bool ktp::Testing::initGL() {
     }
   }
   return success;
+}
+
+void ktp::Testing::tutorial() {
+  glGenVertexArrays(1, &vertex_array_id_);
+  glBindVertexArray(vertex_array_id_);
+
+  constexpr GLfloat vertex_buffer_data[] = {
+    -1.0f, -1.0f, 0.0f,
+     1.0f, -1.0f, 0.0f,
+     0.0f,  1.0f, 0.0f,
+  };
+
+  // Generate 1 buffer, put the resulting identifier in vertex_buffer_
+  glGenBuffers(1, &vertex_buffer_);
+  // The following commands will talk about our 'vertexbuffer' buffer
+  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
+  // Give our vertices to OpenGL.
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data), vertex_buffer_data, GL_STATIC_DRAW);
+
+  const auto path {getResourcesPath("shaders")};
+  program_id_ = SDL2_GLEW::loadShaders(path + "simple_vertex_shader.glsl", path + "simple_fragment_shader.glsl");
 }

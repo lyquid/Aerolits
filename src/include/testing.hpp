@@ -10,7 +10,9 @@ class Testing {
   Testing();
   ~Testing() { glDeleteProgram(gProgramID_); }
   void draw() const;
+  void draw_OLD() const;
   bool initGL();
+  void tutorial();
 
  private:
 
@@ -18,8 +20,12 @@ class Testing {
   GLint gVertexPos2DLocation_ = -1;
   GLuint gVBO_ = 0;
   GLuint gIBO_ = 0;
-
   bool gRenderQuad_ = true;
+
+  // tutorial
+  GLuint vertex_array_id_ {};
+  GLuint vertex_buffer_ {};
+  GLuint program_id_ {};
 };
 
 } // namespace ktp

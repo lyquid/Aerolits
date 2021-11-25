@@ -5,20 +5,14 @@
 #include <GL/glew.h>
 #include <SDL_opengl.h>
 #include <GL/GLU.h>
+#include <string>
 
 namespace ktp {
 
 class SDL2_GLContext {
  public:
-  ~SDL2_GLContext() { SDL_GL_DeleteContext(context_); }
+  ~SDL2_GLContext() { if (context_) SDL_GL_DeleteContext(context_); }
   /**
-   * @brief
-   * @return The SDL_GLContext context.
-   */
-  inline auto context() const { return context_; }
-
-  /**
-   * @brief
    * @return A read and write reference to the SDL_GLContext.
    */
   inline auto& context() { return context_; }
@@ -28,6 +22,8 @@ class SDL2_GLContext {
 
 namespace SDL2_GLEW {
   bool init(SDL_GLContext& context, SDL_Window* window);
+  GLuint loadShaders(const char* vertex_file_path, const char* fragment_file_path);
+  GLuint loadShaders(const std::string& vertex_file_path, const std::string& fragment_file_path);
   void printProgramLog(GLuint program);
   void printShaderLog(GLuint shader);
 } // namespace SDL2_GLEW

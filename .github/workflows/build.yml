@@ -26,8 +26,6 @@ jobs:
         cd /home/runner/work/
         git clone https://github.com/microsoft/vcpkg
         ./vcpkg/bootstrap-vcpkg.sh
-        git pull
-        ./vcpkg update
         ./vcpkg upgrade
 
     - name: Create Build Environment

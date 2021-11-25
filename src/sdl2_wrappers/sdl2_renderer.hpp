@@ -25,7 +25,7 @@ class SDL2_Renderer {
   SDL2_Renderer() = default;
   SDL2_Renderer(const SDL2_Renderer&) = delete;
   SDL2_Renderer(SDL2_Renderer&& other) noexcept { *this = std::move(other); }
-  ~SDL2_Renderer() { SDL_DestroyRenderer(renderer_); }
+  ~SDL2_Renderer() { if (renderer_) SDL_DestroyRenderer(renderer_); }
 
   SDL2_Renderer& operator=(const SDL2_Renderer&) = delete;
   SDL2_Renderer& operator=(SDL2_Renderer&& other) noexcept;

@@ -29,26 +29,26 @@ void ktp::GameState::setWindowTitle(Game& game) {
 /* DEMO STATE */
 
 void ktp::DemoState::draw(Game& game) {
-  game.renderer_.clear();
+  // game.renderer_.clear();
 
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-    if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw(game.renderer_);
-    }
-  }
+  // for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+  //   if (GameEntity::game_entities_[i].active_) {
+  //     GameEntity::game_entities_[i].object_.draw(game.renderer_);
+  //   }
+  // }
 
-  game.gui_sys_.scoreText().render(game.renderer_);
+  // game.gui_sys_.scoreText().render(game.renderer_);
 
-  if (blink_flag_) game.gui_sys_.demoText().render(game.renderer_);
+  // if (blink_flag_) game.gui_sys_.demoText().render(game.renderer_);
 
-  if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
-    blink_flag_ = !blink_flag_;
-    blink_timer_ = SDL2_Timer::SDL2Ticks();
-  }
+  // if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
+  //   blink_flag_ = !blink_flag_;
+  //   blink_timer_ = SDL2_Timer::SDL2Ticks();
+  // }
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  // if (game.debug_draw_on_) game.world_.DebugDraw();
 
-  game.renderer_.present();
+  // game.renderer_.present();
 }
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
@@ -103,26 +103,26 @@ void ktp::DemoState::update(Game& game, float delta_time) {
 /* PAUSED STATE */
 
 void ktp::PausedState::draw(Game& game) {
-  game.renderer_.clear();
+  // game.renderer_.clear();
 
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-    if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw(game.renderer_);
-    }
-  }
+  // for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+  //   if (GameEntity::game_entities_[i].active_) {
+  //     GameEntity::game_entities_[i].object_.draw(game.renderer_);
+  //   }
+  // }
 
-  game.gui_sys_.scoreText().render(game.renderer_);
+  // game.gui_sys_.scoreText().render(game.renderer_);
 
-  if (blink_flag_) game.gui_sys_.pausedText().render(game.renderer_);
+  // if (blink_flag_) game.gui_sys_.pausedText().render(game.renderer_);
 
-  if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
-    blink_flag_ = !blink_flag_;
-    blink_timer_ = SDL2_Timer::SDL2Ticks();
-  }
+  // if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
+  //   blink_flag_ = !blink_flag_;
+  //   blink_timer_ = SDL2_Timer::SDL2Ticks();
+  // }
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  // if (game.debug_draw_on_) game.world_.DebugDraw();
 
-  game.renderer_.present();
+  // game.renderer_.present();
 }
 
 ktp::GameState* ktp::PausedState::enter(Game& game) {
@@ -169,19 +169,19 @@ void ktp::PausedState::update(Game& game, float delta_time) {
 /* PLAYING STATE */
 
 void ktp::PlayingState::draw(Game& game) {
-  game.renderer_.clear();
+  // game.renderer_.clear();
 
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-    if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw(game.renderer_);
-    }
-  }
+  // for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+  //   if (GameEntity::game_entities_[i].active_) {
+  //     GameEntity::game_entities_[i].object_.draw(game.renderer_);
+  //   }
+  // }
 
-  game.gui_sys_.scoreText().render(game.renderer_);
+  // game.gui_sys_.scoreText().render(game.renderer_);
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  // if (game.debug_draw_on_) game.world_.DebugDraw();
 
-  game.renderer_.present();
+  // game.renderer_.present();
 }
 
 ktp::GameState* ktp::PlayingState::enter(Game& game) {
@@ -253,7 +253,9 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
 /* TESTING STATE */
 
 void ktp::TestingState::draw(Game& game) {
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  // game.test_.draw_OLD();
   game.test_.draw();
   SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
@@ -261,6 +263,7 @@ void ktp::TestingState::draw(Game& game) {
 ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
+  game.test_.tutorial();
   return this;
 }
 
@@ -276,6 +279,7 @@ void ktp::TestingState::handleEvents(Game& game) {
       case SDL_MOUSEBUTTONDOWN: {
         int x{0}, y{0};
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+          logMessage("clicked " + std::to_string(x) + ", " + std::to_string(y));
           // AerolitePhysicsComponent::spawnAerolite({(float)x * kPixelsToMeters, (float)y * kPixelsToMeters});
         }
         break;
@@ -329,18 +333,18 @@ void ktp::TestingState::update(Game& game, float delta_time) {
 /* TITLE STATE */
 
 void ktp::TitleState::draw(Game& game) {
-  game.renderer_.clear();
+  // game.renderer_.clear();
 
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-    if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Background) {
-      GameEntity::game_entities_[i].object_.draw(game.renderer_);
-      break;
-    }
-  }
+  // for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+  //   if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Background) {
+  //     GameEntity::game_entities_[i].object_.draw(game.renderer_);
+  //     break;
+  //   }
+  // }
 
-  game.gui_sys_.titleText().render(game.renderer_);
+  // game.gui_sys_.titleText().render(game.renderer_);
 
-  game.renderer_.present();
+  // game.renderer_.present();
 }
 
 ktp::GameState* ktp::TitleState::enter(Game& game) {

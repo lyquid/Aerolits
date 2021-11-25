@@ -41,7 +41,7 @@ bool ktp::Game::init() {
   if (!main_window_.create(kuge::GUISystem::kTitleText_ , screen_size_, SDL_WINDOW_OPENGL)) return false;
 
   SDL2_GLEW::init(context_.context(), main_window_.getWindow());
-  test_.initGL();
+  // test_.initGL();
 
   // if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;
   if (!loadResources()) return false;
