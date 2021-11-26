@@ -2,6 +2,8 @@
 
 #include "../sdl2_wrappers/sdl2_geometry.hpp"
 #include "../sdl2_wrappers/sdl2_opengl.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace ktp {
 
@@ -26,6 +28,13 @@ class Testing {
   GLuint vertex_array_id_ {};
   GLuint vertex_buffer_ {};
   GLuint program_id_ {};
+
+  glm::mat4 projection_ {};
+  glm::mat4 view_ {};
+  // Model matrix : an identity matrix (model will be at the origin)
+  glm::mat4 model_ {glm::mat4{1.0f}};
+  glm::mat4 mvp_ {};
+  GLuint matrix_id_ {};
 };
 
 } // namespace ktp

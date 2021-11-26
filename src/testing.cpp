@@ -42,6 +42,8 @@ void ktp::Testing::draw() const {
   );
   // Use our shader
   glUseProgram(program_id_);
+  // Send our transformation to the currently bound shader, in the "MVP" uniform
+  glUniformMatrix4fv(matrix_id_, 1, GL_FALSE, &mvp_[0][0]);
   // Draw the triangle !
   glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
   glDisableVertexAttribArray(0);
@@ -134,6 +136,25 @@ bool ktp::Testing::initGL() {
 }
 
 void ktp::Testing::tutorial() {
+  // Modify ModelMatrix to translate, rotate, then scale the triangle
+  //model_ = glm::translate(model_, glm::vec3(0.f, 0.0f, 0.0f));
+  //model_ = glm::rotate(model_, glm::radians(60.0f), glm::vec3(1.f, 1.f, 1.f));
+  //model_ = glm::scale(model_, glm::vec3(1.f, 1.f, 1.f));
+
+  // Projection matrix : Field of View, aspect ratio, display range : 0.1 unit <-> 100 units
+  projection_ = glm::perspective(glm::radians(45.0f), 16.f / 9.f, 0.1f, 100.0f);
+  // Ortho
+  //projection_ = glm::ortho(-2.f, 2.f, -1.5f, 1.5f, 0.1f, 100.f);
+  
+  // Camera matrix
+  view_ = glm::lookAt(
+    glm::vec3 {0, 0, 3}, // Camera is at (4,3,3), in World Space
+    glm::vec3 {0, 0, 0}, // and looks at the origin
+    glm::vec3 {0, 1, 0}  // Head is up (set to 0,-1,0 to look upside-down)
+  );
+  // Our ModelViewProjection : multiplication of our 3 matrices
+  mvp_ = projection_ * view_ * model_;
+
   glGenVertexArrays(1, &vertex_array_id_);
   glBindVertexArray(vertex_array_id_);
 
@@ -152,4 +173,5 @@ void ktp::Testing::tutorial() {
 
   const auto path {getResourcesPath("shaders")};
   program_id_ = SDL2_GLEW::loadShaders(path + "simple_vertex_shader.glsl", path + "simple_fragment_shader.glsl");
+  matrix_id_ = glGetUniformLocation(program_id_, "MVP");
 }

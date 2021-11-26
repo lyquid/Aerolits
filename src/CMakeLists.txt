@@ -41,12 +41,15 @@ if(DEFINED CMAKE_TOOLCHAIN_FILE)
   target_link_libraries(Aerolits PRIVATE
     SDL2::SDL2
     box2d::box2d
-    KUGE)
+    KUGE
+    glm::glm
+  )
 else()
   target_link_libraries(Aerolits PRIVATE
     ${SDL2_LIBRARY}
     box2d::box2d
     KUGE
+    glm::glm
   )
 endif()
 

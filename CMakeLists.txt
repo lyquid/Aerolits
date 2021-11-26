@@ -68,6 +68,8 @@ else()
   find_package(GLEW REQUIRED)
   include_directories(${GLEW_INCLUDE_DIRS})
   link_libraries(${GLEW_LIBRARIES})
+  set(glm_DIR "H:/GRUPOS/ACREDITACIONES/TRABAJADORES_CA/ALEX/PrOG/repos/glm/cmake/glm")
+  find_package(glm CONFIG REQUIRED)
 endif()
 
 add_subdirectory(src)
