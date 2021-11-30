@@ -280,7 +280,7 @@ void ktp::TestingState::handleEvents(Game& game) {
         int x{0}, y{0};
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
           logMessage("clicked " + std::to_string(x) + ", " + std::to_string(y));
-          // AerolitePhysicsComponent::spawnAerolite({(float)x * kPixelsToMeters, (float)y * kPixelsToMeters});
+          game.state_ = goToState(game, GameState::testing_);
         }
         break;
       }
@@ -327,6 +327,7 @@ void ktp::TestingState::update(Game& game, float delta_time) {
   //   }
   // }
   //if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnMovingAerolite();
+  game.test_.update(delta_time);
   game.event_bus_.processEvents();
 }
 

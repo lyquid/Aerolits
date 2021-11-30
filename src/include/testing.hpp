@@ -4,37 +4,53 @@
 #include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <vector>
 
 namespace ktp {
+
+struct VAO {
+  GLuint id;
+  // GLfloat* vertex_buffer_data; // the coords array
+  std::vector<GLfloat> vertex_buffer_data; // idem with a vector
+  GLuint vertex_buffer;
+};
 
 class Testing {
  public:
   Testing();
-  ~Testing() { glDeleteProgram(gProgramID_); }
+  ~Testing() {}
   void draw() const;
-  void draw_OLD() const;
-  bool initGL();
   void tutorial();
+  void update(float delta_time);
 
  private:
-
-  GLuint gProgramID_ = 0;
-  GLint gVertexPos2DLocation_ = -1;
-  GLuint gVBO_ = 0;
-  GLuint gIBO_ = 0;
-  bool gRenderQuad_ = true;
-
-  // tutorial
+  // cube
   GLuint vertex_array_id_ {};
   GLuint vertex_buffer_ {};
-  GLuint program_id_ {};
+  GLuint color_buffer_ {};
+  const std::vector<GLfloat> vertex_buffer_data_ {SDL2_GLEW::cube()};
+  std::vector<GLfloat> color_buffer_data_ {};
+  std::vector<bool> color_buffer_data_pattern_ {};
+  GLProgram program_ {};
 
   glm::mat4 projection_ {};
   glm::mat4 view_ {};
-  // Model matrix : an identity matrix (model will be at the origin)
+  // Model matrix: an identity matrix (model will be at the origin)
   glm::mat4 model_ {glm::mat4{1.0f}};
   glm::mat4 mvp_ {};
   GLuint matrix_id_ {};
+
+
+
+  // triangle
+  // GLuint tri_vertex_array_id_ {};
+  // GLuint tri_vertex_buffer_ {};
+  // const std::vector<GLfloat> tri_vertex_buffer_data_ {
+  //  -1.0f, -1.0f, 0.0f,
+  //   1.0f, -1.0f, 0.0f,
+  //   0.0f,  1.0f, 0.0f,
+  // };
+  // glm::mat4 tri_mvp_ {};
 };
 
 } // namespace ktp

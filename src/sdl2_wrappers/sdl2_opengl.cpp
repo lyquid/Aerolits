@@ -2,7 +2,49 @@
 #include "sdl2_opengl.hpp"
 #include <fstream>
 #include <sstream>
-#include <vector>
+
+std::vector<GLfloat> ktp::SDL2_GLEW::cube(GLfloat size) {
+  const auto good_size {SDL_fabsf(size)};
+  std::vector<GLfloat> vertices {
+    -1.f * good_size, -1.f * good_size, -1.f * good_size, // triangle 1 : begin
+    -1.f * good_size, -1.f * good_size,  1.f * good_size,
+    -1.f * good_size,  1.f * good_size,  1.f * good_size, // triangle 1 : end
+     1.f * good_size,  1.f * good_size, -1.f * good_size, // triangle 2 : begin
+    -1.f * good_size, -1.f * good_size, -1.f * good_size,
+    -1.f * good_size,  1.f * good_size, -1.f * good_size, // triangle 2 : end
+     1.f * good_size, -1.f * good_size,  1.f * good_size,
+    -1.f * good_size, -1.f * good_size, -1.f * good_size,
+     1.f * good_size, -1.f * good_size, -1.f * good_size,
+     1.f * good_size,  1.f * good_size, -1.f * good_size,
+     1.f * good_size, -1.f * good_size, -1.f * good_size,
+    -1.f * good_size, -1.f * good_size, -1.f * good_size,
+    -1.f * good_size, -1.f * good_size, -1.f * good_size,
+    -1.f * good_size,  1.f * good_size,  1.f * good_size,
+    -1.f * good_size,  1.f * good_size, -1.f * good_size,
+     1.f * good_size, -1.f * good_size,  1.f * good_size,
+    -1.f * good_size, -1.f * good_size,  1.f * good_size,
+    -1.f * good_size, -1.f * good_size, -1.f * good_size,
+    -1.f * good_size,  1.f * good_size,  1.f * good_size,
+    -1.f * good_size, -1.f * good_size,  1.f * good_size,
+     1.f * good_size, -1.f * good_size,  1.f * good_size,
+     1.f * good_size,  1.f * good_size,  1.f * good_size,
+     1.f * good_size, -1.f * good_size, -1.f * good_size,
+     1.f * good_size,  1.f * good_size, -1.f * good_size,
+     1.f * good_size, -1.f * good_size, -1.f * good_size,
+     1.f * good_size,  1.f * good_size,  1.f * good_size,
+     1.f * good_size, -1.f * good_size,  1.f * good_size,
+     1.f * good_size,  1.f * good_size,  1.f * good_size,
+     1.f * good_size,  1.f * good_size, -1.f * good_size,
+    -1.f * good_size,  1.f * good_size, -1.f * good_size,
+     1.f * good_size,  1.f * good_size,  1.f * good_size,
+    -1.f * good_size,  1.f * good_size, -1.f * good_size,
+    -1.f * good_size,  1.f * good_size,  1.f * good_size,
+     1.f * good_size,  1.f * good_size,  1.f * good_size,
+    -1.f * good_size,  1.f * good_size,  1.f * good_size,
+     1.f * good_size, -1.f * good_size,  1.f * good_size
+  };
+  return vertices;
+}
 
 bool ktp::SDL2_GLEW::init(SDL_GLContext& context, SDL_Window* window) {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -11,6 +53,10 @@ bool ktp::SDL2_GLEW::init(SDL_GLContext& context, SDL_Window* window) {
   SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
   SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
   glEnable(GL_MULTISAMPLE);
+  // Enable depth test
+  glEnable(GL_DEPTH_TEST);
+  // Accept fragment if it closer to the camera than the former one
+  glDepthFunc(GL_LESS);
 
   context = SDL_GL_CreateContext(window);
   if (!context) {
@@ -34,7 +80,7 @@ bool ktp::SDL2_GLEW::init(SDL_GLContext& context, SDL_Window* window) {
   return true;
 }
 
-GLuint ktp::SDL2_GLEW::loadShaders(const char* vertex_file_path, const char* fragment_file_path) {
+auto ktp::SDL2_GLEW::loadShaders(const char* vertex_file_path, const char* fragment_file_path) {
   const std::string vfp {vertex_file_path};
   const std::string ffp {fragment_file_path};
   return loadShaders(vfp, ffp);
@@ -70,18 +116,19 @@ GLuint ktp::SDL2_GLEW::loadShaders(const std::string& vertex_file_path, const st
 	}
   // Compile Vertex Shader
   logMessage("Compiling vertex shader " + vertex_file_path);
-	auto vertex_source_pointer {vertex_shader_code.c_str()};
+	const auto vertex_source_pointer {vertex_shader_code.c_str()};
 	glShaderSource(vertex_shader_id, 1, &vertex_source_pointer, nullptr);
 	glCompileShader(vertex_shader_id);
   printShaderLog(vertex_shader_id);
   // Compile Fragment Shader
   logMessage("Compiling fragment shader " + fragment_file_path);
-	auto fragment_source_pointer {fragment_shader_code.c_str()};
+	const auto fragment_source_pointer {fragment_shader_code.c_str()};
 	glShaderSource(fragment_shader_id, 1, &fragment_source_pointer, nullptr);
 	glCompileShader(fragment_shader_id);
   printShaderLog(fragment_shader_id);
   // Link the program
 	GLuint program_id {glCreateProgram()};
+  if (!program_id) return GL_FALSE;
 	glAttachShader(program_id, vertex_shader_id);
 	glAttachShader(program_id, fragment_shader_id);
 	glLinkProgram(program_id);
