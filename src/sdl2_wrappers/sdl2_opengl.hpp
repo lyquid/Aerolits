@@ -21,6 +21,8 @@ namespace SDL2_GL {
     std::string          vertex_shader_path_ {};
     std::vector<GLfloat> vertices_ {};
   };
+  GLenum glCheckError_(const char* file, int line);
+  #define glCheckError() ktp::SDL2_GL::glCheckError_(__FILE__, __LINE__)
   std::vector<GLfloat> cube(GLfloat size = 1.f);
   bool initGLEW(SDL_GLContext& context, SDL2_Window& window);
   auto loadShaders(const char* vertex_file_path, const char* fragment_file_path);
@@ -30,6 +32,7 @@ namespace SDL2_GL {
   template <typename T>
   inline void glBufferDataFromVector(GLenum target, const std::vector<T>& v, GLenum usage) {
     glBufferData(target, v.size() * sizeof(T), v.data(), usage);
+    glCheckError();
   }
 } // namespace SDL2_GL
 

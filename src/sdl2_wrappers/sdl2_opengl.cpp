@@ -4,6 +4,25 @@
 #include <fstream>
 #include <sstream>
 
+GLenum ktp::SDL2_GL::glCheckError_(const char* file, int line) {
+  GLenum error_code;
+  while ((error_code = glGetError()) != GL_NO_ERROR) {
+    std::string error_msg {};
+    switch (error_code) {
+      case GL_INVALID_ENUM:                  error_msg = "INVALID_ENUM"; break;
+      case GL_INVALID_VALUE:                 error_msg = "INVALID_VALUE"; break;
+      case GL_INVALID_OPERATION:             error_msg = "INVALID_OPERATION"; break;
+      case GL_STACK_OVERFLOW:                error_msg = "STACK_OVERFLOW"; break;
+      case GL_STACK_UNDERFLOW:               error_msg = "STACK_UNDERFLOW"; break;
+      case GL_OUT_OF_MEMORY:                 error_msg = "OUT_OF_MEMORY"; break;
+      case GL_INVALID_FRAMEBUFFER_OPERATION: error_msg = "INVALID_FRAMEBUFFER_OPERATION"; break;
+    }
+    error_msg = error_msg + " in file " + file + " (" + std::to_string(line) + ')';
+    logError(error_msg, SDL_LOG_CATEGORY_RENDER);
+  }
+  return error_code;
+}
+
 std::vector<GLfloat> ktp::SDL2_GL::cube(GLfloat size) {
   const auto good_size {SDL_fabsf(size)};
   std::vector<GLfloat> vertices {
@@ -123,12 +142,14 @@ GLuint ktp::SDL2_GL::loadShaders(const std::string& vertex_file_path, const std:
 	const auto vertex_source_pointer {vertex_shader_code.c_str()};
 	glShaderSource(vertex_shader_id, 1, &vertex_source_pointer, nullptr);
 	glCompileShader(vertex_shader_id);
+  glCheckError();
   printShaderLog(vertex_shader_id);
   // Compile Fragment Shader
   logMessage("Compiling fragment shader " + fragment_file_path);
 	const auto fragment_source_pointer {fragment_shader_code.c_str()};
 	glShaderSource(fragment_shader_id, 1, &fragment_source_pointer, nullptr);
 	glCompileShader(fragment_shader_id);
+  glCheckError();
   printShaderLog(fragment_shader_id);
   // Link the program
 	GLuint program_id {glCreateProgram()};
@@ -137,11 +158,13 @@ GLuint ktp::SDL2_GL::loadShaders(const std::string& vertex_file_path, const std:
 	glAttachShader(program_id, fragment_shader_id);
 	glLinkProgram(program_id);
   printProgramLog(program_id);
+  glCheckError();
   // clean
 	glDetachShader(program_id, vertex_shader_id);
 	glDetachShader(program_id, fragment_shader_id);
 	glDeleteShader(vertex_shader_id);
 	glDeleteShader(fragment_shader_id);
+  glCheckError();
 
   return program_id;
 }
@@ -195,25 +218,33 @@ void ktp::SDL2_VAO::setup(const SDL2_GL::VAO_Config& config) {
   glGenVertexArrays(1, &id_);
   glGenBuffers(1, &vbo_);
   glGenBuffers(1, &ebo_);
+  glCheckError();
 
   glBindVertexArray(id_);
+  glCheckError();
+
   glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+  glCheckError();
   SDL2_GL::glBufferDataFromVector(GL_ARRAY_BUFFER, config.vertices_, config.usage_);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+  glCheckError();
   SDL2_GL::glBufferDataFromVector(GL_ELEMENT_ARRAY_BUFFER, config.indices_, GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
   glEnableVertexAttribArray(0);
+  glCheckError();
 
   // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex
   // attribute's bound vertex buffer object so afterwards we can safely unbind
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glCheckError();
 
   // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO,
   // but this rarely happens. Modifying other VAOs requires a call to glBindVertexArray anyways
   // so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
   glBindVertexArray(0);
+  glCheckError();
 
   shader_program_ = SDL2_GL::loadShaders(config.vertex_shader_path_, config.fragment_shader_path_);
 }
