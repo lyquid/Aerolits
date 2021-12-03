@@ -298,6 +298,8 @@ void ktp::TestingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.debug_draw_on_ = !game.debug_draw_on_;
       break;
     case SDLK_F2:
+      wireframe_mode_ = !wireframe_mode_;
+      wireframe_mode_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       // game.test_.drawTriangles();
       break;
     case SDLK_SPACE:

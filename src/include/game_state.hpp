@@ -81,6 +81,7 @@ class TestingState: public GameState {
  private:
   virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
+  bool wireframe_mode_ {false};
 };
 
 class TitleState: public GameState {

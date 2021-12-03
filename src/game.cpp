@@ -40,8 +40,7 @@ bool ktp::Game::init() {
   logMessage("Box2D version: " + std::to_string(b2_version.major) + '.' + std::to_string(b2_version.minor) + '.' + std::to_string(b2_version.revision));
   if (!main_window_.create(kuge::GUISystem::kTitleText_ , screen_size_, SDL_WINDOW_OPENGL)) return false;
 
-  SDL2_GLEW::init(context_.context(), main_window_.getWindow());
-  // test_.initGL();
+  SDL2_GL::initGLEW(context_.context(), main_window_);
 
   // if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;
   if (!loadResources()) return false;
