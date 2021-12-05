@@ -19,10 +19,8 @@ class Testing {
 
  private:
 
-  SDL2_VAO vao1_ {};
-  SDL2_GL::VAO_Config vao1_config_{};
-  SDL2_VAO vao2_ {};
-  SDL2_GL::VAO_Config vao2_config_{};
+  VAO vao1_ {};
+  VAO_Config vao1_config_{};
 };
 
 } // namespace ktp

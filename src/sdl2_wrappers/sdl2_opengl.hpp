@@ -14,26 +14,12 @@ namespace ktp {
 class SDL2_Window;
 
 namespace SDL2_GL {
-  struct VAO_Config {
-    std::string          fragment_shader_path_ {};
-    std::vector<GLuint>  indices_ {};
-    GLenum               usage_ {};
-    std::string          vertex_shader_path_ {};
-    std::vector<GLfloat> vertices_ {};
-  };
   GLenum glCheckError_(const char* file, int line);
   #define glCheckError() ktp::SDL2_GL::glCheckError_(__FILE__, __LINE__)
+
   std::vector<GLfloat> cube(GLfloat size = 1.f);
+
   bool initGLEW(SDL_GLContext& context, SDL2_Window& window);
-  auto loadShaders(const char* vertex_file_path, const char* fragment_file_path);
-  GLuint loadShaders(const std::string& vertex_file_path, const std::string& fragment_file_path);
-  void printProgramLog(GLuint program);
-  void printShaderLog(GLuint shader);
-  template <typename T>
-  inline void glBufferDataFromVector(GLenum target, const std::vector<T>& v, GLenum usage) {
-    glBufferData(target, v.size() * sizeof(T), v.data(), usage);
-    glCheckError();
-  }
 } // namespace SDL2_GL
 
 class SDL2_GLContext {
@@ -59,35 +45,96 @@ class SDL2_GLContext {
   SDL_GLContext context_ {nullptr};
 };
 
-class SDL2_VAO {
+class ShaderProgram {
  public:
-  SDL2_VAO() = default;
-  SDL2_VAO(const SDL2_VAO& other) = delete;
-  SDL2_VAO(SDL2_VAO&& other) { *this = std::move(other); }
-  ~SDL2_VAO();
-  SDL2_VAO& operator=(const SDL2_VAO& other) = delete;
-  SDL2_VAO& operator=(SDL2_VAO&& other) {
+  ShaderProgram() = default;
+  ShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
+  ShaderProgram(const ShaderProgram& other) { *this = other; }
+  ShaderProgram(ShaderProgram&& other) { *this = std::move(other); }
+  ~ShaderProgram() { glDeleteProgram(id_); }
+  ShaderProgram& ShaderProgram::operator=(const ShaderProgram& other) {
+    id_ = other.id_;
+    return *this;
+  }
+  ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) {
     if (this != &other) {
       id_ = std::exchange(other.id_, 0);
-      shader_program_ = std::exchange(other.shader_program_, 0);
+    }
+    return *this;
+  }
+  inline void setBool(const char* name, bool value) const {
+    glUseProgram(id_);
+    glUniform1i(glGetUniformLocation(id_, name), (int)value);
+  }
+  inline void setInt(const char* name, GLint value) const {
+    glUseProgram(id_);
+    glUniform1i(glGetUniformLocation(id_, name), value);
+  }
+  inline void setFloat(const char* name, GLfloat value) const {
+    glUseProgram(id_);
+    glUniform1f(glGetUniformLocation(id_, name), value);
+  }
+  inline void setUint(const char* name, GLuint value) const {
+    glUseProgram(id_);
+    glUniform1ui(glGetUniformLocation(id_, name), value);
+  }
+  void setup(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
+  inline void use() const { glUseProgram(id_); }
+
+ private:
+  void printProgramLog();
+  void printShaderLog(GLuint shader);
+  GLuint id_ {};
+};
+
+struct VAO_Config {
+  std::string          fragment_shader_path_ {};
+  std::vector<GLuint>  indices_ {};
+  GLsizei              stride_ {};
+  GLenum               usage_ {};
+  GLuint               vertex_attribute_count_ {};
+  std::string          vertex_shader_path_ {};
+  std::vector<GLfloat> vertices_ {};
+};
+
+class VAO {
+ public:
+  VAO() = default;
+  VAO(const VAO& other) = delete;
+  VAO(VAO&& other) { *this = std::move(other); }
+  ~VAO();
+  VAO& operator=(const VAO& other) = delete;
+  VAO& operator=(VAO&& other) {
+    if (this != &other) {
+      ebo_ = std::exchange(other.ebo_, 0);
+      id_ = std::exchange(other.id_, 0);
+      indices_count_ = other.indices_count_;
+      shader_program_ = std::move(other.shader_program_);
       vbo_ = std::exchange(other.vbo_, 0);
+      vertices_count_ = other.vertices_count_;
     }
     return *this;
   }
   inline void draw() const {
-    glUseProgram(shader_program_);
+    shader_program_.use();
     glBindVertexArray(id_);
     glDrawArrays(GL_TRIANGLES, 0, vertices_count_);
-    //glDrawElements(GL_TRIANGLES, indices_count_, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+    // glDrawElements(GL_TRIANGLES, indices_count_, GL_UNSIGNED_INT, 0);
+    // glBindVertexArray(0);
   }
-  void setup(const SDL2_GL::VAO_Config& config);
+  template<typename T>
+  inline void glBufferDataFromVector(GLenum target, const std::vector<T>& v, GLenum usage) {
+    glBufferData(target, v.size() * sizeof(T), v.data(), usage);
+    glCheckError();
+  }
+  void setup(const VAO_Config& config);
+  auto& shaderProgram() { return shader_program_; }
 
  private:
   GLuint ebo_ {};
   GLuint id_ {};
-  GLuint indices_count_ {};
-  GLuint shader_program_ {};
+  GLuint indices_count_ {}; // can we move this to vao config??
+  ShaderProgram shader_program_ {};
   GLuint vbo_ {};
   GLuint vertices_count_ {};
 };
