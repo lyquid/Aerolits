@@ -115,20 +115,20 @@ ktp::ShaderProgram::ShaderProgram(const std::string& vertex_shader_path, const s
   setup(vertex_shader_path, fragment_shader_path);
 }
 
-void ktp::ShaderProgram::printProgramLog() {
+void ktp::ShaderProgram::printProgramLog(GLuint program) {
   // Make sure name is program
-  if (glIsProgram(id_)) {
+  if (glIsProgram(program)) {
     // Program log length
     int info_log_length{}, max_length{};
     // Get info string length
-    glGetProgramiv(id_, GL_INFO_LOG_LENGTH, &max_length);
+    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &max_length);
     std::string info_log {};
     info_log.resize(max_length);
     // Get info log
-    glGetProgramInfoLog(id_, max_length, &info_log_length, info_log.data());
+    glGetProgramInfoLog(program, max_length, &info_log_length, info_log.data());
     if (info_log_length > 0) logMessage(info_log);
   } else {
-    logError("printProgramLog(): Name " + std::to_string(id_) + " is not a program.");
+    logError("printProgramLog(): Name " + std::to_string(program) + " is not a program.");
   }
 }
 
@@ -195,7 +195,7 @@ void ktp::ShaderProgram::setup(const std::string& vertex_shader_path, const std:
 	glAttachShader(id_, vertex_shader_id);
 	glAttachShader(id_, fragment_shader_id);
 	glLinkProgram(id_);
-  printProgramLog();
+  printProgramLog(id_);
   glCheckError();
   // clean
 	// glDetachShader(id_, vertex_shader_id);

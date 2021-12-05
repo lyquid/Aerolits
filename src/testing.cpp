@@ -25,13 +25,10 @@ void ktp::Testing::tutorial() {
   vao1_config_.vertex_attribute_count_ = 2;
   vao1_config_.stride_ = 6;
   vao1_.setup(vao1_config_);
-  // vao1_.shaderProgram().setFloat("offset", -0.5);
 }
 
 void ktp::Testing::update(float delta_time) {
-  // const auto time {(float)SDL2_Timer::SDL2Ticks()};
-  // const auto green_value {SDL_sinf(time) / 2.f + 0.5f};
-  // const auto vertex_color_location {glGetUniformLocation(vao1_.shaderProgram(), "uni_color")};
-  // glUseProgram(vao1_.shaderProgram());
-  // glUniform4f(vertex_color_location, 0.0f, green_value, 0.0f, 1.0f);
+  angle_ += 0.001f;
+  trans_ = glm::rotate(trans_, glm::radians(angle_), glm::vec3(0.f, 0.f, 1.f));
+  vao1_.shaderProgram().setMat4f("transform", trans_);
 }

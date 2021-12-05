@@ -1,10 +1,13 @@
 #ifndef KTP_SDL2_WRAPPERS_SDL2_OPENGL_HPP_
 #define KTP_SDL2_WRAPPERS_SDL2_OPENGL_HPP_
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <SDL.h>
 #include <GL/glew.h>
 #include <SDL_opengl.h>
-#include <GL/GLU.h>
+//#include <GL/GLU.h>
 #include <string>
 #include <utility>
 #include <vector>
@@ -62,6 +65,7 @@ class ShaderProgram {
     }
     return *this;
   }
+  inline auto id() const { return id_; }
   inline void setBool(const char* name, bool value) const {
     glUseProgram(id_);
     glUniform1i(glGetUniformLocation(id_, name), (int)value);
@@ -74,6 +78,10 @@ class ShaderProgram {
     glUseProgram(id_);
     glUniform1f(glGetUniformLocation(id_, name), value);
   }
+  inline void setMat4f(const char* name, const glm::mat4& value, GLboolean trasnpose = GL_FALSE) const {
+    glUseProgram(id_);
+    glUniformMatrix4fv(glGetUniformLocation(id_, name), 1, trasnpose, glm::value_ptr(value));
+  }
   inline void setUint(const char* name, GLuint value) const {
     glUseProgram(id_);
     glUniform1ui(glGetUniformLocation(id_, name), value);
@@ -82,8 +90,9 @@ class ShaderProgram {
   inline void use() const { glUseProgram(id_); }
 
  private:
-  void printProgramLog();
-  void printShaderLog(GLuint shader);
+  static void printProgramLog(GLuint program);
+  static void printShaderLog(GLuint shader);
+  
   GLuint id_ {};
 };
 
