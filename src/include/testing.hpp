@@ -20,10 +20,15 @@ class Testing {
 
  private:
 
-  VAO vao1_ {};
-  VAO_Config vao1_config_{};
-  glm::mat4 trans_ {glm::mat4(1.f)};
-  GLfloat angle_ {};
+  VAO cube_ {};
+  VAO_Config cube_config_{};
+
+  ShaderProgram shader_program_ {};
+
+  glm::mat4 model_ {glm::mat4(1.f)};
+  glm::mat4 view_ {glm::mat4(1.f)};
+  glm::mat4 projection_ {glm::mat4(1.f)};
+  GLfloat angle_ {10.f};
 };
 
 } // namespace ktp

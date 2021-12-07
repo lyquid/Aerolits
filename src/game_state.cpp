@@ -280,7 +280,7 @@ void ktp::TestingState::handleEvents(Game& game) {
         int x{0}, y{0};
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
           logMessage("clicked " + std::to_string(x) + ", " + std::to_string(y));
-          game.state_ = goToState(game, GameState::testing_);
+          // game.state_ = goToState(game, GameState::testing_);
         }
         break;
       }

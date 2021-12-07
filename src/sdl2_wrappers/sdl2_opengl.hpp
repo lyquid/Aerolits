@@ -1,13 +1,10 @@
 #ifndef KTP_SDL2_WRAPPERS_SDL2_OPENGL_HPP_
 #define KTP_SDL2_WRAPPERS_SDL2_OPENGL_HPP_
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <SDL.h>
 #include <GL/glew.h>
 #include <SDL_opengl.h>
-//#include <GL/GLU.h>
+#include <GL/GLU.h>
 #include <string>
 #include <utility>
 #include <vector>
@@ -55,11 +52,11 @@ class ShaderProgram {
   ShaderProgram(const ShaderProgram& other) { *this = other; }
   ShaderProgram(ShaderProgram&& other) { *this = std::move(other); }
   ~ShaderProgram() { glDeleteProgram(id_); }
-  ShaderProgram& ShaderProgram::operator=(const ShaderProgram& other) {
+  ShaderProgram& operator=(const ShaderProgram& other) {
     id_ = other.id_;
     return *this;
   }
-  ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) {
+  ShaderProgram& operator=(ShaderProgram&& other) {
     if (this != &other) {
       id_ = std::exchange(other.id_, 0);
     }
@@ -78,9 +75,17 @@ class ShaderProgram {
     glUseProgram(id_);
     glUniform1f(glGetUniformLocation(id_, name), value);
   }
-  inline void setMat4f(const char* name, const glm::mat4& value, GLboolean trasnpose = GL_FALSE) const {
+  inline void setMat2f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
     glUseProgram(id_);
-    glUniformMatrix4fv(glGetUniformLocation(id_, name), 1, trasnpose, glm::value_ptr(value));
+    glUniformMatrix2fv(glGetUniformLocation(id_, name), 1, transpose, value);
+  }
+  inline void setMat3f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
+    glUseProgram(id_);
+    glUniformMatrix3fv(glGetUniformLocation(id_, name), 1, transpose, value);
+  }
+  inline void setMat4f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
+    glUseProgram(id_);
+    glUniformMatrix4fv(glGetUniformLocation(id_, name), 1, transpose, value);
   }
   inline void setUint(const char* name, GLuint value) const {
     glUseProgram(id_);
@@ -92,17 +97,13 @@ class ShaderProgram {
  private:
   static void printProgramLog(GLuint program);
   static void printShaderLog(GLuint shader);
-  
+
   GLuint id_ {};
 };
 
 struct VAO_Config {
-  std::string          fragment_shader_path_ {};
-  std::vector<GLuint>  indices_ {};
   GLsizei              stride_ {};
   GLenum               usage_ {};
-  GLuint               vertex_attribute_count_ {};
-  std::string          vertex_shader_path_ {};
   std::vector<GLfloat> vertices_ {};
 };
 
@@ -115,37 +116,26 @@ class VAO {
   VAO& operator=(const VAO& other) = delete;
   VAO& operator=(VAO&& other) {
     if (this != &other) {
-      ebo_ = std::exchange(other.ebo_, 0);
       id_ = std::exchange(other.id_, 0);
-      indices_count_ = other.indices_count_;
-      shader_program_ = std::move(other.shader_program_);
+      colors_ = std::exchange(other.colors_, 0);
       vbo_ = std::exchange(other.vbo_, 0);
-      vertices_count_ = other.vertices_count_;
     }
     return *this;
   }
   inline void draw() const {
-    shader_program_.use();
     glBindVertexArray(id_);
-    glDrawArrays(GL_TRIANGLES, 0, vertices_count_);
-    // glDrawElements(GL_TRIANGLES, indices_count_, GL_UNSIGNED_INT, 0);
-    // glBindVertexArray(0);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
   }
   template<typename T>
   inline void glBufferDataFromVector(GLenum target, const std::vector<T>& v, GLenum usage) {
     glBufferData(target, v.size() * sizeof(T), v.data(), usage);
-    glCheckError();
   }
   void setup(const VAO_Config& config);
-  auto& shaderProgram() { return shader_program_; }
 
  private:
-  GLuint ebo_ {};
   GLuint id_ {};
-  GLuint indices_count_ {}; // can we move this to vao config??
-  ShaderProgram shader_program_ {};
   GLuint vbo_ {};
-  GLuint vertices_count_ {};
+  GLuint colors_ {};
 };
 
 } // namespace ktp
