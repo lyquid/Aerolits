@@ -4,6 +4,7 @@
 #include "graphics_component.hpp"
 #include "palette.hpp"
 #include "physics_component.hpp"
+#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <SDL.h>
 #include <memory>
@@ -28,6 +29,24 @@ class PlayerGraphicsComponent: public GraphicsComponent {
  private:
   SDL_Color color_ {ConfigParser::player_config.color_};
   std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
+};
+
+class PlayerGLGraphicsComponent: public GLGraphicsComponent {
+  friend class PlayerPhysicsComponent;
+ public:
+  PlayerGLGraphicsComponent() noexcept;
+  ~PlayerGLGraphicsComponent() {
+    // glDeleteVertexArrays(1, &vao_id_);
+    // glDeleteBuffers(1, &vbo_id_);
+  }
+  virtual void update(const GameEntity& player) override;
+ private:
+  static FPointsVector generatePlayerRenderShape();
+  b2Color color_ {};
+  GLuint vao_id_ {};
+  GLuint vbo_id_ {};
+  GLuint colors_id_ {};
+  ShaderProgram shader_ {};
 };
 
 class DemoInputComponent: public InputComponent {

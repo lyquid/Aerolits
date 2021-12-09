@@ -1,4 +1,4 @@
-#include "include/box2d_scale.hpp"
+#include "include/box2d_utils.hpp"
 #include "include/emitter.hpp"
 #include "include/game.hpp"
 #include "include/game_entity.hpp"

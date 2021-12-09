@@ -1,7 +1,7 @@
 #ifndef AEROLITS_SRC_INCLUDE_PHYSICS_COMPONENT_HPP_
 #define AEROLITS_SRC_INCLUDE_PHYSICS_COMPONENT_HPP_
 
-#include "box2d_scale.hpp"
+#include "box2d_utils.hpp"
 #include <box2d/box2d.h>
 #include <SDL.h>
 #include <vector>

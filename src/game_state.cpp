@@ -255,14 +255,22 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
 void ktp::TestingState::draw(Game& game) {
   glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  // game.test_.draw_OLD();
+
   game.test_.draw();
+
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+    if (GameEntity::game_entities_[i].active_) {
+      GameEntity::game_entities_[i].object_.drawGL();
+    }
+  }
+
   SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
 ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
+  //GameEntity::createEntity(EntityTypes::Player);
   game.test_.tutorial();
   return this;
 }

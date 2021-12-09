@@ -78,7 +78,7 @@ bool ktp::SDL2_GL::initGLEW(SDL_GLContext& context, SDL2_Window& window) {
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
     // Accept fragment if it closer to the camera than the former one
-    glDepthFunc(GL_LESS);
+    // glDepthFunc(GL_LESS);
     // GLEW
     glewExperimental = GL_TRUE;
     const auto glew_error {glewInit()};
@@ -95,10 +95,17 @@ bool ktp::SDL2_GL::initGLEW(SDL_GLContext& context, SDL2_Window& window) {
     if (SDL_GL_SetSwapInterval(0) < 0) {
       logSDL2Error("SDL_GL_SetSwapInterval", SDL_LOG_CATEGORY_RENDER);
     }
-    // vertex attributes
-    int num_attributes {};
-    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &num_attributes);
-    logMessage("Maximum vertex attributes supported: " + std::to_string(num_attributes), SDL_LOG_CATEGORY_RENDER);
+    // result
+    int result {}, minor {};
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &result);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
+    logMessage("OpenGL verion: " + std::to_string(result) + '.' + std::to_string(minor));
+    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &result);
+    logMessage("Multisample bufffers: " + std::to_string(result));
+    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &result);
+    logMessage("Multisample samples: " + std::to_string(result));
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &result);
+    logMessage("Maximum vertex attributes supported: " + std::to_string(result), SDL_LOG_CATEGORY_RENDER);
   }
   return true;
 }
@@ -199,25 +206,44 @@ void ktp::ShaderProgram::setup(const std::string& vertex_shader_path, const std:
   glCheckError();
 }
 
-/* VAO */
+/* VBO */
 
-ktp::VAO::~VAO() {
-  glDeleteVertexArrays(1, &id_);
-  glDeleteBuffers(1, &vbo_);
+void ktp::VBO::setup(const GLfloatVector& vertices) {
+  glGenBuffers(1, &id_);
+  glBindBuffer(GL_ARRAY_BUFFER, id_);
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
 }
+
+void ktp::VBO::setup(GLfloat* vertices, GLsizeiptr size) {
+  glGenBuffers(1, &id_);
+  glBindBuffer(GL_ARRAY_BUFFER, id_);
+  glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+}
+
+/* EBO */
+
+void ktp::EBO::setup(const GLuintVector& indices) {
+  glGenBuffers(1, &id_);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
+}
+
+void ktp::EBO::setup(GLuint* indices, GLsizeiptr size) {
+  glGenBuffers(1, &id_);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
+}
+
+/* VAO */
 
 void ktp::VAO::setup(const VAO_Config& config) {
 
   glGenVertexArrays(1, &id_);
-  glGenBuffers(1, &vbo_);
-  glGenBuffers(1, &colors_);
-
   glBindVertexArray(id_);
   glCheckError();
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+  shape_.setup(config.vertices_);
   glCheckError();
-  glBufferDataFromVector(GL_ARRAY_BUFFER, config.vertices_, config.usage_);
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(
@@ -269,9 +295,8 @@ void ktp::VAO::setup(const VAO_Config& config) {
     0.982f,  0.099f,  0.879f
   };
 
-  glBindBuffer(GL_ARRAY_BUFFER, colors_);
+  colors_.setup(g_color_buffer_data);
   glCheckError();
-  glBufferDataFromVector(GL_ARRAY_BUFFER, g_color_buffer_data, config.usage_);
 
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(

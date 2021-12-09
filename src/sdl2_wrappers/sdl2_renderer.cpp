@@ -2,20 +2,34 @@
 #include "sdl2_renderer.hpp"
 #include <cctype>  // std::toupper
 
-void ktp::b2ColorToSDL2Color(const b2Color& orig, SDL_Color& dest) {
-  dest.r = (Uint8)orig.r * 255;
-  dest.g = (Uint8)orig.g * 255;
-  dest.b = (Uint8)orig.b * 255;
-  dest.a = (Uint8)orig.a * 255;
-}
+// void ktp::b2ColorToSDL2Color(const b2Color& orig, SDL_Color& dest) {
+//   dest.r = static_cast<Uint8>(orig.r * 255.f);
+//   dest.g = static_cast<Uint8>(orig.g * 255.f);
+//   dest.b = static_cast<Uint8>(orig.b * 255.f);
+//   dest.a = static_cast<Uint8>(orig.a * 255.f);
+// }
 
-void ktp::SDL2ColorToB2Color(const SDL_Color& orig, b2Color& dest) {
-  constexpr float inv {1.f / 255.f};
-  dest.r = orig.r * inv;
-  dest.g = orig.g * inv;
-  dest.b = orig.b * inv;
-  dest.a = orig.a * inv;
-}
+// SDL_Color ktp::b2ColorToSDL2Color(const b2Color& orig) {
+//   return SDL_Color {
+//     static_cast<Uint8>(orig.r * 255.f),
+//     static_cast<Uint8>(orig.g * 255.f),
+//     static_cast<Uint8>(orig.b * 255.f),
+//     static_cast<Uint8>(orig.a * 255.f)
+//   };
+// }
+
+// void ktp::SDL2ColorToB2Color(const SDL_Color& orig, b2Color& dest) {
+//   constexpr float inv {1.f / 255.f};
+//   dest.r = orig.r * inv;
+//   dest.g = orig.g * inv;
+//   dest.b = orig.b * inv;
+//   dest.a = orig.a * inv;
+// }
+
+// b2Color ktp::SDL2ColorToB2Color(const SDL_Color& orig) {
+//   constexpr float inv {1.f / 255.f};
+//   return b2Color {orig.r * inv, orig.g * inv, orig.b * inv, orig.a * inv};
+// }
 
 void ktp::SDL2Video::logVideoDrivers() {
   const auto num {SDL_GetNumVideoDrivers()};

@@ -24,6 +24,15 @@ class GraphicsComponent {
   FPointsVector render_shape_ {};
 };
 
+class GLGraphicsComponent {
+
+ public:
+
+  virtual ~GLGraphicsComponent() {}
+  virtual void update(const GameEntity&) = 0;
+
+};
+
 } // namespace ktp
 
 #endif // AEROLITS_SRC_INCLUDE_GRAPHICS_COMPONENT_HPP_

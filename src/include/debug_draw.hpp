@@ -1,7 +1,7 @@
 #ifndef KTP_SRC_INCLUDE_DEBUG_DRAW_HPP_
 #define KTP_SRC_INCLUDE_DEBUG_DRAW_HPP_
 
-#include "box2d_scale.hpp"
+#include "box2d_utils.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <box2d/box2d.h>
 #include <vector>
