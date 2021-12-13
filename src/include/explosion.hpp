@@ -11,7 +11,7 @@ class XParticleGraphicsComponent: public GraphicsComponent {
   friend class ProjectilePhysicsComponent;
   friend class XParticlePhysicsComponent;
  public:
-  virtual void update(const GameEntity& xparticle, const SDL2_Renderer& renderer) override;
+  virtual void update(const GameEntity& xparticle) override;
  private:
   SDL_FPoint position_ {};
   static constexpr SDL_Rect texture_rect_ {256, 64, 128, 128};

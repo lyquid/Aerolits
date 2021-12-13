@@ -22,9 +22,9 @@ void ktp::AerolitesTextures::loadTexture(SDL2_Renderer& ren) {
 
 /* GRAPHICS */
 
-void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite, const SDL2_Renderer& renderer) {
-  renderer.setDrawColor(color_);
-  renderer.drawLines(render_shape_);
+void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite) {
+  // renderer.setDrawColor(color_);
+  // renderer.drawLines(render_shape_);
 }
 
 /* PHYSICS */
@@ -34,8 +34,8 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, Aerol
   born_time_ = Game::gameplay_timer_.milliseconds();
   owner_ = owner;
   size_ = ConfigParser::aerolites_config.size_.value_ * generateRand(ConfigParser::aerolites_config.size_.rand_min_, ConfigParser::aerolites_config.size_.rand_max_);
-  generateAeroliteShape(shape_, size_);
-  graphics_->renderShape().resize(shape_.size() + 1);
+  //generateAeroliteShape(shape_, size_);
+  //graphics_->renderShape().resize(shape_.size() + 1);
   createB2Body(*this);
 }
 
@@ -44,8 +44,8 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, Aerol
   born_time_ = Game::gameplay_timer_.milliseconds();
   owner_ = owner;
   size_ = size;
-  generateAeroliteShape(shape_, size_);
-  graphics_->renderShape().resize(shape_.size() + 1);
+  //generateAeroliteShape(shape_, size_);
+  //graphics_->renderShape().resize(shape_.size() + 1);
   createB2Body(*this);
 }
 
@@ -56,7 +56,7 @@ ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(Aerolite
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);
-    shape_    = std::move(other.shape_);
+    //shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
     graphics_       = std::exchange(other.graphics_, nullptr);
@@ -77,7 +77,7 @@ void ktp::AerolitePhysicsComponent::createB2Body(AerolitePhysicsComponent& aerol
   aerolite.body_ = world_->CreateBody(&body_def);
 
   std::vector<B2Vec2Vector> fixtures_shapes {};
-  Geometry::triangulate(aerolite.shape_, fixtures_shapes);
+  //Geometry::triangulate(aerolite.shape_, fixtures_shapes);
   for (const auto& shape: fixtures_shapes) {
     b2PolygonShape fixture_shape {};
     fixture_shape.Set(shape.data(), shape.size());
@@ -109,9 +109,9 @@ void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, f
 
 void ktp::AerolitePhysicsComponent::reshape(float size) {
   size_ = size;
-  generateAeroliteShape(shape_, size_, shape_.size());
-  graphics_->renderShape().clear();
-  graphics_->renderShape().resize(shape_.size() + 1);
+  // generateAeroliteShape(shape_, size_, shape_.size());
+  // graphics_->renderShape().clear();
+  // graphics_->renderShape().resize(shape_.size() + 1);
   // Box2D
   const auto old_angle   {body_->GetAngle()};
   const auto old_angular {body_->GetAngularVelocity()};
@@ -213,11 +213,11 @@ void ktp::AerolitePhysicsComponent::split() {
 }
 
 void ktp::AerolitePhysicsComponent::transformRenderShape() {
-  for (auto i = 0u; i < shape_.size(); ++i) {
-    graphics_->renderShape().data()[i].x = ((shape_[i].x * SDL_cosf(body_->GetAngle()) - shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
-    graphics_->renderShape().data()[i].y = ((shape_[i].x * SDL_sinf(body_->GetAngle()) + shape_[i].y * SDL_cosf(body_->GetAngle())) + body_->GetPosition().y) * kMetersToPixels;
-  }
-  graphics_->renderShape().back() = graphics_->renderShape().front();
+  // for (auto i = 0u; i < shape_.size(); ++i) {
+    // graphics_->renderShape().data()[i].x = ((shape_[i].x * SDL_cosf(body_->GetAngle()) - shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
+    // graphics_->renderShape().data()[i].y = ((shape_[i].x * SDL_sinf(body_->GetAngle()) + shape_[i].y * SDL_cosf(body_->GetAngle())) + body_->GetPosition().y) * kMetersToPixels;
+  // }
+  // graphics_->renderShape().back() = graphics_->renderShape().front();
 }
 
 void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float delta_time) {

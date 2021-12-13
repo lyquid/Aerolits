@@ -6,8 +6,9 @@
 #include "physics_component.hpp"
 #include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include "../sdl2_wrappers/sdl2_timer.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <SDL.h>
-#include <memory>
 #include <utility> // std::move
 #include <vector>
 
@@ -19,34 +20,22 @@ using B2Vec2Vector = std::vector<b2Vec2>;
 class EmitterGraphicsComponent;
 class EmitterPhysicsComponent;
 class GameEntity;
-class SDL2_Renderer;
 
 class PlayerGraphicsComponent: public GraphicsComponent {
   friend class PlayerPhysicsComponent;
  public:
   PlayerGraphicsComponent() noexcept;
-  virtual void update(const GameEntity& player, const SDL2_Renderer& renderer) override;
- private:
-  SDL_Color color_ {ConfigParser::player_config.color_};
-  std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
-};
-
-class PlayerGLGraphicsComponent: public GLGraphicsComponent {
-  friend class PlayerPhysicsComponent;
- public:
-  PlayerGLGraphicsComponent() noexcept;
-  ~PlayerGLGraphicsComponent() {
-    // glDeleteVertexArrays(1, &vao_id_);
-    // glDeleteBuffers(1, &vbo_id_);
-  }
   virtual void update(const GameEntity& player) override;
  private:
-  static FPointsVector generatePlayerRenderShape();
+  static GLfloatVector generatePlayerRenderShape(float size);
   b2Color color_ {};
-  GLuint vao_id_ {};
-  GLuint vbo_id_ {};
-  GLuint colors_id_ {};
+
+  VAO vao_ {};
+  VBO vertices_ {};
+  VBO colors_ {};
   ShaderProgram shader_ {};
+
+  glm::mat4 projection_ {};
 };
 
 class DemoInputComponent: public InputComponent {
@@ -84,7 +73,6 @@ class PlayerPhysicsComponent: public PhysicsComponent {
 
  private:
 
-  static void generatePlayerShape(B2Vec2Vector& shape, float size);
   void checkWrap();
   void setBox2D();
   void transformRenderShape();
@@ -93,7 +81,7 @@ class PlayerPhysicsComponent: public PhysicsComponent {
   bool thrusting_ {false};
   float cos_ {};
   float sin_ {};
-  std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
+  // std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
 };
 
 } // namespace ktp

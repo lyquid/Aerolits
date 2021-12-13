@@ -256,13 +256,15 @@ void ktp::TestingState::draw(Game& game) {
   glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  game.test_.draw();
+  //game.test_.draw();
 
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.drawGL();
+      GameEntity::game_entities_[i].object_.draw();
     }
   }
+
+  if (game.debug_draw_on_) game.world_.DebugDraw();
 
   SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
@@ -270,8 +272,8 @@ void ktp::TestingState::draw(Game& game) {
 ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
-  //GameEntity::createEntity(EntityTypes::Player);
-  game.test_.tutorial();
+  GameEntity::createEntity(EntityTypes::Player);
+  //game.test_.tutorial();
   return this;
 }
 
@@ -327,17 +329,17 @@ void ktp::TestingState::update(Game& game, float delta_time) {
   // Box2D
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
-  // for (std::size_t i = 0; i < GameEntity::game_entities_.capacity(); ++i) {
-  //   if (GameEntity::game_entities_[i].active_) {
-  //     if (GameEntity::game_entities_[i].object_.canBeDeactivated()) {
-  //       GameEntity::game_entities_[i].object_.free(i);
-  //     } else {
-  //       GameEntity::game_entities_[i].object_.update(delta_time);
-  //     }
-  //   }
-  // }
+  for (std::size_t i = 0; i < GameEntity::game_entities_.capacity(); ++i) {
+    if (GameEntity::game_entities_[i].active_) {
+      if (GameEntity::game_entities_[i].object_.canBeDeactivated()) {
+        GameEntity::game_entities_[i].object_.free(i);
+      } else {
+        GameEntity::game_entities_[i].object_.update(delta_time);
+      }
+    }
+  }
   //if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnMovingAerolite();
-  game.test_.update(delta_time);
+  // game.test_.update(delta_time);
   game.event_bus_.processEvents();
 }
 

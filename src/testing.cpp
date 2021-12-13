@@ -11,80 +11,30 @@ ktp::Testing::Testing() {}
 
 void ktp::Testing::draw() const {
   shader_program_.use();
-  cube_.draw();
+  //cube_.draw();
 }
 
 void ktp::Testing::tutorial() {
-  const auto vertex_shader_path {getResourcesPath("shaders") + "default.vert"};
-  const auto fragment_shader_path {getResourcesPath("shaders") + "default.frag"};
   color_vertices_.resize(108);
   color_vertices_direction_.resize(color_vertices_.size());
-  for (auto i = 0; i < 12*3; ++i) {
+  for (auto i = 0; i < color_vertices_.size() / 3; ++i) {
     const auto color {SDL2ColorToB2Color(Colors::palette.at(generateRand(0u, Colors::palette.size() - 1)))};
     color_vertices_[3 * i + 0] = color.r;
     color_vertices_[3 * i + 1] = color.g;
     color_vertices_[3 * i + 2] = color.b;
-    //color_vertices_[i] = generateRand(0.f, 1.f);
     color_vertices_direction_[3 * i + 0] = generateRand(0u, 1u);
     color_vertices_direction_[3 * i + 1] = generateRand(0u, 1u);
     color_vertices_direction_[3 * i + 2] = generateRand(0u, 1u);
   }
 
-  cube_config_.usage_ = GL_STATIC_DRAW;
-  /* cube_config_.vertices_ = {
-    // positions         // colors
-    -0.5f, -0.5f, 0.f,  1.0f, 0.0f, 0.0f,   // bottom left
-     0.5f, -0.5f, 0.f,  0.0f, 1.0f, 0.0f,   // bottom right
-     0.f,   0.5f, 0.f,  0.0f, 0.0f, 1.0f    // top
-  }; */
-  const std::vector<float> vertices = {
-    -0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-    -0.5f,  0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
+  // cube_config_.colors_ = color_vertices_;
+  // cube_config_.usage_ = GL_STATIC_DRAW;
+  // cube_config_.vertices_ = SDL2_GL::cube(0.5f);
+  // cube_config_.stride_ = 0;
+  //cube_.setup(cube_config_);
 
-    -0.5f, -0.5f,  0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-    -0.5f, -0.5f,  0.5f,
-
-    -0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-
-    -0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f,  0.5f,
-     0.5f, -0.5f,  0.5f,
-    -0.5f, -0.5f,  0.5f,
-    -0.5f, -0.5f, -0.5f,
-
-    -0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f, -0.5f
-  };
-  //cube_config_.vertices_ = SDL2_GL::cube(0.5f);
-  cube_config_.vertices_ = vertices;
-  cube_config_.stride_ = 0;
-
-  cube_.setup(cube_config_);
+  const auto vertex_shader_path {getResourcesPath("shaders") + "default.vert"};
+  const auto fragment_shader_path {getResourcesPath("shaders") + "default.frag"};
   shader_program_.setup(vertex_shader_path, fragment_shader_path);
 
   shader_program_.setMat4f("model", glm::value_ptr(model_));
@@ -136,7 +86,7 @@ void ktp::Testing::update(float delta_time) {
       }
     }
   }
-  cube_.colors_.bind();
+  //cube_.colors_.bind();
   SDL2_GL::glBufferDataFromVector(GL_ARRAY_BUFFER, color_vertices_, GL_STATIC_DRAW);
 
   model_ = glm::rotate(model_, glm::radians(angle_ * delta_time), glm::vec3(0.f, 1.f, 0.f));

@@ -50,13 +50,13 @@ void ktp::InputComponent::stopThrusting(GameEntity& player) {
 }
 
 void ktp::InputComponent::thrust(GameEntity& player, float delta_time) {
-  physics_->delta_.x += SDL_sinf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
+  physics_->delta_.x += -SDL_sinf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
   if (physics_->delta_.x < -max_delta_ ) {
     physics_->delta_.x = -max_delta_;
   } else if (physics_->delta_.x > max_delta_) {
     physics_->delta_.x = max_delta_;
   }
-  physics_->delta_.y += -SDL_cosf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
+  physics_->delta_.y += SDL_cosf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
   if (physics_->delta_.y < -max_delta_) {
     physics_->delta_.y = -max_delta_;
   } else if (physics_->delta_.y > max_delta_) {

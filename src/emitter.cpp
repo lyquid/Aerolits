@@ -8,11 +8,11 @@
 
 /* GRAPHICS */
 
-void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter, const SDL2_Renderer& ren) {
+void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter) {
   ParticlesAtlas::particles_atlas.setBlendMode(blend_mode_);
   for (auto i = 0u; i < particles_pool_size_; ++i) {
     if (particles_pool_[i].inUse()) {
-      particles_pool_[i].draw(ren);
+      // particles_pool_[i].draw(ren);
     }
   }
 }
@@ -26,7 +26,7 @@ ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhy
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);
-    shape_    = std::move(other.shape_);
+    // shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
     angle_                 = other.angle_;

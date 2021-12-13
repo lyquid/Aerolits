@@ -82,7 +82,7 @@ namespace ConfigParser {
     float density_ {1.5f};
     float friction_ {0.8f};
     float restitution_ {0.f};
-    float size_ {1.2f};
+    float size_ {1.2f}; // adjust the default
     float angular_impulse_ {5.f};
     float linear_impulse_ {0.05f};
     float max_delta_ {0.1f};

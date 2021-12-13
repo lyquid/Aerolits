@@ -13,10 +13,10 @@ ktp::ProjectileGraphicsComponent::ProjectileGraphicsComponent() noexcept {
   exhaust_emitter_ = std::make_unique<EmitterGraphicsComponent>();
 }
 
-void ktp::ProjectileGraphicsComponent::update(const GameEntity& projectile, const SDL2_Renderer& renderer) {
-  renderer.setDrawColor(color_);
-  renderer.drawLines(render_shape_);
-  exhaust_emitter_->update(projectile, renderer);
+void ktp::ProjectileGraphicsComponent::update(const GameEntity& projectile) {
+  // renderer.setDrawColor(color_);
+  // renderer.drawLines(render_shape_);
+  // exhaust_emitter_->update(projectile, renderer);
 }
 
 /* PHYSICS */
@@ -25,8 +25,8 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
  graphics_(graphics) {
   owner_ = owner;
   size_ = ConfigParser::projectiles_config.size_;
-  generateProjectileShape(shape_, size_);
-  graphics_->render_shape_.resize(shape_.size());
+  // generateProjectileShape(shape_, size_);
+  // graphics_->render_shape_.resize(shape_.size());
 
   explosion_config_ = ConfigParser::projectiles_config.explosion_config_;
 
@@ -68,7 +68,7 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);
-    shape_    = std::move(other.shape_);
+    // shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
     armed_            = other.armed_;
@@ -137,10 +137,10 @@ void ktp::ProjectilePhysicsComponent::generateProjectileShape(B2Vec2Vector& shap
 }
 
 void ktp::ProjectilePhysicsComponent::transformRenderShape() {
-  for (auto i = 0u; i < shape_.size(); ++i) {
-    graphics_->render_shape_[i].x = ((shape_[i].x * cos_ - shape_[i].y * sin_) + body_->GetPosition().x) * kMetersToPixels;
-    graphics_->render_shape_[i].y = ((shape_[i].x * sin_ + shape_[i].y * cos_) + body_->GetPosition().y) * kMetersToPixels;
-  }
+  // for (auto i = 0u; i < shape_.size(); ++i) {
+    //graphics_->render_shape_[i].x = ((shape_[i].x * cos_ - shape_[i].y * sin_) + body_->GetPosition().x) * kMetersToPixels;
+    //graphics_->render_shape_[i].y = ((shape_[i].x * sin_ + shape_[i].y * cos_) + body_->GetPosition().y) * kMetersToPixels;
+  // }
 }
 
 void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float delta_time) {

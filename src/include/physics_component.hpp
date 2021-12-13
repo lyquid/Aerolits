@@ -21,7 +21,6 @@ class PhysicsComponent {
   inline auto delta() const { return delta_; }
   inline auto owner() const { return owner_; }
   inline void setBody(b2Body* body) { body_ = body; }
-  inline auto& shape() { return shape_; }
   inline auto size() const { return size_; }
 
   virtual void collide(const GameEntity*) = 0;
@@ -44,7 +43,6 @@ class PhysicsComponent {
   bool         collided_ {false};
   SDL_FPoint   delta_ {};
   GameEntity*  owner_ {nullptr};
-  B2Vec2Vector shape_ {};
   float        size_ {};
 };
 

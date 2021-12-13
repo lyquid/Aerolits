@@ -31,9 +31,7 @@ enum class EntityTypes {
 
 using EntitiesCount = std::map<EntityTypes, std::size_t>;
 using EntitiesPool  = ObjectPool<GameEntity>;
-using EntityId      = std::size_t;
 using Graphics      = std::unique_ptr<GraphicsComponent>;
-using GLGraphics    = std::unique_ptr<GLGraphicsComponent>;
 using Input         = std::unique_ptr<InputComponent>;
 using Physics       = std::unique_ptr<PhysicsComponent>;
 
@@ -53,12 +51,11 @@ class GameEntity {
   GameEntity& operator=(const GameEntity& other) = delete;
   GameEntity& operator=(GameEntity&& other) noexcept {
     if (this != &other) {
-      deactivate_  = other.deactivate_;
-      graphics_    = std::exchange(other.graphics_, nullptr);
-      gl_graphics_ = std::exchange(other.gl_graphics_, nullptr);
-      input_       = std::exchange(other.input_, nullptr);
-      physics_     = std::exchange(other.physics_, nullptr);
-      type_        = other.type_;
+      deactivate_ = other.deactivate_;
+      graphics_   = std::exchange(other.graphics_, nullptr);
+      input_      = std::exchange(other.input_, nullptr);
+      physics_    = std::exchange(other.physics_, nullptr);
+      type_       = other.type_;
     }
     return *this;
   }
@@ -105,7 +102,6 @@ class GameEntity {
         break;
       case EntityTypes::Player:
         entity->graphics_ = std::make_unique<PlayerGraphicsComponent>();
-        entity->gl_graphics_ = std::make_unique<PlayerGLGraphicsComponent>();
         entity->physics_  = std::make_unique<PlayerPhysicsComponent>(entity, static_cast<PlayerGraphicsComponent*>(entity->graphics_.get()));
         entity->input_    = std::make_unique<PlayerInputComponent>(static_cast<PlayerPhysicsComponent*>(entity->physics_.get()));
         break;
@@ -144,12 +140,8 @@ class GameEntity {
    *         what the user wants.
    * @param renderer A renderer to draw things on.
    */
-  inline void draw(const SDL2_Renderer& renderer) const {
-    if (graphics_) graphics_->update(*this, renderer);
-  }
-
-  inline void drawGL() const {
-    if (gl_graphics_) gl_graphics_->update(*this);
+  inline void draw() const {
+    if (graphics_) graphics_->update(*this);
   }
 
   /**
@@ -219,7 +211,6 @@ class GameEntity {
   void reset() {
     deactivate_ = false;
     graphics_ = nullptr;
-    gl_graphics_ = nullptr;
     input_    = nullptr;
     physics_  = nullptr;
     --entities_count_[type_];
@@ -232,7 +223,6 @@ class GameEntity {
 
   bool        deactivate_ {false};
   Graphics    graphics_ {nullptr};
-  GLGraphics  gl_graphics_ {nullptr};
   Input       input_ {nullptr};
   Physics     physics_ {nullptr};
   EntityTypes type_;

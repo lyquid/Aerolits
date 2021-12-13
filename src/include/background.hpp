@@ -25,7 +25,7 @@ class BackgroundGraphicsComponent: public GraphicsComponent {
  public:
   inline auto& stars() { return stars_; }
   inline auto& starColors() const { return star_colors_; }
-  virtual void update(const GameEntity& background, const SDL2_Renderer& renderer) override;
+  virtual void update(const GameEntity& background) override;
  private:
   static inline SDL_Rect shapeToRect(const FPointsVector& render_shape);
   static constexpr SDL_Color kBackgroundColor_ {Colors::black};

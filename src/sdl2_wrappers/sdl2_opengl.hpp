@@ -14,7 +14,7 @@ namespace ktp {
 class SDL2_Window;
 
 using GLfloatVector = std::vector<GLfloat>;
-using GLuintVector = std::vector<GLuint>;
+using GLuintVector  = std::vector<GLuint>;
 
 namespace SDL2_GL {
   GLenum glCheckError_(const char* file, int line);
@@ -109,28 +109,22 @@ class ShaderProgram {
   GLuint id_ {};
 };
 
-struct VAO_Config {
-  GLsizei              stride_ {};
-  GLenum               usage_ {};
-  std::vector<GLfloat> vertices_ {};
-};
-
 class VBO {
   friend class VAO;
  public:
-  VBO() = default;
+  VBO();
   VBO(const VBO& other) = delete;
   VBO(VBO&& other) { *this = std::move(other); }
   ~VBO() { glDeleteBuffers(1, &id_); }
   VBO& operator=(const VBO& other) = delete;
   VBO& operator=(VBO&& other) {
     if (this != &other) {
+      glDeleteBuffers(1, &id_);
       id_ = std::exchange(other.id_, 0);
     }
     return *this;
   }
   void bind() const { glBindBuffer(GL_ARRAY_BUFFER, id_); }
-  auto id() const { return id_; }
   void setup(const GLfloatVector& vertices);
   void setup(GLfloat* vertices, GLsizeiptr size);
   void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
@@ -141,19 +135,19 @@ class VBO {
 class EBO {
   friend class VAO;
  public:
-  EBO() = default;
+  EBO();
   EBO(const EBO& other) = delete;
   EBO(EBO&& other) { *this = std::move(other); }
   ~EBO() { glDeleteBuffers(1, &id_); }
   EBO& operator=(const EBO& other) = delete;
   EBO& operator=(EBO&& other) {
     if (this != &other) {
+      glDeleteBuffers(1, &id_);
       id_ = std::exchange(other.id_, 0);
     }
     return *this;
   }
   void bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_); }
-  auto id() const { return id_; }
   void setup(const GLuintVector& indices);
   void setup(GLuint* indices, GLsizeiptr size);
   void unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
@@ -163,32 +157,27 @@ class EBO {
 
 class VAO {
  public:
-  VAO() = default;
+  VAO();
   VAO(const VAO& other) = delete;
   VAO(VAO&& other) { *this = std::move(other); }
   ~VAO() { glDeleteVertexArrays(1, &id_); }
   VAO& operator=(const VAO& other) = delete;
   VAO& operator=(VAO&& other) {
     if (this != &other) {
+      glDeleteVertexArrays(1, &id_);
       id_ = std::exchange(other.id_, 0);
-      colors_ = std::move(other.colors_);
-      shape_ = std::move(other.shape_);
     }
     return *this;
   }
   void bind() const { glBindVertexArray(id_); }
-  inline void draw() const {
+  void draw() const {
     glBindVertexArray(id_);
     glDrawArrays(GL_TRIANGLES, 0, 36);
   }
-  void setup(const VAO_Config& config);
-
-  VBO shape_ {};
-  VBO colors_ {};
-
+  void linkAttrib(const VBO& vbo, GLuint layout, GLuint components, GLenum type, GLsizeiptr stride, void* offset) const ;
+  void unbind() const { glBindVertexArray(0); }
  private:
   GLuint id_ {};
-
 };
 
 } // namespace ktp

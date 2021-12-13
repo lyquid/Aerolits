@@ -21,7 +21,7 @@ class ProjectileGraphicsComponent: public GraphicsComponent {
   friend class ProjectilePhysicsComponent;
  public:
   ProjectileGraphicsComponent() noexcept;
-  virtual void update(const GameEntity& projectile, const SDL2_Renderer& renderer) override;
+  virtual void update(const GameEntity& projectile) override;
  private:
   SDL_Color color_ {ConfigParser::projectiles_config.color_};
   std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};

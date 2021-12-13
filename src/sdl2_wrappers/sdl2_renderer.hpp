@@ -11,11 +11,6 @@
 
 namespace ktp {
 
-// void b2ColorToSDL2Color(const b2Color& orig, SDL_Color& dest);
-// SDL_Color b2ColorToSDL2Color(const b2Color& orig);
-// void SDL2ColorToB2Color(const SDL_Color& orig, b2Color& dest);
-// b2Color SDL2ColorToB2Color(const SDL_Color& orig);
-
 namespace SDL2Video {
   void logVideoDrivers();
 }

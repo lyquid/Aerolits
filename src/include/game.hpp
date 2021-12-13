@@ -36,7 +36,6 @@ class Game {
 
   inline void draw() { state_->draw(*this); }
   inline void handleEvents() { state_->handleEvents(*this); }
-  bool init();
   inline void setFrameTime(double time) { frame_time_ = time; }
   inline bool quit() const { return quit_; }
   void reset();
@@ -57,7 +56,7 @@ class Game {
   bool paused_ {false};
   bool quit_ {false};
   SDL2_Window main_window_ {};
-  //SDL2_Renderer renderer_ {};
+  SDL2_GLContext context_ {};
   // State
   GameState* state_ {nullptr};
   // FPS
@@ -72,13 +71,11 @@ class Game {
   b2World world_ {b2Vec2{0.f, 0.f}};
   int32 velocity_iterations_ {8};
   int32 position_iterations_ {3};
-  DebugDraw debug_draw_ {};
+  //DebugDraw debug_draw_ {};
   bool debug_draw_on_ {false};
   ContactListener contact_listener_ {};
   // Testing
-  Testing test_ {};
-
-  SDL2_GLContext context_ {};
+  // Testing test_ {};
 };
 
 } // end namespace ktp

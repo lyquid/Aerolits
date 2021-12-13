@@ -3,8 +3,10 @@ add_executable(Aerolits
   ../lib/pugixml1.11/pugixml.cpp
   aerolite.cpp
   background.cpp
+  camera.cpp
   config_parser.cpp
   contact_listener.cpp
+  debug_draw.cpp
   emitter.cpp
   explosion.cpp
   game.cpp

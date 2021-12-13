@@ -25,6 +25,26 @@ ktp::SDL2_Timer ktp::Game::gameplay_timer_ {};
 ktp::Game::Game() {
   event_bus_.setSystems(&audio_sys_, &input_sys_, &gui_sys_, &output_sys_);
   GameEntity::event_bus_ = &event_bus_;
+  SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
+  if (!initSDL2()) return;
+  logMessage("Box2D version: " + std::to_string(b2_version.major) + '.' + std::to_string(b2_version.minor) + '.' + std::to_string(b2_version.revision));
+  if (!main_window_.create(kuge::GUISystem::kTitleText_ , screen_size_, SDL_WINDOW_OPENGL)) return;
+
+  SDL2_GL::initGLEW(context_.context(), main_window_);
+
+  // if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;
+  if (!loadResources()) return;
+  // if (!gui_sys_.init(renderer_)) return false;
+
+  // world_.SetDebugDraw(&g_debugDraw);
+  // g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
+  world_.SetContactListener(&contact_listener_);
+
+  PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});
+  PhysicsComponent::setWorld(&world_);
+
+  //state_ = GameState::goToState(*this, GameState::title_);
+  state_ = GameState::goToState(*this, GameState::testing_);
 }
 
 void ktp::Game::clean() {
@@ -32,31 +52,6 @@ void ktp::Game::clean() {
   SDL2_Font::closeTTF();
   SDL2_Image::closeImage();
 	SDL_Quit();
-}
-
-bool ktp::Game::init() {
-  SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
-  if (!initSDL2()) return false;
-  logMessage("Box2D version: " + std::to_string(b2_version.major) + '.' + std::to_string(b2_version.minor) + '.' + std::to_string(b2_version.revision));
-  if (!main_window_.create(kuge::GUISystem::kTitleText_ , screen_size_, SDL_WINDOW_OPENGL)) return false;
-
-  SDL2_GL::initGLEW(context_.context(), main_window_);
-
-  // if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;
-  if (!loadResources()) return false;
-  // if (!gui_sys_.init(renderer_)) return false;
-
-  // debug_draw_.setRenderer(&renderer_);
-  // world_.SetDebugDraw(&debug_draw_);
-  // debug_draw_.SetFlags(b2Draw::e_shapeBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
-  // world_.SetContactListener(&contact_listener_);
-
-  PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});
-  PhysicsComponent::setWorld(&world_);
-
-  //state_ = GameState::goToState(*this, GameState::title_);
-  state_ = GameState::goToState(*this, GameState::testing_);
-  return true;
 }
 
 bool ktp::Game::initSDL2() {

@@ -15,13 +15,13 @@ SDL_Rect ktp::BackgroundGraphicsComponent::shapeToRect(const FPointsVector& rend
   };
 }
 
-void ktp::BackgroundGraphicsComponent::update(const GameEntity& background, const SDL2_Renderer& renderer) {
-  renderer.setDrawColor(kBackgroundColor_);
-  renderer.drawRectFill(shapeToRect(render_shape_));
-  for (const auto& star: stars_) {
-    renderer.setDrawColor(star.color_);
-    renderer.drawPoint(star.position_);
-  }
+void ktp::BackgroundGraphicsComponent::update(const GameEntity& background) {
+  //renderer.setDrawColor(kBackgroundColor_);
+  //renderer.drawRectFill(shapeToRect(render_shape_));
+  // for (const auto& star: stars_) {
+  //   renderer.setDrawColor(star.color_);
+  //   renderer.drawPoint(star.position_);
+  // }
 }
 
 /* PHYSICS */
@@ -29,11 +29,11 @@ void ktp::BackgroundGraphicsComponent::update(const GameEntity& background, cons
 ktp::BackgroundPhysicsComponent::BackgroundPhysicsComponent(GameEntity* owner, BackgroundGraphicsComponent* graphics) noexcept:
  graphics_(graphics) {
   owner_ = owner;
-  graphics_->renderShape().push_back({-kXtraSpace_, -kXtraSpace_}); // top left
-  graphics_->renderShape().push_back({b2_screen_size_.x * kMetersToPixels + kXtraSpace_, -kXtraSpace_}); // top right
-  graphics_->renderShape().push_back({b2_screen_size_.x * kMetersToPixels + kXtraSpace_, b2_screen_size_.y * kMetersToPixels + kXtraSpace_}); // bottom right
-  graphics_->renderShape().push_back({-kXtraSpace_, b2_screen_size_.y * kMetersToPixels + kXtraSpace_}); // bottom left
-  graphics_->renderShape().push_back({-kXtraSpace_, -kXtraSpace_}); // top left again
+  // graphics_->renderShape().push_back({-kXtraSpace_, -kXtraSpace_}); // top left
+  // graphics_->renderShape().push_back({b2_screen_size_.x * kMetersToPixels + kXtraSpace_, -kXtraSpace_}); // top right
+  // graphics_->renderShape().push_back({b2_screen_size_.x * kMetersToPixels + kXtraSpace_, b2_screen_size_.y * kMetersToPixels + kXtraSpace_}); // bottom right
+  // graphics_->renderShape().push_back({-kXtraSpace_, b2_screen_size_.y * kMetersToPixels + kXtraSpace_}); // bottom left
+  // graphics_->renderShape().push_back({-kXtraSpace_, -kXtraSpace_}); // top left again
   generateStars();
 }
 
@@ -44,7 +44,7 @@ ktp::BackgroundPhysicsComponent& ktp::BackgroundPhysicsComponent::operator=(Back
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);
-    shape_    = std::move(other.shape_);
+    // shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
     graphics_ = std::exchange(other.graphics_, nullptr);

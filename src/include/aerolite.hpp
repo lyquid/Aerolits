@@ -28,7 +28,7 @@ namespace AerolitesTextures {
 
 class AeroliteGraphicsComponent: public GraphicsComponent {
  public:
-  virtual void update(const GameEntity& aerolite, const SDL2_Renderer& renderer) override;
+  virtual void update(const GameEntity& aerolite) override;
  private:
   SDL_Color color_ {ConfigParser::aerolites_config.colors_.front()};
 };
