@@ -70,7 +70,6 @@ class ShaderProgram {
     }
     return *this;
   }
-  inline auto id() const { return id_; }
   inline void setBool(const char* name, bool value) const {
     glUseProgram(id_);
     glUniform1i(glGetUniformLocation(id_, name), (int)value);
@@ -170,10 +169,6 @@ class VAO {
     return *this;
   }
   void bind() const { glBindVertexArray(id_); }
-  void draw() const {
-    glBindVertexArray(id_);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-  }
   void linkAttrib(const VBO& vbo, GLuint layout, GLuint components, GLenum type, GLsizeiptr stride, void* offset) const ;
   void unbind() const { glBindVertexArray(0); }
  private:

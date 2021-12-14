@@ -51,7 +51,7 @@ void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {
 void ktp::PlayerGraphicsComponent::update(const GameEntity& player) {
   shader_.use();
   vao_.bind();
-  glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // 9 is the number of indices
 }
 
 /* DEMO INPUT */
