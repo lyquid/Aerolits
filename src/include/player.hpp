@@ -1,13 +1,13 @@
 #pragma once
 
+#include "box2d_utils.hpp"
 #include "config_parser.hpp"
 #include "graphics_component.hpp"
-#include "palette.hpp"
 #include "physics_component.hpp"
 #include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include "../sdl2_wrappers/sdl2_timer.hpp"
+#include <box2d/box2d.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <SDL.h>
 #include <utility> // std::move
 #include <vector>
@@ -28,7 +28,7 @@ class PlayerGraphicsComponent: public GraphicsComponent {
   virtual void update(const GameEntity& player) override;
  private:
   void generateOpenGLStuff(float size);
-  b2Color color_ {};
+  b2Color color_ {SDL2ColorToB2Color(ConfigParser::player_config.color_)};
   VAO vao_ {};
   VBO vertices_ {};
   EBO vertices_indices_ {};

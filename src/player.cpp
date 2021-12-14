@@ -1,17 +1,13 @@
-#include "include/box2d_utils.hpp"
 #include "include/emitter.hpp"
 #include "include/game_entity.hpp"
 #include "include/paths.hpp"
 #include "include/player.hpp"
-#include "sdl2_wrappers/sdl2_renderer.hpp"
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <box2d/box2d.h>
 
 /* GRAPHICS */
 
 ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept {
-  SDL2ColorToB2Color(ConfigParser::player_config.color_, color_);
-
   generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
 
   const auto vertex_shader_path {getResourcesPath("shaders") + "player.vert"};
