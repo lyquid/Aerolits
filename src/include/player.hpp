@@ -29,13 +29,10 @@ class PlayerGraphicsComponent: public GraphicsComponent {
  private:
   void generateOpenGLStuff(float size);
   b2Color color_ {};
-
   VAO vao_ {};
   VBO vertices_ {};
   EBO vertices_indices_ {};
   ShaderProgram shader_ {};
-
-  glm::mat4 projection_ {};
 };
 
 class DemoInputComponent: public InputComponent {
@@ -75,13 +72,14 @@ class PlayerPhysicsComponent: public PhysicsComponent {
 
   void checkWrap();
   void setBox2D();
-  void transformRenderShape();
+  void updateMVP();
 
   PlayerGraphicsComponent* graphics_ {nullptr};
   bool thrusting_ {false};
   float cos_ {};
   float sin_ {};
   // std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
+  glm::mat4 projection_ {};
 };
 
 } // namespace ktp

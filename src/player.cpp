@@ -12,18 +12,11 @@
 ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept {
   SDL2ColorToB2Color(ConfigParser::player_config.color_, color_);
 
-  projection_ = glm::ortho(
-    0.f, PhysicsComponent::b2ScreenSize().x * kMetersToPixels, // left, right
-    0.f, PhysicsComponent::b2ScreenSize().y * kMetersToPixels ,// bottom, top
-    -1.f, 1.f // zNear, zFar
-  ); // this should be somewhere else
-
   generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
 
   const auto vertex_shader_path {getResourcesPath("shaders") + "player.vert"};
   const auto fragment_shader_path {getResourcesPath("shaders") + "player.frag"};
   shader_.setup(vertex_shader_path, fragment_shader_path);
-  shader_.setMat4f("projection", glm::value_ptr(projection_));
 }
 
 void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {
@@ -104,6 +97,11 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner, PlayerGra
   size_ = ConfigParser::player_config.size_;
   setBox2D();
   // exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(EmitterPhysicsComponent::makeEmitter(graphics_->exhaust_emitter_.get(), "fire", {body_->GetPosition().x, body_->GetPosition().y}));
+  projection_ = glm::ortho(
+    0.f, PhysicsComponent::b2ScreenSize().x * kMetersToPixels, // left, right
+    0.f, PhysicsComponent::b2ScreenSize().y * kMetersToPixels, // bottom, top
+    -1.f, 1.f // zNear, zFar
+  );
 }
 
 ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) noexcept {
@@ -182,18 +180,11 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
   body_->CreateFixture(&fixture_def);
 }
 
-void ktp::PlayerPhysicsComponent::transformRenderShape() {
-  glm::mat4 model {1.f};
-  model = glm::translate(model, glm::vec3(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels, 0.f));
-  model = glm::rotate(model, body_->GetAngle(), glm::vec3(0.f, 0.f, 1.f));
-  graphics_->shader_.setMat4f("model", glm::value_ptr(model));
-}
-
 void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_time) {
   checkWrap();
+  updateMVP();
   // cos_ = SDL_cosf(body_->GetAngle());
   // sin_ = SDL_sinf(body_->GetAngle());
-  transformRenderShape();
   // exhaust_emitter_->setAngle(body_->GetAngle());
   // exhaust_emitter_->setPosition({
   //   (body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
@@ -201,4 +192,12 @@ void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_t
   // });
   // exhaust_emitter_->update(player, delta_time);
   // if (thrusting_) exhaust_emitter_->generateParticles();
+}
+
+void ktp::PlayerPhysicsComponent::updateMVP() {
+  glm::mat4 model {1.f};
+  model = glm::translate(model, glm::vec3(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels, 0.f));
+  model = glm::rotate(model, body_->GetAngle(), glm::vec3(0.f, 0.f, 1.f));
+  const glm::mat4 mvp {projection_ * model};
+  graphics_->shader_.setMat4f("mvp", glm::value_ptr(mvp));
 }
