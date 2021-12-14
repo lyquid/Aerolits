@@ -15,7 +15,7 @@
 namespace ktp {
 
 using FPointsVector = std::vector<SDL_FPoint>;
-using B2Vec2Vector = std::vector<b2Vec2>;
+using B2Vec2Vector  = std::vector<b2Vec2>;
 
 class EmitterGraphicsComponent;
 class EmitterPhysicsComponent;
@@ -27,12 +27,12 @@ class PlayerGraphicsComponent: public GraphicsComponent {
   PlayerGraphicsComponent() noexcept;
   virtual void update(const GameEntity& player) override;
  private:
-  static GLfloatVector generatePlayerRenderShape(float size);
+  void generateOpenGLStuff(float size);
   b2Color color_ {};
 
   VAO vao_ {};
   VBO vertices_ {};
-  VBO colors_ {};
+  EBO vertices_indices_ {};
   ShaderProgram shader_ {};
 
   glm::mat4 projection_ {};

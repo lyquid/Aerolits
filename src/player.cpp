@@ -11,55 +11,47 @@
 
 ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept {
   SDL2ColorToB2Color(ConfigParser::player_config.color_, color_);
-  const GLfloatVector color_data {
-    color_.r,  color_.g,  color_.b,
-    color_.r,  color_.g,  color_.b,
-    color_.r,  color_.g,  color_.b,
-    color_.r,  color_.g,  color_.b,
-    color_.r,  color_.g,  color_.b,
-    color_.r,  color_.g,  color_.b,
-    color_.r,  color_.g,  color_.b,
-    color_.r,  color_.g,  color_.b,
-    color_.r,  color_.g,  color_.b
-  };
-  const auto shape {generatePlayerRenderShape(ConfigParser::player_config.size_ * kMetersToPixels)};
+
   projection_ = glm::ortho(
     0.f, PhysicsComponent::b2ScreenSize().x * kMetersToPixels, // left, right
     0.f, PhysicsComponent::b2ScreenSize().y * kMetersToPixels ,// bottom, top
     -1.f, 1.f // zNear, zFar
   ); // this should be somewhere else
 
-  vertices_.setup(shape);
-  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 0, nullptr);
-  colors_.setup(color_data);
-  vao_.linkAttrib(colors_, 1, 3, GL_FLOAT, 0, nullptr);
+  generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
 
-  const auto vertex_shader_path {getResourcesPath("shaders") + "default.vert"};
-  const auto fragment_shader_path {getResourcesPath("shaders") + "default.frag"};
+  const auto vertex_shader_path {getResourcesPath("shaders") + "player.vert"};
+  const auto fragment_shader_path {getResourcesPath("shaders") + "player.frag"};
   shader_.setup(vertex_shader_path, fragment_shader_path);
   shader_.setMat4f("projection", glm::value_ptr(projection_));
 }
 
-ktp::GLfloatVector ktp::PlayerGraphicsComponent::generatePlayerRenderShape(float size) {
-  return GLfloatVector {
-     0.00f * size,  0.50f * size, 0.f * size, // top
-    -0.33f * size, -0.50f * size, 0.f * size, // left
-    -0.15f * size, -0.33f * size, 0.f * size, // left flap
-
-     0.00f * size,  0.50f * size, 0.f * size, // top
-    -0.15f * size, -0.33f * size, 0.f * size, // left flap
-     0.15f * size, -0.33f * size, 0.f * size, // right flap
-
-     0.00f * size,  0.50f * size, 0.f * size, // top
-     0.15f * size, -0.33f * size, 0.f * size, // right flap
-     0.33f * size, -0.50f * size, 0.f * size  // right
+void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {
+  const GLfloatVector player_shape {
+     0.00f * size,  0.50f * size, 0.f * size,  color_.r,  color_.g,  color_.b,  // top        0
+    -0.33f * size, -0.50f * size, 0.f * size,  color_.r,  color_.g,  color_.b,  // left       1
+    -0.15f * size, -0.33f * size, 0.f * size,  color_.r,  color_.g,  color_.b,  // left flap  2
+     0.15f * size, -0.33f * size, 0.f * size,  color_.r,  color_.g,  color_.b,  // right flap 3
+     0.33f * size, -0.50f * size, 0.f * size,  color_.r,  color_.g,  color_.b   // right      4
   };
+  const GLuintVector player_shape_indices {
+    0, 1, 2,
+    0, 2, 3,
+    0, 3, 4
+  };
+  vertices_.setup(player_shape);
+  // vertices
+  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+  // colors
+  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
+  // EBO
+  vertices_indices_.setup(player_shape_indices);
 }
 
 void ktp::PlayerGraphicsComponent::update(const GameEntity& player) {
   shader_.use();
   vao_.bind();
-  glDrawArrays(GL_TRIANGLES, 0, 9);
+  glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 }
 
 /* DEMO INPUT */
