@@ -1,7 +1,7 @@
 #include "include/box2d_utils.hpp"
 #include "include/palette.hpp"
-#include "include/paths.hpp"
 #include "include/random.hpp"
+#include "include/resources.hpp"
 #include "include/testing.hpp"
 #include "sdl2_wrappers/sdl2_geometry.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
@@ -33,8 +33,8 @@ void ktp::Testing::tutorial() {
   // cube_config_.stride_ = 0;
   //cube_.setup(cube_config_);
 
-  const auto vertex_shader_path {getResourcesPath("shaders") + "default.vert"};
-  const auto fragment_shader_path {getResourcesPath("shaders") + "default.frag"};
+  const auto vertex_shader_path {Resources::getResourcesPath("shaders") + "default.vert"};
+  const auto fragment_shader_path {Resources::getResourcesPath("shaders") + "default.frag"};
   // shader_program_.setup(vertex_shader_path, fragment_shader_path);
 
   shader_program_.setMat4f("model", glm::value_ptr(model_));

@@ -2,8 +2,8 @@
 #include "include/box2d_utils.hpp"
 #include "include/game.hpp"
 #include "include/game_entity.hpp"
-#include "include/paths.hpp"
 #include "include/random.hpp"
+#include "include/resources.hpp"
 #include "kuge/kuge.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include "sdl2_wrappers/sdl2_renderer.hpp"
@@ -16,8 +16,8 @@ ktp::ShaderProgram ktp::AeroliteGraphicsComponent::shader_ {};
 
 ktp::AeroliteGraphicsComponent::AeroliteGraphicsComponent() {
   // generateOpenGLStuff(ConfigParser::aerolites_config.size_ * kMetersToPixels); ???????
-  const auto vertex_shader_path {getResourcesPath("shaders") + "aerolite.vert"};
-  const auto fragment_shader_path {getResourcesPath("shaders") + "aerolite.frag"};
+  const auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};
+  const auto fragment_shader_path {Resources::getResourcesPath("shaders") + "aerolite.frag"};
   // shader_.setup(vertex_shader_path, fragment_shader_path);
 }
 

@@ -1,5 +1,5 @@
 #include "../include/palette.hpp"
-#include "../include/paths.hpp"
+#include "../include/resources.hpp"
 #include "event.hpp"
 #include "system.hpp"
 #include <random>
@@ -35,17 +35,17 @@ void kuge::AudioSystem::handleEvent(const KugeEvent* event) {
 
 bool kuge::AudioSystem::loadResources() {
   ktp::SDL2_Sound laser {};
-  if (!laser.loadSound(ktp::getResourcesPath("sounds") + "laser1.wav")) {
+  if (!laser.loadSound(ktp::Resources::getResourcesPath("sounds") + "laser1.wav")) {
     return false;
   } else {
     lasers_.push_back(std::move(laser));
   }
-  if (!laser.loadSound(ktp::getResourcesPath("sounds") + "laser2.wav")) {
+  if (!laser.loadSound(ktp::Resources::getResourcesPath("sounds") + "laser2.wav")) {
     return false;
   } else {
     lasers_.push_back(std::move(laser));
   }
-  if (!laser.loadSound(ktp::getResourcesPath("sounds") + "laser3.wav")) {
+  if (!laser.loadSound(ktp::Resources::getResourcesPath("sounds") + "laser3.wav")) {
     return false;
   } else {
     lasers_.push_back(std::move(laser));
@@ -88,7 +88,7 @@ void kuge::GUISystem::handleEvent(const KugeEvent* event) {
 }
 
 bool kuge::GUISystem::init(const ktp::SDL2_Renderer& ren) {
-  if (!font_.loadFont(ktp::getResourcesPath("fonts") + "Future n0t Found.ttf", 18)) return false;
+  if (!font_.loadFont(ktp::Resources::getResourcesPath("fonts") + "Future n0t Found.ttf", 18)) return false;
 
   renderer_ = &ren; // we need this in order to create new score textures
 

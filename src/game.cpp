@@ -1,7 +1,6 @@
 #include "include/game.hpp"
 #include "include/palette.hpp"
 #include "include/particle.hpp"
-#include "include/paths.hpp"
 #include "include/resources.hpp"
 
 /* kuge/system.hpp */
@@ -73,11 +72,11 @@ bool ktp::Game::loadResources() {
   }
   // ParticlesAtlas::loadTexture(renderer_);
 
-  auto vertex_shader_path {getResourcesPath("shaders") + "aerolite.vert"};
-  auto fragment_shader_path {getResourcesPath("shaders") + "aerolite.frag"};
+  auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};
+  auto fragment_shader_path {Resources::getResourcesPath("shaders") + "aerolite.frag"};
   Resources::loadShader("aerolite", vertex_shader_path, fragment_shader_path);
-  vertex_shader_path = getResourcesPath("shaders") + "player.vert";
-  fragment_shader_path = getResourcesPath("shaders") + "player.frag";
+  vertex_shader_path = Resources::getResourcesPath("shaders") + "player.vert";
+  fragment_shader_path = Resources::getResourcesPath("shaders") + "player.frag";
   Resources::loadShader("player", vertex_shader_path, fragment_shader_path);
   return true;
 }

@@ -1,6 +1,5 @@
 #include "include/emitter.hpp"
 #include "include/game_entity.hpp"
-#include "include/paths.hpp"
 #include "include/player.hpp"
 #include "include/resources.hpp"
 #include <glm/gtc/matrix_transform.hpp>

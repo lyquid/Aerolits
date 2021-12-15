@@ -1,6 +1,6 @@
 #include "include/emitter.hpp"
 #include "include/particle.hpp"
-#include "include/paths.hpp"
+#include "include/resources.hpp"
 #include "sdl2_wrappers/sdl2_renderer.hpp"
 #include "sdl2_wrappers/sdl2_texture.hpp"
 #include <string>
@@ -9,7 +9,7 @@ ktp::SDL2_Texture ktp::ParticlesAtlas::particles_atlas {};
 
 void ktp::ParticlesAtlas::loadTexture(SDL2_Renderer& ren) {
   const std::string file{"particles2.png"};
-  const std::string path{getResourcesPath("textures") + file};
+  const std::string path{Resources::getResourcesPath("textures") + file};
   particles_atlas.loadFromFile(ren, path);
 }
 

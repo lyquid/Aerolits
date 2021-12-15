@@ -1,6 +1,6 @@
 #include "include/config_parser.hpp"
 #include "include/emitter.hpp"
-#include "include/paths.hpp"
+#include "include/resources.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include <algorithm> // std::transform
 #include <sstream> // std::ostringstream
@@ -18,7 +18,7 @@ void ktp::ConfigParser::loadConfigFiles() {
 ktp::ConfigParser::AerolitesConfig ktp::ConfigParser::aerolites_config {};
 
 void ktp::ConfigParser::loadAerolitesConfig() {
-  const std::string path {getConfigPath() + kAerolitesFile};
+  const std::string path {Resources::getConfigPath() + kAerolitesFile};
   pugi::xml_document doc {};
   const auto result {doc.load_file(path.c_str())};
   if (result) {
@@ -280,7 +280,7 @@ void ktp::ConfigParser::constructEmitterTypesVector(const pugi::xml_document& do
 }
 
 void ktp::ConfigParser::loadEmittersConfig() {
-  const std::string path {getConfigPath() + kEmittersFile};
+  const std::string path {Resources::getConfigPath() + kEmittersFile};
   pugi::xml_document doc {};
   const auto result {doc.load_file(path.c_str())};
   if (result) {
@@ -355,7 +355,7 @@ void ktp::ConfigParser::printLoadedEmitterTypes(const pugi::xml_document& doc) {
 ktp::ConfigParser::GameConfig ktp::ConfigParser::game_config {};
 
 void ktp::ConfigParser::loadGameConfig() {
-  const std::string path {getConfigPath() + kGameFile};
+  const std::string path {Resources::getConfigPath() + kGameFile};
   pugi::xml_document doc {};
   const auto result {doc.load_file(path.c_str())};
   if (result) {
@@ -394,7 +394,7 @@ void ktp::ConfigParser::loadGameConfig() {
 ktp::ConfigParser::PlayerConfig ktp::ConfigParser::player_config {};
 
 void ktp::ConfigParser::loadPlayerConfig() {
-  const std::string path {getConfigPath() + kPlayerFile};
+  const std::string path {Resources::getConfigPath() + kPlayerFile};
   pugi::xml_document doc {};
   const auto result {doc.load_file(path.c_str())};
   if (result) {
@@ -502,7 +502,7 @@ void ktp::ConfigParser::loadPlayerConfig() {
 ktp::ConfigParser::ProjectilesConfig ktp::ConfigParser::projectiles_config {};
 
 void ktp::ConfigParser::loadProjectilesConfig() {
-  const std::string path {getConfigPath() + kProjectilesFile};
+  const std::string path {Resources::getConfigPath() + kProjectilesFile};
   pugi::xml_document doc {};
   const auto result {doc.load_file(path.c_str())};
   if (result) {
