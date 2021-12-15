@@ -2,6 +2,7 @@
 #include "include/game_entity.hpp"
 #include "include/paths.hpp"
 #include "include/player.hpp"
+#include "include/resources.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -9,10 +10,7 @@
 
 ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept {
   generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
-
-  const auto vertex_shader_path {getResourcesPath("shaders") + "player.vert"};
-  const auto fragment_shader_path {getResourcesPath("shaders") + "player.frag"};
-  shader_.setup(vertex_shader_path, fragment_shader_path);
+  shader_ = Resources::getShader("player");
 }
 
 void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {

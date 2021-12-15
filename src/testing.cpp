@@ -35,7 +35,7 @@ void ktp::Testing::tutorial() {
 
   const auto vertex_shader_path {getResourcesPath("shaders") + "default.vert"};
   const auto fragment_shader_path {getResourcesPath("shaders") + "default.frag"};
-  shader_program_.setup(vertex_shader_path, fragment_shader_path);
+  // shader_program_.setup(vertex_shader_path, fragment_shader_path);
 
   shader_program_.setMat4f("model", glm::value_ptr(model_));
   shader_program_.setMat4f("view", glm::value_ptr(view_));

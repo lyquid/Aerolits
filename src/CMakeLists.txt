@@ -15,6 +15,7 @@ add_executable(Aerolits
   particle.cpp
   player.cpp
   projectile.cpp
+  resources.cpp
   testing.cpp
 )
 target_compile_features(Aerolits PUBLIC cxx_std_17)

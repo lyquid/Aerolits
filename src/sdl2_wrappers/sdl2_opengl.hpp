@@ -56,20 +56,20 @@ class SDL2_GLContext {
 class ShaderProgram {
  public:
   ShaderProgram() = default;
-  ShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
-  ShaderProgram(const ShaderProgram& other) { *this = other; }
-  ShaderProgram(ShaderProgram&& other) { *this = std::move(other); }
-  ~ShaderProgram() { glDeleteProgram(id_); }
+  ShaderProgram(GLuint id): id_(id) {}
+  ShaderProgram(const ShaderProgram& other): id_(other.id_) {}
+  ShaderProgram(ShaderProgram&& other): id_(other.id_) {}
   ShaderProgram& operator=(const ShaderProgram& other) {
     id_ = other.id_;
     return *this;
   }
   ShaderProgram& operator=(ShaderProgram&& other) {
     if (this != &other) {
-      id_ = std::exchange(other.id_, 0);
+      id_ = other.id_;
     }
     return *this;
   }
+  inline auto id() const { return id_; }
   inline void setBool(const char* name, bool value) const {
     glUseProgram(id_);
     glUniform1i(glGetUniformLocation(id_, name), (int)value);
@@ -98,13 +98,9 @@ class ShaderProgram {
     glUseProgram(id_);
     glUniform1ui(glGetUniformLocation(id_, name), value);
   }
-  void setup(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
   inline void use() const { glUseProgram(id_); }
 
  private:
-  static void printProgramLog(GLuint program);
-  static void printShaderLog(GLuint shader);
-
   GLuint id_ {};
 };
 

@@ -10,21 +10,21 @@
 #include "sdl2_wrappers/sdl2_texture.hpp"
 #include <limits>
 
-/* TEXTURES */
-
-ktp::SDL2_Texture ktp::AerolitesTextures::aerolites_textures {};
-
-void ktp::AerolitesTextures::loadTexture(SDL2_Renderer& ren) {
-  const std::string file {"asteroid.png"};
-  const std::string path {getResourcesPath("textures") + file};
-  aerolites_textures.loadFromFile(ren, path);
-}
-
 /* GRAPHICS */
 
+ktp::ShaderProgram ktp::AeroliteGraphicsComponent::shader_ {};
+
+ktp::AeroliteGraphicsComponent::AeroliteGraphicsComponent() {
+  // generateOpenGLStuff(ConfigParser::aerolites_config.size_ * kMetersToPixels); ???????
+  const auto vertex_shader_path {getResourcesPath("shaders") + "aerolite.vert"};
+  const auto fragment_shader_path {getResourcesPath("shaders") + "aerolite.frag"};
+  // shader_.setup(vertex_shader_path, fragment_shader_path);
+}
+
 void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite) {
-  // renderer.setDrawColor(color_);
-  // renderer.drawLines(render_shape_);
+  shader_.use();
+  vao_.bind();
+  // glDraw...
 }
 
 /* PHYSICS */

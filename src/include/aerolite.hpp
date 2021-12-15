@@ -5,6 +5,7 @@
 #include "palette.hpp"
 #include "physics_component.hpp"
 #include "../sdl2_wrappers/sdl2_geometry.hpp"
+#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include <box2d/box2d.h>
 #include <SDL.h>
 #include <utility> // std::move std::exchange
@@ -16,21 +17,18 @@ using B2Vec2Vector = std::vector<b2Vec2>;
 using B2Line = Geometry::Line<b2Vec2>;
 
 class GameEntity;
-class SDL2_Renderer;
-class SDL2_Texture;
-
-namespace AerolitesTextures {
-
-  void loadTexture(SDL2_Renderer& ren);
-  extern SDL2_Texture aerolites_textures;
-
-} // end namespace AerolitesTextures
 
 class AeroliteGraphicsComponent: public GraphicsComponent {
  public:
+  AeroliteGraphicsComponent();
   virtual void update(const GameEntity& aerolite) override;
  private:
-  SDL_Color color_ {ConfigParser::aerolites_config.colors_.front()};
+  void generateOpenGLStuff(float size);
+  b2Color color_ {SDL2ColorToB2Color(ConfigParser::aerolites_config.colors_.front())};
+  VAO vao_ {};
+  VBO vertices_ {};
+  EBO vertices_indices_ {};
+  static ShaderProgram shader_;
 };
 
 class AerolitePhysicsComponent: public PhysicsComponent {
