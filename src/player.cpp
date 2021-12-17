@@ -42,7 +42,7 @@ void ktp::PlayerGraphicsComponent::update(const GameEntity& player) {
 
 void ktp::DemoInputComponent::update(GameEntity& player, float delta_time) {
   stopSteering(delta_time);
-  shoot(player);
+  // shoot(player);
 
   thrust_ ? thrust(player, delta_time) : stopThrusting(player);
 

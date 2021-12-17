@@ -29,13 +29,14 @@ void ktp::GameState::setWindowTitle(Game& game) {
 /* DEMO STATE */
 
 void ktp::DemoState::draw(Game& game) {
-  // game.renderer_.clear();
+  glClearColor(clear_color_.r, clear_color_.g, clear_color_.b, clear_color_.a);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-  //   if (GameEntity::game_entities_[i].active_) {
-  //     GameEntity::game_entities_[i].object_.draw(game.renderer_);
-  //   }
-  // }
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+    if (GameEntity::game_entities_[i].active_) {
+      GameEntity::game_entities_[i].object_.draw();
+    }
+  }
 
   // game.gui_sys_.scoreText().render(game.renderer_);
 
@@ -46,9 +47,9 @@ void ktp::DemoState::draw(Game& game) {
   //   blink_timer_ = SDL2_Timer::SDL2Ticks();
   // }
 
-  // if (game.debug_draw_on_) game.world_.DebugDraw();
+  if (game.debug_draw_on_) game.world_.DebugDraw();
 
-  // game.renderer_.present();
+  SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
@@ -345,7 +346,8 @@ void ktp::TestingState::update(Game& game, float delta_time) {
 /* TITLE STATE */
 
 void ktp::TitleState::draw(Game& game) {
-  // game.renderer_.clear();
+  // glClearColor(clear_color_.r, clear_color_.g, clear_color_.b, clear_color_.a);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
   //   if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Background) {
@@ -356,15 +358,15 @@ void ktp::TitleState::draw(Game& game) {
 
   // game.gui_sys_.titleText().render(game.renderer_);
 
-  // game.renderer_.present();
+  SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
 ktp::GameState* ktp::TitleState::enter(Game& game) {
   game.reset();
-  GameEntity::createEntity(EntityTypes::Background);
+  // GameEntity::createEntity(EntityTypes::Background);
   GameEntity::createEntity(EntityTypes::Player);
   demo_time_ = SDL2_Timer::SDL2Ticks();
-  game.gui_sys_.resetScore();
+  // game.gui_sys_.resetScore();
   return this;
 }
 
@@ -404,7 +406,7 @@ void ktp::TitleState::update(Game& game, float delta_time) {
   setWindowTitle(game);
   // Background
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-    GameEntity::game_entities_[i].object_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
+    // GameEntity::game_entities_[i].object_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
   }
   // enter Demo mode
   if (SDL2_Timer::SDL2Ticks() - demo_time_ > kWaitForDemo_) {

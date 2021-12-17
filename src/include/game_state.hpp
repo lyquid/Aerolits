@@ -49,6 +49,7 @@ class DemoState: public GameState {
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
   Uint32 blink_timer_ {};
   bool blink_flag_ {true};
+  const b2Color clear_color_ {SDL2ColorToB2Color(Colors::black)};
 };
 
 class PausedState: public GameState {
