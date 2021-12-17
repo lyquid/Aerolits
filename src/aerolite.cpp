@@ -1,14 +1,10 @@
 #include "include/aerolite.hpp"
-#include "include/box2d_utils.hpp"
 #include "include/game.hpp"
 #include "include/game_entity.hpp"
 #include "include/random.hpp"
 #include "include/resources.hpp"
 #include "kuge/kuge.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
-#include "sdl2_wrappers/sdl2_renderer.hpp"
-#include "sdl2_wrappers/sdl2_texture.hpp"
-#include <glm/gtc/type_ptr.hpp>
 #include <algorithm>
 #include <limits>
 
@@ -44,12 +40,6 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, Aerol
   graphics_->vertices_.setup(triangulated_shape);
   graphics_->vertices_count_ = triangulated_shape.size() / 3u;
   graphics_->vao_.linkAttrib(graphics_->vertices_, 0, 3, GL_FLOAT, 3 * sizeof(GLfloat), nullptr);
-
-  projection_ = glm::ortho(
-    0.f, PhysicsComponent::b2ScreenSize().x * kMetersToPixels, // left, right
-    0.f, PhysicsComponent::b2ScreenSize().y * kMetersToPixels, // bottom, top
-    -1.f, 1.f // zNear, zFar
-  );
 }
 
 ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) noexcept {

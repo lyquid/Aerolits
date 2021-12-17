@@ -3,6 +3,9 @@
 
 #include "box2d_utils.hpp"
 #include <box2d/box2d.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <SDL.h>
 #include <vector>
 
@@ -26,24 +29,26 @@ class PhysicsComponent {
   virtual void collide(const GameEntity*) = 0;
   virtual void update(const GameEntity&, float) = 0;
 
-  static inline auto& b2ScreenSize() { return b2_screen_size_; }
+  static inline SDL_FPoint& b2ScreenSize() { return b2_screen_size_; }
   static inline void setScreenSize(const SDL_FPoint& screen_size) {
     b2_screen_size_.x = screen_size.x * kPixelsToMeters;
     b2_screen_size_.y = screen_size.y * kPixelsToMeters;
   }
+  static inline void setProjection(const glm::mat4& projection) { projection_ = projection; }
   static inline void setWorld(b2World* world) { world_ = world; }
 
  protected:
 
   // defined in game.cpp
   static SDL_FPoint b2_screen_size_;
+  static glm::mat4  projection_;
   static b2World*   world_;
 
-  b2Body*      body_ {nullptr};
-  bool         collided_ {false};
-  SDL_FPoint   delta_ {};
-  GameEntity*  owner_ {nullptr};
-  float        size_ {};
+  b2Body*     body_ {nullptr};
+  bool        collided_ {false};
+  SDL_FPoint  delta_ {};
+  GameEntity* owner_ {nullptr};
+  float       size_ {};
 };
 
 } // namespace ktp

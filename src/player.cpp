@@ -2,8 +2,6 @@
 #include "include/game_entity.hpp"
 #include "include/player.hpp"
 #include "include/resources.hpp"
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 /* GRAPHICS */
 
@@ -90,11 +88,6 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner, PlayerGra
   size_ = ConfigParser::player_config.size_;
   setBox2D();
   // exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(EmitterPhysicsComponent::makeEmitter(graphics_->exhaust_emitter_.get(), "fire", {body_->GetPosition().x, body_->GetPosition().y}));
-  projection_ = glm::ortho(
-    0.f, PhysicsComponent::b2ScreenSize().x * kMetersToPixels, // left, right
-    0.f, PhysicsComponent::b2ScreenSize().y * kMetersToPixels, // bottom, top
-    -1.f, 1.f // zNear, zFar
-  );
 }
 
 ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) noexcept {

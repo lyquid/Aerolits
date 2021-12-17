@@ -2,15 +2,10 @@
 
 #include "config_parser.hpp"
 #include "graphics_component.hpp"
-#include "palette.hpp"
 #include "physics_component.hpp"
 #include "../sdl2_wrappers/sdl2_geometry.hpp"
 #include "../sdl2_wrappers/sdl2_opengl.hpp"
-#include <box2d/box2d.h>
-#include <glm/glm.hpp>
-#include <SDL.h>
 #include <utility> // std::move std::exchange
-#include <vector>
 
 namespace ktp {
 
@@ -83,10 +78,6 @@ class AerolitePhysicsComponent: public PhysicsComponent {
    * @brief Used for contacts information.
    */
   b2WorldManifold world_manifold_ {};
-  /**
-   * @brief Projection matrix.
-   */
-  glm::mat4 projection_ {};
 };
 
 } // namespace ktp
