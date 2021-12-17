@@ -113,3 +113,58 @@ bool ktp::Geometry::triangulate(const Polygon& polygon, std::vector<Triangle>& r
   }
   return true;
 }
+
+bool ktp::Geometry::triangulate(const Polygon& polygon, GLfloatVector& result) {
+  const auto vertices {polygon.size()};
+  if (vertices < 3) return false;
+
+  std::vector<std::size_t> V {};
+  V.resize(vertices);
+
+  // we want a counter-clockwise polygon in V
+  if (area(polygon) > 0.f) {
+    for (auto i = 0u; i < vertices; ++i)
+      V[i] = i;
+  }
+  else {
+    for (auto i = 0u; i < vertices; ++i)
+      V[i] = (vertices - 1) - i;
+  }
+
+  auto nv {vertices};
+  // remove nv-2 Vertices, creating 1 triangle every time
+  auto count {2 * nv};   // error detection
+
+  for (std::size_t i = 0, v = nv - 1; nv > 2; ++i) {
+    // if we loop, it is probably a non-simple polygon
+    if (0 >= (count--)) return false; // Triangulate: ERROR - probable bad polygon!
+
+    // three consecutive vertices in current polygon, <u,v,w>
+    auto u {v};
+    if (nv <= u) u = 0; // previous
+    v = u + 1u;
+    if (nv <= v) v = 0; // new v
+    auto w {v + 1u};
+    if (nv <= w) w = 0; // next
+
+    if (snip(polygon, u, v, w, nv, V)) {
+      std::size_t a{V[u]}, b{V[v]}, c{V[w]}, s{}, t{};
+      // output Triangle
+      result.push_back(polygon[a].x);
+      result.push_back(polygon[a].y);
+      result.push_back(0.f);
+      result.push_back(polygon[b].x);
+      result.push_back(polygon[b].y);
+      result.push_back(0.f);
+      result.push_back(polygon[c].x);
+      result.push_back(polygon[c].y);
+      result.push_back(0.f);
+      // remove v from remaining polygon
+      for (s = v, t = v + 1; t < nv; ++s, ++t) V[s] = V[t];
+      --nv;
+      // reset error detection counter
+      count = 2 * nv;
+    }
+  }
+  return true;
+}

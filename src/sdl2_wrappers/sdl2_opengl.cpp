@@ -90,7 +90,6 @@ bool ktp::SDL2_GL::initGLEW(SDL_GLContext& context, SDL2_Window& window) {
     }
     // viewport
     glViewport(0, 0, window.getSize().x, window.getSize().y);
-    // glViewport(0, 0, 800, 600);
     // Vsync
     if (SDL_GL_SetSwapInterval(0) < 0) {
       logSDL2Error("SDL_GL_SetSwapInterval", SDL_LOG_CATEGORY_RENDER);

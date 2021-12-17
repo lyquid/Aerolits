@@ -35,7 +35,7 @@ void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {
 }
 
 void ktp::PlayerGraphicsComponent::update(const GameEntity& player) {
-  shader_.use();
+  shader_.setMat4f("mvp", glm::value_ptr(mvp_));
   vao_.bind();
   glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // 9 is the number of indices
 }
@@ -191,6 +191,5 @@ void ktp::PlayerPhysicsComponent::updateMVP() {
   glm::mat4 model {1.f};
   model = glm::translate(model, glm::vec3(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels, 0.f));
   model = glm::rotate(model, body_->GetAngle(), glm::vec3(0.f, 0.f, 1.f));
-  const glm::mat4 mvp {projection_ * model};
-  graphics_->shader_.setMat4f("mvp", glm::value_ptr(mvp));
+  graphics_->mvp_ = projection_ * model;
 }

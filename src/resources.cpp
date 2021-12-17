@@ -81,8 +81,8 @@ std::string ktp::Resources::getConfigPath(const std::string& sub_dir) {
 }
 
 void ktp::Resources::clear() {
-  for (auto& shader: shaders_map) {
-    glDeleteProgram(shader.second);
+  for (auto& [name, shader_id]: shaders_map) {
+    glDeleteProgram(shader_id);
   }
 }
 
@@ -132,7 +132,7 @@ GLuint ktp::Resources::loadShaderFromFile(const std::string& vertex_shader_path,
   glCheckError();
   printShaderLog(fragment_shader_id);
   // Link the program
-	GLuint id {glCreateProgram()};
+	const GLuint id {glCreateProgram()};
   glCheckError();
 	glAttachShader(id, vertex_shader_id);
 	glAttachShader(id, fragment_shader_id);

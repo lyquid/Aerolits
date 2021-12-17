@@ -169,19 +169,20 @@ void ktp::PausedState::update(Game& game, float delta_time) {
 /* PLAYING STATE */
 
 void ktp::PlayingState::draw(Game& game) {
-  // game.renderer_.clear();
+  glClearColor(clear_color_.r, clear_color_.g, clear_color_.b, clear_color_.a);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-  //   if (GameEntity::game_entities_[i].active_) {
-  //     GameEntity::game_entities_[i].object_.draw(game.renderer_);
-  //   }
-  // }
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+    if (GameEntity::game_entities_[i].active_) {
+      GameEntity::game_entities_[i].object_.draw();
+    }
+  }
 
   // game.gui_sys_.scoreText().render(game.renderer_);
 
-  // if (game.debug_draw_on_) game.world_.DebugDraw();
+  if (game.debug_draw_on_) game.world_.DebugDraw();
 
-  // game.renderer_.present();
+  SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
 ktp::GameState* ktp::PlayingState::enter(Game& game) {
@@ -222,6 +223,10 @@ void ktp::PlayingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
     case SDLK_F1:
       game.debug_draw_on_ = !game.debug_draw_on_;
       break;
+    case SDLK_F2:
+      wireframe_mode_ = !wireframe_mode_;
+      wireframe_mode_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      break;
     case SDLK_p:
       game.state_ = goToState(game, GameState::paused_);
       break;
@@ -253,10 +258,8 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
 /* TESTING STATE */
 
 void ktp::TestingState::draw(Game& game) {
-  glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+  glClearColor(clear_color_.r, clear_color_.g, clear_color_.b, clear_color_.a);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  //game.test_.draw();
 
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
@@ -273,7 +276,6 @@ ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
   GameEntity::createEntity(EntityTypes::Player);
-  //game.test_.tutorial();
   return this;
 }
 
@@ -310,10 +312,8 @@ void ktp::TestingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
     case SDLK_F2:
       wireframe_mode_ = !wireframe_mode_;
       wireframe_mode_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      // game.test_.drawTriangles();
       break;
     case SDLK_SPACE:
-      // game.test_.generateShape(100);
       break;
     case SDLK_r:
       game.state_ = goToState(game, GameState::testing_);
@@ -339,7 +339,6 @@ void ktp::TestingState::update(Game& game, float delta_time) {
     }
   }
   // if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 1) AerolitePhysicsComponent::spawnMovingAerolite();
-  // game.test_.update(delta_time);
   game.event_bus_.processEvents();
 }
 

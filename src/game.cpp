@@ -32,7 +32,6 @@ ktp::Game::Game() {
 
   SDL2_GL::initGLEW(context_.context(), main_window_);
 
-  // if (!renderer_.create(main_window_, screen_size_, SDL_RENDERER_ACCELERATED)) return false;
   if (!loadResources()) return;
   // if (!gui_sys_.init(renderer_)) return false;
 
@@ -44,6 +43,7 @@ ktp::Game::Game() {
   PhysicsComponent::setWorld(&world_);
 
   //state_ = GameState::goToState(*this, GameState::title_);
+  //state_ = GameState::goToState(*this, GameState::playing_);
   state_ = GameState::goToState(*this, GameState::testing_);
 }
 

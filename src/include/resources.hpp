@@ -15,7 +15,7 @@ namespace ktp { namespace Resources {
   std::string getResourcesPath(const std::string& sub_dir = "");
   ShaderProgram loadShader(const std::string& name, const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path = "");
   GLuint loadShaderFromFile(const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path = "");
-  inline ShaderProgram getShader(const std::string& name) { return shaders_map[name]; }
+  inline auto getShader(const std::string& name) { return ShaderProgram{shaders_map.at(name)}; }
   void printProgramLog(GLuint program);
   void printShaderLog(GLuint shader);
 

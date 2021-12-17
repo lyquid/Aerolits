@@ -33,6 +33,7 @@ class PlayerGraphicsComponent: public GraphicsComponent {
   VBO vertices_ {};
   EBO vertices_indices_ {};
   ShaderProgram shader_ {};
+  glm::mat4 mvp_ {};
 };
 
 class DemoInputComponent: public InputComponent {

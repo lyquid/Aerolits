@@ -71,6 +71,8 @@ class PlayingState: public GameState {
  private:
   virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
+  const b2Color clear_color_ {SDL2ColorToB2Color(Colors::black)};
+  bool wireframe_mode_ {false};
 };
 
 class TestingState: public GameState {
@@ -81,6 +83,7 @@ class TestingState: public GameState {
  private:
   virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
+  const b2Color clear_color_ {SDL2ColorToB2Color(Colors::black)};
   bool wireframe_mode_ {false};
 };
 

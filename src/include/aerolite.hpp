@@ -7,6 +7,7 @@
 #include "../sdl2_wrappers/sdl2_geometry.hpp"
 #include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include <box2d/box2d.h>
+#include <glm/glm.hpp>
 #include <SDL.h>
 #include <utility> // std::move std::exchange
 #include <vector>
@@ -19,16 +20,17 @@ using B2Line = Geometry::Line<b2Vec2>;
 class GameEntity;
 
 class AeroliteGraphicsComponent: public GraphicsComponent {
+  friend class AerolitePhysicsComponent;
  public:
-  AeroliteGraphicsComponent();
+  AeroliteGraphicsComponent() noexcept;
   virtual void update(const GameEntity& aerolite) override;
  private:
-  void generateOpenGLStuff(float size);
   b2Color color_ {SDL2ColorToB2Color(ConfigParser::aerolites_config.colors_.front())};
   VAO vao_ {};
   VBO vertices_ {};
-  EBO vertices_indices_ {};
-  static ShaderProgram shader_;
+  ShaderProgram shader_ {};
+  GLuint vertices_count_ {};
+  glm::mat4 mvp_ {};
 };
 
 class AerolitePhysicsComponent: public PhysicsComponent {
@@ -36,7 +38,6 @@ class AerolitePhysicsComponent: public PhysicsComponent {
  public:
 
   AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics) noexcept;
-  AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics, float size) noexcept;
   AerolitePhysicsComponent(const AerolitePhysicsComponent& other) = delete;
   AerolitePhysicsComponent(AerolitePhysicsComponent&& other) { *this = std::move(other); }
 
@@ -52,11 +53,11 @@ class AerolitePhysicsComponent: public PhysicsComponent {
 
  private:
 
-  static void createB2Body(AerolitePhysicsComponent& aerolite);
-  static void generateAeroliteShape(B2Vec2Vector& shape, float size);
-  static void generateAeroliteShape(B2Vec2Vector& shape, float size, unsigned int sides);
+  static void createB2Body(AerolitePhysicsComponent& aerolite, const GLfloatVector& triangulated_shape);
+  static Geometry::Polygon generateAeroliteShape(float size);
+  static Geometry::Polygon generateAeroliteShape(float size, unsigned int sides);
   void split();
-  void transformRenderShape();
+  void updateMVP();
 
   static constexpr float kMinSize_ {0.8f};
   static constexpr unsigned int kMaxSides_ {30u};
@@ -82,6 +83,10 @@ class AerolitePhysicsComponent: public PhysicsComponent {
    * @brief Used for contacts information.
    */
   b2WorldManifold world_manifold_ {};
+  /**
+   * @brief Projection matrix.
+   */
+  glm::mat4 projection_ {};
 };
 
 } // namespace ktp

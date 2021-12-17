@@ -87,7 +87,7 @@ void ktp::Testing::update(float delta_time) {
     }
   }
   //cube_.colors_.bind();
-  SDL2_GL::glBufferDataFromVector(GL_ARRAY_BUFFER, color_vertices_, GL_STATIC_DRAW);
+  // SDL2_GL::glBufferDataFromVector(GL_ARRAY_BUFFER, color_vertices_, GL_STATIC_DRAW);
 
   model_ = glm::rotate(model_, glm::radians(angle_ * delta_time), glm::vec3(0.f, 1.f, 0.f));
   shader_program_.setMat4f("model", glm::value_ptr(model_));
