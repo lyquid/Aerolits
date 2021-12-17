@@ -49,8 +49,8 @@ ktp::Game::Game() {
   PhysicsComponent::setWorld(&world_);
 
   //state_ = GameState::goToState(*this, GameState::title_);
-  state_ = GameState::goToState(*this, GameState::playing_);
-  //state_ = GameState::goToState(*this, GameState::testing_);
+  //state_ = GameState::goToState(*this, GameState::playing_);
+  state_ = GameState::goToState(*this, GameState::testing_);
 }
 
 void ktp::Game::clean() {
