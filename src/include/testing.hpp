@@ -25,7 +25,7 @@ class Testing {
   std::vector<GLfloat> color_vertices_ {};
   std::vector<bool> color_vertices_direction_ {};
 
-  ShaderProgram shader_program_ {};
+  ShaderProgram shader_program_;
 
   glm::mat4 model_ {glm::mat4(1.f)};
   const glm::mat4 projection_ {glm::perspective(glm::radians(45.f), 1366.f / 768.f, 0.1f, 100.f)};

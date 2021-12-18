@@ -50,7 +50,6 @@ class SDL2_GLContext {
 
 class ShaderProgram {
  public:
-  ShaderProgram() = default;
   ShaderProgram(GLuint id): id_(id) {}
   inline auto id() const { return id_; }
   inline void setBool(const char* name, bool value) const {

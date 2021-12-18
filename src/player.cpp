@@ -5,9 +5,8 @@
 
 /* GRAPHICS */
 
-ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept {
+ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept: shader_(Resources::getShader("player")) {
   generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
-  shader_ = Resources::getShader("player");
 }
 
 void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {
@@ -42,7 +41,7 @@ void ktp::PlayerGraphicsComponent::update(const GameEntity& player) {
 
 void ktp::DemoInputComponent::update(GameEntity& player, float delta_time) {
   stopSteering(delta_time);
-  // shoot(player);
+  shoot(player);
 
   thrust_ ? thrust(player, delta_time) : stopThrusting(player);
 

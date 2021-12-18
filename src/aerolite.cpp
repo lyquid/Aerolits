@@ -10,8 +10,7 @@
 
 /* GRAPHICS */
 
-ktp::AeroliteGraphicsComponent::AeroliteGraphicsComponent() noexcept {
-  shader_ = Resources::getShader("aerolite");
+ktp::AeroliteGraphicsComponent::AeroliteGraphicsComponent() noexcept: shader_(Resources::getShader("aerolite")) {
   const glm::vec4 uniform_color {color_.r, color_.g, color_.b, color_.a};
   shader_.setFloat4("aerolite_color", glm::value_ptr(uniform_color));
 }

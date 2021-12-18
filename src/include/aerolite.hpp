@@ -23,7 +23,7 @@ class AeroliteGraphicsComponent: public GraphicsComponent {
   b2Color color_ {SDL2ColorToB2Color(ConfigParser::aerolites_config.colors_.front())};
   VAO vao_ {};
   VBO vertices_ {};
-  ShaderProgram shader_ {};
+  ShaderProgram shader_;
   GLuint vertices_count_ {};
   glm::mat4 mvp_ {};
 };
@@ -55,8 +55,8 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   void updateMVP();
 
   static constexpr float kMinSize_ {0.8f};
-  static constexpr unsigned int kMaxSides_ {30u};
-  static constexpr unsigned int kMinSides_ {25u};
+  static constexpr unsigned int kMaxSides_ {40u};
+  static constexpr unsigned int kMinSides_ {30u};
   static constexpr unsigned int kScore_ {1000u};
   static constexpr unsigned int kNewBornTime_ {10000u}; // 10 seconds
 

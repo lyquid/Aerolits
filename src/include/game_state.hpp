@@ -37,6 +37,7 @@ class GameState {
   virtual void handleSDL2KeyEvents(Game&, SDL_Keycode) = 0;
   void setWindowTitle(Game& game);
   SDL_Event sdl_event_ {};
+  bool wireframe_mode_ {false};
 };
 
 class DemoState: public GameState {
@@ -73,7 +74,6 @@ class PlayingState: public GameState {
   virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
   const b2Color clear_color_ {SDL2ColorToB2Color(Colors::black)};
-  bool wireframe_mode_ {false};
 };
 
 class TestingState: public GameState {
@@ -85,7 +85,6 @@ class TestingState: public GameState {
   virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
   const b2Color clear_color_ {SDL2ColorToB2Color(Colors::black)};
-  bool wireframe_mode_ {false};
 };
 
 class TitleState: public GameState {

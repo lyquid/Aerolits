@@ -7,7 +7,7 @@
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include "sdl2_wrappers/sdl2_timer.hpp"
 
-ktp::Testing::Testing() {}
+ktp::Testing::Testing(): shader_program_(Resources::getShader("player")) {}
 
 void ktp::Testing::draw() const {
   shader_program_.use();
@@ -37,9 +37,9 @@ void ktp::Testing::tutorial() {
   const auto fragment_shader_path {Resources::getResourcesPath("shaders") + "default.frag"};
   // shader_program_.setup(vertex_shader_path, fragment_shader_path);
 
-  shader_program_.setMat4f("model", glm::value_ptr(model_));
-  shader_program_.setMat4f("view", glm::value_ptr(view_));
-  shader_program_.setMat4f("projection", glm::value_ptr(projection_));
+  // shader_program_.setMat4f("model", glm::value_ptr(model_));
+  // shader_program_.setMat4f("view", glm::value_ptr(view_));
+  // shader_program_.setMat4f("projection", glm::value_ptr(projection_));
 }
 
 void ktp::Testing::update(float delta_time) {

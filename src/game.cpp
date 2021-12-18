@@ -84,6 +84,9 @@ bool ktp::Game::loadResources() {
   vertex_shader_path = Resources::getResourcesPath("shaders") + "player.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "player.frag";
   Resources::loadShader("player", vertex_shader_path, fragment_shader_path);
+  vertex_shader_path = Resources::getResourcesPath("shaders") + "projectile.vert";
+  fragment_shader_path = Resources::getResourcesPath("shaders") + "projectile.frag";
+  Resources::loadShader("projectile", vertex_shader_path, fragment_shader_path);
   return true;
 }
 

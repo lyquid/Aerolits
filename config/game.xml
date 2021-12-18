@@ -1,5 +1,5 @@
 <game>
   <output value="true"/>
-  <screenSize x="1366" y="768"/>
-  <!-- <screenSize x="1920" y="1080"/> -->
+  <!-- <screenSize x="1366" y="768"/> -->
+  <screenSize x="1920" y="1080"/>
 </game>

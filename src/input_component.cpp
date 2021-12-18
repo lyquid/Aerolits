@@ -16,14 +16,14 @@ void ktp::InputComponent::shoot(GameEntity& player) {
     const auto cos {SDL_cosf(physics_->body_->GetAngle())};
 
     projectile_phy->body()->SetTransform({
-      physics_->body_->GetPosition().x + projectile_phy->size() * 5.2f * sin,
-      physics_->body_->GetPosition().y - projectile_phy->size() * 5.2f * cos},
-      physics_->body_->GetAngle()
+      physics_->body_->GetPosition().x - projectile_phy->size() * 5.2f * sin,
+      physics_->body_->GetPosition().y + projectile_phy->size() * 5.2f * cos},
+      physics_->body_->GetAngle() - b2_pi
     );
 
     projectile_phy->body()->SetLinearVelocity({
-       projectile_phy->speed() * sin * 30,
-      -projectile_phy->speed() * cos * 30
+      -projectile_phy->speed() * sin * 30,
+       projectile_phy->speed() * cos * 30
     });
 
     shooting_timer_ = SDL2_Timer::SDL2Ticks();

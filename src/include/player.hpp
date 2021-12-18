@@ -6,6 +6,7 @@
 #include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <utility> // std::move
+#include <memory>
 
 namespace ktp {
 
@@ -27,7 +28,7 @@ class PlayerGraphicsComponent: public GraphicsComponent {
   VAO vao_ {};
   VBO vertices_ {};
   EBO vertices_indices_ {};
-  ShaderProgram shader_ {};
+  ShaderProgram shader_;
   glm::mat4 mvp_ {};
 };
 
