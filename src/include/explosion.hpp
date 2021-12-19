@@ -2,7 +2,6 @@
 
 #include "graphics_component.hpp"
 #include "physics_component.hpp"
-#include <SDL.h>
 #include <utility> // std::move std::exchange
 
 namespace ktp {
@@ -13,8 +12,8 @@ class XParticleGraphicsComponent: public GraphicsComponent {
  public:
   virtual void update(const GameEntity& xparticle) override;
  private:
-  SDL_FPoint position_ {};
-  static constexpr SDL_Rect texture_rect_ {256, 64, 128, 128};
+  //SDL_FPoint position_ {};
+  //static constexpr SDL_Rect texture_rect_ {256, 64, 128, 128};
 };
 
 class XParticlePhysicsComponent: public PhysicsComponent {

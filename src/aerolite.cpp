@@ -107,18 +107,23 @@ ktp::Geometry::Polygon ktp::AerolitePhysicsComponent::generateAeroliteShape(floa
 
 void ktp::AerolitePhysicsComponent::reshape(float size) {
   size_ = size;
-  // generateAeroliteShape(shape_, size_, shape_.size());
-  // graphics_->renderShape().clear();
-  // graphics_->renderShape().resize(shape_.size() + 1);
+  const auto new_shape {generateAeroliteShape(size_)};
+  GLfloatVector triangulated_shape {};
+  Geometry::triangulate(new_shape, triangulated_shape);
   // Box2D
   const auto old_angle   {body_->GetAngle()};
   const auto old_angular {body_->GetAngularVelocity()};
   const auto old_delta   {body_->GetLinearVelocity()};
   const auto old_pos     {body_->GetPosition()};
-  // createB2Body(*this);
+  createB2Body(*this, triangulated_shape);
   body_->SetAngularVelocity(old_angular);
   body_->SetLinearVelocity(old_delta);
   body_->SetTransform(old_pos, old_angle);
+  // graphics
+  std::transform(triangulated_shape.begin(), triangulated_shape.end(), triangulated_shape.begin(), [](auto& coord){return coord * kMetersToPixels;});
+  graphics_->vertices_.setup(triangulated_shape);
+  graphics_->vertices_count_ = triangulated_shape.size() / 3u;
+  graphics_->vao_.linkAttrib(graphics_->vertices_, 0, 3, GL_FLOAT, 3 * sizeof(GLfloat), nullptr);
 }
 
 ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnAerolite(const b2Vec2& where) {
@@ -163,12 +168,12 @@ void ktp::AerolitePhysicsComponent::split() {
   if (size_ < kMinSize_) {
     // very small, destroyed on impact
     owner_->deactivate();
-    kuge::AeroliteDestroyedEvent ev {
-      kuge::KugeEventTypes::AeroliteDestroyed,
-      {owner_->physics()->body()->GetPosition().x * kMetersToPixels,
-       owner_->physics()->body()->GetPosition().y * kMetersToPixels},
-       (int)(kScore_ / size_)};
-    owner_->event_bus_->postEvent(ev);
+    // kuge::AeroliteDestroyedEvent ev {
+    //   kuge::KugeEventTypes::AeroliteDestroyed,
+    //   {owner_->physics()->body()->GetPosition().x * kMetersToPixels,
+    //    owner_->physics()->body()->GetPosition().y * kMetersToPixels},
+    //    (int)(kScore_ / size_)};
+    // owner_->event_bus_->postEvent(ev);
     return;
   } else {
     // good sized aerolite
@@ -199,14 +204,13 @@ void ktp::AerolitePhysicsComponent::split() {
       where.y = perpendicular.end.y + kSpacer * (perpendicular.begin.y - perpendicular.end.y);
       aerolite->physics()->body()->SetTransform({where.x, where.y}, old_angle);
     }
-
-    kuge::AeroliteSplittedEvent ev {
-      kuge::KugeEventTypes::AeroliteSplitted,
-      {old_pos.x * kMetersToPixels, old_pos.y * kMetersToPixels},
-      pieces,
-      (int)(((kScore_ / 10u) / size_) * (pieces + 1u))
-    };
-    owner_->event_bus_->postEvent(ev);
+    // kuge::AeroliteSplittedEvent ev {
+    //   kuge::KugeEventTypes::AeroliteSplitted,
+    //   {old_pos.x * kMetersToPixels, old_pos.y * kMetersToPixels},
+    //   pieces,
+    //   (int)(((kScore_ / 10u) / size_) * (pieces + 1u))
+    // };
+    // owner_->event_bus_->postEvent(ev);
   }
 }
 

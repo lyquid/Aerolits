@@ -54,7 +54,7 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   void split();
   void updateMVP();
 
-  static constexpr float kMinSize_ {0.8f};
+  static constexpr float kMinSize_ {1.f};
   static constexpr unsigned int kMaxSides_ {40u};
   static constexpr unsigned int kMinSides_ {30u};
   static constexpr unsigned int kScore_ {1000u};

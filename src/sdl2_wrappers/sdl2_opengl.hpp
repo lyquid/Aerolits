@@ -91,9 +91,19 @@ class ShaderProgram {
 };
 
 class VBO {
-  friend class VAO;
  public:
   VBO();
+  VBO(const VBO& other) = delete;
+  VBO(VBO&& other) { *this = std::move(other); }
+  ~VBO() { if (id_) glDeleteBuffers(1, &id_); }
+  VBO& operator=(const VBO& other) = delete;
+  VBO& operator=(VBO&& other) {
+    if (this != &other) {
+      if (id_) glDeleteBuffers(1, &id_);
+      id_ = std::exchange(other.id_, 0);
+    }
+    return *this;
+  }
   void bind() const { glBindBuffer(GL_ARRAY_BUFFER, id_); }
   void setup(const GLfloatVector& vertices);
   void setup(GLfloat* vertices, GLsizeiptr size);
@@ -103,9 +113,19 @@ class VBO {
 };
 
 class EBO {
-  friend class VAO;
  public:
   EBO();
+  EBO(const EBO& other) = delete;
+  EBO(EBO&& other) { *this = std::move(other); }
+  ~EBO() { if (id_) glDeleteBuffers(1, &id_); }
+  EBO& operator=(const EBO& other) = delete;
+  EBO& operator=(EBO&& other) {
+    if (this != &other) {
+      if (id_) glDeleteBuffers(1, &id_);
+      id_ = std::exchange(other.id_, 0);
+    }
+    return *this;
+  }
   void bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_); }
   void setup(const GLuintVector& indices);
   void setup(GLuint* indices, GLsizeiptr size);
@@ -117,6 +137,17 @@ class EBO {
 class VAO {
  public:
   VAO();
+  VAO(const VAO& other) = delete;
+  VAO(VAO&& other) { *this = std::move(other); }
+  ~VAO() { if (id_) glDeleteVertexArrays(1, &id_); }
+  VAO& operator=(const VAO& other) = delete;
+  VAO& operator=(VAO&& other) {
+    if (this != &other) {
+      if (id_) glDeleteVertexArrays(1, &id_);
+      id_ = std::exchange(other.id_, 0);
+    }
+    return *this;
+  }
   void bind() const { glBindVertexArray(id_); }
   void linkAttrib(const VBO& vbo, GLuint layout, GLuint components, GLenum type, GLsizeiptr stride, void* offset) const ;
   void unbind() const { glBindVertexArray(0); }
