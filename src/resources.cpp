@@ -1,5 +1,7 @@
 #include "include/resources.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include <fstream>
 #include <sstream>
 

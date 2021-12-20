@@ -154,7 +154,7 @@ void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float
       collided_ = false;
     }
   }
-  const auto threshold {size_};
+  const auto threshold {size_ * 1000.f};
   if (body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
       body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold) {
     owner_->deactivate();

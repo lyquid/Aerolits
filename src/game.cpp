@@ -55,8 +55,6 @@ ktp::Game::Game() {
 
 void ktp::Game::clean() {
   SDL2_Audio::closeMixer();
-  SDL2_Font::closeTTF();
-  SDL2_Image::closeImage();
 	SDL_Quit();
 }
 
@@ -65,8 +63,6 @@ bool ktp::Game::initSDL2() {
     logSDL2Error("SDL_Init");
     return false;
   }
-  if (!SDL2_Image::initImage()) return false;
-  if (!SDL2_Font::initTTF()) return false;
   if (!SDL2_Audio::initMixer()) return false;
 
   return true;
@@ -76,7 +72,6 @@ bool ktp::Game::loadResources() {
   if (!audio_sys_.loadResources()) {
     return false;
   }
-  // ParticlesAtlas::loadTexture(renderer_);
 
   auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};
   auto fragment_shader_path {Resources::getResourcesPath("shaders") + "aerolite.frag"};

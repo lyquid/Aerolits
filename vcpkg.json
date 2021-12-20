@@ -10,7 +10,8 @@
     "sdl2",
     "sdl2-image",
     "sdl2-mixer",
-    "sdl2-ttf"
+    "sdl2-ttf",
+    "stb"
   ],
   "builtin-baseline": "59a3f35e7e5a3281e59863a4a0123c325899f8f9",
   "overrides": [

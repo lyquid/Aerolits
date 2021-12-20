@@ -20,6 +20,11 @@ add_executable(Aerolits
 )
 target_compile_features(Aerolits PUBLIC cxx_std_17)
 set_target_properties(Aerolits PROPERTIES CXX_EXTENSIONS OFF)
+if(DEFINED CMAKE_TOOLCHAIN_FILE)
+ target_include_directories(Aerolits PRIVATE ${STB_INCLUDE_DIRS})
+else()
+ include_directories(${Aerolits_SOURCE_DIR}/lib)
+endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 	set(MY_DEBUG_OPTIONS /Wall /RTC)
