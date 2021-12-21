@@ -31,7 +31,7 @@ ktp::Game::Game() {
   logMessage("Box2D version: " + std::to_string(b2_version.major) + '.' + std::to_string(b2_version.minor) + '.' + std::to_string(b2_version.revision));
   if (!main_window_.create(kuge::GUISystem::kTitleText_ , screen_size_, SDL_WINDOW_OPENGL)) return;
 
-  SDL2_GL::initGLEW(context_.context(), main_window_);
+  SDL2_GL::initGLEW(context_, main_window_);
 
   if (!loadResources()) return;
   // if (!gui_sys_.init(renderer_)) return false;

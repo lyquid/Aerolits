@@ -11,6 +11,7 @@
 
 namespace ktp {
 
+class SDL2_GLContext;
 class SDL2_Window;
 
 using GLfloatVector = std::vector<GLfloat>;
@@ -22,7 +23,7 @@ namespace SDL2_GL {
 
   std::vector<GLfloat> cube(GLfloat size = 1.f);
 
-  bool initGLEW(SDL_GLContext& context, SDL2_Window& window);
+  bool initGLEW(SDL2_GLContext& context, const SDL2_Window& window);
 } // namespace SDL2_GL
 
 class SDL2_GLContext {

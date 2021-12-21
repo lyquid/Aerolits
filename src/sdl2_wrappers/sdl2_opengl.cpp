@@ -68,9 +68,9 @@ std::vector<GLfloat> ktp::SDL2_GL::cube(GLfloat size) {
   return vertices;
 }
 
-bool ktp::SDL2_GL::initGLEW(SDL_GLContext& context, SDL2_Window& window) {
-  context = SDL_GL_CreateContext(window.getWindow());
-  if (!context) {
+bool ktp::SDL2_GL::initGLEW(SDL2_GLContext& context, const SDL2_Window& window) {
+  context.context() = SDL_GL_CreateContext(window.getWindow());
+  if (!context.context()) {
     logSDL2Error("SDL_GL_CreateContext", SDL_LOG_CATEGORY_RENDER);
     return false;
   } else {
