@@ -213,6 +213,7 @@ GLuint ktp::Resources::loadTextureFromFile(const std::string& file, bool alpha) 
     image_format = GL_RGBA;
   }
 
+  stbi_set_flip_vertically_on_load(true);
   unsigned char* data {stbi_load(file.c_str(), &width, &height, &num_channels, 0)};
   if (data) {
     logMessage("Loaded texture from file " + file);
