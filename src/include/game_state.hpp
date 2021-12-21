@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_INCLUDE_GAME_STATE_HPP_
 
 #include "../sdl2_wrappers/sdl2_timer.hpp"
+#include "testing.hpp"
 
 // https://gameprogrammingpatterns.com/state.html
 
@@ -85,6 +86,7 @@ class TestingState: public GameState {
   virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
   const b2Color clear_color_ {SDL2ColorToB2Color(Colors::black)};
+  // Testing test_ {};
 };
 
 class TitleState: public GameState {

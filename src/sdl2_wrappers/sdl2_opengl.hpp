@@ -50,6 +50,7 @@ class SDL2_GLContext {
 
 class ShaderProgram {
  public:
+  ShaderProgram() = default;
   ShaderProgram(GLuint id): id_(id) {}
   inline auto id() const { return id_; }
   inline void setBool(const char* name, bool value) const {
@@ -153,6 +154,21 @@ class VAO {
   void unbind() const { glBindVertexArray(0); }
  private:
   GLuint id_ {};
+};
+
+class Texture2D {
+ public:
+  Texture2D(GLuint id): id_(id) {}
+  //void generate(GLsizei width, GLsizei height, unsigned char* data);
+  void bind() const { glBindTexture(GL_TEXTURE_2D, id_); }
+  void unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
+ private:
+  GLuint id_ {};
+  // GLsizei width_ {}, height_ {};
+  // GLint internal_format_ {GL_RGB};
+  // GLenum image_format_ {GL_RGB};
+  // GLint wrap_s_ {GL_REPEAT}, wrap_t_ {GL_REPEAT};
+  // GLint filter_max_ {GL_LINEAR}, filter_min_ {GL_LINEAR};
 };
 
 } // namespace ktp

@@ -12,22 +12,22 @@ namespace ktp {
 class Testing {
  public:
 
-  Testing();
-  ~Testing() {}
+  // Testing();
+  // ~Testing() {}
   void draw() const;
   void tutorial();
   void update(float delta_time);
 
  private:
 
-  //VAO cube_ {};
-  /// VAO_Config cube_config_{};
-  std::vector<GLfloat> color_vertices_ {};
-  std::vector<bool> color_vertices_direction_ {};
+  VAO vao_ {};
+  VBO vbo_ {};
+  GLfloatVector vertices_ {};
+  GLfloatVector vertices_color_ {};
+  std::vector<bool> vertices_color_direction_ {};
 
-  ShaderProgram shader_program_;
+  ShaderProgram shader_program_ {};
 
-  glm::mat4 model_ {glm::mat4(1.f)};
   const glm::mat4 projection_ {glm::perspective(glm::radians(45.f), 1366.f / 768.f, 0.1f, 100.f)};
   GLfloat angle_ {10.f};
 
@@ -37,6 +37,7 @@ class Testing {
   glm::mat4 view_ {glm::lookAt(camera_pos_,
                                camera_pos_ + camera_front_,
                                camera_up_)};
+  glm::mat4 mvp_ {};
 };
 
 } // namespace ktp

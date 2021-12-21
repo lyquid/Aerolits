@@ -1,7 +1,6 @@
 #ifndef AEROLITS_SRC_INCLUDE_BOX2D_UTILS_HPP_
 #define AEROLITS_SRC_INCLUDE_BOX2D_UTILS_HPP_
 
-#include <glm/glm.hpp>
 #include <box2d/box2d.h>
 #include <SDL.h>
 
@@ -37,23 +36,6 @@ namespace ktp {
   static b2Color SDL2ColorToB2Color(const SDL_Color& orig) {
     constexpr float inv {1.f / 255.f};
     return b2Color {orig.r * inv, orig.g * inv, orig.b * inv, orig.a * inv};
-  }
-
-  static glm::vec3 convertWorldToScreen(const b2Vec2& pw) {
-    float w = 1366;
-    float h = 768;
-    b2Vec2 m_center {0.f, 20.f}; //?
-    float ratio = w / h;
-    b2Vec2 extents(ratio * 25.0f, 25.0f);
-    extents *= 1.f; // m_zoom ?
-
-    b2Vec2 lower = m_center - extents;
-    b2Vec2 upper = m_center + extents;
-
-    float u = (pw.x - lower.x) / (upper.x - lower.x);
-    float v = (pw.y - lower.y) / (upper.y - lower.y);
-
-    return glm::vec3{u * w, (1.f - v) * h, 0.f};
   }
 
 } // namespace ktp

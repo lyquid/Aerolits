@@ -8,7 +8,7 @@
 
 GLenum ktp::SDL2_GL::glCheckError_(const char* file, int line) {
   GLenum error_code;
-  while ((error_code = glGetError()) != GL_NO_ERROR) {
+  while (error_code = glGetError()) {
     std::string error_msg {};
     switch (error_code) {
       case GL_INVALID_ENUM:                  error_msg = "INVALID_ENUM"; break;
@@ -169,3 +169,20 @@ void ktp::VAO::linkAttrib(const VBO& vbo, GLuint layout, GLuint components, GLen
   glCheckError();
   vbo.unbind();
 }
+
+/* Texture2D */
+
+// void ktp::Texture2D::generate(GLsizei width, GLsizei height, unsigned char* data) {
+//   width_ = width;
+//   height_ = height;
+//   // create Texture
+//   glBindTexture(GL_TEXTURE_2D, id_);
+//   glTexImage2D(GL_TEXTURE_2D, 0, internal_format_, width, height, 0, image_format_, GL_UNSIGNED_BYTE, data);
+//   // set Texture wrap and filter modes
+//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s_);
+//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t_);
+//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_min_);
+//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_max_);
+//   // unbind texture
+//   glBindTexture(GL_TEXTURE_2D, 0);
+// }

@@ -74,8 +74,6 @@ class Game {
   //DebugDraw debug_draw_ {};
   bool debug_draw_on_ {false};
   ContactListener contact_listener_ {};
-  // Testing
-  // Testing test_ {};
 };
 
 } // end namespace ktp

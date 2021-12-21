@@ -72,7 +72,7 @@ bool ktp::Game::loadResources() {
   if (!audio_sys_.loadResources()) {
     return false;
   }
-
+  // shaders
   auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};
   auto fragment_shader_path {Resources::getResourcesPath("shaders") + "aerolite.frag"};
   Resources::loadShader("aerolite", vertex_shader_path, fragment_shader_path);
@@ -82,6 +82,12 @@ bool ktp::Game::loadResources() {
   vertex_shader_path = Resources::getResourcesPath("shaders") + "projectile.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "projectile.frag";
   Resources::loadShader("projectile", vertex_shader_path, fragment_shader_path);
+  vertex_shader_path = Resources::getResourcesPath("shaders") + "testing.vert";
+  fragment_shader_path = Resources::getResourcesPath("shaders") + "testing.frag";
+  Resources::loadShader("testing", vertex_shader_path, fragment_shader_path);
+  // textures
+  auto texture_path {Resources::getResourcesPath("textures") + "asteroid.png"};
+  Resources::loadTexture("asteroid", texture_path, false);
   return true;
 }
 

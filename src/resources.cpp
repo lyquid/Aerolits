@@ -5,7 +5,19 @@
 #include <fstream>
 #include <sstream>
 
-ktp::Resources::ShadersMap ktp::Resources::shaders_map {};
+ktp::Resources::ShadersMap  ktp::Resources::shaders_map {};
+ktp::Resources::TexturesMap ktp::Resources::textures_map {};
+
+void ktp::Resources::clear() {
+  for (auto& [name, shader_id]: shaders_map) {
+    glDeleteProgram(shader_id);
+  }
+  for (auto& [name, texture_id]: textures_map) {
+    glDeleteTextures(1, &texture_id);
+  }
+}
+
+/* PATHS */
 
 std::string ktp::Resources::getResourcesPath(const std::string& sub_dir) {
   /* Original idea from Will Usher */
@@ -82,11 +94,7 @@ std::string ktp::Resources::getConfigPath(const std::string& sub_dir) {
   return sub_dir.empty() ? base_res : base_res + sub_dir + kPathSeparator;
 }
 
-void ktp::Resources::clear() {
-  for (auto& [name, shader_id]: shaders_map) {
-    glDeleteProgram(shader_id);
-  }
-}
+/* SHADERS */
 
 ktp::ShaderProgram ktp::Resources::loadShader(const std::string& name, const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path) {
   shaders_map[name] = loadShaderFromFile(vertex_shader_path, fragment_shader_path, geometry_shader_path);
@@ -182,4 +190,53 @@ void ktp::Resources::printShaderLog(GLuint shader) {
   } else {
     logError("printShaderLog(): Name " + std::to_string(shader) + " is not a shader.");
   }
+}
+
+/* TEXTURES */
+
+ktp::Texture2D ktp::Resources::loadTexture(const std::string& name, const std::string& file, bool alpha) {
+  textures_map[name] = loadTextureFromFile(file, alpha);
+  return Texture2D{textures_map[name]};
+}
+
+GLuint ktp::Resources::loadTextureFromFile(const std::string& file, bool alpha) {
+  GLuint id {};
+  GLsizei width {}, height {};
+  GLint internal_format {GL_RGB};
+  GLenum image_format {GL_RGB};
+  constexpr GLint wrap_s {GL_REPEAT}, wrap_t {GL_REPEAT};
+  constexpr GLint filter_max {GL_LINEAR}, filter_min {GL_LINEAR_MIPMAP_LINEAR};
+  int num_channels {};
+
+  if (alpha) {
+    internal_format = GL_RGBA;
+    image_format = GL_RGBA;
+  }
+
+  unsigned char* data {stbi_load(file.c_str(), &width, &height, &num_channels, 0)};
+  if (data) {
+    logMessage("Loaded texture from file " + file);
+    glGenTextures(1, &id);
+    glCheckError();
+    glBindTexture(GL_TEXTURE_2D, id);
+    // set Texture wrap and filter modes
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
+    // When MINifying the image, use a LINEAR blend of two mipmaps, each filtered LINEARLY too (GL_LINEAR_MIPMAP_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_min);
+    // When MAGnifying the image (no bigger mipmap available), use XXXX filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_max);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, image_format, GL_UNSIGNED_BYTE, data);
+    glCheckError();
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glCheckError();
+    // unbind texture
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    stbi_image_free(data);
+  } else {
+    logError("Could NOT load texture " + file);
+  }
+  return id;
 }
