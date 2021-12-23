@@ -159,8 +159,8 @@ class VAO {
 
 class Texture2D {
  public:
+  Texture2D() = default;
   Texture2D(GLuint id): id_(id) {}
-  //void generate(GLsizei width, GLsizei height, unsigned char* data);
   void bind() const { glBindTexture(GL_TEXTURE_2D, id_); }
   void unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
  private:

@@ -6,9 +6,8 @@
 #include "kuge/kuge.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include <algorithm>
+#include <cmath>
 #include <limits>
-
-#include <iostream> // boooooooooooooooo!!!
 
 /* GRAPHICS */
 
@@ -76,11 +75,12 @@ ktp::GLfloatVector ktp::AerolitePhysicsComponent::convertToUV(const GLfloatVecto
     if (v[i + 1] > max_y) max_y = v[i + 1];
     if (v[i + 1] < min_y) min_y = v[i + 1];
   }
-  const auto diagonal {SDL_sqrtf((max_x - min_x) * (max_x - min_x) + (max_y - min_y) * (max_y - min_y))};
+  const auto diagonal_inv {1.f / SDL_sqrtf((max_x - min_x) * (max_x - min_x) + (max_y - min_y) * (max_y - min_y))};
   GLfloatVector result {};
+  result.reserve(static_cast<std::size_t>(v.size() * 0.66f));
   for (std::size_t i = 0; i < v.size(); i += 3) {
-    result.push_back((v[i] - min_x) / diagonal);
-    result.push_back((v[i + 1] - min_y) / diagonal);
+    result.push_back((v[i] - min_x) * diagonal_inv);
+    result.push_back((v[i + 1] - min_y) * diagonal_inv);
   }
   return result;
 }
@@ -121,11 +121,11 @@ ktp::Geometry::Polygon ktp::AerolitePhysicsComponent::generateAeroliteShape(floa
 
 ktp::Geometry::Polygon ktp::AerolitePhysicsComponent::generateAeroliteShape(float size, unsigned int sides, SDL_FPoint offset) {
   Geometry::Polygon shape {};
+  shape.reserve(sides);
   GLfloat x {}, y {};
-  // Generates a shape around coord [0,0], CCW staring around 15:00, length based on the size specified
+  // Generates a shape around coord [0,0], CCW, length based on the size specified
   for (auto i = 0u; i < sides; ++i) {
-    const auto f_size {size * generateRand(0.85f, 1.f)};
-    // const auto f_size {size};
+    const auto f_size {size * generateRand(0.82f, 1.f)};
     x = f_size * SDL_cosf(2 * b2_pi * i / sides) + offset.x;
     y = f_size * SDL_sinf(2 * b2_pi * i / sides) + offset.y;
     shape.push_back({x, y});
