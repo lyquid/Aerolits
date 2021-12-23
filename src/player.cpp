@@ -6,19 +6,18 @@
 /* GRAPHICS */
 
 ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept:
-  shader_(Resources::getShader("player")),
-  texture_(Resources::getTexture("asteroid")) {
-    
+  shader_(Resources::getShader("player")) {
+
   generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
 }
 
 void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {
   const GLfloatVector player_shape {
-     0.00f * size,  0.50f * size, 0.f,  color_.r,  color_.g,  color_.b,  0.50f, 0.75f,     // top        0
-    -0.33f * size, -0.50f * size, 0.f,  color_.r,  color_.g,  color_.b,  0.33f, 0.25f,     // left       1
-    -0.15f * size, -0.33f * size, 0.f,  color_.r,  color_.g,  color_.b,  0.45f, 0.33f,     // left flap  2
-     0.15f * size, -0.33f * size, 0.f,  color_.r,  color_.g,  color_.b,  0.65f, 0.33f,     // right flap 3
-     0.33f * size, -0.50f * size, 0.f,  color_.r,  color_.g,  color_.b,  0.77f, 0.25f      // right      4
+     0.00f * size,  0.50f * size, 0.f,  color_.r,  color_.g,  color_.b,   // top        0
+    -0.33f * size, -0.50f * size, 0.f,  color_.r,  color_.g,  color_.b,   // left       1
+    -0.15f * size, -0.33f * size, 0.f,  color_.r,  color_.g,  color_.b,   // left flap  2
+     0.15f * size, -0.33f * size, 0.f,  color_.r,  color_.g,  color_.b,   // right flap 3
+     0.33f * size, -0.50f * size, 0.f,  color_.r,  color_.g,  color_.b    // right      4
   };
   const GLuintVector player_shape_indices {
     0, 1, 2,
@@ -27,18 +26,15 @@ void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {
   };
   vertices_.setup(player_shape);
   // vertices
-  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 8 * sizeof(GLfloat), nullptr);
+  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
   // colors
-  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
-  // texture
-  vao_.linkAttrib(vertices_, 2, 2, GL_FLOAT, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GL_FLOAT)));
+  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
   // EBO
   vertices_indices_.setup(player_shape_indices);
 }
 
 void ktp::PlayerGraphicsComponent::update(const GameEntity& player) {
   shader_.setMat4f("mvp", glm::value_ptr(mvp_));
-  texture_.bind();
   vao_.bind();
   glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // 9 is the number of indices
 }

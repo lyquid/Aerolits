@@ -49,7 +49,6 @@ ktp::Game::Game() {
   PhysicsComponent::setWorld(&world_);
 
   state_ = GameState::goToState(*this, GameState::title_);
-  //state_ = GameState::goToState(*this, GameState::playing_);
   //state_ = GameState::goToState(*this, GameState::testing_);
 }
 
@@ -88,6 +87,8 @@ bool ktp::Game::loadResources() {
   // textures
   auto texture_path {Resources::getResourcesPath("textures") + "asteroid.png"};
   Resources::loadTexture("asteroid", texture_path, false);
+  texture_path = Resources::getResourcesPath("textures") + "asteroid_cut.png";
+  Resources::loadTexture("asteroid_cut", texture_path, false);
   return true;
 }
 

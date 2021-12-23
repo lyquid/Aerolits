@@ -30,7 +30,6 @@ class PlayerGraphicsComponent: public GraphicsComponent {
   EBO vertices_indices_ {};
   ShaderProgram shader_;
   glm::mat4 mvp_ {};
-  Texture2D texture_;
 };
 
 class DemoInputComponent: public InputComponent {

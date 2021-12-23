@@ -20,10 +20,12 @@ class AeroliteGraphicsComponent: public GraphicsComponent {
   AeroliteGraphicsComponent() noexcept;
   virtual void update(const GameEntity& aerolite) override;
  private:
-  b2Color color_ {SDL2ColorToB2Color(ConfigParser::aerolites_config.colors_.front())};
+  b2Color color_ {SDL2ColorToB2Color(ConfigParser::aerolites_config.colors_[1])};
   VAO vao_ {};
   VBO vertices_ {};
+  VBO uv_ {};
   ShaderProgram shader_;
+  Texture2D texture_;
   GLuint vertices_count_ {};
   glm::mat4 mvp_ {};
 };
@@ -48,13 +50,14 @@ class AerolitePhysicsComponent: public PhysicsComponent {
 
  private:
 
+  static GLfloatVector convertToUV(const GLfloatVector& v);
   static void createB2Body(AerolitePhysicsComponent& aerolite, const GLfloatVector& triangulated_shape);
-  static Geometry::Polygon generateAeroliteShape(float size);
-  static Geometry::Polygon generateAeroliteShape(float size, unsigned int sides);
+  static Geometry::Polygon generateAeroliteShape(float size, SDL_FPoint offset = {0.f, 0.f});
+  static Geometry::Polygon generateAeroliteShape(float size, unsigned int sides, SDL_FPoint offset = {0.f, 0.f});
   void split();
   void updateMVP();
 
-  static constexpr float kMinSize_ {1.f};
+  static constexpr float kMinSize_ {1.4f};
   static constexpr unsigned int kMaxSides_ {40u};
   static constexpr unsigned int kMinSides_ {30u};
   static constexpr unsigned int kScore_ {1000u};
