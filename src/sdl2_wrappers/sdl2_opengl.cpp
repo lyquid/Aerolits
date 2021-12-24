@@ -181,9 +181,9 @@ void ktp::EBO::setup(const GLuintVector& indices) {
   glCheckError();
 }
 
-void ktp::EBO::setup(const GLuint* indices, GLsizeiptr count) {
+void ktp::EBO::setup(const GLuint* indices, GLsizeiptr size) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, count, indices, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
   glCheckError();
 }
 
