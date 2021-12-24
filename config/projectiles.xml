@@ -15,7 +15,7 @@
     <friction value="0.0"/>
     <linearDamping value="5.0"/>
     <particleRadius value="0.2"/>
-    <rays value="80"/>
+    <rays value="40"/>
     <restitution value="0.99"/>
   </explosion>
 </projectiles>

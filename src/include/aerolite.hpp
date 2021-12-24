@@ -24,9 +24,10 @@ class AeroliteGraphicsComponent: public GraphicsComponent {
   VAO vao_ {};
   VBO vertices_ {};
   VBO uv_ {};
+  EBO ebo_ {};
   ShaderProgram shader_;
   Texture2D texture_;
-  GLuint vertices_count_ {};
+  GLuint indices_count_ {};
   glm::mat4 mvp_ {};
 };
 

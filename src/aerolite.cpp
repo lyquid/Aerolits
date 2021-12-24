@@ -6,7 +6,6 @@
 #include "kuge/kuge.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include <algorithm>
-#include <cmath>
 #include <limits>
 
 /* GRAPHICS */
@@ -23,7 +22,7 @@ void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite) {
   shader_.setMat4f("mvp", glm::value_ptr(mvp_));
   texture_.bind();
   vao_.bind();
-  glDrawArrays(GL_TRIANGLES, 0, vertices_count_);
+  glDrawElements(GL_TRIANGLES, indices_count_, GL_UNSIGNED_INT, 0);
 }
 
 /* PHYSICS */
@@ -33,20 +32,28 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, Aerol
   born_time_ = Game::gameplay_timer_.milliseconds();
   owner_ = owner;
   size_ = ConfigParser::aerolites_config.size_.value_ * generateRand(ConfigParser::aerolites_config.size_.rand_min_, ConfigParser::aerolites_config.size_.rand_max_);
-
+  // shape is a vector of points: {[x,y], [x,y], ...} with center at [0,0]
   const auto shape {generateAeroliteShape(size_)};
+  // triangulated_shape is a vector of floats: {x, y, z, x, y, z, x, y, ...}
   GLfloatVector triangulated_shape {};
   Geometry::triangulate(shape, triangulated_shape);
+  // Box2D
   createB2Body(*this, triangulated_shape);
-  // normalize the coords to UV coords
-  GLfloatVector texture_coords {convertToUV(triangulated_shape)};
+  // generate a EBO based on the triangulated_shape
+  GLuintVector indices {};
+  EBO::generateEBO(triangulated_shape, indices);
+  // convert cartesian coords to UV coords and set up the uv VBO
+  const GLfloatVector texture_coords {convertToUV(triangulated_shape)};
   graphics_->uv_.setup(texture_coords);
-  // transform box2d coords to pixels
+  // convert box2d coords to pixels and set up the vertices VBO
   std::transform(triangulated_shape.begin(), triangulated_shape.end(), triangulated_shape.begin(), [](auto& coord){return coord * kMetersToPixels;});
   graphics_->vertices_.setup(triangulated_shape);
-  graphics_->vertices_count_ = triangulated_shape.size() / 3u;
+  // link the attributes
   graphics_->vao_.linkAttrib(graphics_->vertices_, 0, 3, GL_FLOAT, 0, nullptr);
-  graphics_->vao_.linkAttrib(graphics_->uv_, 1, 2, GL_FLOAT, 0, nullptr);
+  graphics_->vao_.linkAttrib(graphics_->uv_,       1, 2, GL_FLOAT, 0, nullptr);
+  // setup the EBO
+  graphics_->indices_count_ = indices.size();
+  graphics_->ebo_.setup(indices);
 }
 
 ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) noexcept {
@@ -71,9 +78,9 @@ ktp::GLfloatVector ktp::AerolitePhysicsComponent::convertToUV(const GLfloatVecto
   GLfloat max_x{v[0]}, min_x{v[0]}, max_y{v[1]}, min_y{v[1]};
   for (std::size_t i = 0; i < v.size(); i += 3) {
     if (v[i] > max_x) max_x = v[i];
-    if (v[i] < min_x) min_x = v[i];
+    else if (v[i] < min_x) min_x = v[i];
     if (v[i + 1] > max_y) max_y = v[i + 1];
-    if (v[i + 1] < min_y) min_y = v[i + 1];
+    else if (v[i + 1] < min_y) min_y = v[i + 1];
   }
   const auto diagonal_inv {1.f / SDL_sqrtf((max_x - min_x) * (max_x - min_x) + (max_y - min_y) * (max_y - min_y))};
   GLfloatVector result {};
@@ -147,15 +154,21 @@ void ktp::AerolitePhysicsComponent::reshape(float size) {
   body_->SetAngularVelocity(old_angular);
   body_->SetLinearVelocity(old_delta);
   body_->SetTransform(old_pos, old_angle);
+  // generate a new EBO based on the triangulated_shape
+  GLuintVector indices {};
+  EBO::generateEBO(triangulated_shape, indices);
   // normalize texture
-  GLfloatVector texture_coords {convertToUV(triangulated_shape)};
+  const GLfloatVector texture_coords {convertToUV(triangulated_shape)};
   graphics_->uv_.setup(texture_coords);
-  // graphics
+  // convert box2d coords to pixels
   std::transform(triangulated_shape.begin(), triangulated_shape.end(), triangulated_shape.begin(), [](auto& coord){return coord * kMetersToPixels;});
+  // setup VBO and link the attributes
   graphics_->vertices_.setup(triangulated_shape);
-  graphics_->vertices_count_ = triangulated_shape.size() / 3u;
   graphics_->vao_.linkAttrib(graphics_->vertices_, 0, 3, GL_FLOAT, 0, nullptr);
   graphics_->vao_.linkAttrib(graphics_->uv_, 1, 2, GL_FLOAT, 0, nullptr);
+  // setup the EBO
+  graphics_->indices_count_ = indices.size();
+  graphics_->ebo_.setup(indices);
 }
 
 ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnAerolite(const b2Vec2& where) {

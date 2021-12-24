@@ -1,13 +1,14 @@
 #include "sdl2_log.hpp"
 #include "sdl2_opengl.hpp"
 #include "sdl2_window.hpp"
+#include <array>
 #include <fstream>
 #include <sstream>
 
 /* SDL2_GL */
 
 GLenum ktp::SDL2_GL::glCheckError_(const char* file, int line) {
-  GLenum error_code;
+  GLenum error_code {};
   while (error_code = glGetError()) {
     std::string error_msg {};
     switch (error_code) {
@@ -75,10 +76,6 @@ bool ktp::SDL2_GL::initGLEW(SDL2_GLContext& context, const SDL2_Window& window) 
     return false;
   } else {
     glEnable(GL_MULTISAMPLE);
-    // Enable depth test
-    // glEnable(GL_DEPTH_TEST);
-    // Accept fragment if it closer to the camera than the former one
-    // glDepthFunc(GL_LESS);
     // GLEW
     glewExperimental = GL_TRUE;
     const auto glew_error {glewInit()};
@@ -122,7 +119,7 @@ void ktp::VBO::setup(const GLfloatVector& vertices) {
   glCheckError();
 }
 
-void ktp::VBO::setup(GLfloat* vertices, GLsizeiptr size) {
+void ktp::VBO::setup(const GLfloat* vertices, GLsizeiptr size) {
   glBindBuffer(GL_ARRAY_BUFFER, id_);
   glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
   glCheckError();
@@ -135,15 +132,58 @@ ktp::EBO::EBO() {
   glCheckError();
 }
 
+void ktp::EBO::generateEBO(GLfloatVector& vertices, GLuintVector& indices) {
+  std::vector<std::array<GLfloat, 3>> coords {}, unique_coords {};
+  coords.reserve(static_cast<std::size_t>(vertices.size() * 0.33f));
+  // assemble a vector of arrays: {[x,y,z], [x,y,z], ...}
+  for (std::size_t i = 0; i < vertices.size(); i += 3) {
+    coords.push_back({vertices[i], vertices[i + 1], vertices[i + 2]});
+  }
+  unique_coords.reserve(static_cast<std::size_t>(coords.size() - (coords.size() * 0.25f)));
+  // indices will be as long as the coords vector
+  indices.clear();
+  indices.reserve(coords.size());
+  // push the first element and the first index
+  indices.push_back(0);
+  unique_coords.push_back(coords[0]);
+  // find repeated coords
+  for (std::size_t i = 1; i < coords.size(); ++i) {
+    bool found {false};
+    for (std::size_t j = 0; j < unique_coords.size(); ++j) {
+      if (coords[i][0] == unique_coords[j][0] && coords[i][1] == unique_coords[j][1] && coords[i][2] == unique_coords[j][2]) {
+        // coord already in the list
+        found = true;
+        // so, new index will point to the j position
+        indices.push_back(j);
+        break;
+      }
+    }
+    if (!found) {
+      // new unique coord
+      unique_coords.push_back(coords[i]);
+      // the new index points at position size()-1
+      indices.push_back(unique_coords.size() - 1u);
+    }
+  }
+  // re-construct the vertices vector: {z, y, z, x, y, z, x, y, ...}
+  vertices.clear();
+  if (vertices.capacity() < unique_coords.size() * 3u) vertices.reserve(unique_coords.size() * 3u);
+  for (const auto& coord: unique_coords) {
+    for (const auto num: coord) {
+      vertices.push_back(num);
+    }
+  }
+}
+
 void ktp::EBO::setup(const GLuintVector& indices) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
   glCheckError();
 }
 
-void ktp::EBO::setup(GLuint* indices, GLsizeiptr size) {
+void ktp::EBO::setup(const GLuint* indices, GLsizeiptr count) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, count, indices, GL_STATIC_DRAW);
   glCheckError();
 }
 

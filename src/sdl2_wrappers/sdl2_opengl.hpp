@@ -108,7 +108,7 @@ class VBO {
   }
   void bind() const { glBindBuffer(GL_ARRAY_BUFFER, id_); }
   void setup(const GLfloatVector& vertices);
-  void setup(GLfloat* vertices, GLsizeiptr size);
+  void setup(const GLfloat* vertices, GLsizeiptr size);
   void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
  private:
   GLuint id_ {};
@@ -128,9 +128,10 @@ class EBO {
     }
     return *this;
   }
+  static void generateEBO(GLfloatVector& vertices, GLuintVector& indices);
   void bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_); }
   void setup(const GLuintVector& indices);
-  void setup(GLuint* indices, GLsizeiptr size);
+  void setup(const GLuint* indices, GLsizeiptr count);
   void unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
  private:
   GLuint id_ {};
