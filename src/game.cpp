@@ -53,6 +53,8 @@ ktp::Game::Game() {
 }
 
 void ktp::Game::clean() {
+  GameEntity::clear();
+  clearB2World(world_);
   SDL2_Audio::closeMixer();
 	SDL_Quit();
 }
@@ -96,13 +98,5 @@ void ktp::Game::reset() {
   GameEntity::clear();
   // we need to do this to prevent some of the bodies not being destroyed
   // ie: explosion particles if you pause and go to title
-  if (world_.GetBodyCount()) {
-    b2Body* body {world_.GetBodyList()};
-    b2Body* aux {nullptr};
-    while (body) {
-      aux = body->GetNext();
-      world_.DestroyBody(body);
-      body = aux;
-    }
-  }
+  clearB2World(world_);
 }
