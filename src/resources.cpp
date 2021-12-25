@@ -4,7 +4,9 @@
 #include "stb_image.h"
 #include <fstream>
 #include <sstream>
+#include <utility>
 
+ktp::Resources::FontsMap    ktp::Resources::fonts_map {};
 ktp::Resources::ShadersMap  ktp::Resources::shaders_map {};
 ktp::Resources::TexturesMap ktp::Resources::textures_map {};
 
@@ -94,14 +96,19 @@ std::string ktp::Resources::getConfigPath(const std::string& sub_dir) {
   return sub_dir.empty() ? base_res : base_res + sub_dir + kPathSeparator;
 }
 
-/* SHADERS */
+/* FONTS */
 
-ktp::ShaderProgram ktp::Resources::loadShader(const std::string& name, const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path) {
-  shaders_map[name] = loadShaderFromFile(vertex_shader_path, fragment_shader_path, geometry_shader_path);
-  return ShaderProgram{shaders_map[name]};
+void ktp::Resources::loadFont(const std::string& name, const std::string& file, int size) {
+  SDL2_Font font {};
+  if (font.loadFont(file, size)) {
+    fonts_map[name] = std::move(font);
+    logMessage("Loaded font \"" + name + "\" (" + std::to_string(size) + ") from file " + file);
+  }
 }
 
-GLuint ktp::Resources::loadShaderFromFile(const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path) {
+/* SHADERS */
+
+void ktp::Resources::loadShader(const std::string& name, const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path) {
   // Create the shaders
 	GLuint vertex_shader_id {glCreateShader(GL_VERTEX_SHADER)};
 	GLuint fragment_shader_id {glCreateShader(GL_FRAGMENT_SHADER)};
@@ -115,6 +122,7 @@ GLuint ktp::Resources::loadShaderFromFile(const std::string& vertex_shader_path,
 		vertex_shader_stream.close();
 	} else {
     logError("Could NOT open vertex shader file", vertex_shader_path);
+    return;
 	}
   // Read the Fragment Shader code from the file
 	std::string fragment_shader_code {};
@@ -126,6 +134,7 @@ GLuint ktp::Resources::loadShaderFromFile(const std::string& vertex_shader_path,
 		fragment_shader_stream.close();
 	} else {
     logError("Could NOT open fragment shader file", fragment_shader_path);
+    return;
 	}
   // Compile Vertex Shader
   logMessage("Compiling vertex shader " + vertex_shader_path);
@@ -155,7 +164,11 @@ GLuint ktp::Resources::loadShaderFromFile(const std::string& vertex_shader_path,
 	glDeleteShader(vertex_shader_id);
 	glDeleteShader(fragment_shader_id);
   glCheckError();
-  return id;
+
+  if (id) {
+    shaders_map[name] = id;
+    logMessage("Shader program \"" + name + "\" successfully compiled and linked.");
+  }
 }
 
 void ktp::Resources::printProgramLog(GLuint program) {
@@ -194,12 +207,7 @@ void ktp::Resources::printShaderLog(GLuint shader) {
 
 /* TEXTURES */
 
-ktp::Texture2D ktp::Resources::loadTexture(const std::string& name, const std::string& file, bool alpha) {
-  textures_map[name] = loadTextureFromFile(file, alpha);
-  return Texture2D{textures_map[name]};
-}
-
-GLuint ktp::Resources::loadTextureFromFile(const std::string& file, bool alpha) {
+void ktp::Resources::loadTexture(const std::string& name, const std::string& file, bool alpha) {
   GLuint id {};
   GLsizei width {}, height {};
   GLint internal_format {GL_RGB};
@@ -216,7 +224,7 @@ GLuint ktp::Resources::loadTextureFromFile(const std::string& file, bool alpha) 
   stbi_set_flip_vertically_on_load(true);
   unsigned char* data {stbi_load(file.c_str(), &width, &height, &num_channels, 0)};
   if (data) {
-    logMessage("Loaded texture from file " + file);
+    logMessage("Loaded texture \"" + name + "\" from file " + file);
     glGenTextures(1, &id);
     glCheckError();
     glBindTexture(GL_TEXTURE_2D, id);
@@ -239,5 +247,5 @@ GLuint ktp::Resources::loadTextureFromFile(const std::string& file, bool alpha) 
   } else {
     logError("Could NOT load texture " + file);
   }
-  return id;
+  textures_map[name] = id;
 }

@@ -64,6 +64,7 @@ bool ktp::Game::initSDL2() {
     logSDL2Error("SDL_Init");
     return false;
   }
+  if (!SDL2_Font::initTTF()) return false;
   if (!SDL2_Audio::initMixer()) return false;
 
   return true;
@@ -73,6 +74,16 @@ bool ktp::Game::loadResources() {
   if (!audio_sys_.loadResources()) {
     return false;
   }
+  // fonts
+  auto font_path {Resources::getResourcesPath("fonts") + "Future n0t Found.ttf"};
+  Resources::loadFont("future", font_path, 10);
+
+  // textures
+  auto texture_path {Resources::getResourcesPath("textures") + "aerolite_00.png"};
+  Resources::loadTexture("aerolite_00", texture_path, false);
+  texture_path = Resources::getResourcesPath("textures") + "aerolite_01.png";
+  Resources::loadTexture("aerolite_01", texture_path, false);
+
   // shaders
   auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};
   auto fragment_shader_path {Resources::getResourcesPath("shaders") + "aerolite.frag"};
@@ -86,11 +97,7 @@ bool ktp::Game::loadResources() {
   vertex_shader_path = Resources::getResourcesPath("shaders") + "testing.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "testing.frag";
   Resources::loadShader("testing", vertex_shader_path, fragment_shader_path);
-  // textures
-  auto texture_path {Resources::getResourcesPath("textures") + "aerolite_00.png"};
-  Resources::loadTexture("aerolite_00", texture_path, false);
-  texture_path = Resources::getResourcesPath("textures") + "aerolite_01.png";
-  Resources::loadTexture("aerolite_01", texture_path, false);
+
   return true;
 }
 
