@@ -53,6 +53,7 @@ ktp::Game::Game() {
 }
 
 void ktp::Game::clean() {
+  Resources::cleanOpenGL();
   GameEntity::clear();
   clearB2World(world_);
   SDL2_Audio::closeMixer();

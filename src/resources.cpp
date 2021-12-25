@@ -10,7 +10,7 @@ ktp::Resources::FontsMap    ktp::Resources::fonts_map {};
 ktp::Resources::ShadersMap  ktp::Resources::shaders_map {};
 ktp::Resources::TexturesMap ktp::Resources::textures_map {};
 
-void ktp::Resources::clear() {
+void ktp::Resources::cleanOpenGL() {
   for (auto& [name, shader_id]: shaders_map) {
     glDeleteProgram(shader_id);
   }
