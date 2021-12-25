@@ -20,7 +20,7 @@ class AeroliteGraphicsComponent: public GraphicsComponent {
   AeroliteGraphicsComponent() noexcept;
   virtual void update(const GameEntity& aerolite) override;
  private:
-  b2Color color_ {SDL2ColorToB2Color(ConfigParser::aerolites_config.colors_[1])};
+  const b2Color color_ {SDL2ColorToB2Color(ConfigParser::aerolites_config.colors_[1])};
   VAO vao_ {};
   VBO vertices_ {};
   VBO uv_ {};

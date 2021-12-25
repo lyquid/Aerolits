@@ -12,7 +12,7 @@
 
 ktp::AeroliteGraphicsComponent::AeroliteGraphicsComponent() noexcept:
   shader_(Resources::getShader("aerolite")),
-  texture_(Resources::getTexture("asteroid_cut")) {
+  texture_(Resources::getTexture("aerolite_00")) {
 
   const glm::vec4 uniform_color {color_.r, color_.g, color_.b, color_.a};
   shader_.setFloat4("aerolite_color", glm::value_ptr(uniform_color));
@@ -169,6 +169,8 @@ void ktp::AerolitePhysicsComponent::reshape(float size) {
   // setup the EBO
   graphics_->indices_count_ = indices.size();
   graphics_->ebo_.setup(indices);
+  // change the texture
+  // graphics_->texture_ = Resources::getTexture("aerolite_01");
 }
 
 ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnAerolite(const b2Vec2& where) {

@@ -85,10 +85,10 @@ bool ktp::Game::loadResources() {
   fragment_shader_path = Resources::getResourcesPath("shaders") + "testing.frag";
   Resources::loadShader("testing", vertex_shader_path, fragment_shader_path);
   // textures
-  auto texture_path {Resources::getResourcesPath("textures") + "asteroid.png"};
-  Resources::loadTexture("asteroid", texture_path, false);
-  texture_path = Resources::getResourcesPath("textures") + "asteroid_cut.png";
-  Resources::loadTexture("asteroid_cut", texture_path, false);
+  auto texture_path {Resources::getResourcesPath("textures") + "aerolite_00.png"};
+  Resources::loadTexture("aerolite_00", texture_path, false);
+  texture_path = Resources::getResourcesPath("textures") + "aerolite_01.png";
+  Resources::loadTexture("aerolite_01", texture_path, false);
   return true;
 }
 
