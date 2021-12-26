@@ -20,22 +20,82 @@ extern TexturesMap textures_map;
  */
 void cleanOpenGL();
 
-// paths
+/**
+ * @brief Gets the path to the config directory.
+ * @param sub_dir Specify a sub directory.
+ * @return The full path to the config directory (and subdirectory if instructed).
+ */
 std::string getConfigPath(const std::string& sub_dir = "");
+
+/**
+ * @brief Gets the path to the resources directory.
+ * @param sub_dir Specify a sub directory, ie. textures.
+ * @return The full path to the resources directory (and subdirectory if instructed).
+ */
 std::string getResourcesPath(const std::string& sub_dir = "");
 
-// fonts
+/* FONTS */
+
+/**
+ * @brief Looks for a font. And gives it to you!
+ * @param name The name of the font to look for.
+ * @return A pointer to the TTF_Font. Don't delete it >:(
+ */
 inline auto getFont(const std::string name) { return fonts_map.at(name).getFont(); }
+
+/**
+ * @brief Loads a font from a file and adds it to the fonts map.
+ * @param name The name you want to give to the font.
+ * @param file The full path to the font file.
+ * @param size The size of the font you desire.
+ */
 void loadFont(const std::string& name, const std::string& file, int size);
 
-// shaders
+/* SHADERS */
+
+/**
+ * @brief Retrieves a shader by name.
+ * @param name The name of the shader you want.
+ * @return A ShaderProgram with the shader requested.
+ */
 inline auto getShader(const std::string& name) { return ShaderProgram{shaders_map.at(name)}; }
+
+/**
+ * @brief Loads and compiles a shader program.
+ * @param name The name you wan to give to the shader program.
+ * @param vertex_shader_path Vertex shader file path.
+ * @param fragment_shader_path Fragment shader file path.
+ * @param geometry_shader_path **NOT IMPLEMENTED**
+ */
 void loadShader(const std::string& name, const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path = "");
+
+/**
+ * @brief Prints any problems with the shader program. If any...
+ * @param program The id of the shader program.
+ */
 void printProgramLog(GLuint program);
+
+/**
+ * @brief Prints problems with the shader, if any.
+ * @param shader The shader id.
+ */
 void printShaderLog(GLuint shader);
 
-// textures
+/* TEXTURES */
+
+/**
+ * @brief Retrieves a texture by name.
+ * @param name The name of the texture.
+ * @return A Texture2D object with the requested texture.
+ */
 inline auto getTexture(const std::string& name) { return Texture2D{textures_map.at(name)}; }
+
+/**
+ * @brief Image file to opengl texture loader. Use with caution.
+ * @param name The name you want for the texture. Don't forget it!
+ * @param file The full path to the image file.
+ * @param alpha Alpha channel?
+ */
 void loadTexture(const std::string& name, const std::string& file, bool alpha);
 
 } } // namespace resources / ktp
