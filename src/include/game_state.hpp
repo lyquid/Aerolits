@@ -86,7 +86,7 @@ class TestingState: public GameState {
   virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
   const b2Color clear_color_ {SDL2ColorToB2Color(Colors::black)};
-  // Testing test_ {};
+  Testing* test_ {nullptr};
 };
 
 class TitleState: public GameState {
@@ -98,7 +98,7 @@ class TitleState: public GameState {
   virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
   static constexpr auto kDefaultBackgroundDeltaInMenu_ {500.f};
-  static constexpr Uint32 kWaitForDemo_ {2000};
+  static constexpr Uint32 kWaitForDemo_ {1000};
   Uint32 demo_time_ {};
 };
 

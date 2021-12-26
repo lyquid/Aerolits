@@ -76,6 +76,8 @@ bool ktp::SDL2_GL::initGLEW(SDL2_GLContext& context, const SDL2_Window& window) 
     return false;
   } else {
     glEnable(GL_MULTISAMPLE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // GLEW
     glewExperimental = GL_TRUE;
     const auto glew_error {glewInit()};

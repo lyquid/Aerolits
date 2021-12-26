@@ -15,16 +15,18 @@ class Testing {
   // Testing();
   // ~Testing() {}
   void draw() const;
-  void tutorial();
+  void init();
   void update(float delta_time);
 
  private:
 
   VAO vao_ {};
   VBO vbo_ {};
+  VBO uv_ {};
   GLfloatVector vertices_ {};
   GLfloatVector vertices_color_ {};
   std::vector<bool> vertices_color_direction_ {};
+  Texture2D texture_ {};
 
   ShaderProgram shader_program_ {};
 

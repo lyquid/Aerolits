@@ -98,4 +98,6 @@ inline auto getTexture(const std::string& name) { return Texture2D{textures_map.
  */
 void loadTexture(const std::string& name, const std::string& file, bool alpha);
 
+void loadTextureFromTextBlended(const std::string& name, const std::string& text, const std::string& font, SDL_Color color);
+
 } } // namespace resources / ktp

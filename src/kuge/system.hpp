@@ -1,6 +1,7 @@
 #ifndef KUGE_HEADERS_SYSTEM_HPP_
 #define KUGE_HEADERS_SYSTEM_HPP_
 
+#include "../sdl2_wrappers/sdl2_font.hpp"
 #include "../sdl2_wrappers/sdl2_log.hpp"
 #include "../sdl2_wrappers/sdl2_renderer.hpp"
 #include "../sdl2_wrappers/sdl2_sound.hpp"

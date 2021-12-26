@@ -48,10 +48,10 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   static GameEntity* spawnMovingAerolite();
   virtual void update(const GameEntity& aerolite, float delta_time) override;
   inline auto worldManifold() { return &world_manifold_; }
-
+static GLfloatVector convertToUV(const GLfloatVector& v);
  private:
 
-  static GLfloatVector convertToUV(const GLfloatVector& v);
+
   static void createB2Body(AerolitePhysicsComponent& aerolite, const GLfloatVector& triangulated_shape);
   static Geometry::Polygon generateAeroliteShape(float size, SDL_FPoint offset = {0.f, 0.f});
   static Geometry::Polygon generateAeroliteShape(float size, unsigned int sides, SDL_FPoint offset = {0.f, 0.f});

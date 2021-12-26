@@ -48,8 +48,8 @@ ktp::Game::Game() {
   );
   PhysicsComponent::setWorld(&world_);
 
-  state_ = GameState::goToState(*this, GameState::title_);
-  //state_ = GameState::goToState(*this, GameState::testing_);
+  //state_ = GameState::goToState(*this, GameState::title_);
+  state_ = GameState::goToState(*this, GameState::testing_);
 }
 
 void ktp::Game::clean() {
@@ -77,13 +77,14 @@ bool ktp::Game::loadResources() {
   }
   // fonts
   auto font_path {Resources::getResourcesPath("fonts") + "Future n0t Found.ttf"};
-  Resources::loadFont("future", font_path, 10);
+  Resources::loadFont("future", font_path, 512);
 
   // textures
   auto texture_path {Resources::getResourcesPath("textures") + "aerolite_00.png"};
   Resources::loadTexture("aerolite_00", texture_path, false);
   texture_path = Resources::getResourcesPath("textures") + "aerolite_01.png";
   Resources::loadTexture("aerolite_01", texture_path, false);
+  Resources::loadTextureFromTextBlended("title", "Aeròlits", "future", Colors::white);
 
   // shaders
   auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};

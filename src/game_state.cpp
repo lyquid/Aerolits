@@ -272,7 +272,7 @@ void ktp::TestingState::draw(Game& game) {
     }
   }
 
-  // test_.draw();
+  test_->draw();
 
   if (game.debug_draw_on_) game.world_.DebugDraw();
 
@@ -283,7 +283,8 @@ ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
   // GameEntity::createEntity(EntityTypes::Player);
-  // test_.tutorial();
+  test_ = new Testing;
+  test_->init();
   return this;
 }
 
@@ -346,7 +347,7 @@ void ktp::TestingState::update(Game& game, float delta_time) {
       }
     }
   }
-  // test_.update(delta_time);
+  test_->update(delta_time);
   // if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 1) AerolitePhysicsComponent::spawnMovingAerolite();
   game.event_bus_.processEvents();
 }

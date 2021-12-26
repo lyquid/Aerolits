@@ -88,47 +88,81 @@ void kuge::GUISystem::handleEvent(const KugeEvent* event) {
 }
 
 bool kuge::GUISystem::init(const ktp::SDL2_Renderer& ren) {
-  if (!font_.loadFont(ktp::Resources::getResourcesPath("fonts") + "Future n0t Found.ttf", 18)) return false;
+  using namespace ktp;
+  // render a surface, remember to free it when done
+  auto surface = TTF_RenderUTF8_Blended(Resources::getFont("future"), kTitleText_.c_str(), Colors::white);
+  const auto colors = surface->format->BytesPerPixel;
+  // find out the image format
+  GLenum image_format {};
+  if (colors == 4) {   // alpha
+    surface->format->Rmask == 0x000000ff ? image_format = GL_RGBA : image_format = GL_BGRA;
+  } else {             // no alpha
+    surface->format->Rmask == 0x000000ff ? image_format = GL_RGB : image_format = GL_BGR;
+  }
+  // lets generate the opnegl texture
+  GLuint id {};
+  glGenTextures(1, &id);
+  glCheckError();
+  glBindTexture(GL_TEXTURE_2D, id);
+  // set Texture wrap and filter modes
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
+  // // When MINifying the image, use a LINEAR blend of two mipmaps, each filtered LINEARLY too (GL_LINEAR_MIPMAP_LINEAR)
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_min);
+  // // When MAGnifying the image (no bigger mipmap available), use XXXX filtering
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_max);
+  glTexImage2D(GL_TEXTURE_2D, 0, colors, surface->w, surface->h, 0, image_format, GL_UNSIGNED_BYTE, surface->pixels);
+  glCheckError();
+  glCheckError();
+  // unbind texture
+  glBindTexture(GL_TEXTURE_2D, 0);
+  // push it to the textures map
+  Resources::textures_map["title_text"] = id;
+  // free the surface
+  SDL_FreeSurface(surface);
 
-  renderer_ = &ren; // we need this in order to create new score textures
 
-  int w, h;
+  // if (!font_.loadFont(ktp::Resources::getResourcesPath("fonts") + "Future n0t Found.ttf", 18)) return false;
 
-  demo_text_.texture_.loadFromTextSolid(ren, font_, kDemoModeText_, ktp::Colors::white);
-  w = demo_text_.texture_.getWidth()  * screen_size_.x * 0.0025f;
-  h = demo_text_.texture_.getHeight() * screen_size_.y * 0.0050f;
-  demo_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
+  // renderer_ = &ren; // we need this in order to create new score textures
 
-  paused_text_.texture_.loadFromTextSolid(ren, font_, kPausedText_, ktp::Colors::white);
-  w = paused_text_.texture_.getWidth()  * screen_size_.x * 0.0025f;
-  h = paused_text_.texture_.getHeight() * screen_size_.y * 0.0050f;
-  paused_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
+  // int w, h;
 
-  score_text_.texture_.loadFromTextSolid(ren, font_, kScoreText_ + std::to_string(score_), ktp::Colors::white);
-  w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
-  h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
-  score_text_.rectangle_ = {0, 0, w, h};
+  // demo_text_.texture_.loadFromTextSolid(ren, font_, kDemoModeText_, ktp::Colors::white);
+  // w = demo_text_.texture_.getWidth()  * screen_size_.x * 0.0025f;
+  // h = demo_text_.texture_.getHeight() * screen_size_.y * 0.0050f;
+  // demo_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
 
-  title_text_.texture_.loadFromTextSolid(ren, font_, kTitleText_, ktp::Colors::white);
-  w = title_text_.texture_.getWidth()  * screen_size_.x * 0.0125f;
-  h = title_text_.texture_.getHeight() * screen_size_.y * 0.0250f;
-  title_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
+  // paused_text_.texture_.loadFromTextSolid(ren, font_, kPausedText_, ktp::Colors::white);
+  // w = paused_text_.texture_.getWidth()  * screen_size_.x * 0.0025f;
+  // h = paused_text_.texture_.getHeight() * screen_size_.y * 0.0050f;
+  // paused_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
+
+  // score_text_.texture_.loadFromTextSolid(ren, font_, kScoreText_ + std::to_string(score_), ktp::Colors::white);
+  // w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
+  // h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
+  // score_text_.rectangle_ = {0, 0, w, h};
+
+  // title_text_.texture_.loadFromTextSolid(ren, font_, kTitleText_, ktp::Colors::white);
+  // w = title_text_.texture_.getWidth()  * screen_size_.x * 0.0125f;
+  // h = title_text_.texture_.getHeight() * screen_size_.y * 0.0250f;
+  // title_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
 
   return true;
 }
 
 void kuge::GUISystem::resetScore() {
-  score_ = 0;
-  score_text_.texture_.loadFromTextSolid(*renderer_, font_, kScoreText_ + std::to_string(score_), ktp::Colors::white);
-  int w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
-  int h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
-  score_text_.rectangle_ = {0, 0, w, h};
+  // score_ = 0;
+  // score_text_.texture_.loadFromTextSolid(*renderer_, font_, kScoreText_ + std::to_string(score_), ktp::Colors::white);
+  // int w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
+  // int h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
+  // score_text_.rectangle_ = {0, 0, w, h};
 }
 
 void kuge::GUISystem::updateScore(Uint32 points) {
-  score_ += points;
-  score_text_.texture_.loadFromTextSolid(*renderer_, font_, kScoreText_ + std::to_string(score_), ktp::Colors::white);
-  int w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
-  int h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
-  score_text_.rectangle_ = {0, 0, w, h};
+  // score_ += points;
+  // score_text_.texture_.loadFromTextSolid(*renderer_, font_, kScoreText_ + std::to_string(score_), ktp::Colors::white);
+  // int w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
+  // int h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
+  // score_text_.rectangle_ = {0, 0, w, h};
 }
