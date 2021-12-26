@@ -133,46 +133,37 @@ ktp::EBO::EBO() {
 }
 
 void ktp::EBO::generateEBO(GLfloatVector& vertices, GLuintVector& indices) {
-  std::vector<std::array<GLfloat, 3>> coords {}, unique_coords {};
-  coords.reserve(static_cast<std::size_t>(vertices.size() * 0.33f));
-  // assemble a vector of arrays: {[x,y,z], [x,y,z], ...}
-  for (std::size_t i = 0; i < vertices.size(); i += 3) {
-    coords.push_back({vertices[i], vertices[i + 1], vertices[i + 2]});
-  }
-  unique_coords.reserve(static_cast<std::size_t>(coords.size() - (coords.size() * 0.25f)));
-  // indices will be as long as the coords vector
+  GLfloatVector unique_coords {};
   indices.clear();
-  indices.reserve(coords.size());
-  // push the first element and the first index
+  // push the first element
   indices.push_back(0);
-  unique_coords.push_back(coords[0]);
-  // find repeated coords
-  for (std::size_t i = 1; i < coords.size(); ++i) {
+  // push the first three coords
+  unique_coords.push_back(vertices[0]);
+  unique_coords.push_back(vertices[1]);
+  unique_coords.push_back(vertices[2]);
+  // find repeated coords by groups of 3
+  for (std::size_t i = 3; i < vertices.size(); i += 3) {
     bool found {false};
-    for (std::size_t j = 0; j < unique_coords.size(); ++j) {
-      if (coords[i][0] == unique_coords[j][0] && coords[i][1] == unique_coords[j][1] && coords[i][2] == unique_coords[j][2]) {
+    for (std::size_t j = 0; j < unique_coords.size(); j += 3) {
+      if (vertices[i] == unique_coords[j] && vertices[i + 1] == unique_coords[j + 1] && vertices[i + 2] == unique_coords[j + 2]) {
         // coord already in the list
         found = true;
-        // so, new index will point to the j position
-        indices.push_back(j);
+        // so, new index will point to...
+        indices.push_back(j / 3u);
         break;
       }
     }
     if (!found) {
       // new unique coord
-      unique_coords.push_back(coords[i]);
-      // the new index points at position size()-1
-      indices.push_back(unique_coords.size() - 1u);
+      unique_coords.push_back(vertices[i]);
+      unique_coords.push_back(vertices[i + 1]);
+      unique_coords.push_back(vertices[i + 2]);
+      // the new index points at...
+      indices.push_back((unique_coords.size() - 1u) / 3u);
     }
   }
-  // re-construct the vertices vector: {z, y, z, x, y, z, x, y, ...}
-  vertices.clear();
-  if (vertices.capacity() < unique_coords.size() * 3u) vertices.reserve(unique_coords.size() * 3u);
-  for (const auto& coord: unique_coords) {
-    for (const auto num: coord) {
-      vertices.push_back(num);
-    }
-  }
+  // the new vertices
+  vertices = std::move(unique_coords);
 }
 
 void ktp::EBO::setup(const GLuintVector& indices) {

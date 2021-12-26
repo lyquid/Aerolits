@@ -237,6 +237,7 @@ class EBO {
     }
     return *this;
   }
+  
   /**
    * @brief Generates an EBO by removing duplicate coordinates and creating an index array.
    * @param vertices Vector of vertices.
