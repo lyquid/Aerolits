@@ -41,7 +41,7 @@ std::string getResourcesPath(const std::string& sub_dir = "");
  * @param name The name of the font to look for.
  * @return A pointer to the TTF_Font. Don't delete it >:(
  */
-inline auto getFont(const std::string name) { return fonts_map.at(name).getFont(); }
+inline auto getFont(const std::string name) { return fonts_map.at(name).font(); }
 
 /**
  * @brief Loads a font from a file and adds it to the fonts map.
