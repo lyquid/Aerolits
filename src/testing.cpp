@@ -8,10 +8,6 @@
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include "sdl2_wrappers/sdl2_timer.hpp"
 
-// ktp::Testing::Testing() {
-//   logMessage("testing ctt");
-// }
-
 void ktp::Testing::draw() const {
   shader_program_.setMat4f("mvp", glm::value_ptr(mvp_));
   texture_.bind();
@@ -24,7 +20,7 @@ void ktp::Testing::init() {
   shader_program_ = Resources::getShader("testing");
 
   vertices_ = {
-        // first triangle
+    // first triangle
      0.5f,  0.5f, 0.0f,  // top right
      0.5f, -0.5f, 0.0f,  // bottom right
     -0.5f,  0.5f, 0.0f,  // top left
@@ -34,13 +30,13 @@ void ktp::Testing::init() {
     -0.5f,  0.5f, 0.0f   // top left
   };
   const GLfloatVector texture_coords {
-      1.0f, 0.0f,   // top right
-       1.0f, 1.0f,   // bottom right
-       0.0f, 0.0f,    // top left
+    1.0f, 0.0f,   // top right
+    1.0f, 1.0f,   // bottom right
+    0.0f, 0.0f,    // top left
 
-       1.0f, 1.0f,   // bottom right
-       0.0f, 1.0f,   // bottom left
-       0.0f, 0.0f    // top left
+    1.0f, 1.0f,   // bottom right
+    0.0f, 1.0f,   // bottom left
+    0.0f, 0.0f    // top left
   };
   //const GLfloatVector texture_coords {AerolitePhysicsComponent::convertToUV(vertices_)};
   uv_.setup(texture_coords);

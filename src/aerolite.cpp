@@ -215,12 +215,8 @@ void ktp::AerolitePhysicsComponent::split() {
   if (size_ < kMinSize_) {
     // very small, destroyed on impact
     owner_->deactivate();
-    // kuge::AeroliteDestroyedEvent ev {
-    //   kuge::KugeEventTypes::AeroliteDestroyed,
-    //   {owner_->physics()->body()->GetPosition().x * kMetersToPixels,
-    //    owner_->physics()->body()->GetPosition().y * kMetersToPixels},
-    //    (int)(kScore_ / size_)};
-    // owner_->event_bus_->postEvent(ev);
+    kuge::AeroliteDestroyedEvent ev {kuge::KugeEventTypes::AeroliteDestroyed, (int)(kScore_ / size_)};
+    owner_->event_bus_->postEvent(ev);
     return;
   } else {
     // good sized aerolite
@@ -251,13 +247,12 @@ void ktp::AerolitePhysicsComponent::split() {
       where.y = perpendicular.end.y + kSpacer * (perpendicular.begin.y - perpendicular.end.y);
       aerolite->physics()->body()->SetTransform({where.x, where.y}, old_angle);
     }
-    // kuge::AeroliteSplittedEvent ev {
-    //   kuge::KugeEventTypes::AeroliteSplitted,
-    //   {old_pos.x * kMetersToPixels, old_pos.y * kMetersToPixels},
-    //   pieces,
-    //   (int)(((kScore_ / 10u) / size_) * (pieces + 1u))
-    // };
-    // owner_->event_bus_->postEvent(ev);
+    kuge::AeroliteSplittedEvent ev {
+      kuge::KugeEventTypes::AeroliteSplitted,
+      pieces,
+      (int)(((kScore_ / 10u) / size_) * (pieces + 1u))
+    };
+    owner_->event_bus_->postEvent(ev);
   }
 }
 

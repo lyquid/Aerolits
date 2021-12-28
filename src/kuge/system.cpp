@@ -2,6 +2,7 @@
 #include "../include/resources.hpp"
 #include "event.hpp"
 #include "system.hpp"
+#include <glm/gtc/type_ptr.hpp>
 #include <random>
 
 /* AUDIO SYSTEM */
@@ -58,19 +59,40 @@ bool kuge::AudioSystem::loadResources() {
 
 /* GUI SYSTEM */
 
-const ktp::SDL2_Renderer* kuge::GUISystem::renderer_ {nullptr};
+kuge::GUIStringImpl::GUIStringImpl(const GUIStringConfig& config) {
+  config_ = config;
+  texture_ = ktp::Resources::loadTextureFromTextBlended(config_.name_, config_.text_, config_.font_, config_.color_);
+  shader_ = ktp::Resources::getShader(config_.shader_);
+  vao_.bind();
+  vbo_.setup(config_.vertices_);
+  uv_.setup(config_.texture_coords_);
+  vao_.linkAttrib(vbo_, 0, 3, GL_FLOAT, 0, nullptr);
+  vao_.linkAttrib(uv_, 1, 2, GL_FLOAT, 0, nullptr);
+  ebo_.setup(config_.indices_);
+}
+
+void kuge::GUIStringImpl::draw() const {
+  shader_.use();
+  texture_.bind();
+  vao_.bind();
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void kuge::GUIStringImpl::updateTexture(const std::string& text) {
+  config_.text_ = text;
+  texture_ = ktp::Resources::loadTextureFromTextBlended(config_.name_, config_.text_, config_.font_, config_.color_);
+}
 
 kuge::GUISystem& kuge::GUISystem::operator=(GUISystem&& other) noexcept {
   if (this != &other) {
     // inherited members
     event_bus_ = std::exchange(other.event_bus_, nullptr);
     // own members
-    screen_size_ = std::move(other.screen_size_);
-    font_        = std::move(other.font_);
     demo_text_   = std::move(other.demo_text_);
     paused_text_ = std::move(other.paused_text_);
     score_text_  = std::move(other.score_text_);
     title_text_  = std::move(other.title_text_);
+    score_       = other.score_;
   }
   return *this;
 }
@@ -87,82 +109,78 @@ void kuge::GUISystem::handleEvent(const KugeEvent* event) {
   }
 }
 
-bool kuge::GUISystem::init(const ktp::SDL2_Renderer& ren) {
-  using namespace ktp;
-  // render a surface, remember to free it when done
-  auto surface = TTF_RenderUTF8_Blended(Resources::getFont("future"), kTitleText_.c_str(), Colors::white);
-  const auto colors = surface->format->BytesPerPixel;
-  // find out the image format
-  GLenum image_format {};
-  if (colors == 4) {   // alpha
-    surface->format->Rmask == 0x000000ff ? image_format = GL_RGBA : image_format = GL_BGRA;
-  } else {             // no alpha
-    surface->format->Rmask == 0x000000ff ? image_format = GL_RGB : image_format = GL_BGR;
-  }
-  // lets generate the opnegl texture
-  GLuint id {};
-  glGenTextures(1, &id);
-  glCheckError();
-  glBindTexture(GL_TEXTURE_2D, id);
-  // set Texture wrap and filter modes
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
-  // // When MINifying the image, use a LINEAR blend of two mipmaps, each filtered LINEARLY too (GL_LINEAR_MIPMAP_LINEAR)
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_min);
-  // // When MAGnifying the image (no bigger mipmap available), use XXXX filtering
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_max);
-  glTexImage2D(GL_TEXTURE_2D, 0, colors, surface->w, surface->h, 0, image_format, GL_UNSIGNED_BYTE, surface->pixels);
-  glCheckError();
-  glCheckError();
-  // unbind texture
-  glBindTexture(GL_TEXTURE_2D, 0);
-  // push it to the textures map
-  Resources::textures_map["title_text"] = id;
-  // free the surface
-  SDL_FreeSurface(surface);
-
-
-  // if (!font_.loadFont(ktp::Resources::getResourcesPath("fonts") + "Future n0t Found.ttf", 18)) return false;
-
-  // renderer_ = &ren; // we need this in order to create new score textures
-
-  // int w, h;
-
-  // demo_text_.texture_.loadFromTextSolid(ren, font_, kDemoModeText_, ktp::Colors::white);
-  // w = demo_text_.texture_.getWidth()  * screen_size_.x * 0.0025f;
-  // h = demo_text_.texture_.getHeight() * screen_size_.y * 0.0050f;
-  // demo_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
-
-  // paused_text_.texture_.loadFromTextSolid(ren, font_, kPausedText_, ktp::Colors::white);
-  // w = paused_text_.texture_.getWidth()  * screen_size_.x * 0.0025f;
-  // h = paused_text_.texture_.getHeight() * screen_size_.y * 0.0050f;
-  // paused_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
-
-  // score_text_.texture_.loadFromTextSolid(ren, font_, kScoreText_ + std::to_string(score_), ktp::Colors::white);
-  // w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
-  // h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
-  // score_text_.rectangle_ = {0, 0, w, h};
-
-  // title_text_.texture_.loadFromTextSolid(ren, font_, kTitleText_, ktp::Colors::white);
-  // w = title_text_.texture_.getWidth()  * screen_size_.x * 0.0125f;
-  // h = title_text_.texture_.getHeight() * screen_size_.y * 0.0250f;
-  // title_text_.rectangle_ = {(int)(screen_size_.x * 0.5f - w * 0.5f), (int)(screen_size_.y * 0.5f - h * 0.5f), w, h};
-
-  return true;
+void kuge::GUISystem::init() {
+  GUIStringConfig config {};
+  /* TITLE TEXT */
+  config.name_   = "title";
+  config.text_   = kTitleText_;
+  config.color_  = ktp::Colors::white;
+  config.font_   = "future";
+  config.shader_ = "gui_string";
+  config.vertices_ = {
+     0.8f,  0.4f, 0.0f,  // top right
+     0.8f, -0.4f, 0.0f,  // bottom right
+    -0.8f, -0.4f, 0.0f,  // bottom left
+    -0.8f,  0.4f, 0.0f   // top left
+  };
+  config.indices_ = {
+    0, 1, 3,   // first triangle
+    1, 2, 3    // second triangle
+  };
+  config.texture_coords_ = {
+    1.0f, 0.0f,   // top right
+    1.0f, 1.0f,   // bottom right
+    0.0f, 1.0f,   // bottom left
+    0.0f, 0.0f    // top left
+  };
+  title_text_ = std::make_unique<GUIStringImpl>(config);
+  /* DEMO MODE TEXT */
+  config.name_   = "demo";
+  config.text_   = kDemoModeText_;
+  config.color_  = ktp::Colors::white;
+  config.font_   = "future";
+  config.shader_ = "gui_string";
+  config.vertices_ = {
+     0.2f,  0.1f, 0.0f,  // top right
+     0.2f, -0.1f, 0.0f,  // bottom right
+    -0.2f, -0.1f, 0.0f,  // bottom left
+    -0.2f,  0.1f, 0.0f   // top left
+  };
+  demo_text_ = std::make_unique<GUIStringImpl>(config);
+  /* PAUSED TEXT */
+  config.name_   = "paused";
+  config.text_   = kPausedText_;
+  config.color_  = ktp::Colors::white;
+  config.font_   = "future";
+  config.shader_ = "gui_string";
+  config.vertices_ = {
+     0.2f,  0.1f, 0.0f,  // top right
+     0.2f, -0.1f, 0.0f,  // bottom right
+    -0.2f, -0.1f, 0.0f,  // bottom left
+    -0.2f,  0.1f, 0.0f   // top left
+  };
+  paused_text_ = std::make_unique<GUIStringImpl>(config);
+  /* SCORE TEXT */
+  config.name_   = "score";
+  config.text_   = kScoreText_;
+  config.color_  = ktp::Colors::white;
+  config.font_   = "future";
+  config.shader_ = "gui_string";
+  config.vertices_ = {
+    -0.80f, 0.99f, 0.0f,  // top right
+    -0.80f, 0.93f, 0.0f,  // bottom right
+    -1.00f, 0.93f, 0.0f,  // bottom left
+    -1.00f, 0.99f, 0.0f   // top left
+  };
+  score_text_ = std::make_unique<GUIStringImpl>(config);
 }
 
 void kuge::GUISystem::resetScore() {
-  // score_ = 0;
-  // score_text_.texture_.loadFromTextSolid(*renderer_, font_, kScoreText_ + std::to_string(score_), ktp::Colors::white);
-  // int w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
-  // int h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
-  // score_text_.rectangle_ = {0, 0, w, h};
+  score_ = 0;
+  score_text_->updateTexture(kScoreText_ + std::to_string(score_));
 }
 
 void kuge::GUISystem::updateScore(Uint32 points) {
-  // score_ += points;
-  // score_text_.texture_.loadFromTextSolid(*renderer_, font_, kScoreText_ + std::to_string(score_), ktp::Colors::white);
-  // int w = score_text_.texture_.getWidth()  * screen_size_.x * 0.0009f;
-  // int h = score_text_.texture_.getHeight() * screen_size_.y * 0.0018f;
-  // score_text_.rectangle_ = {0, 0, w, h};
+  score_ += points;
+  score_text_->updateTexture(kScoreText_ + std::to_string(score_));
 }

@@ -1,6 +1,8 @@
 #include "sdl2_log.hpp"
 #include "sdl2_opengl.hpp"
 #include "sdl2_window.hpp"
+#include "../include/box2d_utils.hpp"
+#include "../include/palette.hpp"
 #include <array>
 #include <fstream>
 #include <sstream>
@@ -78,6 +80,8 @@ bool ktp::SDL2_GL::initGLEW(SDL2_GLContext& context, const SDL2_Window& window) 
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    const auto clear_color {SDL2ColorToB2Color(Colors::black)};
+    glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
     // GLEW
     glewExperimental = GL_TRUE;
     const auto glew_error {glewInit()};

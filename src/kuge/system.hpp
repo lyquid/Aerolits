@@ -1,13 +1,14 @@
 #ifndef KUGE_HEADERS_SYSTEM_HPP_
 #define KUGE_HEADERS_SYSTEM_HPP_
 
-#include "../sdl2_wrappers/sdl2_font.hpp"
 #include "../sdl2_wrappers/sdl2_log.hpp"
-#include "../sdl2_wrappers/sdl2_renderer.hpp"
+#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include "../sdl2_wrappers/sdl2_sound.hpp"
-#include "../sdl2_wrappers/sdl2_texture.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <array>
 #include <iterator>
+#include <memory>
 #include <string>
 #include <utility> // std::move
 #include <vector>
@@ -47,25 +48,51 @@ class AudioSystem: public System {
   static laser_randomizer_it          lasers_it_;
 };
 
-class GUIString {
- public:
-  inline void render(const ktp::SDL2_Renderer& ren) const { texture_.render(ren, rectangle_); }
-  ktp::SDL2_Texture texture_ {};
-  SDL_Rect rectangle_ {};
+struct GUIStringConfig {
+  // The desired name for the texture.
+  std::string name_ {};
+  // The text to display.
+  std::string text_ {};
+  // The font to use.
+  std::string font_ {};
+  // The color for the font.
+  SDL_Color color_ {};
+  // The shader to use.
+  std::string shader_ {};
+  ktp::GLfloatVector vertices_;
+  ktp::GLuintVector indices_;
+  ktp::GLfloatVector texture_coords_;
 };
+
+class GUIStringImpl {
+ public:
+  GUIStringImpl(const GUIStringConfig& config);
+  void draw() const;
+  void updateTexture(const std::string& text);
+ private:
+  GUIStringConfig config_ {};
+  ktp::VAO vao_ {};
+  ktp::VBO vbo_ {};
+  ktp::VBO uv_ {};
+  ktp::EBO ebo_ {};
+  ktp::ShaderProgram shader_ {};
+  ktp::Texture2D texture_ {};
+};
+
+using GUIString = std::unique_ptr<GUIStringImpl>;
 
 class GUISystem: public System {
 
  public:
 
-  GUISystem(SDL_Point screen_size): screen_size_(screen_size) {}
+  GUISystem() = default;
   GUISystem(const GUISystem&) = delete;
   GUISystem(GUISystem&& other) { *this = std::move(other); }
   GUISystem& operator=(const GUISystem&) = delete;
   GUISystem& operator=(GUISystem&& other) noexcept;
 
   virtual void handleEvent(const KugeEvent*) override;
-  bool init(const ktp::SDL2_Renderer& ren);
+  void init();
   void resetScore();
   inline auto score() const {return score_; }
   void updateScore(Uint32 points);
@@ -75,23 +102,19 @@ class GUISystem: public System {
   inline auto& scoreText() const { return score_text_; }
   inline auto& titleText() const { return title_text_; }
 
-  inline static const std::string kDemoModeText_ {"DEMO MODE"};
-  inline static const std::string kPausedText_ {"PAUSED"};
-  inline static const std::string kScoreText_ {"SCORE "};
-  inline static const std::string kTitleText_ {"Aerolits"};
+  inline static const std::string kDemoModeText_ {"DEMOSTRACIÓ"};
+  inline static const std::string kPausedText_ {"PAUSAT"};
+  inline static const std::string kScoreText_ {"PUNTUACIÓ "};
+  inline static const std::string kTitleText_ {"Aeròlits"};
 
  private:
-
-  static const ktp::SDL2_Renderer* renderer_;
 
   GUIString demo_text_ {};
   GUIString paused_text_ {};
   GUIString score_text_ {};
   GUIString title_text_ {};
 
-  ktp::SDL2_Font font_ {};
   Uint32 score_ {0};
-  SDL_Point screen_size_ {};
 };
 
 class InputSystem: public System {

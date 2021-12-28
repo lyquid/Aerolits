@@ -84,6 +84,22 @@ void printShaderLog(GLuint shader);
 /* TEXTURES */
 
 /**
+ * @brief Round up to next higher power of 2 (return x if it's already a power of 2).
+ * @param x The number!
+ * @return The next higher power of 2.
+ */
+inline int pow2RoundUp(int x) {
+  if (x < 0) return 0;
+  --x;
+  x |= x >> 1;
+  x |= x >> 2;
+  x |= x >> 4;
+  x |= x >> 8;
+  x |= x >> 16;
+  return x + 1;
+}
+
+/**
  * @brief Retrieves a texture by name.
  * @param name The name of the texture.
  * @return A Texture2D object with the requested texture.
@@ -98,6 +114,24 @@ inline auto getTexture(const std::string& name) { return Texture2D{textures_map.
  */
 void loadTexture(const std::string& name, const std::string& file, bool alpha);
 
-void loadTextureFromTextBlended(const std::string& name, const std::string& text, const std::string& font, SDL_Color color);
+/**
+ * @brief Tries to create textures with text. Blended in this case, which may be slow.
+ * @param name The name of the texture for the textures map.
+ * @param text The desired text to display.
+ * @param font The font to use.
+ * @param color The color desired.
+ * @return Texture2D
+ */
+Texture2D loadTextureFromTextBlended(const std::string& name, const std::string& text, const std::string& font, SDL_Color color);
+
+/**
+ * @brief Tries to create textures with text. Solid in this case, which should be fast.
+ * @param name The name of the texture for the textures map.
+ * @param text The desired text to display.
+ * @param font The font to use.
+ * @param color The color desired.
+ * @return Texture2D
+ */
+Texture2D loadTextureFromTextSolid(const std::string& name, const std::string& text, const std::string& font, SDL_Color color);
 
 } } // namespace resources / ktp

@@ -29,7 +29,6 @@ void ktp::GameState::setWindowTitle(Game& game) {
 /* DEMO STATE */
 
 void ktp::DemoState::draw(Game& game) {
-  glClearColor(clear_color_.r, clear_color_.g, clear_color_.b, clear_color_.a);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
@@ -38,14 +37,14 @@ void ktp::DemoState::draw(Game& game) {
     }
   }
 
-  // game.gui_sys_.scoreText().render(game.renderer_);
+  game.gui_sys_.scoreText()->draw();
 
-  // if (blink_flag_) game.gui_sys_.demoText().render(game.renderer_);
+  if (blink_flag_) game.gui_sys_.demoText()->draw();
 
-  // if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
-  //   blink_flag_ = !blink_flag_;
-  //   blink_timer_ = SDL2_Timer::SDL2Ticks();
-  // }
+  if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
+    blink_flag_ = !blink_flag_;
+    blink_timer_ = SDL2_Timer::SDL2Ticks();
+  }
 
   if (game.debug_draw_on_) game.world_.DebugDraw();
 
@@ -108,26 +107,27 @@ void ktp::DemoState::update(Game& game, float delta_time) {
 /* PAUSED STATE */
 
 void ktp::PausedState::draw(Game& game) {
-  // game.renderer_.clear();
 
-  // for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-  //   if (GameEntity::game_entities_[i].active_) {
-  //     GameEntity::game_entities_[i].object_.draw(game.renderer_);
-  //   }
-  // }
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // game.gui_sys_.scoreText().render(game.renderer_);
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+    if (GameEntity::game_entities_[i].active_) {
+      GameEntity::game_entities_[i].object_.draw();
+    }
+  }
 
-  // if (blink_flag_) game.gui_sys_.pausedText().render(game.renderer_);
+  game.gui_sys_.scoreText()->draw();
 
-  // if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
-  //   blink_flag_ = !blink_flag_;
-  //   blink_timer_ = SDL2_Timer::SDL2Ticks();
-  // }
+  if (blink_flag_) game.gui_sys_.pausedText()->draw();
 
-  // if (game.debug_draw_on_) game.world_.DebugDraw();
+  if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
+    blink_flag_ = !blink_flag_;
+    blink_timer_ = SDL2_Timer::SDL2Ticks();
+  }
 
-  // game.renderer_.present();
+  if (game.debug_draw_on_) game.world_.DebugDraw();
+
+  SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
 ktp::GameState* ktp::PausedState::enter(Game& game) {
@@ -174,7 +174,6 @@ void ktp::PausedState::update(Game& game, float delta_time) {
 /* PLAYING STATE */
 
 void ktp::PlayingState::draw(Game& game) {
-  glClearColor(clear_color_.r, clear_color_.g, clear_color_.b, clear_color_.a);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
@@ -183,7 +182,7 @@ void ktp::PlayingState::draw(Game& game) {
     }
   }
 
-  // game.gui_sys_.scoreText().render(game.renderer_);
+  game.gui_sys_.scoreText()->draw();
 
   if (game.debug_draw_on_) game.world_.DebugDraw();
 
@@ -263,7 +262,6 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
 /* TESTING STATE */
 
 void ktp::TestingState::draw(Game& game) {
-  glClearColor(clear_color_.r, clear_color_.g, clear_color_.b, clear_color_.a);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
@@ -355,7 +353,6 @@ void ktp::TestingState::update(Game& game, float delta_time) {
 /* TITLE STATE */
 
 void ktp::TitleState::draw(Game& game) {
-  // glClearColor(clear_color_.r, clear_color_.g, clear_color_.b, clear_color_.a);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
@@ -365,7 +362,7 @@ void ktp::TitleState::draw(Game& game) {
   //   }
   // }
 
-  // game.gui_sys_.titleText().render(game.renderer_);
+  game.gui_sys_.titleText()->draw();
 
   SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
@@ -375,7 +372,7 @@ ktp::GameState* ktp::TitleState::enter(Game& game) {
   // GameEntity::createEntity(EntityTypes::Background);
   GameEntity::createEntity(EntityTypes::Player);
   demo_time_ = SDL2_Timer::SDL2Ticks();
-  // game.gui_sys_.resetScore();
+  game.gui_sys_.resetScore();
   return this;
 }
 

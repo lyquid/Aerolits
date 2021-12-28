@@ -34,7 +34,7 @@ ktp::Game::Game() {
   SDL2_GL::initGLEW(context_, main_window_);
 
   if (!loadResources()) return;
-  // if (!gui_sys_.init(renderer_)) return false;
+  gui_sys_.init();
 
   // world_.SetDebugDraw(&g_debugDraw);
   // g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
@@ -48,8 +48,8 @@ ktp::Game::Game() {
   );
   PhysicsComponent::setWorld(&world_);
 
-  //state_ = GameState::goToState(*this, GameState::title_);
-  state_ = GameState::goToState(*this, GameState::testing_);
+  state_ = GameState::goToState(*this, GameState::title_);
+  // state_ = GameState::goToState(*this, GameState::testing_);
 }
 
 void ktp::Game::clean() {
@@ -84,12 +84,14 @@ bool ktp::Game::loadResources() {
   Resources::loadTexture("aerolite_00", texture_path, false);
   texture_path = Resources::getResourcesPath("textures") + "aerolite_01.png";
   Resources::loadTexture("aerolite_01", texture_path, false);
-  Resources::loadTextureFromTextBlended("title", "Aeròlits", "future", Colors::white);
 
   // shaders
   auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};
   auto fragment_shader_path {Resources::getResourcesPath("shaders") + "aerolite.frag"};
   Resources::loadShader("aerolite", vertex_shader_path, fragment_shader_path);
+  vertex_shader_path = Resources::getResourcesPath("shaders") + "gui_string.vert";
+  fragment_shader_path = Resources::getResourcesPath("shaders") + "gui_string.frag";
+  Resources::loadShader("gui_string", vertex_shader_path, fragment_shader_path);
   vertex_shader_path = Resources::getResourcesPath("shaders") + "player.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "player.frag";
   Resources::loadShader("player", vertex_shader_path, fragment_shader_path);
