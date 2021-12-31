@@ -2,22 +2,34 @@
 #include "include/emitter.hpp"
 #include "include/game_entity.hpp"
 #include "include/random.hpp"
+#include "include/resources.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include "sdl2_wrappers/sdl2_renderer.hpp"
 #include "sdl2_wrappers/sdl2_texture.hpp"
 
 /* GRAPHICS */
 
+ktp::EmitterGraphicsComponent::EmitterGraphicsComponent() {
+  // shader_ = Resources::getShader("particle");
+}
+
 void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter) {
-  ParticlesAtlas::particles_atlas.setBlendMode(blend_mode_);
-  for (auto i = 0u; i < particles_pool_size_; ++i) {
-    if (particles_pool_[i].inUse()) {
-      // particles_pool_[i].draw(ren);
-    }
-  }
+  // ParticlesAtlas::particles_atlas.setBlendMode(blend_mode_);
+  // for (auto i = 0u; i < particles_pool_size_; ++i) {
+  //   if (particles_pool_[i].inUse()) {
+  //     particles_pool_[i].draw();
+  //   }
+  // }
+  // shader_.use();
+  // vao_.bind();
+  // glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
+  // glVertexAttribDivisor(1, 1); // positions : one per quad (its center) -> 1
+  // glDrawArraysInstanced(GL_TRIANGLES, 0, 4, alive_particles_count_);
 }
 
 /* PHYSICS */
+
+ktp::EmitterPhysicsComponent::EmitterPhysicsComponent(EmitterGraphicsComponent* graphics) noexcept: graphics_(graphics) {}
 
 ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhysicsComponent&& other) noexcept {
   if (this != &other) {
@@ -26,7 +38,6 @@ ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhy
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);
-    // shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
     angle_                 = other.angle_;
@@ -37,6 +48,8 @@ ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhy
     interval_time_         = other.interval_time_;
     position_              = other.position_;
     start_time_            = other.start_time_;
+
+    particule_position_size_data_ = std::move(other.particule_position_size_data_);
   }
   return *this;
 }
@@ -100,6 +113,7 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
     first_available_ = new_particle->getNext();
     new_particle->init(new_data);
     ++alive_particles_count_;
+    graphics_->alive_particles_count_ = alive_particles_count_;
 
     if (first_available_ == nullptr) return;
   }
@@ -120,8 +134,10 @@ void ktp::EmitterPhysicsComponent::inflatePool() {
 ktp::EmitterPhysicsComponent ktp::EmitterPhysicsComponent::makeEmitter(EmitterGraphicsComponent* graphics, const std::string& type, const SDL_FPoint& pos) {
   EmitterPhysicsComponent emitter {graphics};
   emitter.setType(type);
+  //emitter.setupOpenGL();
   emitter.setPosition(pos);
-  return std::move(emitter);
+  emitter.particule_position_size_data_.resize(emitter.graphics_->particles_pool_size_ * 4);
+  return emitter;
 }
 
 void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
@@ -143,20 +159,43 @@ void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
   inflatePool();
 }
 
+void ktp::EmitterPhysicsComponent::setupOpenGL() {
+  const GLfloatVector vertex_buffer_data {
+    -0.5f, -0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+    -0.5f,  0.5f, 0.0f,
+     0.5f,  0.5f, 0.0f,
+  };
+  vertex_buffer_.setup(vertex_buffer_data);
+  position_buffer_.setup(nullptr, graphics_->particles_pool_size_ * 4 * sizeof(GLfloat), GL_STREAM_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, alive_particles_count_ * sizeof(GLfloat) * 4, particule_position_size_data_.data());
+
+  //color_buffer_.setup(nullptr, graphics_->particles_pool_size_ * 4 * sizeof(GLubyte), GL_STREAM_DRAW);
+  //glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLubyte) * 4, g_particule_color_data);
+
+  graphics_->vao_.linkAttrib(vertex_buffer_, 0, 3, GL_FLOAT, 0, nullptr);
+  graphics_->vao_.linkAttrib(position_buffer_, 1, 4, GL_FLOAT, 0, nullptr);
+}
+
 void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta_time) {
   for (auto i = 0u; i < graphics_->particles_pool_size_; ++i) {
-    if (data_->vortex_) {
-      if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_})) {
+    // if (data_->vortex_) {
+    //   if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_})) {
+    //     graphics_->particles_pool_[i].setNext(first_available_);
+    //     first_available_ = &graphics_->particles_pool_[i];
+    //     --alive_particles_count_;
+    //     graphics_->alive_particles_count_ = alive_particles_count_;
+    //   }
+    // } else { // no vortex
+      if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(particule_position_size_data_, i)) {
         graphics_->particles_pool_[i].setNext(first_available_);
         first_available_ = &graphics_->particles_pool_[i];
         --alive_particles_count_;
+        graphics_->alive_particles_count_ = alive_particles_count_;
+
+        position_buffer_.setup(nullptr, graphics_->particles_pool_size_ * 4 * sizeof(GLfloat), GL_STREAM_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, alive_particles_count_ * sizeof(GLfloat) * 4, particule_position_size_data_.data());
       }
-    } else { // no vortex
-      if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update()) {
-        graphics_->particles_pool_[i].setNext(first_available_);
-        first_available_ = &graphics_->particles_pool_[i];
-        --alive_particles_count_;
-      }
-    }
+    //}
   }
 }

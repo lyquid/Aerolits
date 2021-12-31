@@ -39,7 +39,7 @@ static b2Color SDL2ColorToB2Color(const SDL_Color& orig) {
 }
 
 /**
- * @brief Removes alll the bodies rom the world.
+ * @brief Removes all the bodies rom the world.
  * @param world The world to purge.
  */
 inline void clearB2World(b2World& world) {

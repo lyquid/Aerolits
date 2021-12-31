@@ -199,14 +199,14 @@ class VBO {
    * @brief Sets up the data for the buffer.
    * @param vertices A std::vector of floats to use as data.
    */
-  void setup(const GLfloatVector& vertices);
+  void setup(const GLfloatVector& vertices, GLenum usage = GL_STATIC_DRAW);
 
   /**
    * @brief Sets up the data for the buffer.
    * @param vertices A pointer to an array of floats to use as data.
    * @param size The size in bytes of the data.
    */
-  void setup(const GLfloat* vertices, GLsizeiptr size);
+  void setup(const GLfloat* vertices, GLsizeiptr size, GLenum usage = GL_STATIC_DRAW);
 
   /**
    * @brief Unbinds the VBO.
@@ -237,7 +237,7 @@ class EBO {
     }
     return *this;
   }
-  
+
   /**
    * @brief Generates an EBO by removing duplicate coordinates and creating an index array.
    * @param vertices Vector of vertices.
@@ -254,14 +254,14 @@ class EBO {
    * @brief Sets up the data for the buffer.
    * @param vertices A std::vector of uints to use as data.
    */
-  void setup(const GLuintVector& indices);
+  void setup(const GLuintVector& indices, GLenum usage = GL_STATIC_DRAW);
 
   /**
    * @brief Sets up the data for the buffer.
    * @param indices A pointer to an array of unsigned ints to use as data.
    * @param size The size in bytes of the data.
    */
-  void setup(const GLuint* indices, GLsizeiptr size);
+  void setup(const GLuint* indices, GLsizeiptr size, GLenum usage = GL_STATIC_DRAW);
 
   /**
    * @brief Unbinds the EBO.

@@ -30,6 +30,7 @@ class PlayerGraphicsComponent: public GraphicsComponent {
   EBO vertices_indices_ {};
   ShaderProgram shader_;
   glm::mat4 mvp_ {};
+  std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
 };
 
 class DemoInputComponent: public InputComponent {
@@ -75,7 +76,7 @@ class PlayerPhysicsComponent: public PhysicsComponent {
   bool thrusting_ {false};
   float cos_ {};
   float sin_ {};
-  // std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
+  std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
 };
 
 } // namespace ktp

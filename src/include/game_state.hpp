@@ -77,6 +77,7 @@ class PlayingState: public GameState {
 
 class TestingState: public GameState {
  public:
+  ~TestingState() { delete test_; }
   virtual void draw(Game& game) override;
   virtual void handleEvents(Game& game) override;
   virtual void update(Game& game, float delta_time) override;

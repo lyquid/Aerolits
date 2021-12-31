@@ -48,8 +48,8 @@ ktp::Game::Game() {
   );
   PhysicsComponent::setWorld(&world_);
 
-  state_ = GameState::goToState(*this, GameState::title_);
-  // state_ = GameState::goToState(*this, GameState::testing_);
+  // state_ = GameState::goToState(*this, GameState::title_);
+  state_ = GameState::goToState(*this, GameState::testing_);
 }
 
 void ktp::Game::clean() {
@@ -84,23 +84,30 @@ bool ktp::Game::loadResources() {
   Resources::loadTexture("aerolite_00", texture_path, false);
   texture_path = Resources::getResourcesPath("textures") + "aerolite_01.png";
   Resources::loadTexture("aerolite_01", texture_path, false);
+  texture_path = Resources::getResourcesPath("textures") + "particle_01.png";
+  Resources::loadTexture("particle_01", texture_path, false);
+  texture_path = Resources::getResourcesPath("textures") + "particle_02.png";
+  Resources::loadTexture("particle_02", texture_path, false);
 
   // shaders
   auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};
   auto fragment_shader_path {Resources::getResourcesPath("shaders") + "aerolite.frag"};
-  Resources::loadShader("aerolite", vertex_shader_path, fragment_shader_path);
+  if (!Resources::loadShader("aerolite", vertex_shader_path, fragment_shader_path)) return false;
   vertex_shader_path = Resources::getResourcesPath("shaders") + "gui_string.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "gui_string.frag";
-  Resources::loadShader("gui_string", vertex_shader_path, fragment_shader_path);
+  if (!Resources::loadShader("gui_string", vertex_shader_path, fragment_shader_path)) return false;
+  vertex_shader_path = Resources::getResourcesPath("shaders") + "particle.vert";
+  fragment_shader_path = Resources::getResourcesPath("shaders") + "particle.frag";
+  if (!Resources::loadShader("particle", vertex_shader_path, fragment_shader_path)) return false;
   vertex_shader_path = Resources::getResourcesPath("shaders") + "player.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "player.frag";
-  Resources::loadShader("player", vertex_shader_path, fragment_shader_path);
+  if (!Resources::loadShader("player", vertex_shader_path, fragment_shader_path)) return false;
   vertex_shader_path = Resources::getResourcesPath("shaders") + "projectile.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "projectile.frag";
-  Resources::loadShader("projectile", vertex_shader_path, fragment_shader_path);
+  if (!Resources::loadShader("projectile", vertex_shader_path, fragment_shader_path)) return false;
   vertex_shader_path = Resources::getResourcesPath("shaders") + "testing.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "testing.frag";
-  Resources::loadShader("testing", vertex_shader_path, fragment_shader_path);
+  if (!Resources::loadShader("testing", vertex_shader_path, fragment_shader_path)) return false;
 
   return true;
 }

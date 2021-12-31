@@ -281,6 +281,8 @@ ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
   // GameEntity::createEntity(EntityTypes::Player);
+  SDL_SetRelativeMouseMode(SDL_TRUE);
+  delete test_;
   test_ = new Testing;
   test_->init();
   return this;
@@ -298,11 +300,14 @@ void ktp::TestingState::handleEvents(Game& game) {
       case SDL_MOUSEBUTTONDOWN: {
         int x{0}, y{0};
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          AerolitePhysicsComponent::spawnAerolite({(float)x, (float)y});
-          logMessage("clicked " + std::to_string(x) + ", " + std::to_string(y));
+          // AerolitePhysicsComponent::spawnAerolite({(float)x, (float)y});
+          // logMessage("clicked " + std::to_string(x) + ", " + std::to_string(y));
         }
         break;
       }
+      case SDL_MOUSEMOTION:
+        test_->updateMouse(sdl_event_.motion.xrel, sdl_event_.motion.yrel);
+        break;
       default: break;
     }
   }

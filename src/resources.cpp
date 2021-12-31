@@ -108,7 +108,7 @@ void ktp::Resources::loadFont(const std::string& name, const std::string& file, 
 
 /* SHADERS */
 
-void ktp::Resources::loadShader(const std::string& name, const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path) {
+bool ktp::Resources::loadShader(const std::string& name, const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path) {
   // Create the shaders
 	GLuint vertex_shader_id {glCreateShader(GL_VERTEX_SHADER)};
 	GLuint fragment_shader_id {glCreateShader(GL_FRAGMENT_SHADER)};
@@ -122,7 +122,7 @@ void ktp::Resources::loadShader(const std::string& name, const std::string& vert
 		vertex_shader_stream.close();
 	} else {
     logError("Could NOT open vertex shader file", vertex_shader_path);
-    return;
+    return false;
 	}
   // Read the Fragment Shader code from the file
 	std::string fragment_shader_code {};
@@ -134,7 +134,7 @@ void ktp::Resources::loadShader(const std::string& name, const std::string& vert
 		fragment_shader_stream.close();
 	} else {
     logError("Could NOT open fragment shader file", fragment_shader_path);
-    return;
+    return false;
 	}
   // Compile Vertex Shader
   logMessage("Compiling vertex shader " + vertex_shader_path);
@@ -142,7 +142,7 @@ void ktp::Resources::loadShader(const std::string& name, const std::string& vert
 	glShaderSource(vertex_shader_id, 1, &vertex_source_pointer, nullptr);
 	glCompileShader(vertex_shader_id);
   glCheckError();
-  printShaderLog(vertex_shader_id);
+  if (!printShaderLog(vertex_shader_id)) return false;
   // Compile Fragment Shader
   logMessage("Compiling fragment shader " + fragment_shader_path);
 	const auto fragment_source_pointer {fragment_shader_code.c_str()};
@@ -156,7 +156,7 @@ void ktp::Resources::loadShader(const std::string& name, const std::string& vert
 	glAttachShader(id, vertex_shader_id);
 	glAttachShader(id, fragment_shader_id);
 	glLinkProgram(id);
-  printProgramLog(id);
+  if (!printProgramLog(id)) return false;
   glCheckError();
   // clean
 	// glDetachShader(id_, vertex_shader_id);
@@ -165,13 +165,12 @@ void ktp::Resources::loadShader(const std::string& name, const std::string& vert
 	glDeleteShader(fragment_shader_id);
   glCheckError();
 
-  if (id) {
-    shaders_map[name] = id;
-    logMessage("Shader program \"" + name + "\" successfully compiled and linked.");
-  }
+  shaders_map[name] = id;
+  logMessage("Shader program \"" + name + "\" successfully compiled and linked.");
+  return true;
 }
 
-void ktp::Resources::printProgramLog(GLuint program) {
+bool ktp::Resources::printProgramLog(GLuint program) {
   // Make sure name is program
   if (glIsProgram(program)) {
     // Program log length
@@ -182,13 +181,18 @@ void ktp::Resources::printProgramLog(GLuint program) {
     info_log.resize(max_length);
     // Get info log
     glGetProgramInfoLog(program, max_length, &info_log_length, info_log.data());
-    if (info_log_length > 0) logMessage(info_log);
+    if (info_log_length > 0) {
+      logError(info_log);
+      return false;
+    }
   } else {
     logError("printProgramLog(): Name " + std::to_string(program) + " is not a program.");
+    return false;
   }
+  return true;
 }
 
-void ktp::Resources::printShaderLog(GLuint shader) {
+bool ktp::Resources::printShaderLog(GLuint shader) {
   // Make sure name is shader
   if (glIsShader(shader)) {
     // Shader log length
@@ -199,10 +203,15 @@ void ktp::Resources::printShaderLog(GLuint shader) {
     info_log.resize(max_length);
     // Get info log
     glGetShaderInfoLog(shader, max_length, &info_log_length, info_log.data());
-    if (info_log_length > 0) logMessage(info_log);
+    if (info_log_length > 0) {
+      logError(info_log);
+      return false;
+    }
   } else {
     logError("printShaderLog(): Name " + std::to_string(shader) + " is not a shader.");
+    return false;
   }
+  return true;
 }
 
 /* TEXTURES */

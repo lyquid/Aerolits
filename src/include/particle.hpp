@@ -1,21 +1,19 @@
 #ifndef AEROLITS_SRC_INCLUDE_PARTICLE_HPP_
 #define AEROLITS_SRC_INCLUDE_PARTICLE_HPP_
 
+#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include <SDL.h>
 #include <utility> // std::move
 #include <vector>
 
 namespace ktp {
 
-class SDL2_Renderer;
-class SDL2_Texture;
+// namespace ParticlesAtlas {
 
-namespace ParticlesAtlas {
+//   void loadTexture(SDL2_Renderer& ren);
+//   extern SDL2_Texture particles_atlas;
 
-  void loadTexture(SDL2_Renderer& ren);
-  extern SDL2_Texture particles_atlas;
-
-} // end namespace ParticlesAtlas
+// } // end namespace ParticlesAtlas
 
 using ColorsVector  = std::vector<SDL_Color>;
 using FPointsVector = std::vector<SDL_FPoint>;
@@ -47,13 +45,15 @@ class Particle {
 
  public:
 
-  void draw(const SDL2_Renderer& ren) const;
+  void draw() const;
   inline Particle* getNext() const { return state_.next_; }
   void init(const ParticleData& data);
   inline bool inUse() const { return life_ > 0; }
   inline void setNext(Particle* next) { state_.next_ = next; }
-  bool update();
-  bool update(const Vortex& vortex);
+  // bool update();
+  // bool update(const Vortex& vortex);
+  bool update(GLfloatVector& pos, unsigned int index);
+  // bool update(const Vortex& vortex);
 
   Particle& operator=(const Particle& other) noexcept;
   Particle& operator=(Particle&& other) noexcept;

@@ -9,6 +9,7 @@ ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept:
   shader_(Resources::getShader("player")) {
 
   generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
+  exhaust_emitter_ = std::make_unique<EmitterGraphicsComponent>();
 }
 
 void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {
@@ -88,7 +89,7 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner, PlayerGra
   owner_ = owner;
   size_ = ConfigParser::player_config.size_;
   setBox2D();
-  // exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(EmitterPhysicsComponent::makeEmitter(graphics_->exhaust_emitter_.get(), "fire", {body_->GetPosition().x, body_->GetPosition().y}));
+  exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(EmitterPhysicsComponent::makeEmitter(graphics_->exhaust_emitter_.get(), "fire", {body_->GetPosition().x, body_->GetPosition().y}));
 }
 
 ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) noexcept {
@@ -104,7 +105,7 @@ ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysic
     thrusting_       = other.thrusting_;
     cos_             = other.cos_;
     sin_             = other.sin_;
-    // exhaust_emitter_ = std::move(other.exhaust_emitter_);
+    exhaust_emitter_ = std::move(other.exhaust_emitter_);
   }
   return *this;
 }
@@ -172,13 +173,13 @@ void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_t
   updateMVP();
   // cos_ = SDL_cosf(body_->GetAngle());
   // sin_ = SDL_sinf(body_->GetAngle());
-  // exhaust_emitter_->setAngle(body_->GetAngle());
-  // exhaust_emitter_->setPosition({
-  //   (body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
-  //   (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_
-  // });
-  // exhaust_emitter_->update(player, delta_time);
-  // if (thrusting_) exhaust_emitter_->generateParticles();
+  exhaust_emitter_->setAngle(body_->GetAngle());
+  exhaust_emitter_->setPosition({
+    (body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
+    (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_
+  });
+  exhaust_emitter_->update(player, delta_time);
+  if (thrusting_) exhaust_emitter_->generateParticles();
 }
 
 void ktp::PlayerPhysicsComponent::updateMVP() {

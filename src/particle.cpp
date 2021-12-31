@@ -5,13 +5,13 @@
 #include "sdl2_wrappers/sdl2_texture.hpp"
 #include <string>
 
-ktp::SDL2_Texture ktp::ParticlesAtlas::particles_atlas {};
+// ktp::SDL2_Texture ktp::ParticlesAtlas::particles_atlas {};
 
-void ktp::ParticlesAtlas::loadTexture(SDL2_Renderer& ren) {
-  const std::string file{"particles2.png"};
-  const std::string path{Resources::getResourcesPath("textures") + file};
-  particles_atlas.loadFromFile(ren, path);
-}
+// void ktp::ParticlesAtlas::loadTexture(SDL2_Renderer& ren) {
+//   const std::string file{"particles2.png"};
+//   const std::string path{Resources::getResourcesPath("textures") + file};
+//   particles_atlas.loadFromFile(ren, path);
+// }
 
 ktp::Particle& ktp::Particle::operator=(const Particle& other) noexcept {
   life_ = other.life_;
@@ -43,15 +43,15 @@ ktp::Particle::State& ktp::Particle::State::operator=(State&& other) noexcept {
   return *this;
 }
 
-void ktp::Particle::draw(const SDL2_Renderer& ren) const {
-  ParticlesAtlas::particles_atlas.setColorMod(state_.live_.current_color_);
-  ParticlesAtlas::particles_atlas.setAlphaMod(state_.live_.current_color_.a);
-  ParticlesAtlas::particles_atlas.render(ren, state_.live_.texture_rect_,
-                                         {static_cast<int>(state_.live_.position_.x),
-                                          static_cast<int>(state_.live_.position_.y),
-                                          static_cast<int>(state_.live_.current_size_),
-                                          static_cast<int>(state_.live_.current_size_)},
-                                         state_.live_.rotation_);
+void ktp::Particle::draw() const {
+  // ParticlesAtlas::particles_atlas.setColorMod(state_.live_.current_color_);
+  // ParticlesAtlas::particles_atlas.setAlphaMod(state_.live_.current_color_.a);
+  // ParticlesAtlas::particles_atlas.render(ren, state_.live_.texture_rect_,
+  //                                        {static_cast<int>(state_.live_.position_.x),
+  //                                         static_cast<int>(state_.live_.position_.y),
+  //                                         static_cast<int>(state_.live_.current_size_),
+  //                                         static_cast<int>(state_.live_.current_size_)},
+  //                                        state_.live_.rotation_);
 }
 
 void ktp::Particle::init(const ParticleData& data) {
@@ -81,7 +81,7 @@ SDL_Color ktp::Particle::interpolate3Colors(const SDL_Color& start_color, const 
 }
 
 /* return true if the previously live particle gave up the ghost in that frame */
-bool ktp::Particle::update() {
+bool ktp::Particle::update(GLfloatVector& pos, unsigned int index) {
   // time step increment to interpolate
   state_.live_.time_step_ += (1.f / state_.live_.start_life_);
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
@@ -115,55 +115,59 @@ bool ktp::Particle::update() {
   // position update
   state_.live_.position_.x += state_.live_.current_speed_.x;
   state_.live_.position_.y += state_.live_.current_speed_.y;
+  pos[4 * index + 0] = state_.live_.position_.x;
+  pos[4 * index + 1] = state_.live_.position_.y;
+  pos[4 * index + 2] = 0;
+  pos[4 * index + 3] = 0;
 
   --life_;
   return life_ == 0;
 }
 
 /* return true if the previously live particle gave up the ghost in that frame */
-bool ktp::Particle::update(const Vortex& vortex) {
-  // time step increment to interpolate
-  state_.live_.time_step_ += (1.f / state_.live_.start_life_);
-  if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
-  // size interpolation
-  const float last_size{state_.live_.current_size_};
-  if (state_.live_.sizes_.size() == 2) {
-    state_.live_.current_size_ = interpolateRange(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.time_step_);
-  } else if (state_.live_.sizes_.size() > 2) {
-    state_.live_.current_size_ = interpolateRange3(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.sizes_[2], state_.live_.time_step_);
-  }
-  // new position based on the new size
-  state_.live_.position_.x += ((last_size - state_.live_.current_size_) * 0.5f);
-  state_.live_.position_.y += ((last_size - state_.live_.current_size_) * 0.5f);
-  // color interpolation
-  if (state_.live_.colors_.size() == 2) {
-    state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
-  } else if (state_.live_.colors_.size() > 2) {
-    state_.live_.current_color_ = interpolate3Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.colors_[2], state_.live_.time_step_);
-  }
-  // rotation speed interpolation
-  state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.end_rotation_speed_, state_.live_.time_step_);
-  state_.live_.rotation_ += state_.live_.current_rotation_speed_;
-  // speed interpolation
-  if (state_.live_.speeds_.size() == 2) {
-    state_.live_.current_speed_.x = interpolateRange(state_.live_.speeds_[0].x, state_.live_.speeds_[1].x, state_.live_.time_step_);
-    state_.live_.current_speed_.y = interpolateRange(state_.live_.speeds_[0].y, state_.live_.speeds_[1].y, state_.live_.time_step_);
-  } else if (state_.live_.speeds_.size() > 2) {
-    state_.live_.current_speed_.x = interpolateRange3(state_.live_.speeds_[0].x, state_.live_.speeds_[1].x, state_.live_.speeds_[2].x, state_.live_.time_step_);
-    state_.live_.current_speed_.y = interpolateRange3(state_.live_.speeds_[0].y, state_.live_.speeds_[1].y, state_.live_.speeds_[2].y, state_.live_.time_step_);
-  }
-  // vortex stuff
-  const auto dx{state_.live_.position_.x - vortex.position_.x};
-  const auto dy{state_.live_.position_.y - vortex.position_.y};
+// bool ktp::Particle::update(const Vortex& vortex) {
+//   // time step increment to interpolate
+//   state_.live_.time_step_ += (1.f / state_.live_.start_life_);
+//   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
+//   // size interpolation
+//   const float last_size{state_.live_.current_size_};
+//   if (state_.live_.sizes_.size() == 2) {
+//     state_.live_.current_size_ = interpolateRange(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.time_step_);
+//   } else if (state_.live_.sizes_.size() > 2) {
+//     state_.live_.current_size_ = interpolateRange3(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.sizes_[2], state_.live_.time_step_);
+//   }
+//   // new position based on the new size
+//   state_.live_.position_.x += ((last_size - state_.live_.current_size_) * 0.5f);
+//   state_.live_.position_.y += ((last_size - state_.live_.current_size_) * 0.5f);
+//   // color interpolation
+//   if (state_.live_.colors_.size() == 2) {
+//     state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
+//   } else if (state_.live_.colors_.size() > 2) {
+//     state_.live_.current_color_ = interpolate3Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.colors_[2], state_.live_.time_step_);
+//   }
+//   // rotation speed interpolation
+//   state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.end_rotation_speed_, state_.live_.time_step_);
+//   state_.live_.rotation_ += state_.live_.current_rotation_speed_;
+//   // speed interpolation
+//   if (state_.live_.speeds_.size() == 2) {
+//     state_.live_.current_speed_.x = interpolateRange(state_.live_.speeds_[0].x, state_.live_.speeds_[1].x, state_.live_.time_step_);
+//     state_.live_.current_speed_.y = interpolateRange(state_.live_.speeds_[0].y, state_.live_.speeds_[1].y, state_.live_.time_step_);
+//   } else if (state_.live_.speeds_.size() > 2) {
+//     state_.live_.current_speed_.x = interpolateRange3(state_.live_.speeds_[0].x, state_.live_.speeds_[1].x, state_.live_.speeds_[2].x, state_.live_.time_step_);
+//     state_.live_.current_speed_.y = interpolateRange3(state_.live_.speeds_[0].y, state_.live_.speeds_[1].y, state_.live_.speeds_[2].y, state_.live_.time_step_);
+//   }
+//   // vortex stuff
+//   const auto dx{state_.live_.position_.x - vortex.position_.x};
+//   const auto dy{state_.live_.position_.y - vortex.position_.y};
 
-  const auto vx{-dy * vortex.speed_};
-  const auto vy{ dx * vortex.speed_};
+//   const auto vx{-dy * vortex.speed_};
+//   const auto vy{ dx * vortex.speed_};
 
-  const auto factor{1.f / (1.f + (dx * dx + dy * dy) / vortex.scale_)};
-  // position update
-  state_.live_.position_.x += (vx - state_.live_.current_speed_.x) * factor;
-  state_.live_.position_.y += (vy - state_.live_.current_speed_.y) * factor;
+//   const auto factor{1.f / (1.f + (dx * dx + dy * dy) / vortex.scale_)};
+//   // position update
+//   state_.live_.position_.x += (vx - state_.live_.current_speed_.x) * factor;
+//   state_.live_.position_.y += (vy - state_.live_.current_speed_.y) * factor;
 
-  --life_;
-  return life_ == 0;
-}
+//   --life_;
+//   return life_ == 0;
+// }

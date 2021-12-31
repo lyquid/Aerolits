@@ -67,19 +67,19 @@ inline auto getShader(const std::string& name) { return ShaderProgram{shaders_ma
  * @param fragment_shader_path Fragment shader file path.
  * @param geometry_shader_path **NOT IMPLEMENTED**
  */
-void loadShader(const std::string& name, const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path = "");
+bool loadShader(const std::string& name, const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path = "");
 
 /**
  * @brief Prints any problems with the shader program. If any...
  * @param program The id of the shader program.
  */
-void printProgramLog(GLuint program);
+bool printProgramLog(GLuint program);
 
 /**
  * @brief Prints problems with the shader, if any.
  * @param shader The shader id.
  */
-void printShaderLog(GLuint shader);
+bool printShaderLog(GLuint shader);
 
 /* TEXTURES */
 

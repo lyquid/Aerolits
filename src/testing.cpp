@@ -9,89 +9,81 @@
 #include "sdl2_wrappers/sdl2_timer.hpp"
 
 void ktp::Testing::draw() const {
-  shader_program_.setMat4f("mvp", glm::value_ptr(mvp_));
-  texture_.bind();
+  shader_program_.use();
   vao_.bind();
-  glDrawArrays(GL_TRIANGLES, 0, vertices_.size() / 3);
+  glDrawElements(GL_TRIANGLES, (GLsizei)indices_data_.size(), GL_UNSIGNED_INT, 0);
 }
 
 void ktp::Testing::init() {
-  texture_ = Resources::getTexture("title");
   shader_program_ = Resources::getShader("testing");
 
-  vertices_ = {
-    // first triangle
-     0.5f,  0.5f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f,  0.5f, 0.0f,  // top left
-    // second triangle
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f   // top left
-  };
-  const GLfloatVector texture_coords {
-    1.0f, 0.0f,   // top right
-    1.0f, 1.0f,   // bottom right
-    0.0f, 0.0f,    // top left
+  // vertices_ = {
+  //   // first triangle
+  //    0.5f,  0.5f, 0.0f,  // top right
+  //    0.5f, -0.5f, 0.0f,  // bottom right
+  //   -0.5f,  0.5f, 0.0f,  // top left
+  //   // second triangle
+  //    0.5f, -0.5f, 0.0f,  // bottom right
+  //   -0.5f, -0.5f, 0.0f,  // bottom left
+  //   -0.5f,  0.5f, 0.0f   // top left
+  // };
 
-    1.0f, 1.0f,   // bottom right
-    0.0f, 1.0f,   // bottom left
-    0.0f, 0.0f    // top left
-  };
-  //const GLfloatVector texture_coords {AerolitePhysicsComponent::convertToUV(vertices_)};
-  uv_.setup(texture_coords);
+  vertices_data_ = SDL2_GL::cube(0.5f);
+  EBO::generateEBO(vertices_data_, indices_data_);
+  vao_.bind();
+  indices_.setup(indices_data_);
+  vertices_.setup(vertices_data_);
+  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 0, nullptr);
 
-  vbo_.setup(vertices_);
-  vao_.linkAttrib(vbo_, 0, 3, GL_FLOAT, 0, nullptr);
-  vao_.linkAttrib(uv_, 1, 2, GL_FLOAT, 0, nullptr);
+  vertices_color_data_.resize(vertices_data_.size());
+  for (auto& i: vertices_color_data_) {
+    i = generateRand(0.f, 1.f);
+  }
+  colors_.setup(vertices_color_data_);
+  vao_.linkAttrib(colors_, 1, 3, GL_FLOAT, 0, nullptr);
 }
 
 void ktp::Testing::update(float delta_time) {
-  // const auto state {SDL_GetKeyboardState(nullptr)};
-  // const float kSpeed {1.5f * delta_time};
-  // if (state[SDL_SCANCODE_W]) {
-  //   camera_pos_ += kSpeed * camera_front_;
-  // }
-  // if (state[SDL_SCANCODE_S]) {
-  //   camera_pos_ -= kSpeed * camera_front_;
-  // }
-  // if (state[SDL_SCANCODE_A]) {
-  //   camera_pos_ -= glm::normalize(glm::cross(camera_front_, camera_up_)) * kSpeed;
-  // }
-  // if (state[SDL_SCANCODE_D]) {
-  //   camera_pos_ += glm::normalize(glm::cross(camera_front_, camera_up_)) * kSpeed;
-  // }
+  updateCamera(delta_time);
+  updateMVP(delta_time);
+}
 
-  // auto yaw {-90.f};
-  // auto pitch {0.f};
-  // glm::vec3 direction {};
-  // direction.x = SDL_cosf(glm::radians(yaw)) * SDL_cosf(glm::radians(pitch));
-  // direction.y = SDL_sinf(glm::radians(pitch));
-  // direction.z = SDL_sinf(glm::radians(yaw)) * SDL_cosf(glm::radians(pitch));
+void ktp::Testing::updateCamera(float delta_time) {
+  const auto state {SDL_GetKeyboardState(nullptr)};
+  const float kSpeed {1.5f * delta_time};
+  if (state[SDL_SCANCODE_W]) {
+    camera_pos_ += kSpeed * camera_front_;
+  }
+  if (state[SDL_SCANCODE_S]) {
+    camera_pos_ -= kSpeed * camera_front_;
+  }
+  if (state[SDL_SCANCODE_A]) {
+    camera_pos_ -= glm::normalize(glm::cross(camera_front_, camera_up_)) * kSpeed;
+  }
+  if (state[SDL_SCANCODE_D]) {
+    camera_pos_ += glm::normalize(glm::cross(camera_front_, camera_up_)) * kSpeed;
+  }
+}
 
-  // const auto step {0.5f * delta_time};
-  // for (auto i = 0; i < vertices_color_.size(); ++i) {
-  //   if (vertices_color_direction_[i]) {
-  //     if (vertices_color_[i] < 1) {
-  //       vertices_color_[i] += step * generateRand(0.f, 1.f);
-  //     } else {
-  //       vertices_color_[i] -= step * generateRand(0.f, 1.f);
-  //       vertices_color_direction_[i] = !vertices_color_direction_[i];
-  //     }
-  //   } else {
-  //     if (vertices_color_[i] > 0) {
-  //       vertices_color_[i] -= step * generateRand(0.f, 1.f);
-  //     } else {
-  //       vertices_color_[i] += step * generateRand(0.f, 1.f);
-  //       vertices_color_direction_[i] = !vertices_color_direction_[i];
-  //     }
-  //   }
-  // }
-  //cube_.colors_.bind();
-  // SDL2_GL::glBufferDataFromVector(GL_ARRAY_BUFFER, color_vertices_, GL_STATIC_DRAW);
+void ktp::Testing::updateMouse(float x_pos, float y_pos) {
+  constexpr float sensitivity {0.1f};
 
+  yaw_   += x_pos * sensitivity;
+  pitch_ -= y_pos * sensitivity;;
+
+  if (pitch_ >  89.0f) pitch_ =  89.0f;
+  if (pitch_ < -89.0f) pitch_ = -89.0f;
+
+  glm::vec3 direction {};
+  direction.x = SDL_cosf(glm::radians(yaw_)) * SDL_cosf(glm::radians(pitch_));
+  direction.y = SDL_sinf(glm::radians(pitch_));
+  direction.z = SDL_sinf(glm::radians(yaw_)) * SDL_cosf(glm::radians(pitch_));
+  camera_front_ = glm::normalize(direction);
+}
+
+void ktp::Testing::updateMVP(float delta_time) {
   glm::mat4 model {1.f};
-  model = glm::rotate(model, glm::radians(angle_ * delta_time), glm::vec3(0.f, 1.f, 0.f));
   view_ = glm::lookAt(camera_pos_, camera_pos_ + camera_front_, camera_up_);
   mvp_ = projection_ * view_ * model;
+  shader_program_.setMat4f("mvp", glm::value_ptr(mvp_));
 }

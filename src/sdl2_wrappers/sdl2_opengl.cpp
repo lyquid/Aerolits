@@ -77,6 +77,8 @@ bool ktp::SDL2_GL::initGLEW(SDL2_GLContext& context, const SDL2_Window& window) 
     logSDL2Error("SDL_GL_CreateContext", SDL_LOG_CATEGORY_RENDER);
     return false;
   } else {
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -119,15 +121,15 @@ ktp::VBO::VBO() {
   glCheckError();
 }
 
-void ktp::VBO::setup(const GLfloatVector& vertices) {
+void ktp::VBO::setup(const GLfloatVector& vertices, GLenum usage) {
   glBindBuffer(GL_ARRAY_BUFFER, id_);
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), usage);
   glCheckError();
 }
 
-void ktp::VBO::setup(const GLfloat* vertices, GLsizeiptr size) {
+void ktp::VBO::setup(const GLfloat* vertices, GLsizeiptr size, GLenum usage) {
   glBindBuffer(GL_ARRAY_BUFFER, id_);
-  glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, size, vertices, usage);
   glCheckError();
 }
 
@@ -172,15 +174,15 @@ void ktp::EBO::generateEBO(GLfloatVector& vertices, GLuintVector& indices) {
   vertices = std::move(unique_coords);
 }
 
-void ktp::EBO::setup(const GLuintVector& indices) {
+void ktp::EBO::setup(const GLuintVector& indices, GLenum usage) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), usage);
   glCheckError();
 }
 
-void ktp::EBO::setup(const GLuint* indices, GLsizeiptr size) {
+void ktp::EBO::setup(const GLuint* indices, GLsizeiptr size, GLenum usage) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, usage);
   glCheckError();
 }
 
