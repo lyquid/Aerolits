@@ -77,8 +77,6 @@ bool ktp::SDL2_GL::initGLEW(SDL2_GLContext& context, const SDL2_Window& window) 
     logSDL2Error("SDL_GL_CreateContext", SDL_LOG_CATEGORY_RENDER);
     return false;
   } else {
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

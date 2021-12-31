@@ -280,8 +280,10 @@ void ktp::TestingState::draw(Game& game) {
 ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
-  // GameEntity::createEntity(EntityTypes::Player);
   SDL_SetRelativeMouseMode(SDL_TRUE);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS);
+  glEnable(GL_CULL_FACE);
   delete test_;
   test_ = new Testing;
   test_->init();
