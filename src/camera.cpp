@@ -35,6 +35,12 @@ void ktp::Camera::mouseMovement(float x_offset, float y_offset, bool constrain_p
   updateCameraVectors();
 }
 
+void ktp::Camera::mouseScroll(float y_offset) {
+  zoom_ -= y_offset;
+  if (zoom_ < 1.f) zoom_ = 1.f;
+  if (zoom_ > 45.f) zoom_ = 45.f;
+}
+
 void ktp::Camera::updateCameraVectors() {
   // Calculate the new front_ vector
   const glm::vec3 new_front {

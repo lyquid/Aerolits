@@ -308,7 +308,10 @@ void ktp::TestingState::handleEvents(Game& game) {
         break;
       }
       case SDL_MOUSEMOTION:
-        test_->updateMouse(sdl_event_.motion.xrel, sdl_event_.motion.yrel);
+        test_->updateMouse((float)sdl_event_.motion.xrel, (float)sdl_event_.motion.yrel);
+        break;
+      case SDL_MOUSEWHEEL:
+        test_->updateZoom(((float)sdl_event_.wheel.y));
         break;
       default: break;
     }

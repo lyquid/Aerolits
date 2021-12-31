@@ -39,10 +39,22 @@ class Camera {
   void mouseMovement(float x_offset, float y_offset, bool constrain_pitch = true);
 
   /**
+   * @brief Sets the zoom based on the mousewheel spinning.
+   * @param y_offset The amount spinned.
+   */
+  void mouseScroll(float y_offset);
+
+  /**
    * @brief Calculates the view matrix using Euler angles and the glm::lookAt() matrix.
    * @return The view matrix.
    */
   inline auto viewMatrix() const { return glm::lookAt(position_, position_ + front_, up_); }
+
+  /**
+   * @brief Get the zoom!
+   * @return The zoom's current value.
+   */
+  inline auto zoom() const { return zoom_; }
 
  private:
 
