@@ -5,40 +5,65 @@
 
 namespace ktp {
 
+enum class CameraMovement {
+  Forward,
+  Backward,
+  Left,
+  Right,
+  count
+};
+
+/**
+ * @brief An abstract camera class that processes input and calculates the corresponding Euler angles,
+ *        vectors and matrices for use in OpenGL.
+ */
 class Camera {
  public:
-  Camera() { updateCameraVectors(); }
-  // const glm::mat4 projection_ {glm::perspective(glm::radians(45.f), 16.f / 9.f, 0.1f, 100.f)};
-  // returns the view matrix calculated using Euler Angles and the LookAt Matrix
-  auto viewMatrix() const {
-    return glm::lookAt(position_, position_ + front_, up_);
-  }
+
+  Camera(const glm::vec3& position = glm::vec3{0.f, 0.f, 0.f}, const glm::vec3& up = glm::vec3{0.f, 1.f, 0.f}, float yaw = -90.f, float pitch = 0.f);
+  Camera (float pos_x, float pos_y, float pos_z, float up_x, float up_y, float up_z, float yaw, float pitch);
+
+  /**
+   * @brief Processes keyboard input to move the camera accordingly.
+   * @param direction Where should the camera go.
+   * @param delta_time The delta time!
+   */
+  void keyboardMovement(CameraMovement direction, float delta_time);
+
+  /**
+   * @brief Processes mouse movement to move the camera accordingly.
+   * @param x_offset
+   * @param y_offset
+   * @param constrain_pitch To make sure that when pitch is out of bounds, screen doesn't get flipped.
+   */
+  void mouseMovement(float x_offset, float y_offset, bool constrain_pitch = true);
+
+  /**
+   * @brief Calculates the view matrix using Euler angles and the glm::lookAt() matrix.
+   * @return The view matrix.
+   */
+  inline auto viewMatrix() const { return glm::lookAt(position_, position_ + front_, up_); }
+
  private:
-  // calculates the front vector from the Camera's (updated) Euler Angles
-  void updateCameraVectors() {
-    // calculate the new Front vector
-    // glm::vec3 front;
-    // front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    // front.y = sin(glm::radians(Pitch));
-    // front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    // Front = glm::normalize(front);
-    // also re-calculate the Right and Up vector
-    right_ = glm::normalize(glm::cross(front_, world_up_));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-    up_    = glm::normalize(glm::cross(right_, front_));
-  }
-  // camera Attributes
-  glm::vec3 position_ {0.0f, 0.0f, 0.0f};
-  glm::vec3 front_ {0.0f, 0.0f, -1.0f};
+
+  /**
+   * @brief Calculates the front vector from the camera's (updated) Euler angles.
+   */
+  void updateCameraVectors();
+
+  // camera attributes
+  glm::vec3 position_ {0.f, 0.f, 0.f};
+  glm::vec3 front_ {0.f, 0.f, -1.f};
   glm::vec3 up_ {};
   glm::vec3 right_ {};
-  glm::vec3 world_up_ {0.0f, 1.0f, 0.0f};
-  // euler Angles
-  // float Yaw;
-  // float Pitch;
+  glm::vec3 world_up_ {0.f, 1.f, 0.f};
+  // Euler angles
+  float yaw_ {-90.f};
+  float pitch_ {};
   // camera options
-  // float MovementSpeed;
-  // float MouseSensitivity;
-  // float Zoom;
+  float movement_speed_ {2.5f};
+  float mouse_sensitivity_ {0.1f};
+  float zoom_ {45.f};
 };
 
 } // namespace ktp
