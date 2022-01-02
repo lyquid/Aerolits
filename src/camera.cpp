@@ -39,6 +39,22 @@ void ktp::Camera::mouseScroll(float y_offset) {
   zoom_ -= y_offset;
   if (zoom_ < 1.f) zoom_ = 1.f;
   if (zoom_ > 45.f) zoom_ = 45.f;
+  if (current_projection_ == Projection::Perspective) {
+    perspective_ = glm::perspective(glm::radians(zoom_), ratio_, 0.1f, 100.f);
+  }
+}
+
+void ktp::Camera::setProjection(Projection proj) {
+  switch (proj) {
+    case Projection::Orthographic:
+      projection_ = ortho_;
+      current_projection_ = Projection::Orthographic;
+      break;
+    case Projection::Perspective:
+      projection_ = perspective_;
+      current_projection_ = Projection::Perspective;
+      break;
+  }
 }
 
 void ktp::Camera::updateCameraVectors() {

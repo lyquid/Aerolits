@@ -13,6 +13,12 @@ enum class CameraMovement {
   count
 };
 
+enum class Projection {
+  Orthographic,
+  Perspective,
+  count
+};
+
 /**
  * @brief An abstract camera class that processes input and calculates the corresponding Euler angles,
  *        vectors and matrices for use in OpenGL.
@@ -45,6 +51,29 @@ class Camera {
   void mouseScroll(float y_offset);
 
   /**
+   * @brief
+   * @return auto
+   */
+  inline auto projectionMatrix() const { return projection_; }
+
+  /**
+   * @brief Sets the orthographic projection.
+   */
+  inline void setOrthographicMatrix(const glm::mat4& ortho) { ortho_ = ortho; }
+
+  /**
+   * @brief Sets the projection to some kind of projection.
+   * @param proj The projection type you want.
+   */
+  void setProjection(Projection proj);
+
+  /**
+   * @brief Sets the ratio for the perspective projection.
+   * @param ratio desired.
+   */
+  inline void setRatio(float ratio) { ratio_ = ratio; perspective_ = glm::perspective(glm::radians(zoom_), ratio_, 0.1f, 100.f); }
+
+  /**
    * @brief Calculates the view matrix using Euler angles and the glm::lookAt() matrix.
    * @return The view matrix.
    */
@@ -54,7 +83,7 @@ class Camera {
    * @brief Get the zoom!
    * @return The zoom's current value.
    */
-  inline auto zoom() const { return zoom_; }
+  inline auto zoom() const { return zoom_; } // maybe DELETE
 
  private:
 
@@ -75,7 +104,13 @@ class Camera {
   // camera options
   float movement_speed_ {2.5f};
   float mouse_sensitivity_ {0.1f};
+  // projection matrix
+  Projection current_projection_ {Projection::Perspective};
+  float ratio_ {16.f /9.f};
   float zoom_ {45.f};
+  glm::mat4 ortho_ {};
+  glm::mat4 perspective_ {glm::perspective(glm::radians(zoom_), ratio_, 0.1f, 100.f)};
+  glm::mat4 projection_ {perspective_};
 };
 
 } // namespace ktp
