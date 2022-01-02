@@ -1,4 +1,5 @@
 #include "include/aerolite.hpp"
+#include "include/camera.hpp"
 #include "include/game.hpp"
 #include "include/game_entity.hpp"
 #include "include/random.hpp"
@@ -286,5 +287,5 @@ void ktp::AerolitePhysicsComponent::updateMVP() {
   glm::mat4 model {1.f};
   model = glm::translate(model, glm::vec3(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels, 0.f));
   model = glm::rotate(model, body_->GetAngle(), glm::vec3(0.f, 0.f, 1.f));
-  graphics_->mvp_ = projection_ * model;
+  graphics_->mvp_ = camera_.projectionMatrix() * camera_.viewMatrix() * model;
 }

@@ -1,3 +1,4 @@
+#include "include/camera.hpp"
 #include "include/emitter.hpp"
 #include "include/game_entity.hpp"
 #include "include/player.hpp"
@@ -171,8 +172,8 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
 void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_time) {
   checkWrap();
   updateMVP();
-  // cos_ = SDL_cosf(body_->GetAngle());
-  // sin_ = SDL_sinf(body_->GetAngle());
+  cos_ = SDL_cosf(body_->GetAngle());
+  sin_ = SDL_sinf(body_->GetAngle());
   exhaust_emitter_->setAngle(body_->GetAngle());
   exhaust_emitter_->setPosition({
     (body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
@@ -186,5 +187,5 @@ void ktp::PlayerPhysicsComponent::updateMVP() {
   glm::mat4 model {1.f};
   model = glm::translate(model, glm::vec3(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels, 0.f));
   model = glm::rotate(model, body_->GetAngle(), glm::vec3(0.f, 0.f, 1.f));
-  graphics_->mvp_ = projection_ * model;
+  graphics_->mvp_ = camera_.projectionMatrix() * camera_.viewMatrix() * model;
 }

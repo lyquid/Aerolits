@@ -51,7 +51,7 @@ class Camera {
   inline auto projectionMatrix() const { return projection_; }
 
   /**
-   * @brief Sets the orthographic projection.
+   * @brief Sets the orthographic matrix projection.
    */
   inline void setOrthographicMatrix(const glm::mat4& ortho) { ortho_ = ortho; }
 
@@ -109,7 +109,7 @@ class Camera {
   Projection current_projection_ {Projection::Perspective};
   float ratio_ {16.f /9.f};
   float zoom_ {45.f};
-  glm::mat4 ortho_ {};
+  glm::mat4 ortho_ {glm::ortho(0.f, 800.f, 600.f, 0.f, -1.f, 1.f)};
   glm::mat4 perspective_ {glm::perspective(glm::radians(zoom_), ratio_, 0.1f, 100.f)};
   // current projection matrix
   glm::mat4 projection_ {perspective_};

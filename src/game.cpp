@@ -15,9 +15,9 @@ ktp::EntitiesCount ktp::GameEntity::entities_count_ {};
 ktp::EntitiesPool  ktp::GameEntity::game_entities_ {2000};
 
 /* include/physics_component.hpp */
-SDL_FPoint ktp::PhysicsComponent::b2_screen_size_ {};
-glm::mat4  ktp::PhysicsComponent::projection_ {};
-b2World*   ktp::PhysicsComponent::world_ {nullptr};
+SDL_FPoint   ktp::PhysicsComponent::b2_screen_size_ {};
+ktp::Camera& ktp::PhysicsComponent::camera_ {Game::camera_};
+b2World*     ktp::PhysicsComponent::world_ {nullptr};
 
 /* GAME */
 
@@ -43,15 +43,17 @@ ktp::Game::Game() {
   world_.SetContactListener(&contact_listener_);
 
   PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});
-  PhysicsComponent::setProjection(glm::ortho(
-    0.f, (float)ConfigParser::game_config.screen_size_.x, // left, right
-    0.f, (float)ConfigParser::game_config.screen_size_.y, // bottom, top
-    -1.f, 1.f) // zNear, zFar
-  );
   PhysicsComponent::setWorld(&world_);
 
-  // state_ = GameState::goToState(*this, GameState::title_);
-  state_ = GameState::goToState(*this, GameState::testing_);
+  camera_.setOrthographicMatrix(glm::ortho(
+    0.f, (float)screen_size_.x, // left, right
+    0.f, (float)screen_size_.y, // bottom, top
+    -1.f, 1.f) // zNear, zFar
+  );
+  camera_.setProjection(Projection::Orthographic);
+
+  state_ = GameState::goToState(*this, GameState::title_);
+  // state_ = GameState::goToState(*this, GameState::testing_);
 }
 
 void ktp::Game::clean() {

@@ -6,6 +6,7 @@ ktp::Camera::Camera(const glm::vec3& position, const glm::vec3& up, float yaw, f
   yaw_ = yaw;
   pitch_ = pitch;
   updateCameraVectors();
+  updateViewMatrix();
 }
 
 ktp::Camera::Camera(float pos_x, float pos_y, float pos_z, float up_x, float up_y, float up_z, float yaw, float pitch) {
@@ -14,6 +15,7 @@ ktp::Camera::Camera(float pos_x, float pos_y, float pos_z, float up_x, float up_
   yaw_ = yaw;
   pitch_ = pitch;
   updateCameraVectors();
+  updateViewMatrix();
 }
 
 void ktp::Camera::look(float x_offset, float y_offset, bool constrain_pitch) {

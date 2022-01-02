@@ -13,6 +13,8 @@ namespace ktp {
 
 using B2Vec2Vector = std::vector<b2Vec2>;
 
+class Camera;
+
 class PhysicsComponent {
 
  public:
@@ -34,14 +36,13 @@ class PhysicsComponent {
     b2_screen_size_.x = screen_size.x * kPixelsToMeters;
     b2_screen_size_.y = screen_size.y * kPixelsToMeters;
   }
-  static inline void setProjection(const glm::mat4& projection) { projection_ = projection; }
   static inline void setWorld(b2World* world) { world_ = world; }
 
  protected:
 
   // defined in game.cpp
   static SDL_FPoint b2_screen_size_;
-  static glm::mat4  projection_;
+  static Camera&    camera_;
   static b2World*   world_;
 
   b2Body*     body_ {nullptr};
