@@ -280,7 +280,7 @@ void ktp::TestingState::draw(Game& game) {
 ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
-  SDL_SetRelativeMouseMode(SDL_TRUE);
+  //SDL_SetRelativeMouseMode(SDL_TRUE);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
   glEnable(GL_CULL_FACE);
@@ -302,16 +302,21 @@ void ktp::TestingState::handleEvents(Game& game) {
       case SDL_MOUSEBUTTONDOWN: {
         int x{0}, y{0};
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+          SDL_SetRelativeMouseMode(SDL_TRUE);
           // AerolitePhysicsComponent::spawnAerolite({(float)x, (float)y});
           // logMessage("clicked " + std::to_string(x) + ", " + std::to_string(y));
+        } else if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+          SDL_SetRelativeMouseMode(SDL_FALSE);
         }
         break;
       }
       case SDL_MOUSEMOTION:
-        test_->updateMouse((float)sdl_event_.motion.xrel, (float)sdl_event_.motion.yrel);
+        if (SDL_GetRelativeMouseMode())
+          test_->updateMouse((float)sdl_event_.motion.xrel, (float)sdl_event_.motion.yrel);
         break;
       case SDL_MOUSEWHEEL:
-        test_->updateZoom(((float)sdl_event_.wheel.y));
+        if (SDL_GetRelativeMouseMode())
+          test_->updateZoom(((float)sdl_event_.wheel.y));
         break;
       default: break;
     }
