@@ -71,7 +71,7 @@ class Camera {
    * @brief Calculates the view matrix using Euler angles and the glm::lookAt() matrix.
    * @return The view matrix.
    */
-  inline auto viewMatrix() const { return glm::lookAt(position_, position_ + front_, up_); }
+  inline auto viewMatrix() const { return view_; }
 
   /**
    * @brief Increases or decreases the zoom level.
@@ -86,6 +86,13 @@ class Camera {
    */
   void updateCameraVectors();
 
+  /**
+   * @brief Updates the view matrix.
+   */
+  inline void updateViewMatrix() { view_ = glm::lookAt(position_, position_ + front_, up_); }
+
+  // view matrix
+  glm::mat4 view_ {};
   // camera attributes
   glm::vec3 position_ {0.f, 0.f, 0.f};
   glm::vec3 front_ {0.f, 0.f, -1.f};
@@ -98,12 +105,13 @@ class Camera {
   // camera options
   float movement_speed_ {2.5f};
   float mouse_sensitivity_ {0.1f};
-  // projection matrix
+  // projection options
   Projection current_projection_ {Projection::Perspective};
   float ratio_ {16.f /9.f};
   float zoom_ {45.f};
   glm::mat4 ortho_ {};
   glm::mat4 perspective_ {glm::perspective(glm::radians(zoom_), ratio_, 0.1f, 100.f)};
+  // current projection matrix
   glm::mat4 projection_ {perspective_};
 };
 

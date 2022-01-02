@@ -25,6 +25,7 @@ void ktp::Camera::look(float x_offset, float y_offset, bool constrain_pitch) {
     if (pitch_ < -89.f) pitch_ = -89.f;
   }
   updateCameraVectors();
+  updateViewMatrix();
 }
 
 void ktp::Camera::move(CameraMovement direction, float delta_time) {
@@ -33,6 +34,7 @@ void ktp::Camera::move(CameraMovement direction, float delta_time) {
   if (direction == CameraMovement::Backward) position_ -= front_ * velocity;
   if (direction == CameraMovement::Left)     position_ -= right_ * velocity;
   if (direction == CameraMovement::Right)    position_ += right_ * velocity;
+  updateViewMatrix();
 }
 
 void ktp::Camera::setProjection(Projection proj) {
