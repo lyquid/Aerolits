@@ -4,7 +4,6 @@
 #include <SDL.h>
 #include <GL/glew.h>
 #include <SDL_opengl.h>
-#include <GL/GLU.h>
 #include <string>
 #include <utility>
 #include <vector>
