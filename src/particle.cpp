@@ -115,10 +115,10 @@ bool ktp::Particle::update(GLfloatVector& pos, unsigned int index) {
   // position update
   state_.live_.position_.x += state_.live_.current_speed_.x;
   state_.live_.position_.y += state_.live_.current_speed_.y;
-  pos[4 * index + 0] = state_.live_.position_.x;
-  pos[4 * index + 1] = state_.live_.position_.y;
-  pos[4 * index + 2] = 0;
-  pos[4 * index + 3] = 0;
+  pos[2 * index + 0] = state_.live_.position_.x;
+  pos[2 * index + 1] = state_.live_.position_.y;
+  //pos[4 * index + 2] = 0;
+  //pos[4 * index + 3] = 0;
 
   --life_;
   return life_ == 0;

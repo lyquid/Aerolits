@@ -30,7 +30,7 @@ void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {
   // vertices
   vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
   // colors
-  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GL_FLOAT)));
+  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
   // EBO
   vertices_indices_.setup(player_shape_indices);
 }

@@ -57,6 +57,7 @@ class EmitterGraphicsComponent: public GraphicsComponent {
   unsigned int  alive_particles_count_ {};
   VAO vao_ {};
   ShaderProgram shader_ {};
+  glm::mat4 mvp_ {};
 };
 
 class EmitterPhysicsComponent: public PhysicsComponent {
@@ -95,6 +96,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   EmitterPhysicsComponent(EmitterGraphicsComponent* graphics) noexcept;
 
   void inflatePool(); // maybe static?
+  void updateMVP();
 
   float                     angle_ {};
   unsigned int              alive_particles_count_ {};
@@ -107,8 +109,8 @@ class EmitterPhysicsComponent: public PhysicsComponent {
 
   VBO vertex_buffer_ {};
   VBO position_buffer_ {};
-  VBO color_buffer_ {};
-  GLfloatVector particule_position_size_data_ {};
+  // VBO color_buffer_ {};
+  GLfloatVector particules_positions_data_ {};
 };
 
 } // namespace ktp
