@@ -21,6 +21,8 @@ b2World*   ktp::PhysicsComponent::world_ {nullptr};
 
 /* GAME */
 
+ktp::Camera ktp::Game::camera_ {};
+
 ktp::SDL2_Timer ktp::Game::gameplay_timer_ {};
 
 ktp::Game::Game() {

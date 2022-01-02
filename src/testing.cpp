@@ -56,7 +56,6 @@ void ktp::Testing::updateCamera(float delta_time) {
 
 void ktp::Testing::updateMVP(float delta_time) {
   glm::mat4 model {1.f};
-  projection_ = glm::perspective(glm::radians(45.f), 16.f / 9.f, 0.1f, 100.f);
-  mvp_ = projection_ * camera_.viewMatrix() * model;
-  shader_program_.setMat4f("mvp", glm::value_ptr(mvp_));
+  const glm::mat4 mvp {camera_.projectionMatrix() * camera_.viewMatrix() * model};
+  shader_program_.setMat4f("mvp", glm::value_ptr(mvp));
 }

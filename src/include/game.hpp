@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_INCLUDE_GAME_HPP_
 
 #include "background.hpp"
+#include "camera.hpp"
 #include "config_parser.hpp"
 #include "contact_listener.hpp"
 #include "debug_draw.hpp"
@@ -40,6 +41,8 @@ class Game {
   inline bool quit() const { return quit_; }
   void reset();
   inline void update(float delta_time) { state_->update(*this, delta_time); }
+
+  static Camera camera_;
 
   /**
    * @brief This timer only goes when playing or in demo state.

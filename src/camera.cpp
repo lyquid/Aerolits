@@ -68,5 +68,6 @@ void ktp::Camera::zoom(float how_much) {
   if (zoom_ > 45.f) zoom_ = 45.f;
   if (current_projection_ == Projection::Perspective) {
     perspective_ = glm::perspective(glm::radians(zoom_), ratio_, 0.1f, 100.f);
+    projection_ = perspective_;
   }
 }
