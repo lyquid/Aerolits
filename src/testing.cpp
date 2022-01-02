@@ -41,22 +41,22 @@ void ktp::Testing::update(float delta_time) {
 void ktp::Testing::updateCamera(float delta_time) {
   const auto state {SDL_GetKeyboardState(nullptr)};
   if (state[SDL_SCANCODE_W]) {
-    camera_.keyboardMovement(CameraMovement::Forward, delta_time);
+    camera_.move(CameraMovement::Forward, delta_time);
   }
   if (state[SDL_SCANCODE_S]) {
-    camera_.keyboardMovement(CameraMovement::Backward, delta_time);
+    camera_.move(CameraMovement::Backward, delta_time);
   }
   if (state[SDL_SCANCODE_A]) {
-    camera_.keyboardMovement(CameraMovement::Left, delta_time);
+    camera_.move(CameraMovement::Left, delta_time);
   }
   if (state[SDL_SCANCODE_D]) {
-    camera_.keyboardMovement(CameraMovement::Right, delta_time);
+    camera_.move(CameraMovement::Right, delta_time);
   }
 }
 
 void ktp::Testing::updateMVP(float delta_time) {
   glm::mat4 model {1.f};
-  projection_ = glm::perspective(glm::radians(camera_.zoom()), 16.f / 9.f, 0.1f, 100.f);
+  projection_ = glm::perspective(glm::radians(45.f), 16.f / 9.f, 0.1f, 100.f);
   mvp_ = projection_ * camera_.viewMatrix() * model;
   shader_program_.setMat4f("mvp", glm::value_ptr(mvp_));
 }

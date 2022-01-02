@@ -16,17 +16,9 @@ ktp::Camera::Camera(float pos_x, float pos_y, float pos_z, float up_x, float up_
   updateCameraVectors();
 }
 
-void ktp::Camera::keyboardMovement(CameraMovement direction, float delta_time) {
-  const auto velocity {movement_speed_ * delta_time};
-  if (direction == CameraMovement::Forward)  position_ += front_ * velocity;
-  if (direction == CameraMovement::Backward) position_ -= front_ * velocity;
-  if (direction == CameraMovement::Left)     position_ -= right_ * velocity;
-  if (direction == CameraMovement::Right)    position_ += right_ * velocity;
-}
-
-void ktp::Camera::mouseMovement(float x_offset, float y_offset, bool constrain_pitch) {
+void ktp::Camera::look(float x_offset, float y_offset, bool constrain_pitch) {
   yaw_   += x_offset * mouse_sensitivity_;
-  pitch_ -= y_offset * mouse_sensitivity_;
+  pitch_ += y_offset * mouse_sensitivity_;
   // Make sure that when pitch is out of bounds, screen doesn't get flipped.
   if (constrain_pitch) {
     if (pitch_ >  89.f) pitch_ =  89.f;
@@ -35,13 +27,12 @@ void ktp::Camera::mouseMovement(float x_offset, float y_offset, bool constrain_p
   updateCameraVectors();
 }
 
-void ktp::Camera::mouseScroll(float y_offset) {
-  zoom_ -= y_offset;
-  if (zoom_ < 1.f) zoom_ = 1.f;
-  if (zoom_ > 45.f) zoom_ = 45.f;
-  if (current_projection_ == Projection::Perspective) {
-    perspective_ = glm::perspective(glm::radians(zoom_), ratio_, 0.1f, 100.f);
-  }
+void ktp::Camera::move(CameraMovement direction, float delta_time) {
+  const auto velocity {movement_speed_ * delta_time};
+  if (direction == CameraMovement::Forward)  position_ += front_ * velocity;
+  if (direction == CameraMovement::Backward) position_ -= front_ * velocity;
+  if (direction == CameraMovement::Left)     position_ -= right_ * velocity;
+  if (direction == CameraMovement::Right)    position_ += right_ * velocity;
 }
 
 void ktp::Camera::setProjection(Projection proj) {
@@ -69,4 +60,13 @@ void ktp::Camera::updateCameraVectors() {
   // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
   right_ = glm::normalize(glm::cross(front_, world_up_));
   up_    = glm::normalize(glm::cross(right_, front_));
+}
+
+void ktp::Camera::zoom(float how_much) {
+  zoom_ -= how_much;
+  if (zoom_ < 1.f) zoom_ = 1.f;
+  if (zoom_ > 45.f) zoom_ = 45.f;
+  if (current_projection_ == Projection::Perspective) {
+    perspective_ = glm::perspective(glm::radians(zoom_), ratio_, 0.1f, 100.f);
+  }
 }

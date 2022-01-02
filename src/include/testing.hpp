@@ -16,8 +16,8 @@ class Testing {
   void draw() const;
   void init();
   void update(float delta_time);
-  void updateMouse(float x_pos, float y_pos) { camera_.mouseMovement(x_pos, y_pos); }
-  void updateZoom(float y_offset) { camera_.mouseScroll(y_offset); }
+  void updateMouse(float x_pos, float y_pos) { camera_.look(x_pos, -y_pos); }
+  void updateZoom(float y_offset) { camera_.zoom(y_offset); }
 
  private:
 

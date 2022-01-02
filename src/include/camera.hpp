@@ -30,25 +30,19 @@ class Camera {
   Camera (float pos_x, float pos_y, float pos_z, float up_x, float up_y, float up_z, float yaw, float pitch);
 
   /**
-   * @brief Processes keyboard input to move the camera accordingly.
-   * @param direction Where should the camera go.
-   * @param delta_time The delta time!
-   */
-  void keyboardMovement(CameraMovement direction, float delta_time);
-
-  /**
-   * @brief Processes mouse movement to move the camera accordingly.
+   * @brief Points the camera to directions.
    * @param x_offset
    * @param y_offset
    * @param constrain_pitch To make sure that when pitch is out of bounds, screen doesn't get flipped.
    */
-  void mouseMovement(float x_offset, float y_offset, bool constrain_pitch = true);
+  void look(float x_offset, float y_offset, bool constrain_pitch = true);
 
   /**
-   * @brief Sets the zoom based on the mousewheel spinning.
-   * @param y_offset The amount spinned.
+   * @brief Moves the camera.
+   * @param direction Where should the camera go.
+   * @param delta_time The delta time!
    */
-  void mouseScroll(float y_offset);
+  void move(CameraMovement direction, float delta_time);
 
   /**
    * @brief
@@ -80,10 +74,10 @@ class Camera {
   inline auto viewMatrix() const { return glm::lookAt(position_, position_ + front_, up_); }
 
   /**
-   * @brief Get the zoom!
-   * @return The zoom's current value.
+   * @brief Increases or decreases the zoom level.
+   * @param how_much you want.
    */
-  inline auto zoom() const { return zoom_; } // maybe DELETE
+  void zoom(float how_much);
 
  private:
 
