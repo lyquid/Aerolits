@@ -35,6 +35,8 @@ ktp::Game::Game() {
 
   SDL2_GL::initGLEW(context_, main_window_);
 
+  initImgui();
+
   if (!loadResources()) return;
   gui_sys_.init();
 
@@ -52,16 +54,35 @@ ktp::Game::Game() {
   );
   camera_.setProjection(Projection::Orthographic);
 
-  state_ = GameState::goToState(*this, GameState::title_);
-  // state_ = GameState::goToState(*this, GameState::testing_);
+  // state_ = GameState::goToState(*this, GameState::title_);
+  state_ = GameState::goToState(*this, GameState::testing_);
 }
 
 void ktp::Game::clean() {
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplSDL2_Shutdown();
+  ImGui::DestroyContext();
   Resources::cleanOpenGL();
   GameEntity::clear();
   clearB2World(world_);
   SDL2_Audio::closeMixer();
 	SDL_Quit();
+}
+
+bool ktp::Game::initImgui() {
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO(); (void)io;
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+  //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+  // Setup Dear ImGui style
+  ImGui::StyleColorsDark();
+
+  // Setup Platform/Renderer backends
+  ImGui_ImplSDL2_InitForOpenGL(main_window_.getWindow(), context_.context());
+  ImGui_ImplOpenGL3_Init("#version 330");
+  return true;
 }
 
 bool ktp::Game::initSDL2() {

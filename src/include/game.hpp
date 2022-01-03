@@ -12,6 +12,9 @@
 #include "../kuge/kuge.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <box2d/box2d.h>
+#include "../../lib/imgui/imgui.h"
+#include "../../lib/imgui/imgui_impl_sdl.h"
+#include "../../lib/imgui/imgui_impl_opengl3.h"
 #include <string>
 
 namespace ktp {
@@ -52,6 +55,7 @@ class Game {
  private:
 
   void clean();
+  bool initImgui();
   bool initSDL2();
   bool loadResources();
 

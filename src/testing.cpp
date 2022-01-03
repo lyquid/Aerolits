@@ -12,6 +12,13 @@ void ktp::Testing::draw() const {
   shader_program_.use();
   vao_.bind();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices_data_.size(), GL_UNSIGNED_INT, 0);
+  // bool show_demo_window {true};
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplSDL2_NewFrame();
+  ImGui::NewFrame();
+  // ImGui::ShowDemoWindow(&show_demo_window);
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void ktp::Testing::init() {
