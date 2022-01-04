@@ -76,6 +76,7 @@ add_subdirectory(src)
 add_subdirectory(src/kuge)
 add_subdirectory(src/sdl2_wrappers)
 add_subdirectory(lib/imgui)
+add_subdirectory(lib/pugixml)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

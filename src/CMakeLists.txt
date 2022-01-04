@@ -1,6 +1,5 @@
 add_executable(Aerolits
   ../main.cpp
-  ../lib/pugixml1.11/pugixml.cpp
   aerolite.cpp
   background.cpp
   camera.cpp
@@ -23,6 +22,7 @@ set_target_properties(Aerolits PROPERTIES CXX_EXTENSIONS OFF)
 
 target_include_directories(Aerolits PRIVATE ${Aerolits_SOURCE_DIR}/lib)
 target_include_directories(Aerolits PRIVATE ${Aerolits_SOURCE_DIR}/lib/imgui)
+target_include_directories(Aerolits PRIVATE ${Aerolits_SOURCE_DIR}/lib/pugixml)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 	set(MY_DEBUG_OPTIONS /Wall /RTC)
@@ -49,6 +49,7 @@ if(DEFINED CMAKE_TOOLCHAIN_FILE)
     glm::glm
     imgui
     KUGE
+    pugixml
     SDL2::SDL2
     SDL2_wrappers
   )
@@ -58,6 +59,7 @@ else()
     glm::glm
     imgui
     KUGE
+    pugixml
     ${SDL2_LIBRARY}
     SDL2_wrappers
   )

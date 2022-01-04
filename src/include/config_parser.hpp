@@ -1,7 +1,7 @@
 #pragma once
 
 #include "palette.hpp"
-#include "../../lib/pugixml1.11/pugixml.hpp"
+#include "pugixml.hpp"
 #include <SDL.h>
 #include <string>
 #include <vector>
