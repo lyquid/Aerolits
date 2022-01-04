@@ -65,8 +65,6 @@ else()
   )
 endif()
 
-target_include_directories(Aerolits PRIVATE "${Aerolits_SOURCE_DIR}/src/include")
-
 install(TARGETS Aerolits RUNTIME DESTINATION ${BIN_DIR})
 
 add_subdirectory(tests)
