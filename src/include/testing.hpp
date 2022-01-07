@@ -6,6 +6,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
+#include "imgui_stdlib.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -16,7 +17,7 @@ namespace ktp {
 class Testing {
  public:
 
-  void draw() const;
+  void draw();
   void init();
   void update(float delta_time);
   void updateMouse(float x_pos, float y_pos) { camera_.look(x_pos, -y_pos); }
@@ -38,6 +39,8 @@ class Testing {
   ShaderProgram shader_program_ {};
 
   Camera camera_ {glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 1.f, 0.f), -90.f, 0.f};
+
+  bool show_another_window_ {true};
 };
 
 } // namespace ktp
