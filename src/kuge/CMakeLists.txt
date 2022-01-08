@@ -1,5 +1,7 @@
 add_library(KUGE
+  backend_system.cpp
   event.cpp
+  gui_system.cpp
   system.cpp
 )
 
