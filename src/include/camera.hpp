@@ -56,7 +56,9 @@ class Camera {
   inline void setOrthographicMatrix(const glm::mat4& ortho) { ortho_ = ortho; }
 
   /**
-   * @brief Sets the projection to some kind of projection.
+   * @brief Sets the projection to some kind of projection. **CAUTION** It just
+   * copies the specified matrix. If you make changes to a projection, you must
+   * use this function again for the changes to make effect.
    * @param proj The projection type you want.
    */
   void setProjection(Projection proj);
@@ -106,13 +108,13 @@ class Camera {
   float movement_speed_ {2.5f};
   float mouse_sensitivity_ {0.1f};
   // projection options
-  Projection current_projection_ {Projection::Perspective};
   float ratio_ {16.f /9.f};
   float zoom_ {45.f};
   glm::mat4 ortho_ {glm::ortho(0.f, 800.f, 600.f, 0.f, -1.f, 1.f)};
   glm::mat4 perspective_ {glm::perspective(glm::radians(zoom_), ratio_, 0.1f, 100.f)};
   // current projection matrix
   glm::mat4 projection_ {perspective_};
+  Projection current_projection_ {Projection::Perspective};
 };
 
 } // namespace ktp

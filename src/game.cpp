@@ -54,8 +54,8 @@ ktp::Game::Game() {
   );
   camera_.setProjection(Projection::Orthographic);
 
-  state_ = GameState::goToState(*this, GameState::title_);
-  // state_ = GameState::goToState(*this, GameState::testing_);
+  // state_ = GameState::goToState(*this, GameState::title_);
+  state_ = GameState::goToState(*this, GameState::testing_);
 }
 
 void ktp::Game::clean() {

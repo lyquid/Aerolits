@@ -25,11 +25,17 @@ void ktp::Testing::draw() {
     ImGui::End();
   }
 
+  ImGui::Begin("Another Window 2", &show_another_window_);
+  ImGui::Text("Hello from another window!");
+  // ImGui::InputText("string", nullptr);
+  ImGui::End();
+
   ImGui::Text("Hello, world %d", 123);
   // if (ImGui::Button("Save")) MySaveFunction();
   std::string buf {"holamanola"};
   ImGui::InputText("string", &buf);
-  //ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+  float f {};
+  ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
 
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -60,6 +66,7 @@ void ktp::Testing::update(float delta_time) {
 }
 
 void ktp::Testing::updateCamera(float delta_time) {
+  if (ImGui::GetIO().WantCaptureKeyboard) return;
   const auto state {SDL_GetKeyboardState(nullptr)};
   if (state[SDL_SCANCODE_W]) {
     camera_.move(CameraMovement::Forward, delta_time);

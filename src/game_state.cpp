@@ -2,6 +2,7 @@
 #include "include/game_state.hpp"
 #include "include/physics_component.hpp"
 #include "kuge/system.hpp" // GUISystem
+#include "imgui.h"
 #include <SDL.h>
 #include <memory>
 #include <string> // std::to_string
@@ -291,21 +292,24 @@ ktp::GameState* ktp::TestingState::enter(Game& game) {
 
 void ktp::TestingState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
+    ImGui_ImplSDL2_ProcessEvent(&sdl_event_);
     switch (sdl_event_.type) {
       case SDL_QUIT:
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
-        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN: {
-        int x{0}, y{0};
-        if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          SDL_SetRelativeMouseMode(SDL_TRUE);
-          // AerolitePhysicsComponent::spawnAerolite({(float)x, (float)y});
-          // logMessage("clicked " + std::to_string(x) + ", " + std::to_string(y));
-        } else if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-          SDL_SetRelativeMouseMode(SDL_FALSE);
+        if (!ImGui::GetIO().WantCaptureMouse) {
+          int x{0}, y{0};
+          if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+            SDL_SetRelativeMouseMode(SDL_TRUE);
+            // AerolitePhysicsComponent::spawnAerolite({(float)x, (float)y});
+            // logMessage("clicked " + std::to_string(x) + ", " + std::to_string(y));
+          } else if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+            SDL_SetRelativeMouseMode(SDL_FALSE);
+          }
         }
         break;
       }
