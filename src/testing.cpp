@@ -12,30 +12,30 @@ void ktp::Testing::draw() {
   shader_program_.use();
   vao_.bind();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices_data_.size(), GL_UNSIGNED_INT, 0);
-  // bool show_demo_window {true};
+  bool show_demo_window {true};
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplSDL2_NewFrame();
   ImGui::NewFrame();
-  // ImGui::ShowDemoWindow(&show_demo_window);
+  ImGui::ShowDemoWindow(&show_demo_window);
 
-  if (show_another_window_) {
-    ImGui::Begin("Another Window", &show_another_window_);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-    ImGui::Text("Hello from another window!");
-    if (ImGui::Button("Close Me")) show_another_window_ = false;
-    ImGui::End();
-  }
+  // if (show_another_window_) {
+  //   ImGui::Begin("Another Window", &show_another_window_);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+  //   ImGui::Text("Hello from another window!");
+  //   if (ImGui::Button("Close Me")) show_another_window_ = false;
+  //   ImGui::End();
+  // }
 
-  ImGui::Begin("Another Window 2", &show_another_window_);
-  ImGui::Text("Hello from another window!");
-  // ImGui::InputText("string", nullptr);
-  ImGui::End();
+  // ImGui::Begin("Another Window 2", &show_another_window_);
+  // ImGui::Text("Hello from another window!");
+  // // ImGui::InputText("string", nullptr);
+  // ImGui::End();
 
-  ImGui::Text("Hello, world %d", 123);
-  // if (ImGui::Button("Save")) MySaveFunction();
-  std::string buf {"holamanola"};
-  ImGui::InputText("string", &buf);
-  float f {};
-  ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+  // ImGui::Text("Hello, world %d", 123);
+  // // if (ImGui::Button("Save")) MySaveFunction();
+  // std::string buf {"holamanola"};
+  // ImGui::InputText("string", &buf);
+  // float f {};
+  // ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
 
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
