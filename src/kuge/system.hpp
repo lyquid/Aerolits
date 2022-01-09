@@ -1,19 +1,9 @@
 #ifndef KUGE_HEADERS_SYSTEM_HPP_
 #define KUGE_HEADERS_SYSTEM_HPP_
 
-#include "../sdl2_wrappers/sdl2_log.hpp"
-#include "../sdl2_wrappers/sdl2_sound.hpp"
-#include <array>
-#include <iterator>
-#include <memory>
-#include <string>
-#include <utility> // std::move
-#include <vector>
+#include "event.hpp"
 
 namespace kuge {
-
-class EventBus;
-class KugeEvent;
 
 class System {
  public:
@@ -24,25 +14,6 @@ class System {
   } */
  protected:
   static const EventBus* event_bus_;
-};
-
-class AudioSystem: public System {
-
-  using laser_randomizer    = std::array<unsigned int, 400>;
-  using laser_randomizer_it = laser_randomizer::const_iterator;
-
- public:
-
-  virtual void handleEvent(const KugeEvent* event) override;
-  static bool loadResources();
-
- private:
-
-  static void generateRandomSequence();
-  // Lasers
-  static std::vector<ktp::SDL2_Sound> lasers_;
-  static laser_randomizer             lasers_sequence_;
-  static laser_randomizer_it          lasers_it_;
 };
 
 class InputSystem: public System {

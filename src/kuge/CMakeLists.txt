@@ -1,8 +1,8 @@
 add_library(KUGE
+  audio_system.cpp
   backend_system.cpp
   event.cpp
   gui_system.cpp
-  system.cpp
 )
 
 add_subdirectory(tests)

@@ -1,9 +1,6 @@
+#include "audio_system.hpp"
 #include "../include/resources.hpp"
-#include "event.hpp"
-#include "system.hpp"
 #include <random>
-
-/* AUDIO SYSTEM */
 
 std::vector<ktp::SDL2_Sound>           kuge::AudioSystem::lasers_ {};
 kuge::AudioSystem::laser_randomizer    kuge::AudioSystem::lasers_sequence_ {};
