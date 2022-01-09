@@ -6,9 +6,6 @@
 
 namespace kuge {
 
-class EventBus;
-class KugeEvent;
-
 struct GUIStringConfig {
   // The desired name for the texture.
   std::string name_ {};
