@@ -26,7 +26,7 @@ ktp::Camera ktp::Game::camera_ {};
 ktp::SDL2_Timer ktp::Game::gameplay_timer_ {};
 
 ktp::Game::Game() {
-  event_bus_.setSystems(&audio_sys_, &input_sys_, &gui_sys_, &output_sys_);
+  event_bus_.setSystems(&audio_sys_, &backend_sys_, &input_sys_, &gui_sys_, &output_sys_);
   GameEntity::event_bus_ = &event_bus_;
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
   if (!initSDL2()) return;
@@ -54,8 +54,8 @@ ktp::Game::Game() {
   );
   camera_.setProjection(Projection::Orthographic);
 
-  // state_ = GameState::goToState(*this, GameState::title_);
-  state_ = GameState::goToState(*this, GameState::testing_);
+  state_ = GameState::goToState(*this, GameState::title_);
+  // state_ = GameState::goToState(*this, GameState::testing_);
 }
 
 void ktp::Game::clean() {
@@ -72,13 +72,12 @@ void ktp::Game::clean() {
 bool ktp::Game::initImgui() {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
-  ImGuiIO& io = ImGui::GetIO(); (void)io;
+  ImGuiIO& io {ImGui::GetIO()};
+  (void)io;
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-  //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
+  // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
-
   // Setup Platform/Renderer backends
   ImGui_ImplSDL2_InitForOpenGL(main_window_.getWindow(), context_.context());
   ImGui_ImplOpenGL3_Init("#version 330");
@@ -103,7 +102,6 @@ bool ktp::Game::loadResources() {
   // fonts
   auto font_path {Resources::getResourcesPath("fonts") + "Future n0t Found.ttf"};
   Resources::loadFont("future", font_path, 512);
-
   // textures
   auto texture_path {Resources::getResourcesPath("textures") + "aerolite_00.png"};
   Resources::loadTexture("aerolite_00", texture_path, false);
@@ -113,7 +111,6 @@ bool ktp::Game::loadResources() {
   Resources::loadTexture("particle_01", texture_path, false);
   texture_path = Resources::getResourcesPath("textures") + "particle_02.png";
   Resources::loadTexture("particle_02", texture_path, false);
-
   // shaders
   auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};
   auto fragment_shader_path {Resources::getResourcesPath("shaders") + "aerolite.frag"};

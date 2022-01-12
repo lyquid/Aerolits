@@ -9,7 +9,9 @@ namespace kuge {
 class BackendSystem: public System {
  public:
   virtual void handleEvent(const KugeEvent* event) override {}
+  void draw();
  private:
+  void mainMenuBar();
 };
 
 } // namespace kuge

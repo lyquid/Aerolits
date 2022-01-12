@@ -71,6 +71,7 @@ class Game {
   // KUGE engine
   kuge::EventBus event_bus_ {};
   kuge::AudioSystem audio_sys_ {};
+  kuge::BackendSystem backend_sys_ {};
   kuge::GUISystem gui_sys_ {};
   kuge::InputSystem input_sys_ {};
   kuge::OutputSystem output_sys_ {ConfigParser::game_config.output_};
@@ -79,7 +80,6 @@ class Game {
   int32 velocity_iterations_ {8};
   int32 position_iterations_ {3};
   //DebugDraw debug_draw_ {};
-  bool debug_draw_on_ {false};
   ContactListener contact_listener_ {};
 };
 

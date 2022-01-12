@@ -2,7 +2,6 @@
 #include "include/game_state.hpp"
 #include "include/physics_component.hpp"
 #include "kuge/system.hpp" // GUISystem
-#include "imgui.h"
 #include <SDL.h>
 #include <memory>
 #include <string> // std::to_string
@@ -13,6 +12,10 @@ ktp::PausedState  ktp::GameState::paused_ {};
 ktp::PlayingState ktp::GameState::playing_ {};
 ktp::TestingState ktp::GameState::testing_ {};
 ktp::TitleState   ktp::GameState::title_ {};
+
+bool ktp::GameState::backend_draw_ {false};
+bool ktp::GameState::debug_draw_ {false};
+bool ktp::GameState::polygon_draw_ {false};
 
 void ktp::GameState::setWindowTitle(Game& game) {
   game.main_window_.setTitle(
@@ -47,7 +50,9 @@ void ktp::DemoState::draw(Game& game) {
     blink_timer_ = SDL2_Timer::SDL2Ticks();
   }
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  if (debug_draw_) game.world_.DebugDraw();
+
+  if (backend_draw_) game.backend_sys_.draw();
 
   SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
@@ -67,15 +72,16 @@ ktp::GameState* ktp::DemoState::enter(Game& game) {
 
 void ktp::DemoState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
+    ImGui_ImplSDL2_ProcessEvent(&sdl_event_);
     switch (sdl_event_.type) {
       case SDL_QUIT:
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
-        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN:
-        game.state_ = goToState(game, GameState::title_);
+        if (!ImGui::GetIO().WantCaptureMouse) game.state_ = goToState(game, GameState::title_);
         break;
       default:
         break;
@@ -89,11 +95,11 @@ void ktp::DemoState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.quit_ = true;
       break;
     case SDLK_F1:
-      game.debug_draw_on_ = !game.debug_draw_on_;
+      backend_draw_ = !backend_draw_;
       break;
     case SDLK_F2:
-      wireframe_mode_ = !wireframe_mode_;
-      wireframe_mode_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      polygon_draw_ = !polygon_draw_;
+      updatePolygonDraw();
       break;
     default:
       game.state_ = goToState(game, GameState::title_);
@@ -126,7 +132,9 @@ void ktp::PausedState::draw(Game& game) {
     blink_timer_ = SDL2_Timer::SDL2Ticks();
   }
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  if (debug_draw_) game.world_.DebugDraw();
+
+  if (backend_draw_) game.backend_sys_.draw();
 
   SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
@@ -140,12 +148,13 @@ ktp::GameState* ktp::PausedState::enter(Game& game) {
 
 void ktp::PausedState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
+    ImGui_ImplSDL2_ProcessEvent(&sdl_event_);
     switch (sdl_event_.type) {
       case SDL_QUIT:
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
-        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       default:
         break;
@@ -159,7 +168,11 @@ void ktp::PausedState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.state_ = goToState(game, GameState::title_);
       break;
     case SDLK_F1:
-      game.debug_draw_on_ = !game.debug_draw_on_;
+      backend_draw_ = !backend_draw_;
+      break;
+    case SDLK_F2:
+      polygon_draw_ = !polygon_draw_;
+      updatePolygonDraw();
       break;
     default:
       game.state_ = goToState(game, GameState::playing_);
@@ -185,7 +198,9 @@ void ktp::PlayingState::draw(Game& game) {
 
   game.gui_sys_.scoreText()->draw();
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  if (debug_draw_) game.world_.DebugDraw();
+
+  if (backend_draw_) game.backend_sys_.draw();
 
   SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
@@ -197,13 +212,13 @@ ktp::GameState* ktp::PlayingState::enter(Game& game) {
 
 void ktp::PlayingState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
+    ImGui_ImplSDL2_ProcessEvent(&sdl_event_);
     switch (sdl_event_.type) {
       case SDL_QUIT:
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
-        // input_sys_.postEvent(kuge::EventTypes::KeyPressed, SDL_GetKeyName(sdl_event_.key.keysym.sym));
-        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN: {
         int x{0}, y{0};
@@ -226,11 +241,11 @@ void ktp::PlayingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.state_ = goToState(game, GameState::paused_);
       break;
     case SDLK_F1:
-      game.debug_draw_on_ = !game.debug_draw_on_;
+      backend_draw_ = !backend_draw_;
       break;
     case SDLK_F2:
-      wireframe_mode_ = !wireframe_mode_;
-      wireframe_mode_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      polygon_draw_ = !polygon_draw_;
+      updatePolygonDraw();
       break;
     case SDLK_p:
       game.state_ = goToState(game, GameState::paused_);
@@ -273,7 +288,9 @@ void ktp::TestingState::draw(Game& game) {
 
   test_->draw();
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  if (debug_draw_) game.world_.DebugDraw();
+
+  if (backend_draw_) game.backend_sys_.draw();
 
   SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
@@ -332,11 +349,11 @@ void ktp::TestingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.quit_ = true;
       break;
     case SDLK_F1:
-      game.debug_draw_on_ = !game.debug_draw_on_;
+      backend_draw_ = !backend_draw_;
       break;
     case SDLK_F2:
-      wireframe_mode_ = !wireframe_mode_;
-      wireframe_mode_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      polygon_draw_ = !polygon_draw_;
+      updatePolygonDraw();
       break;
     case SDLK_SPACE:
       break;
@@ -382,6 +399,8 @@ void ktp::TitleState::draw(Game& game) {
 
   game.gui_sys_.titleText()->draw();
 
+  if (backend_draw_) game.backend_sys_.draw();
+
   SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
@@ -396,13 +415,13 @@ ktp::GameState* ktp::TitleState::enter(Game& game) {
 
 void ktp::TitleState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
+    ImGui_ImplSDL2_ProcessEvent(&sdl_event_);
     switch (sdl_event_.type) {
       case SDL_QUIT:
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
-        // input_sys_.postEvent(kuge::EventTypes::KeyPressed, SDL_GetKeyName(sdl_event_.key.keysym.sym));
-        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN:
         demo_time_ = SDL2_Timer::SDL2Ticks();
@@ -417,6 +436,13 @@ void ktp::TitleState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
       game.quit_ = true;
+      break;
+    case SDLK_F1:
+      backend_draw_ = !backend_draw_;
+      break;
+    case SDLK_F2:
+      polygon_draw_ = !polygon_draw_;
+      updatePolygonDraw();
       break;
     default:
       demo_time_ = SDL2_Timer::SDL2Ticks();

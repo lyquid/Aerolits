@@ -32,13 +32,18 @@ class GameState {
   static TestingState testing_;
   static TitleState   title_;
 
+  static inline void updatePolygonDraw() { polygon_draw_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+
+  static bool backend_draw_;
+  static bool debug_draw_;
+  static bool polygon_draw_;
+
  protected:
 
   inline virtual GameState* enter(Game& game) { return this; }
   virtual void handleSDL2KeyEvents(Game&, SDL_Keycode) = 0;
   void setWindowTitle(Game& game);
   SDL_Event sdl_event_ {};
-  bool wireframe_mode_ {false};
 };
 
 class DemoState: public GameState {
