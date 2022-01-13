@@ -21,13 +21,13 @@ void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter) {
   //     particles_pool_[i].draw();
   //   }
   // }
-  shader_.use();
   shader_.setMat4f("mvp", glm::value_ptr(mvp_));
   vao_.bind();
-  glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
-  glVertexAttribDivisor(1, 0); // colors
-  glVertexAttribDivisor(2, 1); // colors
-  glDrawArraysInstanced(GL_TRIANGLES, 0, 4, alive_particles_count_);
+  glDrawArrays(GL_TRIANGLES, 0, alive_particles_count_);
+  // glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
+  // glVertexAttribDivisor(1, 0); // colors
+  // glVertexAttribDivisor(2, 1); // offsets
+  // glDrawArraysInstanced(GL_TRIANGLES, 0, 4, alive_particles_count_);
 }
 
 /* PHYSICS */
@@ -168,7 +168,7 @@ void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
 void ktp::EmitterPhysicsComponent::setupOpenGL() {
   graphics_->vao_.bind();
   const GLfloatVector vertex_buffer_data {
-        // positions     // colors
+    // vertices     // colors
     -0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
      0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
     -0.05f, -0.05f,  0.0f, 0.0f, 1.0f,
@@ -181,8 +181,8 @@ void ktp::EmitterPhysicsComponent::setupOpenGL() {
   graphics_->vao_.linkAttrib(vertex_buffer_, 0, 2, GL_FLOAT, 5 * sizeof(GLfloat), nullptr);
   graphics_->vao_.linkAttrib(vertex_buffer_, 1, 3, GL_FLOAT, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
-  position_buffer_.setup(NULL, graphics_->particles_pool_size_ * 2 * sizeof(GLfloat), GL_STREAM_DRAW);
-  graphics_->vao_.linkAttrib(position_buffer_, 2, 2, GL_FLOAT, 0, nullptr);
+  // position_buffer_.setup(NULL, graphics_->particles_pool_size_ * 2 * sizeof(GLfloat), GL_STREAM_DRAW);
+  // graphics_->vao_.linkAttrib(position_buffer_, 2, 2, GL_FLOAT, 0, nullptr);
 }
 
 void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta_time) {
@@ -194,9 +194,6 @@ void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta
       --alive_particles_count_;
       graphics_->alive_particles_count_ = alive_particles_count_;
     }
-
-
-
 
     // if (data_->vortex_) {
     //   if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_})) {
@@ -217,9 +214,9 @@ void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta
       // }
     //}
   }
-  position_buffer_.setup(NULL, graphics_->particles_pool_size_ * 2 * sizeof(GLfloat), GL_STREAM_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, graphics_->particles_pool_size_ * 2 * sizeof(GLfloat), particules_positions_data_.data());
-  graphics_->vao_.linkAttrib(position_buffer_, 2, 2, GL_FLOAT, 0, nullptr);
+  // position_buffer_.setup(NULL, graphics_->particles_pool_size_ * 2 * sizeof(GLfloat), GL_STREAM_DRAW);
+  // glBufferSubData(GL_ARRAY_BUFFER, 0, graphics_->particles_pool_size_ * 2 * sizeof(GLfloat), particules_positions_data_.data());
+  // graphics_->vao_.linkAttrib(position_buffer_, 2, 2, GL_FLOAT, 0, nullptr);
   updateMVP();
 }
 

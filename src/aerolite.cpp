@@ -16,10 +16,12 @@ ktp::AeroliteGraphicsComponent::AeroliteGraphicsComponent() noexcept:
   texture_(Resources::getTexture("aerolite_00")) {
 
   const glm::vec4 uniform_color {color_.r, color_.g, color_.b, color_.a};
+  shader_.use();
   shader_.setFloat4("aerolite_color", glm::value_ptr(uniform_color));
 }
 
 void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite) {
+  shader_.use();
   shader_.setMat4f("mvp", glm::value_ptr(mvp_));
   texture_.bind();
   vao_.bind();

@@ -191,14 +191,14 @@ ktp::VAO::VAO() {
   glCheckError();
 }
 
-void ktp::VAO::linkAttrib(const VBO& vbo, GLuint layout, GLuint components, GLenum type, GLsizeiptr stride, void* offset) const {
+void ktp::VAO::linkAttrib(const VBO& vbo, GLuint layout, GLuint components, GLenum type, GLsizeiptr stride, void* offset, GLboolean normalize) const {
   glBindVertexArray(id_);
   vbo.bind();
   glVertexAttribPointer(
     layout,       // index: specifies the index of the generic vertex attribute to be modified. Must match the layout in the shader
     components,   // size: specifies the number of components per generic vertex attribute. Must be 1, 2, 3, 4.
     type,         // type of the data
-    GL_FALSE,     // normalized: specifies whether fixed-point data values should be normalized
+    normalize,    // normalize: specifies whether fixed-point data values should be normalized
     stride,       // stride: specifies the byte offset between consecutive generic vertex attributes
     offset        // pointer: specifies a offset of the first component of the first generic vertex attribute in the array in the data store
   );

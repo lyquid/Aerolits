@@ -85,7 +85,6 @@ class ShaderProgram {
    * @param value The value to be set.
    */
   inline void setBool(const char* name, bool value) const {
-    glUseProgram(id_);
     glUniform1i(glGetUniformLocation(id_, name), (int)value);
   }
 
@@ -95,7 +94,6 @@ class ShaderProgram {
    * @param value The value to be set.
    */
   inline void setInt(const char* name, GLint value) const {
-    glUseProgram(id_);
     glUniform1i(glGetUniformLocation(id_, name), value);
   }
 
@@ -105,7 +103,6 @@ class ShaderProgram {
    * @param value The value to be set.
    */
   inline void setFloat(const char* name, GLfloat value) const {
-    glUseProgram(id_);
     glUniform1f(glGetUniformLocation(id_, name), value);
   }
 
@@ -115,7 +112,6 @@ class ShaderProgram {
    * @param value A pointer to the values to be set.
    */
   inline void setFloat4(const char* name, const GLfloat* value) const {
-    glUseProgram(id_);
     glUniform4f(glGetUniformLocation(id_, name), value[0], value[1], value[2], value[3]);
   }
 
@@ -125,7 +121,6 @@ class ShaderProgram {
    * @param value A pointer to the values to be set.
    */
   inline void setMat2f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
-    glUseProgram(id_);
     glUniformMatrix2fv(glGetUniformLocation(id_, name), 1, transpose, value);
   }
 
@@ -135,7 +130,6 @@ class ShaderProgram {
    * @param value A pointer to the values to be set.
    */
   inline void setMat3f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
-    glUseProgram(id_);
     glUniformMatrix3fv(glGetUniformLocation(id_, name), 1, transpose, value);
   }
 
@@ -145,7 +139,6 @@ class ShaderProgram {
    * @param value A pointer to the values to be set.
    */
   inline void setMat4f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
-    glUseProgram(id_);
     glUniformMatrix4fv(glGetUniformLocation(id_, name), 1, transpose, value);
   }
 
@@ -155,8 +148,67 @@ class ShaderProgram {
    * @param value The value to be set.
    */
   inline void setUint(const char* name, GLuint value) const {
-    glUseProgram(id_);
     glUniform1ui(glGetUniformLocation(id_, name), value);
+  }
+
+  /**
+   * @brief Sets a 2 component vector uniform. Uses glUniform2fv()
+   * @param name The name of the uniform.
+   * @param value A pointer to the values to be set.
+   */
+  inline void setVec2(const char* name, const GLfloat* value) const {
+    glUniform2fv(glGetUniformLocation(id_, name), 1, value);
+  }
+
+  /**
+   * @brief Sets a 2 component vector uniform. Uses glUniform2f()
+   * @param name The name of the uniform.
+   * @param x value.
+   * @param y value.
+   */
+  inline void setVec2(const char* name, GLfloat x, GLfloat y) const {
+    glUniform2f(glGetUniformLocation(id_, name), x, y);
+  }
+
+  /**
+   * @brief Sets a 3 component vector uniform. Uses glUniform3fv()
+   * @param name The name of the uniform.
+   * @param value A pointer to the values to be set.
+   */
+  inline void setVec3(const char* name, const GLfloat* value) const {
+    glUniform3fv(glGetUniformLocation(id_, name), 1, value);
+  }
+
+  /**
+   * @brief Sets a 3 component vector uniform. Uses glUniform3f()
+   * @param name The name of the uniform.
+   * @param x value.
+   * @param y value.
+   * @param z value.
+   */
+  inline void setVec3(const char* name, GLfloat x, GLfloat y, GLfloat z) const {
+    glUniform3f(glGetUniformLocation(id_, name), x, y, z);
+  }
+
+  /**
+   * @brief Sets a 4 component vector uniform. Uses glUniform4fv()
+   * @param name The name of the uniform.
+   * @param value A pointer to the values to be set.
+   */
+  inline void setVec4(const char* name, const GLfloat* value) const {
+    glUniform4fv(glGetUniformLocation(id_, name), 1, value);
+  }
+
+  /**
+   * @brief Sets a 4 component vector uniform. Uses glUniform4f()
+   * @param name The name of the uniform.
+   * @param x value.
+   * @param y value.
+   * @param z value.
+   * @param w value.
+   */
+  inline void setVec4(const char* name, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const {
+    glUniform4f(glGetUniformLocation(id_, name), x, y, z, w);
   }
 
   /**
@@ -305,8 +357,9 @@ class VAO {
    * @param type Type of the data.
    * @param stride Specifies the byte offset between consecutive generic vertex attributes.
    * @param offset Specifies a offset of the first component of the first generic vertex attribute in the array in the data store.
+   * @param normalize Specifies whether fixed-point data values should be normalized.
    */
-  void linkAttrib(const VBO& vbo, GLuint layout, GLuint components, GLenum type, GLsizeiptr stride, void* offset) const ;
+  void linkAttrib(const VBO& vbo, GLuint layout, GLuint components, GLenum type, GLsizeiptr stride, void* offset, GLboolean normalize = GL_FALSE) const;
 
   /**
    * @brief Unbinds the VAO.

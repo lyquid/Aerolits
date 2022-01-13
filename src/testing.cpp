@@ -4,6 +4,7 @@
 #include "include/random.hpp"
 #include "include/resources.hpp"
 #include "include/testing.hpp"
+#include "imgui.h"
 #include "sdl2_wrappers/sdl2_geometry.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include "sdl2_wrappers/sdl2_timer.hpp"
@@ -11,53 +12,43 @@
 void ktp::Testing::draw() {
   shader_program_.use();
   vao_.bind();
-  glDrawElements(GL_TRIANGLES, (GLsizei)indices_data_.size(), GL_UNSIGNED_INT, 0);
-  bool show_demo_window {true};
-  ImGui_ImplOpenGL3_NewFrame();
-  ImGui_ImplSDL2_NewFrame();
-  ImGui::NewFrame();
-  ImGui::ShowDemoWindow(&show_demo_window);
-
-  // if (show_another_window_) {
-  //   ImGui::Begin("Another Window", &show_another_window_);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-  //   ImGui::Text("Hello from another window!");
-  //   if (ImGui::Button("Close Me")) show_another_window_ = false;
-  //   ImGui::End();
-  // }
-
-  // ImGui::Begin("Another Window 2", &show_another_window_);
-  // ImGui::Text("Hello from another window!");
-  // // ImGui::InputText("string", nullptr);
-  // ImGui::End();
-
-  // ImGui::Text("Hello, world %d", 123);
-  // // if (ImGui::Button("Save")) MySaveFunction();
-  // std::string buf {"holamanola"};
-  // ImGui::InputText("string", &buf);
-  // float f {};
-  // ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-
-  ImGui::Render();
-  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void ktp::Testing::init() {
-  shader_program_ = Resources::getShader("testing");
+  shader_program_ = Resources::getShader("test");
 
-  vertices_data_ = SDL2_GL::cube(0.5f);
-  EBO::generateEBO(vertices_data_, indices_data_);
+  vertices_data_ = {
+    // positions      // colors
+    -0.05f,  0.05f,   1.0f, 0.0f, 0.0f,
+     0.05f, -0.05f,   0.0f, 1.0f, 0.0f,
+    -0.05f, -0.05f,   0.0f, 0.0f, 1.0f,
 
-  vao_.bind();
-  indices_.setup(indices_data_);
+    -0.05f,  0.05f,   1.0f, 0.0f, 0.0f,
+     0.05f, -0.05f,   0.0f, 1.0f, 0.0f,
+     0.05f,  0.05f,   0.0f, 1.0f, 1.0f
+  };
+
+  // vao_.bind();
   vertices_.setup(vertices_data_);
-  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 0, nullptr);
+  vao_.linkAttrib(vertices_, 0, 2, GL_FLOAT, 5 * sizeof(GLfloat), nullptr);
+  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 5 * sizeof(GLfloat), (void*)(sizeof(GLfloat) * 2));
 
-  vertices_color_data_.resize(vertices_data_.size());
-  for (auto& i: vertices_color_data_) {
-    i = generateRand(0.f, 1.f);
+  glm::vec2 translations[100];
+  int index {0};
+  float offset {0.1f};
+  for (int y = -10; y < 10; y += 2) {
+    for (int x = -10; x < 10; x += 2) {
+      glm::vec2 translation {};
+      translation.x = (float)x / 10.0f + offset;
+      translation.y = (float)y / 10.0f + offset;
+      translations[index++] = translation;
+    }
   }
-  colors_.setup(vertices_color_data_);
-  vao_.linkAttrib(colors_, 1, 3, GL_FLOAT, 0, nullptr);
+
+  shader_program_.use();
+  for (unsigned int i = 0; i < 100; i++) {
+    //shader_program_.setVec2(("offsets[" + std::to_string(i) + "]")), translations[i]);
+  }
 }
 
 void ktp::Testing::update(float delta_time) {

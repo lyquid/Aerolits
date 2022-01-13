@@ -3,10 +3,6 @@
 #include "camera.hpp"
 #include "../sdl2_wrappers/sdl2_geometry.hpp"
 #include "../sdl2_wrappers/sdl2_opengl.hpp"
-#include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui_stdlib.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -30,11 +26,7 @@ class Testing {
 
   VAO vao_ {};
   VBO vertices_ {};
-  VBO colors_ {};
-  EBO indices_ {};
   GLfloatVector vertices_data_ {};
-  GLuintVector indices_data_ {};
-  GLfloatVector vertices_color_data_ {};
   Texture2D texture_ {};
   ShaderProgram shader_program_ {};
 

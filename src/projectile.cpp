@@ -12,6 +12,7 @@ ktp::ProjectileGraphicsComponent::ProjectileGraphicsComponent() noexcept: shader
   generateOpenGLStuff(ConfigParser::projectiles_config.size_ * kMetersToPixels);
   // exhaust_emitter_ = std::make_unique<EmitterGraphicsComponent>();
   const glm::vec4 uniform_color {color_.r, color_.g, color_.b, color_.a};
+  shader_.use();
   shader_.setFloat4("projectile_color", glm::value_ptr(uniform_color));
 }
 
@@ -37,6 +38,7 @@ void ktp::ProjectileGraphicsComponent::generateOpenGLStuff(float size) {
 
 void ktp::ProjectileGraphicsComponent::update(const GameEntity& projectile) {
   // exhaust_emitter_->update(projectile, renderer);
+  shader_.use();
   shader_.setMat4f("mvp", glm::value_ptr(mvp_));
   vao_.bind();
   glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // 9 is the number of indices

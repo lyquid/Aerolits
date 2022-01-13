@@ -115,6 +115,9 @@ bool ktp::Game::loadResources() {
   auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};
   auto fragment_shader_path {Resources::getResourcesPath("shaders") + "aerolite.frag"};
   if (!Resources::loadShader("aerolite", vertex_shader_path, fragment_shader_path)) return false;
+  vertex_shader_path = Resources::getResourcesPath("shaders") + "cube.vert";
+  fragment_shader_path = Resources::getResourcesPath("shaders") + "cube.frag";
+  if (!Resources::loadShader("cube", vertex_shader_path, fragment_shader_path)) return false;
   vertex_shader_path = Resources::getResourcesPath("shaders") + "gui_string.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "gui_string.frag";
   if (!Resources::loadShader("gui_string", vertex_shader_path, fragment_shader_path)) return false;
@@ -127,9 +130,9 @@ bool ktp::Game::loadResources() {
   vertex_shader_path = Resources::getResourcesPath("shaders") + "projectile.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "projectile.frag";
   if (!Resources::loadShader("projectile", vertex_shader_path, fragment_shader_path)) return false;
-  vertex_shader_path = Resources::getResourcesPath("shaders") + "testing.vert";
-  fragment_shader_path = Resources::getResourcesPath("shaders") + "testing.frag";
-  if (!Resources::loadShader("testing", vertex_shader_path, fragment_shader_path)) return false;
+  vertex_shader_path = Resources::getResourcesPath("shaders") + "test.vert";
+  fragment_shader_path = Resources::getResourcesPath("shaders") + "test.frag";
+  if (!Resources::loadShader("test", vertex_shader_path, fragment_shader_path)) return false;
 
   return true;
 }
