@@ -112,6 +112,12 @@ bool ktp::Resources::loadShader(const std::string& name, const std::string& vert
   // Create the shaders
 	GLuint vertex_shader_id {glCreateShader(GL_VERTEX_SHADER)};
 	GLuint fragment_shader_id {glCreateShader(GL_FRAGMENT_SHADER)};
+  bool geometry_shader_present {};
+  GLuint geometry_shader_id {};
+  if (geometry_shader_path != "") {
+    geometry_shader_present = true;
+    glCreateShader(GL_GEOMETRY_SHADER);
+  }
   // Read the Vertex Shader code from the file
 	std::string vertex_shader_code {};
 	std::ifstream vertex_shader_stream {vertex_shader_path, std::ios::in};
@@ -136,6 +142,20 @@ bool ktp::Resources::loadShader(const std::string& name, const std::string& vert
     logError("Could NOT open fragment shader file", fragment_shader_path);
     return false;
 	}
+  std::string geometry_shader_code {};
+  if (geometry_shader_present) {
+    // Read the Geometry Shader code from the file
+    std::ifstream geometry_shader_stream {geometry_shader_path, std::ios::in};
+    if (geometry_shader_stream.is_open()) {
+      std::stringstream sstr {};
+      sstr << geometry_shader_stream.rdbuf();
+      geometry_shader_code = sstr.str();
+      geometry_shader_stream.close();
+    } else {
+      logError("Could NOT open geometry shader file", geometry_shader_path);
+      return false;
+    }
+  }
   // Compile Vertex Shader
   logMessage("Compiling vertex shader " + vertex_shader_path);
 	const auto vertex_source_pointer {vertex_shader_code.c_str()};
@@ -149,21 +169,39 @@ bool ktp::Resources::loadShader(const std::string& name, const std::string& vert
 	glShaderSource(fragment_shader_id, 1, &fragment_source_pointer, nullptr);
 	glCompileShader(fragment_shader_id);
   glCheckError();
-  printShaderLog(fragment_shader_id);
+  if (!printShaderLog(fragment_shader_id)) return false;
+  // Compile Geometry shader
+  if (geometry_shader_present) {
+    logMessage("Compiling geometry shader " + geometry_shader_path);
+    const auto geometry_source_pointer {geometry_shader_code.c_str()};
+    glShaderSource(geometry_shader_id, 1, &geometry_source_pointer, nullptr);
+    glCompileShader(geometry_shader_id);
+    glCheckError();
+    if (!printShaderLog(geometry_shader_id)) return false;
+  }
   // Link the program
 	const GLuint id {glCreateProgram()};
   glCheckError();
 	glAttachShader(id, vertex_shader_id);
-	glAttachShader(id, fragment_shader_id);
-	glLinkProgram(id);
-  if (!printProgramLog(id)) return false;
   glCheckError();
-  // clean
-	// glDetachShader(id_, vertex_shader_id);
-	// glDetachShader(id_, fragment_shader_id);
+	glAttachShader(id, fragment_shader_id);
+  glCheckError();
+  if (geometry_shader_present) {
+    glAttachShader(id, geometry_shader_id);
+    glCheckError();
+  }
+	glLinkProgram(id);
+  glCheckError();
+  if (!printProgramLog(id)) return false;
+  // Clean
 	glDeleteShader(vertex_shader_id);
+  glCheckError();
 	glDeleteShader(fragment_shader_id);
   glCheckError();
+  if (geometry_shader_present) {
+    glDeleteShader(geometry_shader_id);
+    glCheckError();
+  }
 
   shaders_map[name] = id;
   logMessage("Shader program \"" + name + "\" successfully compiled and linked.");

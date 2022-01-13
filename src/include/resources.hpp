@@ -65,7 +65,7 @@ inline auto getShader(const std::string& name) { return ShaderProgram{shaders_ma
  * @param name The name you wan to give to the shader program.
  * @param vertex_shader_path Vertex shader file path.
  * @param fragment_shader_path Fragment shader file path.
- * @param geometry_shader_path **NOT IMPLEMENTED**
+ * @param geometry_shader_path Geometry shader file path.
  */
 bool loadShader(const std::string& name, const std::string& vertex_shader_path, const std::string& fragment_shader_path, const std::string& geometry_shader_path = "");
 
