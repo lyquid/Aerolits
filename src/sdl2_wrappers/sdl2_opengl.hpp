@@ -362,6 +362,18 @@ class VAO {
   void linkAttrib(const VBO& vbo, GLuint layout, GLuint components, GLenum type, GLsizeiptr stride, void* offset, GLboolean normalize = GL_FALSE) const;
 
   /**
+   * @brief Specifies how OpenGL should interpret the vertex buffer data whenever a draw call is made. IT DOESN'T BIND ANYTHING!
+   * @param vbo The vertex buffer object to be binded.
+   * @param layout Specifies the index of the generic vertex attribute to be modified. Must match the layout in the shader.
+   * @param components Specifies the number of components per generic vertex attribute. Must be 1, 2, 3, 4.
+   * @param type Type of the data.
+   * @param stride Specifies the byte offset between consecutive generic vertex attributes.
+   * @param offset Specifies a offset of the first component of the first generic vertex attribute in the array in the data store.
+   * @param normalize Specifies whether fixed-point data values should be normalized.
+   */
+  void linkAttribFast(GLuint layout, GLuint components, GLenum type, GLsizeiptr stride, void* offset, GLboolean normalize = GL_FALSE) const;
+
+  /**
    * @brief Unbinds the VAO.
    */
   void unbind() const { glBindVertexArray(0); }
