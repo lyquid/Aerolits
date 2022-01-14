@@ -45,10 +45,9 @@ void ktp::Testing::init() {
     }
   }
 
-  shader_program_.use();
-  for (unsigned int i = 0; i < 100; ++i) {
-    shader_program_.setVec2(("offsets[" + std::to_string(i) + "]").c_str(), glm::value_ptr(translations[i]));
-  }
+  translations_.setup(translations, 100 * sizeof(glm::vec2));
+  vao_.linkAttrib(translations_, 2, 2, GL_FLOAT, 0, nullptr);
+  glVertexAttribDivisor(2, 1);
 }
 
 void ktp::Testing::update(float delta_time) {

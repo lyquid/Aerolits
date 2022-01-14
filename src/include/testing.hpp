@@ -26,6 +26,7 @@ class Testing {
 
   VAO vao_ {};
   VBO vertices_ {};
+  VBO translations_ {};
   GLfloatVector vertices_data_ {};
   ShaderProgram shader_program_ {};
 

@@ -249,6 +249,7 @@ class VBO {
   /**
    * @brief Sets up the data for the buffer.
    * @param vertices A std::vector of floats to use as data.
+   * @param usage The usage type, ie: GL_STATIC_DRAW.
    */
   void setup(const GLfloatVector& vertices, GLenum usage = GL_STATIC_DRAW);
 
@@ -256,8 +257,23 @@ class VBO {
    * @brief Sets up the data for the buffer.
    * @param vertices A pointer to an array of floats to use as data.
    * @param size The size in bytes of the data.
+   * @param usage The usage type, ie: GL_STATIC_DRAW.
    */
   void setup(const GLfloat* vertices, GLsizeiptr size, GLenum usage = GL_STATIC_DRAW);
+
+  /**
+   * @brief Sets up the data for the buffer.
+   * @tparam T Things stored *contiguously* in memory.
+   * @param vertices A pointer to an array of Ts to use as data.
+   * @param size The size in bytes of the data.
+   * @param usage The usage type, ie: GL_STATIC_DRAW.
+   */
+  template <typename T>
+  void setup(const T* vertices, GLsizeiptr size, GLenum usage = GL_STATIC_DRAW) {
+    glBindBuffer(GL_ARRAY_BUFFER, id_);
+    glBufferData(GL_ARRAY_BUFFER, size, vertices, usage);
+    glCheckError();
+  }
 
   /**
    * @brief Unbinds the VBO.
