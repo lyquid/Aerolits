@@ -12,6 +12,7 @@
 void ktp::Testing::draw() {
   shader_program_.use();
   vao_.bind();
+  glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 100);
 }
 
 void ktp::Testing::init() {
@@ -19,19 +20,18 @@ void ktp::Testing::init() {
 
   vertices_data_ = {
     // positions      // colors
-    -0.05f,  0.05f,   1.0f, 0.0f, 0.0f,
-     0.05f, -0.05f,   0.0f, 1.0f, 0.0f,
-    -0.05f, -0.05f,   0.0f, 0.0f, 1.0f,
+    -0.05f,  0.05f,   1.f, 0.f, 0.f, // top left
+     0.05f, -0.05f,   0.f, 1.f, 0.f, // bottom right
+    -0.05f, -0.05f,   0.f, 0.f, 1.f, // bottom left
 
-    -0.05f,  0.05f,   1.0f, 0.0f, 0.0f,
-     0.05f, -0.05f,   0.0f, 1.0f, 0.0f,
-     0.05f,  0.05f,   0.0f, 1.0f, 1.0f
+    -0.05f,  0.05f,   1.f, 0.f, 0.f, // top left
+     0.05f, -0.05f,   0.f, 1.f, 0.f, // bottom right
+     0.05f,  0.05f,   0.f, 1.f, 1.f  // top right
   };
 
-  // vao_.bind();
   vertices_.setup(vertices_data_);
   vao_.linkAttrib(vertices_, 0, 2, GL_FLOAT, 5 * sizeof(GLfloat), nullptr);
-  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 5 * sizeof(GLfloat), (void*)(sizeof(GLfloat) * 2));
+  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
   glm::vec2 translations[100];
   int index {0};
@@ -46,8 +46,8 @@ void ktp::Testing::init() {
   }
 
   shader_program_.use();
-  for (unsigned int i = 0; i < 100; i++) {
-    //shader_program_.setVec2(("offsets[" + std::to_string(i) + "]")), translations[i]);
+  for (unsigned int i = 0; i < 100; ++i) {
+    shader_program_.setVec2(("offsets[" + std::to_string(i) + "]").c_str(), glm::value_ptr(translations[i]));
   }
 }
 
@@ -76,5 +76,6 @@ void ktp::Testing::updateCamera(float delta_time) {
 void ktp::Testing::updateMVP(float delta_time) {
   glm::mat4 model {1.f};
   const glm::mat4 mvp {camera_.projectionMatrix() * camera_.viewMatrix() * model};
-  shader_program_.setMat4f("mvp", glm::value_ptr(mvp));
+  // shader_program_.use();
+  // shader_program_.setMat4f("mvp", glm::value_ptr(mvp));
 }

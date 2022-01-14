@@ -300,7 +300,7 @@ ktp::GameState* ktp::TestingState::enter(Game& game) {
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
-  glEnable(GL_CULL_FACE);
+  // glEnable(GL_CULL_FACE);
   delete test_;
   test_ = new Testing;
   test_->init();

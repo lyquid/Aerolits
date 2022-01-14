@@ -27,12 +27,9 @@ class Testing {
   VAO vao_ {};
   VBO vertices_ {};
   GLfloatVector vertices_data_ {};
-  Texture2D texture_ {};
   ShaderProgram shader_program_ {};
 
   Camera camera_ {glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 1.f, 0.f), -90.f, 0.f};
-
-  bool show_another_window_ {true};
 };
 
 } // namespace ktp
