@@ -116,26 +116,22 @@ bool ktp::SDL2_GL::initGLEW(SDL2_GLContext& context, const SDL2_Window& window) 
 
 ktp::VBO::VBO() {
   glGenBuffers(1, &id_);
-  glCheckError();
 }
 
 void ktp::VBO::setup(const GLfloatVector& vertices, GLenum usage) {
   glBindBuffer(GL_ARRAY_BUFFER, id_);
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), usage);
-  glCheckError();
 }
 
 void ktp::VBO::setup(const GLfloat* vertices, GLsizeiptr size, GLenum usage) {
   glBindBuffer(GL_ARRAY_BUFFER, id_);
   glBufferData(GL_ARRAY_BUFFER, size, vertices, usage);
-  glCheckError();
 }
 
 /* EBO */
 
 ktp::EBO::EBO() {
   glGenBuffers(1, &id_);
-  glCheckError();
 }
 
 void ktp::EBO::generateEBO(GLfloatVector& vertices, GLuintVector& indices) {
@@ -175,20 +171,17 @@ void ktp::EBO::generateEBO(GLfloatVector& vertices, GLuintVector& indices) {
 void ktp::EBO::setup(const GLuintVector& indices, GLenum usage) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), usage);
-  glCheckError();
 }
 
 void ktp::EBO::setup(const GLuint* indices, GLsizeiptr size, GLenum usage) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, usage);
-  glCheckError();
 }
 
 /* VAO */
 
 ktp::VAO::VAO() {
   glGenVertexArrays(1, &id_);
-  glCheckError();
 }
 
 void ktp::VAO::linkAttrib(const VBO& vbo, GLuint layout, GLuint components, GLenum type, GLsizeiptr stride, void* offset, GLboolean normalize) const {
@@ -203,7 +196,6 @@ void ktp::VAO::linkAttrib(const VBO& vbo, GLuint layout, GLuint components, GLen
     stride,       // stride: specifies the byte offset between consecutive generic vertex attributes
     offset        // pointer: specifies a offset of the first component of the first generic vertex attribute in the array in the data store
   );
-  glCheckError();
 }
 
 void ktp::VAO::linkAttribFast(GLuint layout, GLuint components, GLenum type, GLsizeiptr stride, void* offset, GLboolean normalize) const {
