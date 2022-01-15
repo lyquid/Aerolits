@@ -2,6 +2,7 @@
   "name": "aerolits",
   "version": "0.1.0",
   "dependencies": [
+    "assimp",
     "opengl",
     "box2d",
     "glew",

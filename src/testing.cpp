@@ -12,41 +12,40 @@
 void ktp::Testing::draw() {
   shader_program_.use();
   vao_.bind();
-  glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 100);
+  glDrawArraysInstanced(GL_TRIANGLES, 0, vertices_data_.size(), 1000);
 }
 
 void ktp::Testing::init() {
   shader_program_ = Resources::getShader("test");
-
-  vertices_data_ = {
-    // positions      // colors
-    -0.05f,  0.05f,   1.f, 0.f, 0.f, // top left
-     0.05f, -0.05f,   0.f, 1.f, 0.f, // bottom right
-    -0.05f, -0.05f,   0.f, 0.f, 1.f, // bottom left
-
-    -0.05f,  0.05f,   1.f, 0.f, 0.f, // top left
-     0.05f, -0.05f,   0.f, 1.f, 0.f, // bottom right
-     0.05f,  0.05f,   0.f, 1.f, 1.f  // top right
-  };
-
+  // vertices
+  vertices_data_ = SDL2_GL::cube(0.05f);
   vertices_.setup(vertices_data_);
-  vao_.linkAttrib(vertices_, 0, 2, GL_FLOAT, 5 * sizeof(GLfloat), nullptr);
-  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-
-  glm::vec2 translations[100];
+  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 0, nullptr);
+  // colors
+  GLfloatVector colors_data_ {};
+  colors_data_.resize(vertices_data_.size());
+  for (auto& color_c: colors_data_) {
+    color_c = generateRand(0.f, 1.f);
+  }
+  colors_.setup(colors_data_);
+  vao_.linkAttrib(colors_, 1, 3, GL_FLOAT, 0, nullptr);
+  // translations
+  glm::vec3 translations[1000];
   int index {0};
   float offset {0.1f};
-  for (int y = -10; y < 10; y += 2) {
-    for (int x = -10; x < 10; x += 2) {
-      glm::vec2 translation {};
-      translation.x = (float)x / 10.0f + offset;
-      translation.y = (float)y / 10.0f + offset;
-      translations[index++] = translation;
+  for (int z = -10; z < 10; z += 2) {
+    for (int y = -10; y < 10; y += 2) {
+      for (int x = -10; x < 10; x += 2) {
+        glm::vec3 translation {};
+        translation.x = (float)x / 10.0f + offset;
+        translation.y = (float)y / 10.0f + offset;
+        translation.z = (float)z / 10.0f + offset;
+        translations[index++] = translation;
+      }
     }
   }
-
-  translations_.setup(translations, 100 * sizeof(glm::vec2));
-  vao_.linkAttrib(translations_, 2, 2, GL_FLOAT, 0, nullptr);
+  translations_.setup(translations, 1000 * sizeof(glm::vec3));
+  vao_.linkAttrib(translations_, 2, 3, GL_FLOAT, 0, nullptr);
   glVertexAttribDivisor(2, 1);
 }
 
@@ -75,6 +74,6 @@ void ktp::Testing::updateCamera(float delta_time) {
 void ktp::Testing::updateMVP(float delta_time) {
   glm::mat4 model {1.f};
   const glm::mat4 mvp {camera_.projectionMatrix() * camera_.viewMatrix() * model};
-  // shader_program_.use();
-  // shader_program_.setMat4f("mvp", glm::value_ptr(mvp));
+  shader_program_.use();
+  shader_program_.setMat4f("mvp", glm::value_ptr(mvp));
 }
