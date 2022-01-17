@@ -14,7 +14,9 @@ ktp::TestingState ktp::GameState::testing_ {};
 ktp::TitleState   ktp::GameState::title_ {};
 
 bool ktp::GameState::backend_draw_ {false};
+bool ktp::GameState::culling_ {true};
 bool ktp::GameState::debug_draw_ {false};
+bool ktp::GameState::deep_test_ {true};
 bool ktp::GameState::polygon_draw_ {false};
 
 void ktp::GameState::setWindowTitle(Game& game) {
@@ -298,9 +300,6 @@ void ktp::TestingState::draw(Game& game) {
 ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LESS);
-  // glEnable(GL_CULL_FACE);
   delete test_;
   test_ = new Testing;
   test_->init();

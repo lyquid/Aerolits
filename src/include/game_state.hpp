@@ -26,17 +26,21 @@ class GameState {
 
   inline static GameState* goToState(Game& game, GameState& state) { return state.enter(game); }
 
+  static inline void updateCulling() { culling_ ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE); }
+  static inline void updateDeepTest() { deep_test_ ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST); }
+  static inline void updatePolygonDraw() { polygon_draw_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+
+  static bool backend_draw_;
+  static bool culling_;
+  static bool debug_draw_;
+  static bool deep_test_;
+  static bool polygon_draw_;
+
   static DemoState    demo_;
   static PausedState  paused_;
   static PlayingState playing_;
   static TestingState testing_;
   static TitleState   title_;
-
-  static inline void updatePolygonDraw() { polygon_draw_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
-
-  static bool backend_draw_;
-  static bool debug_draw_;
-  static bool polygon_draw_;
 
  protected:
 
