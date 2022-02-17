@@ -12,10 +12,18 @@
 void ktp::Testing::draw() {
   shader_program_.use();
   vao_.bind();
-  glDrawArraysInstanced(GL_TRIANGLES, 0, vertices_data_.size(), 1000);
+  glDrawArraysInstanced(GL_TRIANGLES, 0, vertices_data_.size(), kNumCubes_);
 }
 
 void ktp::Testing::init() {
+  // camera
+  // camera_.setOrthographicMatrix(glm::ortho(
+  //   0.f, 1366.f, // left, right
+  //   0.f, 768.f, // bottom, top
+  //   -1.f, 1.f) // zNear, zFar
+  // );
+  // camera_.setProjection(Projection::Orthographic);
+  // shader
   shader_program_ = Resources::getShader("test");
   // vertices
   vertices_data_ = SDL2_GL::cube(0.05f);
@@ -30,8 +38,8 @@ void ktp::Testing::init() {
   colors_.setup(colors_data_);
   vao_.linkAttrib(colors_, 1, 3, GL_FLOAT, 0, nullptr);
   // translations
-  glm::vec3 translations[1000];
-  int index {0};
+  std::vector<glm::vec3> translations(kNumCubes_);
+  int index {};
   float offset {0.1f};
   for (int z = -10; z < 10; z += 2) {
     for (int y = -10; y < 10; y += 2) {
@@ -44,14 +52,14 @@ void ktp::Testing::init() {
       }
     }
   }
-  translations_.setup(translations, 1000 * sizeof(glm::vec3));
+  translations_.setup(translations.data(), kNumCubes_ * sizeof(glm::vec3));
   vao_.linkAttrib(translations_, 2, 3, GL_FLOAT, 0, nullptr);
   glVertexAttribDivisor(2, 1);
 }
 
 void ktp::Testing::update(float delta_time) {
   updateCamera(delta_time);
-  updateMVP(delta_time);
+  updateMVP();
 }
 
 void ktp::Testing::updateCamera(float delta_time) {
@@ -71,7 +79,7 @@ void ktp::Testing::updateCamera(float delta_time) {
   }
 }
 
-void ktp::Testing::updateMVP(float delta_time) {
+void ktp::Testing::updateMVP() {
   glm::mat4 model {1.f};
   const glm::mat4 mvp {camera_.projectionMatrix() * camera_.viewMatrix() * model};
   shader_program_.use();

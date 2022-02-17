@@ -18,12 +18,18 @@ class EmitterPhysicsComponent;
 class GameEntity;
 
 class PlayerGraphicsComponent: public GraphicsComponent {
+
   friend class PlayerPhysicsComponent;
+
  public:
-  PlayerGraphicsComponent() noexcept;
+
+  PlayerGraphicsComponent();
   virtual void update(const GameEntity& player) override;
+
  private:
+
   void generateOpenGLStuff(float size);
+  
   b2Color color_ {SDL2ColorToB2Color(ConfigParser::player_config.color_)};
   VAO vao_ {};
   VBO vertices_ {};
@@ -59,10 +65,8 @@ class PlayerPhysicsComponent: public PhysicsComponent {
   PlayerPhysicsComponent(GameEntity* owner, PlayerGraphicsComponent* graphics) noexcept;
   PlayerPhysicsComponent(const PlayerPhysicsComponent& other) = delete;
   PlayerPhysicsComponent(PlayerPhysicsComponent&& other) { *this = std::move(other); }
-
   PlayerPhysicsComponent& operator=(const PlayerPhysicsComponent& other) = delete;
   PlayerPhysicsComponent& operator=(PlayerPhysicsComponent&& other) noexcept;
-
   virtual void collide(const GameEntity* other) override {}
   virtual void update(const GameEntity& player, float delta_time) override;
 

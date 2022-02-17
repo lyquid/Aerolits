@@ -22,7 +22,9 @@ class Testing {
  private:
 
   void updateCamera(float delta_time);
-  void updateMVP(float delta_time);
+  void updateMVP();
+
+  static constexpr int kNumCubes_ {1000};
 
   VAO vao_ {};
   VBO vertices_ {};

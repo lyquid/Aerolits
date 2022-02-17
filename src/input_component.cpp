@@ -2,7 +2,6 @@
 #include "include/game_entity.hpp"
 #include "include/input_component.hpp"
 #include <SDL.h>
-#include <utility> // std::move
 
 /* INPUT COMPONENT */
 

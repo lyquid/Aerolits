@@ -499,6 +499,7 @@ void ktp::ConfigParser::loadPlayerConfig() {
 
 // PROJECTILES
 
+ktp::ConfigParser::ExplosionConfig   ktp::ConfigParser::explosion_config {};
 ktp::ConfigParser::ProjectilesConfig ktp::ConfigParser::projectiles_config {};
 
 void ktp::ConfigParser::loadProjectilesConfig() {
@@ -589,7 +590,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("blastPower")) {
       const auto blast_power {projectiles.child("explosion").child("blastPower").attribute("value").as_float()};
       if (blast_power >= 0) {
-        projectiles_config.explosion_config_.blast_power_ = blast_power;
+        explosion_config.blast_power_ = blast_power;
       } else {
         logMessage("Warning! Projectiles explosion blast power less than 0. Using default blast power.");
       }
@@ -600,7 +601,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("density")) {
       const auto density {projectiles.child("explosion").child("density").attribute("value").as_float()};
       if (density >= 0) {
-        projectiles_config.explosion_config_.density_ = density;
+        explosion_config.density_ = density;
       } else {
         logMessage("Warning! Projectiles explosion density less than 0. Using default density.");
       }
@@ -611,7 +612,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("duration")) {
       const auto explosion_duration {projectiles.child("explosion").child("duration").attribute("value").as_uint()};
       if (explosion_duration >= 0) {
-        projectiles_config.explosion_config_.duration_ = explosion_duration;
+        explosion_config.duration_ = explosion_duration;
       } else {
         logMessage("Warning! Projectiles explosion duration less than 0. Using default duration.");
       }
@@ -622,7 +623,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("friction")) {
       const auto friction {projectiles.child("explosion").child("friction").attribute("value").as_float()};
       if (checkWithinRange(friction, 0.f, 1.f)) {
-        projectiles_config.explosion_config_.friction_ = friction;
+        explosion_config.friction_ = friction;
       } else {
         logMessage("Warning! Projectiles explosion friction not in range [0, 1]. Using default friction.");
       }
@@ -633,7 +634,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("linearDamping")) {
       const auto damping {projectiles.child("explosion").child("linearDamping").attribute("value").as_float()};
       if (damping >= 0) {
-        projectiles_config.explosion_config_.linear_damping_ = damping;
+        explosion_config.linear_damping_ = damping;
       } else {
         logMessage("Warning! Projectiles explosion linear damping less than 0. Using default linear damping.");
       }
@@ -644,7 +645,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("particleRadius")) {
       const auto radius {projectiles.child("explosion").child("particleRadius").attribute("value").as_float()};
       if (radius > 0) {
-        projectiles_config.explosion_config_.particle_radius_ = radius;
+        explosion_config.particle_radius_ = radius;
       } else {
         logMessage("Warning! Projectiles explosion particle radius 0 or less. Using default particle radius.");
       }
@@ -655,7 +656,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("rays")) {
       const auto rays {projectiles.child("explosion").child("rays").attribute("value").as_uint()};
       if (rays >= 0) {
-        projectiles_config.explosion_config_.rays_ = rays;
+        explosion_config.rays_ = rays;
       } else {
         logMessage("Warning! Projectiles explosion rays less than 0. Using default rays.");
       }
@@ -666,13 +667,14 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("restitution")) {
       const auto restitution {projectiles.child("explosion").child("restitution").attribute("value").as_float()};
       if (checkWithinRange(restitution, 0.f, 1.f)) {
-        projectiles_config.explosion_config_.restitution_ = restitution;
+        explosion_config.restitution_ = restitution;
       } else {
         logMessage("Warning! Projectiles explosion restitution not in range [0, 1]. Using default restitution.");
       }
     } else {
       logMessage("Warning! Projectiles explosion restitution not set. Using default restitution.");
     }
+    projectiles_config.explosion_config_ = explosion_config;
   } else {
     const std::string error_msg {
             "WARNING! " + kProjectilesFile + " parsed with errors\n"

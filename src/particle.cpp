@@ -58,8 +58,8 @@ void ktp::Particle::init(const ParticleData& data) {
   life_ = data.start_life_;
   state_.live_ = data;
   // position is set to center the texture on the emitter
-  state_.live_.position_ = {data.position_.x - data.current_size_ * 0.5f,
-                            data.position_.y - data.current_size_ * 0.5f};
+  // state_.live_.position_ = {data.position_.x - data.current_size_ * 0.5f,
+  //                           data.position_.y - data.current_size_ * 0.5f};
 }
 
 SDL_Color ktp::Particle::interpolate2Colors(const SDL_Color& start_color, const SDL_Color& end_color, float time_step) {
@@ -81,7 +81,7 @@ SDL_Color ktp::Particle::interpolate3Colors(const SDL_Color& start_color, const 
 }
 
 /* return true if the previously live particle gave up the ghost in that frame */
-bool ktp::Particle::update(GLfloatVector& pos, unsigned int index) {
+bool ktp::Particle::update(glm::vec2& pos) {
   // time step increment to interpolate
   state_.live_.time_step_ += (1.f / state_.live_.start_life_);
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
@@ -115,10 +115,14 @@ bool ktp::Particle::update(GLfloatVector& pos, unsigned int index) {
   // position update
   state_.live_.position_.x += state_.live_.current_speed_.x;
   state_.live_.position_.y += state_.live_.current_speed_.y;
-  pos[2 * index + 0] = state_.live_.position_.x;
-  pos[2 * index + 1] = state_.live_.position_.y;
-  //pos[4 * index + 2] = 0;
-  //pos[4 * index + 3] = 0;
+
+  pos.x = state_.live_.position_.x;
+  pos.y = state_.live_.position_.y;
+
+  // pos[2 * index + 0] = state_.live_.position_.x;
+  // pos[2 * index + 1] = state_.live_.position_.y;
+  // pos[4 * index + 2] = 0;
+  // pos[4 * index + 3] = 0;
 
   --life_;
   return life_ == 0;

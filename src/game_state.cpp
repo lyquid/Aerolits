@@ -14,9 +14,9 @@ ktp::TestingState ktp::GameState::testing_ {};
 ktp::TitleState   ktp::GameState::title_ {};
 
 bool ktp::GameState::backend_draw_ {false};
-bool ktp::GameState::culling_ {true};
+bool ktp::GameState::culling_ {false};
 bool ktp::GameState::debug_draw_ {false};
-bool ktp::GameState::deep_test_ {true};
+bool ktp::GameState::deep_test_ {false};
 bool ktp::GameState::polygon_draw_ {false};
 
 void ktp::GameState::setWindowTitle(Game& game) {
@@ -28,7 +28,7 @@ void ktp::GameState::setWindowTitle(Game& game) {
     + " (Player: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Player) + GameEntity::entitiesCount(EntityTypes::PlayerDemo))
     + " Aerolites: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Aerolite))
     + " Projectiles: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Projectile))
-    + " Explosions: " + std::to_string(GameEntity::entitiesCount(EntityTypes::ExplosionParticle)) + ')'
+    + " Explosions: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Explosion)) + ')'
   );
 }
 

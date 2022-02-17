@@ -44,31 +44,46 @@ struct EmitterType {
 };
 
 class EmitterGraphicsComponent: public GraphicsComponent {
+
   friend class EmitterPhysicsComponent;
+
  public:
+ 
   EmitterGraphicsComponent();
+  EmitterGraphicsComponent(const EmitterGraphicsComponent& other) = delete;
+  EmitterGraphicsComponent(EmitterGraphicsComponent&& other) { *this = std::move(other); }
   ~EmitterGraphicsComponent() { delete[] particles_pool_; }
+
+  EmitterGraphicsComponent& operator=(const EmitterGraphicsComponent& other) = delete;
+  EmitterGraphicsComponent& operator=(EmitterGraphicsComponent&& other);
+
   virtual void update(const GameEntity& emitter) override;
+
  private:
+
   SDL_BlendMode blend_mode_ {};
   Particle*     particles_pool_ {nullptr};
-  unsigned int  particles_pool_size_ {0};
-
+  unsigned int  particles_pool_size_ {};
   unsigned int  alive_particles_count_ {};
+
   VAO vao_ {};
-  ShaderProgram shader_ {};
+  VBO vertices_ {};
+  VBO colors_ {};
+  VBO translations_ {};
+  GLfloatVector vertices_data_ {};
+  std::vector<glm::vec2> translations_data_ {};
+  ShaderProgram shader_program_ {};
   glm::mat4 mvp_ {};
 };
 
 class EmitterPhysicsComponent: public PhysicsComponent {
-
  public:
 
   EmitterPhysicsComponent(const EmitterPhysicsComponent& other) = delete;
   EmitterPhysicsComponent(EmitterPhysicsComponent&& other) { *this = std::move(other); }
 
   EmitterPhysicsComponent& operator=(const EmitterPhysicsComponent& other) = delete;
-  EmitterPhysicsComponent& operator=(EmitterPhysicsComponent&& other) noexcept;
+  EmitterPhysicsComponent& operator=(EmitterPhysicsComponent&& other);
 
   inline bool canBeDeleted() const { return lifeTimeOver() && !alive_particles_count_; }
   virtual void collide(const GameEntity* other) override {}
@@ -93,7 +108,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
 
  private:
 
-  EmitterPhysicsComponent(EmitterGraphicsComponent* graphics) noexcept;
+  EmitterPhysicsComponent(EmitterGraphicsComponent* graphics): graphics_(graphics) {}
 
   void inflatePool(); // maybe static?
   void updateMVP();
@@ -106,11 +121,6 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   Uint32                    interval_time_ {};
   SDL_FPoint                position_ {0, 0};
   Uint32                    start_time_ {SDL2_Timer::SDL2Ticks()};
-
-  VBO vertex_buffer_ {};
-  VBO position_buffer_ {};
-  // VBO color_buffer_ {};
-  GLfloatVector particules_positions_data_ {};
 };
 
 } // namespace ktp

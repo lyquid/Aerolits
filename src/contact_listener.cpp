@@ -13,7 +13,7 @@ void ktp::ContactListener::BeginContact(b2Contact* contact) {
       case EntityTypes::Aerolite:
         if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
           // kill player
-        } else if (fixture_B->type() == EntityTypes::ExplosionParticle) {
+        } else if (fixture_B->type() == EntityTypes::Explosion) {
           contact->GetWorldManifold(static_cast<AerolitePhysicsComponent*>(fixture_A->physics())->worldManifold());
           fixture_A->physics()->collide(fixture_B);
           fixture_B->physics()->collide(fixture_A);
@@ -23,7 +23,7 @@ void ktp::ContactListener::BeginContact(b2Contact* contact) {
         break;
       case EntityTypes::Background:
         break;
-      case EntityTypes::ExplosionParticle:
+      case EntityTypes::Explosion:
         if (fixture_B->type() == EntityTypes::Aerolite) {
           contact->GetWorldManifold(static_cast<AerolitePhysicsComponent*>(fixture_B->physics())->worldManifold());
           fixture_A->physics()->collide(fixture_B);
@@ -42,7 +42,7 @@ void ktp::ContactListener::BeginContact(b2Contact* contact) {
           fixture_A->physics()->collide(fixture_B);
         } else if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
           // kill player or something
-        } else if (fixture_B->type() == EntityTypes::ExplosionParticle) {
+        } else if (fixture_B->type() == EntityTypes::Explosion) {
           fixture_A->physics()->collide(fixture_B);
           fixture_B->physics()->collide(fixture_A);
         } else if (fixture_B->type() == EntityTypes::Projectile) {

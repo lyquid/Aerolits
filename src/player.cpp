@@ -6,7 +6,7 @@
 
 /* GRAPHICS */
 
-ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept:
+ktp::PlayerGraphicsComponent::PlayerGraphicsComponent():
   shader_(Resources::getShader("player")) {
 
   generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
@@ -91,7 +91,14 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner, PlayerGra
   owner_ = owner;
   size_ = ConfigParser::player_config.size_;
   setBox2D();
-  exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(EmitterPhysicsComponent::makeEmitter(graphics_->exhaust_emitter_.get(), "fire", {body_->GetPosition().x, body_->GetPosition().y}));
+  exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(
+    EmitterPhysicsComponent::makeEmitter(
+      graphics_->exhaust_emitter_.get(),
+      "fire",
+      {(body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
+       (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_}
+    )
+  );
 }
 
 ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) noexcept {

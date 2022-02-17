@@ -102,6 +102,7 @@ namespace ConfigParser {
     unsigned int rays_ {100u};
     float restitution_ {0.99f};
   };
+  extern ExplosionConfig explosion_config;
 
   struct ProjectilesConfig {
     unsigned int arm_time_ {300u};

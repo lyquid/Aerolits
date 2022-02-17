@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_INCLUDE_PARTICLE_HPP_
 
 #include "../sdl2_wrappers/sdl2_opengl.hpp"
+#include <glm/glm.hpp>
 #include <SDL.h>
 #include <utility> // std::move
 #include <vector>
@@ -52,7 +53,10 @@ class Particle {
   inline void setNext(Particle* next) { state_.next_ = next; }
   // bool update();
   // bool update(const Vortex& vortex);
-  bool update(GLfloatVector& pos, unsigned int index);
+  // bool update(GLfloatVector& pos, unsigned int index);
+  bool update(glm::vec2& pos);
+
+
   // bool update(const Vortex& vortex);
 
   Particle& operator=(const Particle& other) noexcept;

@@ -34,12 +34,12 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
 
  public:
 
-  ProjectilePhysicsComponent(GameEntity* owner, ProjectileGraphicsComponent* graphics) noexcept;
+  ProjectilePhysicsComponent(GameEntity* owner, ProjectileGraphicsComponent* graphics);
   ProjectilePhysicsComponent(const ProjectilePhysicsComponent& other) = delete;
   ProjectilePhysicsComponent(ProjectilePhysicsComponent&& other) { *this = std::move(other); }
 
   ProjectilePhysicsComponent& operator=(const ProjectilePhysicsComponent& other) = delete;
-  ProjectilePhysicsComponent& operator=(ProjectilePhysicsComponent&& other) noexcept;
+  ProjectilePhysicsComponent& operator=(ProjectilePhysicsComponent&& other);
 
   inline void collide(const GameEntity* other) override { collided_ = true; }
   void detonate();
@@ -54,7 +54,7 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
   unsigned int arm_time_ {ConfigParser::projectiles_config.arm_time_};
   bool detonated_ {false};
   // std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
-  ConfigParser::ExplosionConfig explosion_config_ {};
+  ExplosionPhysicsComponent* explosion_ {nullptr};
   unsigned int fired_time_ {};
   ProjectileGraphicsComponent* graphics_ {nullptr};
   float speed_ {ConfigParser::projectiles_config.speed_};

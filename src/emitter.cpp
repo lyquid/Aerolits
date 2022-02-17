@@ -11,7 +11,45 @@
 /* GRAPHICS */
 
 ktp::EmitterGraphicsComponent::EmitterGraphicsComponent() {
-  shader_ = Resources::getShader("particle");
+  shader_program_ = Resources::getShader("particle");
+  const float size {1000.f};
+  vertices_data_ = {
+    // vertices
+    -0.5f * size,  0.5f * size,
+     0.5f * size, -0.5f * size,
+    -0.5f * size, -0.5f * size,
+    -0.5f * size,  0.5f * size,
+     0.5f * size, -0.5f * size,
+     0.5f * size,  0.5f * size
+  };
+  vertices_.setup(vertices_data_);
+  vao_.linkAttrib(vertices_, 0, 2, GL_FLOAT, 0, nullptr);
+  // colors
+  GLfloatVector colors_data_ {};
+  colors_data_.resize((vertices_data_.size() / 2) * 3);
+  for (auto& color_c: colors_data_) {
+    color_c = generateRand(0.f, 1.f);
+  }
+  colors_.setup(colors_data_);
+  vao_.linkAttrib(colors_, 1, 3, GL_FLOAT, 0, nullptr);
+}
+
+ktp::EmitterGraphicsComponent& ktp::EmitterGraphicsComponent::operator=(EmitterGraphicsComponent&& other) {
+  if (this != &other) {
+    blend_mode_            = other.blend_mode_;
+    particles_pool_        = std::exchange(other.particles_pool_, nullptr);
+    particles_pool_size_   = other.particles_pool_size_;
+    alive_particles_count_ = other.alive_particles_count_;
+    vao_                   = std::move(other.vao_);
+    vertices_              = std::move(other.vertices_);
+    colors_                = std::move(other.colors_);
+    translations_          = std::move(other.translations_);
+    vertices_data_         = std::move(other.vertices_data_);
+    translations_data_     = std::move(other.translations_data_);
+    shader_program_        = std::move(other.shader_program_);
+    mvp_                   = std::move(other.mvp_);
+  }
+  return *this;
 }
 
 void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter) {
@@ -21,20 +59,14 @@ void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter) {
   //     particles_pool_[i].draw();
   //   }
   // }
-  shader_.use();
-  shader_.setMat4f("mvp", glm::value_ptr(mvp_));
+  shader_program_.use();
   vao_.bind();
-  glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
-  glVertexAttribDivisor(1, 0); // colors
-  glVertexAttribDivisor(2, 1); // colors
-  glDrawArraysInstanced(GL_TRIANGLES, 0, 4, alive_particles_count_);
+  glDrawArraysInstanced(GL_TRIANGLES, 0, vertices_data_.size(), alive_particles_count_);
 }
 
 /* PHYSICS */
 
-ktp::EmitterPhysicsComponent::EmitterPhysicsComponent(EmitterGraphicsComponent* graphics) noexcept: graphics_(graphics) {}
-
-ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhysicsComponent&& other) noexcept {
+ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhysicsComponent&& other) {
   if (this != &other) {
     // inherited members
     body_     = other.body_;
@@ -51,11 +83,6 @@ ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhy
     interval_time_         = other.interval_time_;
     position_              = other.position_;
     start_time_            = other.start_time_;
-
-    vertex_buffer_ = std::move(other.vertex_buffer_);
-    position_buffer_ = std::move(other.position_buffer_);
-    // color_buffer_ = std::move(other.color_buffer_);
-    particules_positions_data_ = std::move(other.particules_positions_data_);
   }
   return *this;
 }
@@ -127,6 +154,7 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
 }
 
 void ktp::EmitterPhysicsComponent::inflatePool() {
+  delete[] graphics_->particles_pool_;
   graphics_->particles_pool_ = new Particle[graphics_->particles_pool_size_];
 
   first_available_ = &graphics_->particles_pool_[0];
@@ -142,7 +170,6 @@ ktp::EmitterPhysicsComponent ktp::EmitterPhysicsComponent::makeEmitter(EmitterGr
   emitter.setType(type);
   emitter.setupOpenGL();
   emitter.setPosition(pos);
-  emitter.particules_positions_data_.resize(emitter.graphics_->particles_pool_size_ * 2);
   return emitter;
 }
 
@@ -167,36 +194,26 @@ void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
 
 void ktp::EmitterPhysicsComponent::setupOpenGL() {
   graphics_->vao_.bind();
-  const GLfloatVector vertex_buffer_data {
-        // positions     // colors
-    -0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
-     0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
-    -0.05f, -0.05f,  0.0f, 0.0f, 1.0f,
+  // translations
+  graphics_->translations_data_.resize(graphics_->particles_pool_size_);
+  graphics_->translations_.setup(graphics_->translations_data_.data(), graphics_->particles_pool_size_ * sizeof(glm::vec2));
+  graphics_->vao_.linkAttrib(graphics_->translations_, 2, 2, GL_FLOAT, 0, nullptr);
 
-    -0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
-     0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
-     0.05f,  0.05f,  0.0f, 1.0f, 1.0f
-  };
-  vertex_buffer_.setup(vertex_buffer_data);
-  graphics_->vao_.linkAttrib(vertex_buffer_, 0, 2, GL_FLOAT, 5 * sizeof(GLfloat), nullptr);
-  graphics_->vao_.linkAttrib(vertex_buffer_, 1, 3, GL_FLOAT, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-
-  position_buffer_.setup(NULL, graphics_->particles_pool_size_ * 2 * sizeof(GLfloat), GL_STREAM_DRAW);
-  graphics_->vao_.linkAttrib(position_buffer_, 2, 2, GL_FLOAT, 0, nullptr);
+  // graphics_->translations_data_.resize(graphics_->particles_pool_size_ * 2);
+  // graphics_->translations_.setup(graphics_->translations_data_);
+  // graphics_->vao_.linkAttrib(graphics_->translations_, 2, 2, GL_FLOAT, 0, nullptr);
+  glVertexAttribDivisor(2, 1);
 }
 
 void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta_time) {
   for (auto i = 0u; i < graphics_->particles_pool_size_; ++i) {
 
-    if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(particules_positions_data_, i)) {
+    if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(graphics_->translations_data_[i])) {
       graphics_->particles_pool_[i].setNext(first_available_);
       first_available_ = &graphics_->particles_pool_[i];
       --alive_particles_count_;
       graphics_->alive_particles_count_ = alive_particles_count_;
     }
-
-
-
 
     // if (data_->vortex_) {
     //   if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_})) {
@@ -217,15 +234,24 @@ void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta
       // }
     //}
   }
-  position_buffer_.setup(NULL, graphics_->particles_pool_size_ * 2 * sizeof(GLfloat), GL_STREAM_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, graphics_->particles_pool_size_ * 2 * sizeof(GLfloat), particules_positions_data_.data());
-  graphics_->vao_.linkAttrib(position_buffer_, 2, 2, GL_FLOAT, 0, nullptr);
+  // translations_buffer_.setup(NULL, graphics_->particles_pool_size_ * 2 * sizeof(GLfloat), GL_STREAM_DRAW);
+  // glBufferSubData(GL_ARRAY_BUFFER, 0, graphics_->particles_pool_size_ * 2 * sizeof(GLfloat), particules_positions_data_.data());
+  // graphics_->vao_.linkAttrib(translations_buffer_, 2, 2, GL_FLOAT, 0, nullptr);
+
+  graphics_->translations_.setup(graphics_->translations_data_.data(), graphics_->particles_pool_size_ * sizeof(glm::vec2));
+  graphics_->vao_.linkAttrib(graphics_->translations_, 2, 2, GL_FLOAT, 0, nullptr);
+
+  // graphics_->translations_.setup(graphics_->translations_data_);
+  // graphics_->vao_.linkAttrib(graphics_->translations_, 2, 2, GL_FLOAT, 0, nullptr);
+  glVertexAttribDivisor(2, 1);
   updateMVP();
 }
 
 void ktp::EmitterPhysicsComponent::updateMVP() {
-  // glm::mat4 model {1.f};
-  // model = glm::translate(model, glm::vec3(position_.x, position_.y, 0.f));
+  glm::mat4 model {1.f};
+  model = glm::translate(model, glm::vec3(position_.x, position_.y, 0.f));
   // model = glm::rotate(model, angle_, glm::vec3(0.f, 0.f, 1.f));
-  graphics_->mvp_ = camera_.projectionMatrix() * camera_.viewMatrix()/*  * model */;
+  graphics_->mvp_ = camera_.projectionMatrix() * camera_.viewMatrix() * model;
+  graphics_->shader_program_.use();
+  graphics_->shader_program_.setMat4f("mvp", glm::value_ptr(graphics_->mvp_));
 }
