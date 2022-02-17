@@ -3,6 +3,7 @@
 #include "config_parser.hpp"
 #include "graphics_component.hpp"
 #include "physics_component.hpp"
+#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include <utility> // std::move std::exchange
 
 namespace ktp {
@@ -13,8 +14,7 @@ class ExplosionGraphicsComponent: public GraphicsComponent {
  public:
   virtual void update(const GameEntity& explosion) override;
  private:
-  SDL_FPoint position_ {};
-  //static constexpr SDL_Rect texture_rect_ {256, 64, 128, 128};
+  b2Color color_ {SDL2ColorToB2Color(ConfigParser::explosion_config.color_)};
 };
 
 class ExplosionPhysicsComponent: public PhysicsComponent {

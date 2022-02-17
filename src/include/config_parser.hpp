@@ -94,6 +94,7 @@ namespace ConfigParser {
 
   struct ExplosionConfig {
     float blast_power_ {50.f};
+    SDL_Color color_ {Colors::red};
     float density_ {60.f};
     unsigned int duration_ {500u};
     float friction_ {0.f};
@@ -112,7 +113,6 @@ namespace ConfigParser {
     float restitution_ {0.35f};
     float size_ {0.15f};
     float speed_ {0.1f};
-    // explosion
     ExplosionConfig explosion_config_ {};
   };
   extern ProjectilesConfig projectiles_config;

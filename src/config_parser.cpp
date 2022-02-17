@@ -586,7 +586,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     } else {
       logMessage("Warning! Projectiles speed not set. Using default speed.");
     }
-    // Blast power
+    // Explosion blast power
     if (projectiles.child("explosion").child("blastPower")) {
       const auto blast_power {projectiles.child("explosion").child("blastPower").attribute("value").as_float()};
       if (blast_power >= 0) {
@@ -596,6 +596,18 @@ void ktp::ConfigParser::loadProjectilesConfig() {
       }
     } else {
       logMessage("Warning! Projectiles explosion blast power not set. Using default blast power.");
+    }
+    // Explosion color
+    if (projectiles.child("explosion").child("color")) {
+      const SDL_Color requested_color {
+        (Uint8)projectiles.child("explosion").child("color").attribute("r").as_uint(),
+        (Uint8)projectiles.child("explosion").child("color").attribute("g").as_uint(),
+        (Uint8)projectiles.child("explosion").child("color").attribute("b").as_uint(),
+        (Uint8)255
+      };
+      explosion_config.color_ = Colors::getNearestColor(requested_color);
+    } else {
+      logMessage("Warning! Explosion color not set. Using default color.");
     }
     // Explosion density
     if (projectiles.child("explosion").child("density")) {
