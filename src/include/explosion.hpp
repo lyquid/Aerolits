@@ -24,10 +24,13 @@ class ExplosionGraphicsComponent: public GraphicsComponent {
   void generateOpenGLStuff(float size);
   b2Color color_ {SDL2ColorToB2Color(ConfigParser::explosion_config.color_)};
   GLuint rays_ {ConfigParser::projectiles_config.explosion_config_.rays_};
+  bool render_ {false};
 
   VAO vao_ {};
   VBO vertices_ {};
   GLfloatVector vertices_data_ {};
+  EBO indices_ {};
+  GLuintVector indices_data_ {};
   VBO translations_ {};
   std::vector<glm::vec3> translations_data_ {};
   ShaderProgram shader_ {Resources::getShader("explosion")};

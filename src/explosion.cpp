@@ -10,15 +10,19 @@ ktp::ExplosionGraphicsComponent::ExplosionGraphicsComponent() {
 
 void ktp::ExplosionGraphicsComponent::generateOpenGLStuff(float size) {
   vertices_data_ = {
-     0.00f * size,  0.50f * size, 0.f,  color_.r,  color_.g,  color_.b,   // top        0
-    -0.33f * size, -0.50f * size, 0.f,  color_.r,  color_.g,  color_.b,   // left       1
-     0.33f * size, -0.50f * size, 0.f,  color_.r,  color_.g,  color_.b    // right      2
+     0.5f * size,  0.5f * size, 0.f,  color_.r,  color_.g,  color_.b,   // top right      0
+    -0.5f * size,  0.5f * size, 0.f,  color_.r,  color_.g,  color_.b,   // top left       1
+    -0.5f * size, -0.5f * size, 0.f,  color_.r,  color_.g,  color_.b,   // down left      2
+     0.5f * size, -0.5f * size, 0.f,  color_.r,  color_.g,  color_.b    // down right     3
   };
   vertices_.setup(vertices_data_);
   // vertices
   vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
   // colors
   vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+  // EBO
+  indices_data_ = { 0, 1, 2, 0, 2, 3 };
+  indices_.setup(indices_data_);
   // translations, currently just resized
   translations_.setup(translations_data_.data(), translations_data_.size() * sizeof(glm::vec3));
   vao_.linkAttrib(translations_, 2, 3, GL_FLOAT, 0, nullptr);
@@ -26,9 +30,11 @@ void ktp::ExplosionGraphicsComponent::generateOpenGLStuff(float size) {
 }
 
 void ktp::ExplosionGraphicsComponent::update(const GameEntity& explosion) {
-  shader_.use();
-  vao_.bind();
-  glDrawArraysInstanced(GL_TRIANGLES, 0, vertices_data_.size(), rays_);
+  if (render_) {
+    shader_.use();
+    vao_.bind();
+    glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(indices_data_.size()), GL_UNSIGNED_INT, 0, rays_);
+  }
 }
 
 // PHYSICS
@@ -89,7 +95,6 @@ ktp::ExplosionPhysicsComponent& ktp::ExplosionPhysicsComponent::operator=(Explos
 void ktp::ExplosionPhysicsComponent::detonate(Uint32 time, const b2Vec2& position) {
   detonated_ = true;
   detonation_time_ = time;
-  // position_ = position;
   for (auto& body: explosion_rays_) {
     body->SetTransform(position, 0);
     body->SetEnabled(true);
@@ -99,7 +104,8 @@ void ktp::ExplosionPhysicsComponent::detonate(Uint32 time, const b2Vec2& positio
 void ktp::ExplosionPhysicsComponent::update(const GameEntity& explosion, float delta_time) {
   if (detonated_ && Game::gameplay_timer_.milliseconds() - explosion_config_.duration_ > detonation_time_) {
     owner_->deactivate();
-  } else {
+  } else if (detonated_) {
+    graphics_->render_ = true;
     for (std::size_t i = 0; i < explosion_rays_.size(); ++i) {
       graphics_->translations_data_[i].x = explosion_rays_[i]->GetPosition().x * kMetersToPixels;
       graphics_->translations_data_[i].y = explosion_rays_[i]->GetPosition().y * kMetersToPixels;
