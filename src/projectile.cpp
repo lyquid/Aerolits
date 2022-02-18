@@ -81,7 +81,6 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
   if (explosion_) {
     explosion_->explosion_config_ = ConfigParser::projectiles_config.explosion_config_;
     explosion_->explosion_config_.particle_radius_ = ConfigParser::projectiles_config.explosion_config_.particle_radius_ * kMetersToPixels;
-    explosion_->explosion_rays_.reserve(ConfigParser::projectiles_config.explosion_config_.rays_);
   }
 
   // exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(EmitterPhysicsComponent::makeEmitter(graphics_->exhaust_emitter_.get(), "projectile_exhaust", {body_->GetPosition().x, body_->GetPosition().y}));
@@ -114,8 +113,6 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
 
 void ktp::ProjectilePhysicsComponent::detonate() {
   detonated_ = true;
-  explosion_->graphics_->position_.x = body_->GetPosition().x * kMetersToPixels;
-  explosion_->graphics_->position_.y = body_->GetPosition().y * kMetersToPixels;
   explosion_->detonate(Game::gameplay_timer_.milliseconds(), body_->GetPosition());
 }
 

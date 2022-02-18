@@ -10,7 +10,7 @@
   </Box2D>
   <explosion>
     <blastPower value="15.0"/>
-    <color r="41" g="255" b="95"/>
+    <color r="243" g="194" b="32"/>
     <density value="6.0"/>
     <duration value="150"/>
     <friction value="0.0"/>
