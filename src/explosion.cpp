@@ -10,28 +10,31 @@ ktp::ExplosionGraphicsComponent::ExplosionGraphicsComponent() {
 
 void ktp::ExplosionGraphicsComponent::generateOpenGLStuff(float size) {
   vertices_data_ = {
-     0.5f * size,  0.5f * size, 0.f,  color_.r,  color_.g,  color_.b,   // top right      0
-    -0.5f * size,  0.5f * size, 0.f,  color_.r,  color_.g,  color_.b,   // top left       1
-    -0.5f * size, -0.5f * size, 0.f,  color_.r,  color_.g,  color_.b,   // down left      2
-     0.5f * size, -0.5f * size, 0.f,  color_.r,  color_.g,  color_.b    // down right     3
+     0.5f * size,  0.5f * size, 0.f,  color_.r,  color_.g,  color_.b,  1.f, 1.f, // top right      0
+    -0.5f * size,  0.5f * size, 0.f,  color_.r,  color_.g,  color_.b,  0.f, 1.f, // top left       1
+    -0.5f * size, -0.5f * size, 0.f,  color_.r,  color_.g,  color_.b,  0.f, 0.f, // down left      2
+     0.5f * size, -0.5f * size, 0.f,  color_.r,  color_.g,  color_.b,  1.f, 0.f  // down right     3
   };
   vertices_.setup(vertices_data_);
   // vertices
-  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 8 * sizeof(GLfloat), nullptr);
   // colors
-  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+  // texture
+  vao_.linkAttrib(vertices_, 2, 2, GL_FLOAT, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
   // EBO
   indices_data_ = { 0, 1, 2, 0, 2, 3 };
   indices_.setup(indices_data_);
   // translations, currently just resized
   translations_.setup(translations_data_.data(), translations_data_.size() * sizeof(glm::vec3));
-  vao_.linkAttrib(translations_, 2, 3, GL_FLOAT, 0, nullptr);
-  glVertexAttribDivisor(2, 1);
+  vao_.linkAttrib(translations_, 3, 3, GL_FLOAT, 0, nullptr);
+  glVertexAttribDivisor(3, 1);
 }
 
 void ktp::ExplosionGraphicsComponent::update(const GameEntity& explosion) {
   if (render_) {
     shader_.use();
+    texture_.bind();
     vao_.bind();
     glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(indices_data_.size()), GL_UNSIGNED_INT, 0, rays_);
   }

@@ -22,8 +22,8 @@ class ExplosionGraphicsComponent: public GraphicsComponent {
  private:
 
   void generateOpenGLStuff(float size);
-  b2Color color_ {SDL2ColorToB2Color(ConfigParser::explosion_config.color_)};
-  GLuint rays_ {ConfigParser::projectiles_config.explosion_config_.rays_};
+  const b2Color color_ {SDL2ColorToB2Color(ConfigParser::explosion_config.color_)};
+  const GLuint rays_ {ConfigParser::projectiles_config.explosion_config_.rays_};
   bool render_ {false};
 
   VAO vao_ {};
@@ -35,6 +35,7 @@ class ExplosionGraphicsComponent: public GraphicsComponent {
   std::vector<glm::vec3> translations_data_ {};
   ShaderProgram shader_ {Resources::getShader("explosion")};
   glm::mat4 mvp_ {};
+  Texture2D texture_ {Resources::getTexture("particle_02")};
 };
 
 class ExplosionPhysicsComponent: public PhysicsComponent {
