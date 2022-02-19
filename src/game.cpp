@@ -110,7 +110,7 @@ bool ktp::Game::loadResources() {
   texture_path = Resources::getResourcesPath("textures") + "particle_01.png";
   Resources::loadTexture("particle_01", texture_path, false);
   texture_path = Resources::getResourcesPath("textures") + "particle_02.png";
-  Resources::loadTexture("particle_02", texture_path, false);
+  Resources::loadTexture("particle_02", texture_path, true);
   // shaders
   auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};
   auto fragment_shader_path {Resources::getResourcesPath("shaders") + "aerolite.frag"};
