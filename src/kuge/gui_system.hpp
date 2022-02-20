@@ -2,7 +2,7 @@
 #define KUGE_HEADERS_GUI_SYSTEM_HPP_
 
 #include "system.hpp"
-#include "../sdl2_wrappers/sdl2_opengl.hpp"
+#include "../include/opengl.hpp"
 
 namespace kuge {
 

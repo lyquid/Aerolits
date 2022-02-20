@@ -224,7 +224,7 @@ bool triangulate(const Polygon& polygon, std::vector<Triangle>& result);
  * @param result Where to store the resulting triangles.
  * @return True if all went ok.
  */
-bool triangulate(const Polygon& polygon, GLfloatVector& result);
+bool triangulate(const Polygon& polygon, std::vector<GLfloat>& result);
 
 /**
  * @brief Divides a polygon in triangles. **Doesn't work with polygons with inner holes.**

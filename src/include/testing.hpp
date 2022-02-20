@@ -1,8 +1,8 @@
 #pragma once
 
 #include "camera.hpp"
+#include "opengl.hpp"
 #include "../sdl2_wrappers/sdl2_geometry.hpp"
-#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

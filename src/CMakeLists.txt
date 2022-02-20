@@ -11,6 +11,7 @@ add_executable(Aerolits
   game.cpp
   game_state.cpp
   input_component.cpp
+  opengl.cpp
   particle.cpp
   player.cpp
   projectile.cpp

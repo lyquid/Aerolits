@@ -114,7 +114,7 @@ bool ktp::Geometry::triangulate(const Polygon& polygon, std::vector<Triangle>& r
   return true;
 }
 
-bool ktp::Geometry::triangulate(const Polygon& polygon, GLfloatVector& result) {
+bool ktp::Geometry::triangulate(const Polygon& polygon, std::vector<GLfloat>& result) {
   const auto vertices {polygon.size()};
   if (vertices < 3) return false;
 

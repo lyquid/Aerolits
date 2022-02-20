@@ -1,7 +1,7 @@
 #pragma once
 
+#include "opengl.hpp"
 #include "../sdl2_wrappers/sdl2_font.hpp"
-#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include <map>
 #include <string>
 

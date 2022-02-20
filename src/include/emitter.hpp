@@ -3,9 +3,9 @@
 #include "config_parser.hpp"
 #include "graphics_component.hpp"
 #include "object_pool.hpp"
+#include "opengl.hpp"
 #include "particle.hpp"
 #include "physics_component.hpp"
-#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <SDL.h>
 #include <string>
@@ -48,7 +48,7 @@ class EmitterGraphicsComponent: public GraphicsComponent {
   friend class EmitterPhysicsComponent;
 
  public:
- 
+
   EmitterGraphicsComponent();
   EmitterGraphicsComponent(const EmitterGraphicsComponent& other) = delete;
   EmitterGraphicsComponent(EmitterGraphicsComponent&& other) { *this = std::move(other); }

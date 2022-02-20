@@ -2,9 +2,9 @@
 
 #include "config_parser.hpp"
 #include "graphics_component.hpp"
+#include "opengl.hpp"
 #include "physics_component.hpp"
 #include "../sdl2_wrappers/sdl2_geometry.hpp"
-#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include <utility> // std::move std::exchange
 
 namespace ktp {

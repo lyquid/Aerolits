@@ -26,7 +26,7 @@ void ktp::Testing::init() {
   // shader
   shader_program_ = Resources::getShader("test");
   // vertices
-  vertices_data_ = SDL2_GL::cube(0.05f);
+  vertices_data_ = cube(0.05f);
   vertices_.setup(vertices_data_);
   vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 0, nullptr);
   // colors
