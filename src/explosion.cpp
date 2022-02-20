@@ -4,7 +4,6 @@
 // GRAPHICS
 
 ktp::ExplosionGraphicsComponent::ExplosionGraphicsComponent() {
-  translations_data_.resize(rays_);
   generateOpenGLStuff(ConfigParser::explosion_config.particle_radius_ * kMetersToPixels);
 }
 
@@ -25,8 +24,8 @@ void ktp::ExplosionGraphicsComponent::generateOpenGLStuff(float size) {
   // EBO
   indices_data_ = { 0, 1, 2, 0, 2, 3 };
   indices_.setup(indices_data_);
-  // translations, currently just resized
-  translations_.setup(translations_data_.data(), translations_data_.size() * sizeof(glm::vec3));
+  // translations
+  translations_.setup(nullptr, rays_ * sizeof(glm::vec3), GL_STREAM_DRAW);
   vao_.linkAttrib(translations_, 3, 3, GL_FLOAT, 0, nullptr);
   glVertexAttribDivisor(3, 1);
 }
@@ -45,7 +44,7 @@ void ktp::ExplosionGraphicsComponent::update(const GameEntity& explosion) {
 ktp::ExplosionPhysicsComponent::ExplosionPhysicsComponent(GameEntity* owner, ExplosionGraphicsComponent* graphics):
  graphics_(graphics) {
   owner_ = owner;
-  explosion_rays_.reserve(ConfigParser::projectiles_config.explosion_config_.rays_);
+  explosion_rays_.reserve(explosion_config_.rays_);
   b2Body* current_body {nullptr};
   for (std::size_t i = 0; i < explosion_config_.rays_; ++i) {
 
@@ -74,6 +73,8 @@ ktp::ExplosionPhysicsComponent::ExplosionPhysicsComponent(GameEntity* owner, Exp
     current_body->CreateFixture(&fd);
     current_body->SetEnabled(false);
     explosion_rays_.push_back(current_body);
+
+    translations_data_.resize(explosion_config_.rays_);
   }
 }
 
@@ -110,10 +111,10 @@ void ktp::ExplosionPhysicsComponent::update(const GameEntity& explosion, float d
   } else if (detonated_) {
     graphics_->render_ = true;
     for (std::size_t i = 0; i < explosion_rays_.size(); ++i) {
-      graphics_->translations_data_[i].x = explosion_rays_[i]->GetPosition().x * kMetersToPixels;
-      graphics_->translations_data_[i].y = explosion_rays_[i]->GetPosition().y * kMetersToPixels;
+      translations_data_[i].x = explosion_rays_[i]->GetPosition().x * kMetersToPixels;
+      translations_data_[i].y = explosion_rays_[i]->GetPosition().y * kMetersToPixels;
     }
-    graphics_->translations_.setup(graphics_->translations_data_.data(), graphics_->translations_data_.size() * sizeof(glm::vec3));
+    graphics_->translations_.setupSubData(translations_data_.data(), translations_data_.size() * sizeof(glm::vec3));
     updateMVP();
   }
 }

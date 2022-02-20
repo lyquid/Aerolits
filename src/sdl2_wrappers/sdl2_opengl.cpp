@@ -121,11 +121,7 @@ ktp::VBO::VBO() {
   glGenBuffers(1, &id_);
 }
 
-void ktp::VBO::setup(const GLfloatVector& vertices, GLenum usage) {
-  glBindBuffer(GL_ARRAY_BUFFER, id_);
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), usage);
-}
-
+// this setup is needed when you pass nullptr for a later use with subData
 void ktp::VBO::setup(const GLfloat* vertices, GLsizeiptr size, GLenum usage) {
   glBindBuffer(GL_ARRAY_BUFFER, id_);
   glBufferData(GL_ARRAY_BUFFER, size, vertices, usage);
