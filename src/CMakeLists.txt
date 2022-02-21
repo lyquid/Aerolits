@@ -47,6 +47,7 @@ endif()
 if(DEFINED CMAKE_TOOLCHAIN_FILE)
   target_link_libraries(Aerolits PRIVATE
     box2d::box2d
+    GLEW::GLEW
     glm::glm
     imgui
     KUGE
@@ -57,6 +58,7 @@ if(DEFINED CMAKE_TOOLCHAIN_FILE)
 else()
   target_link_libraries(Aerolits PRIVATE
     box2d::box2d
+    GLEW::GLEW
     glm::glm
     imgui
     KUGE

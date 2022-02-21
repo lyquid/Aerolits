@@ -2,6 +2,7 @@
 #define KTP_OPENGL_HPP_
 
 #include <GL/glew.h>
+#include <utility>
 #include <vector>
 
 namespace ktp {

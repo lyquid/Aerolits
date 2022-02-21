@@ -106,16 +106,19 @@ void ktp::ExplosionPhysicsComponent::detonate(Uint32 time, const b2Vec2& positio
 }
 
 void ktp::ExplosionPhysicsComponent::update(const GameEntity& explosion, float delta_time) {
-  if (detonated_ && Game::gameplay_timer_.milliseconds() - explosion_config_.duration_ > detonation_time_) {
-    owner_->deactivate();
-  } else if (detonated_) {
-    graphics_->render_ = true;
-    for (std::size_t i = 0; i < explosion_rays_.size(); ++i) {
-      translations_data_[i].x = explosion_rays_[i]->GetPosition().x * kMetersToPixels;
-      translations_data_[i].y = explosion_rays_[i]->GetPosition().y * kMetersToPixels;
+  if (detonated_) {
+    if (Game::gameplay_timer_.milliseconds() - explosion_config_.duration_ > detonation_time_) {
+      owner_->deactivate();
+      return;
+    } else {
+      graphics_->render_ = true;
+      for (std::size_t i = 0; i < explosion_rays_.size(); ++i) {
+        translations_data_[i].x = explosion_rays_[i]->GetPosition().x * kMetersToPixels;
+        translations_data_[i].y = explosion_rays_[i]->GetPosition().y * kMetersToPixels;
+      }
+      graphics_->translations_.setupSubData(translations_data_.data(), translations_data_.size() * sizeof(glm::vec3));
+      updateMVP();
     }
-    graphics_->translations_.setupSubData(translations_data_.data(), translations_data_.size() * sizeof(glm::vec3));
-    updateMVP();
   }
 }
 
