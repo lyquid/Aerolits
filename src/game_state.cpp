@@ -223,14 +223,27 @@ void ktp::PlayingState::handleEvents(Game& game) {
         if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN: {
-        int x{0}, y{0};
-        if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          // Emitter emi{"plasma", {static_cast<float>(x), static_cast<float>(y)}};
-          // emitters_.push_back(std::move({EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}}));
-          // game.emitters_.push_back(std::move(emi));
+        if (!ImGui::GetIO().WantCaptureMouse) {
+          int x{0}, y{0};
+          if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+            // SDL_SetRelativeMouseMode(SDL_TRUE);
+            AerolitePhysicsComponent::spawnAerolite({(float)x, (float)game.screen_size_.y - (float)y});
+            logMessage("clicked " + std::to_string(x) + ", " + std::to_string(game.screen_size_.y - y));
+          } else if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+            SDL_SetRelativeMouseMode(SDL_FALSE);
+          }
         }
         break;
       }
+      // case SDL_MOUSEBUTTONDOWN: {
+      //   int x{0}, y{0};
+      //   if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+      //     // Emitter emi{"plasma", {static_cast<float>(x), static_cast<float>(y)}};
+      //     // emitters_.push_back(std::move({EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}}));
+      //     // game.emitters_.push_back(std::move(emi));
+      //   }
+      //   break;
+      // }
       default:
         break;
     }
@@ -272,7 +285,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
       }
     }
   }
-  if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnMovingAerolite();
+  if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 0) AerolitePhysicsComponent::spawnMovingAerolite();
 
   game.event_bus_.processEvents();
 }

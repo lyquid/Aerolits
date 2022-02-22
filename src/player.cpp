@@ -181,9 +181,10 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
 void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_time) {
   checkWrap();
   updateMVP();
-  cos_ = SDL_cosf(body_->GetAngle());
-  sin_ = SDL_sinf(body_->GetAngle());
-  exhaust_emitter_->setAngle(body_->GetAngle());
+  const auto good_angle {body_->GetAngle() + b2_pi};
+  cos_ = SDL_cosf(good_angle);
+  sin_ = SDL_sinf(good_angle);
+  exhaust_emitter_->setAngle(good_angle);
   exhaust_emitter_->setPosition({
     (body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
     (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_

@@ -71,7 +71,7 @@ class EmitterGraphicsComponent: public GraphicsComponent {
   VBO           vertices_ {};
   GLfloatVector vertices_data_ {};
   EBO           indices_ {};
-  GLuintVector  indices_data_ {};
+  GLuintVector  indices_data_ { 0, 1, 2, 0, 2, 3 };
   VBO           translations_ {};
   glm::mat4     mvp_ {};
   ShaderProgram shader_ {Resources::getShader("particle")};

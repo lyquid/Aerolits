@@ -7,22 +7,19 @@
 /* GRAPHICS */
 
 ktp::EmitterGraphicsComponent::EmitterGraphicsComponent() {
-  const float size {8.f};
-  vertices_data_ = {
-     0.5f * size,  0.5f * size, 0.f,   1.f,  1.f,  1.f,   1.f, 1.f, // top right      0
-    -0.5f * size,  0.5f * size, 0.f,   1.f,  1.f,  1.f,   0.f, 1.f, // top left       1
-    -0.5f * size, -0.5f * size, 0.f,   1.f,  1.f,  1.f,   0.f, 0.f, // down left      2
-     0.5f * size, -0.5f * size, 0.f,   1.f,  1.f,  1.f,   1.f, 0.f  // down right     3
+  const float size {80.f};
+  vertices_data_ = {                      // uv
+     0.5f * size,  0.5f * size, 0.f,      1.f, 1.f, // top right      0
+    -0.5f * size,  0.5f * size, 0.f,      0.f, 1.f, // top left       1
+    -0.5f * size, -0.5f * size, 0.f,      0.f, 0.f, // down left      2
+     0.5f * size, -0.5f * size, 0.f,      1.f, 0.f  // down right     3
   };
   vertices_.setup(vertices_data_);
   // vertices
-  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 8 * sizeof(GLfloat), nullptr);
-  // color
-  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 5 * sizeof(GLfloat), nullptr);
   // texture uv
-  vao_.linkAttrib(vertices_, 2, 2, GL_FLOAT, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+  vao_.linkAttrib(vertices_, 1, 2, GL_FLOAT, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
   // EBO
-  indices_data_ = { 0, 1, 2, 0, 2, 3 };
   indices_.setup(indices_data_);
 }
 
@@ -186,8 +183,8 @@ void ktp::EmitterPhysicsComponent::setupOpenGL() {
   // translations
   translations_data_.resize(graphics_->particles_pool_size_);
   graphics_->translations_.setup(nullptr, graphics_->particles_pool_size_ * sizeof(glm::vec3), GL_STREAM_DRAW);
-  graphics_->vao_.linkAttrib(graphics_->translations_, 3, 3, GL_FLOAT, 0, nullptr);
-  glVertexAttribDivisor(3, 1);
+  graphics_->vao_.linkAttrib(graphics_->translations_, 2, 3, GL_FLOAT, 0, nullptr);
+  glVertexAttribDivisor(2, 1);
 }
 
 void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta_time) {
