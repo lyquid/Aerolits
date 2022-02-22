@@ -66,7 +66,7 @@ class EmitterGraphicsComponent: public GraphicsComponent {
   Particle*     particles_pool_ {nullptr};
   unsigned int  particles_pool_size_ {};
   unsigned int  alive_particles_count_ {};
-
+  // opengl stuff
   VAO           vao_ {};
   VBO           vertices_ {};
   GLfloatVector vertices_data_ {};

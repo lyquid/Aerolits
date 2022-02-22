@@ -32,7 +32,6 @@ struct ParticleData {
 };
 
 class Particle {
-
  public:
 
   Particle() = default;
