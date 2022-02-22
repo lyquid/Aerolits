@@ -1,7 +1,6 @@
 #ifndef AEROLITS_SRC_INCLUDE_PARTICLE_HPP_
 #define AEROLITS_SRC_INCLUDE_PARTICLE_HPP_
 
-#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include <glm/glm.hpp>
 #include <SDL.h>
 #include <utility> // std::move
@@ -34,24 +33,23 @@ struct ParticleData {
 
 class Particle {
 
-  friend class EmitterGraphicsComponent;
-  friend class EmitterPhysicsComponent;
-
  public:
 
-  void draw() const;
-  inline Particle* getNext() const { return state_.next_; }
+  Particle() = default;
+  Particle(const Particle& other) { *this = other; }
+  Particle(Particle&& other) { *this = std::move(other); }
+
+  Particle& operator=(const Particle& other);
+  Particle& operator=(Particle&& other);
+
+  Particle* getNext() const { return state_.next_; }
   void init(const ParticleData& data);
-  inline bool inUse() const { return life_ > 0; }
-  inline void setNext(Particle* next) { state_.next_ = next; }
+  bool inUse() const { return life_ > 0; }
+  void setNext(Particle* next) { state_.next_ = next; }
   bool update(glm::vec3& pos);
   bool update(const Vortex& vortex, glm::vec3& pos);
 
-  Particle& operator=(const Particle& other) noexcept;
-  Particle& operator=(Particle&& other) noexcept;
-
   inline static SDL_Color interpolate2Colors(const SDL_Color& start_color, const SDL_Color& end_color, float time_step);
-
   inline static SDL_Color interpolate3Colors(const SDL_Color& start_color, const SDL_Color& mid_color, const SDL_Color& end_color, float time_step);
 
   template<typename T>
@@ -80,16 +78,12 @@ class Particle {
 
  private:
 
-  Particle() {}
-  Particle(const Particle& other) noexcept { *this = other; }
-  Particle(Particle&& other) noexcept { *this = std::move(other); }
-  ~Particle() {}
-
   unsigned int life_ {};
+
   union State {
     ~State() {}
-    State& operator=(const State& other) noexcept;
-    State& operator=(State&& other) noexcept;
+    State& operator=(const State& other);
+    State& operator=(State&& other);
 
     ParticleData live_;
     Particle* next_ {nullptr};
