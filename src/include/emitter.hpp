@@ -6,6 +6,7 @@
 #include "opengl.hpp"
 #include "particle.hpp"
 #include "physics_component.hpp"
+#include "resources.hpp"
 #include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <SDL.h>
 #include <string>
@@ -66,14 +67,15 @@ class EmitterGraphicsComponent: public GraphicsComponent {
   unsigned int  particles_pool_size_ {};
   unsigned int  alive_particles_count_ {};
 
-  VAO vao_ {};
-  VBO vertices_ {};
-  VBO colors_ {};
-  VBO translations_ {};
+  VAO           vao_ {};
+  VBO           vertices_ {};
   GLfloatVector vertices_data_ {};
-  std::vector<glm::vec2> translations_data_ {};
-  ShaderProgram shader_program_ {};
-  glm::mat4 mvp_ {};
+  EBO           indices_ {};
+  GLuintVector  indices_data_ {};
+  VBO           translations_ {};
+  glm::mat4     mvp_ {};
+  ShaderProgram shader_ {Resources::getShader("particle")};
+  Texture2D     texture_ {Resources::getTexture("particle_02")};
 };
 
 class EmitterPhysicsComponent: public PhysicsComponent {
@@ -121,6 +123,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   Uint32                    interval_time_ {};
   SDL_FPoint                position_ {0, 0};
   Uint32                    start_time_ {SDL2_Timer::SDL2Ticks()};
+  std::vector<glm::vec3>    translations_data_ {};
 };
 
 } // namespace ktp
