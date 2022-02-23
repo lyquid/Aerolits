@@ -15,14 +15,14 @@ class ExplosionGraphicsComponent: public GraphicsComponent {
   friend class ExplosionPhysicsComponent;
 
  public:
-  
+
   ExplosionGraphicsComponent();
   virtual void update(const GameEntity& explosion) override;
 
  private:
 
   void generateOpenGLStuff(float size);
-  const b2Color color_ {SDL2ColorToB2Color(ConfigParser::explosion_config.color_)};
+  const Color color_ {ConfigParser::explosion_config.color_};
   const GLuint  rays_ {ConfigParser::projectiles_config.explosion_config_.rays_};
   VAO           vao_ {};
   VBO           vertices_ {};

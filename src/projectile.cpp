@@ -8,7 +8,7 @@
 
 /* GRAPHICS */
 
-ktp::ProjectileGraphicsComponent::ProjectileGraphicsComponent() noexcept: shader_(Resources::getShader("projectile")) {
+ktp::ProjectileGraphicsComponent::ProjectileGraphicsComponent(): shader_(Resources::getShader("projectile")) {
   generateOpenGLStuff(ConfigParser::projectiles_config.size_ * kMetersToPixels);
   // exhaust_emitter_ = std::make_unique<EmitterGraphicsComponent>();
   const glm::vec4 uniform_color {color_.r, color_.g, color_.b, color_.a};

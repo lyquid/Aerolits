@@ -35,6 +35,7 @@ ktp::EmitterGraphicsComponent& ktp::EmitterGraphicsComponent::operator=(EmitterG
     indices_               = std::move(other.indices_);
     indices_data_          = std::move(other.indices_data_);
     translations_          = std::move(other.translations_);
+    colors_                = std::move(other.colors_);
     mvp_                   = std::move(other.mvp_);
     shader_                = std::move(other.shader_);
     texture_               = std::move(other.texture_);
@@ -69,6 +70,7 @@ ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhy
     position_              = other.position_;
     start_time_            = other.start_time_;
     translations_data_     = std::move(other.translations_data_);
+    colors_data_           = std::move(other.colors_data_);
   }
   return *this;
 }
@@ -100,12 +102,7 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
     new_data.current_size_ = new_data.sizes_.front();
 
     new_data.colors_ = data_->colors_;
-    if (data_->colors_.size() == 0) {
-      // no color specified in xml
-      new_data.current_color_ = Colors::white;
-    } else {
-      new_data.current_color_ = data_->colors_.front();
-    }
+    new_data.current_color_ = data_->colors_.front();
 
     new_data.rotation_ = data_->rotation_.value_ * generateRand(data_->rotation_.rand_min_, data_->rotation_.rand_max_);
 
@@ -185,19 +182,24 @@ void ktp::EmitterPhysicsComponent::setupOpenGL() {
   graphics_->translations_.setup(nullptr, graphics_->particles_pool_size_ * sizeof(glm::vec3), GL_STREAM_DRAW);
   graphics_->vao_.linkAttrib(graphics_->translations_, 2, 3, GL_FLOAT, 0, nullptr);
   glVertexAttribDivisor(2, 1);
+  // colors
+  colors_data_.resize(graphics_->particles_pool_size_);
+  graphics_->colors_.setup(nullptr, graphics_->particles_pool_size_ * sizeof(glm::vec4), GL_STREAM_DRAW);
+  graphics_->vao_.linkAttrib(graphics_->colors_, 3, 4, GL_FLOAT, 0, nullptr);
+  glVertexAttribDivisor(3, 1);
 }
 
 void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta_time) {
   for (auto i = 0u; i < graphics_->particles_pool_size_; ++i) {
     if (data_->vortex_) {
-      if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_}, translations_data_[i])) {
+      if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_}, translations_data_[i], colors_data_[i])) {
         graphics_->particles_pool_[i].setNext(first_available_);
         first_available_ = &graphics_->particles_pool_[i];
         --alive_particles_count_;
         graphics_->alive_particles_count_ = alive_particles_count_;
       }
     } else { // no vortex
-      if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(translations_data_[i])) {
+      if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(translations_data_[i], colors_data_[i])) {
         graphics_->particles_pool_[i].setNext(first_available_);
         first_available_ = &graphics_->particles_pool_[i];
         --alive_particles_count_;
@@ -206,6 +208,7 @@ void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta
     }
   }
   graphics_->translations_.setupSubData(translations_data_.data(), translations_data_.size() * sizeof(glm::vec3));
+  graphics_->colors_.setupSubData(colors_data_.data(), colors_data_.size() * sizeof(glm::vec4));
   updateMVP();
 }
 

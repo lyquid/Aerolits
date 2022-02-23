@@ -36,7 +36,7 @@ struct EmitterType {
   float         vortex_speed_ {};
   // Particles properties
   RRVUint      max_particle_life_ {};
-  ColorsVector colors_ {};
+  GLMColors    colors_ {};
   RRVFVector   sizes_ {};
   RRVFVector   speeds_ {};
   RRVFloat     rotation_ {};
@@ -73,6 +73,7 @@ class EmitterGraphicsComponent: public GraphicsComponent {
   EBO           indices_ {};
   GLuintVector  indices_data_ { 0, 1, 2, 0, 2, 3 };
   VBO           translations_ {};
+  VBO           colors_ {};
   glm::mat4     mvp_ {};
   ShaderProgram shader_ {Resources::getShader("particle")};
   Texture2D     texture_ {Resources::getTexture("particle_02")};
@@ -124,6 +125,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   SDL_FPoint                position_ {0, 0};
   Uint32                    start_time_ {SDL2_Timer::SDL2Ticks()};
   std::vector<glm::vec3>    translations_data_ {};
+  GLMColors                 colors_data_ {};
 };
 
 } // namespace ktp

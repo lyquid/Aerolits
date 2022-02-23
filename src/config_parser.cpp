@@ -28,13 +28,13 @@ void ktp::ConfigParser::loadAerolitesConfig() {
       aerolites_config.colors_.clear();
       auto color = aerolites.child("colors").begin();
       while (color != aerolites.child("colors").end()) {
-        const SDL_Color requested_color {
-          (Uint8)color->attribute("r").as_uint(),
-          (Uint8)color->attribute("g").as_uint(),
-          (Uint8)color->attribute("b").as_uint(),
-          (Uint8)255
+        const Color requested_color {
+          color->attribute("r").as_uint() * Color::inv255(),
+          color->attribute("g").as_uint() * Color::inv255(),
+          color->attribute("b").as_uint() * Color::inv255(),
+          255u * Color::inv255()
         };
-        SDL_Color final_color {Colors::getNearestColor(requested_color)};
+        Color final_color {Palette::getNearestColor(requested_color)};
         final_color.a = requested_color.a;
         aerolites_config.colors_.push_back(final_color);
         ++color;
@@ -216,13 +216,13 @@ void ktp::ConfigParser::constructEmitterTypesVector(const pugi::xml_document& do
     /* COLORS */
     auto it = emitter.child("colors").begin();
     while (it != emitter.child("colors").end()) {
-      const SDL_Color requested_color {
-        static_cast<Uint8>(it->attribute("r").as_uint()),
-        static_cast<Uint8>(it->attribute("g").as_uint()),
-        static_cast<Uint8>(it->attribute("b").as_uint()),
-        static_cast<Uint8>(it->attribute("a").as_uint())
+      const Color requested_color {
+        it->attribute("r").as_uint(),
+        it->attribute("g").as_uint(),
+        it->attribute("b").as_uint(),
+        it->attribute("a").as_uint()
       };
-      SDL_Color final_color {Colors::getNearestColor(requested_color)};
+      glm::vec4 final_color {Palette::colorToGlmVec4(Palette::getNearestColor(requested_color))};
       final_color.a = requested_color.a;
       emi.colors_.push_back(final_color);
       ++it;
@@ -401,13 +401,13 @@ void ktp::ConfigParser::loadPlayerConfig() {
     const auto player {doc.child("player")};
     // Color
     if (player.child("color")) {
-      const SDL_Color requested_color {
-        (Uint8)player.child("color").attribute("r").as_uint(),
-        (Uint8)player.child("color").attribute("g").as_uint(),
-        (Uint8)player.child("color").attribute("b").as_uint(),
-        (Uint8)255
+      const Color requested_color {
+        player.child("color").attribute("r").as_uint(),
+        player.child("color").attribute("g").as_uint(),
+        player.child("color").attribute("b").as_uint(),
+        255u
       };
-      player_config.color_ = Colors::getNearestColor(requested_color);
+      player_config.color_ = Palette::getNearestColor(requested_color);
     } else {
       logMessage("Warning! Player color not set. Using default color.");
     }
@@ -521,13 +521,13 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     }
     // Color
     if (projectiles.child("color")) {
-      const SDL_Color requested_color {
-        (Uint8)projectiles.child("color").attribute("r").as_uint(),
-        (Uint8)projectiles.child("color").attribute("g").as_uint(),
-        (Uint8)projectiles.child("color").attribute("b").as_uint(),
-        (Uint8)255
+      const Color requested_color {
+        projectiles.child("color").attribute("r").as_uint(),
+        projectiles.child("color").attribute("g").as_uint(),
+        projectiles.child("color").attribute("b").as_uint(),
+        255u
       };
-      projectiles_config.color_ = Colors::getNearestColor(requested_color);
+      projectiles_config.color_ = Palette::getNearestColor(requested_color);
     } else {
       logMessage("Warning! Projectiles color not set. Using default color.");
     }
@@ -599,13 +599,13 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     }
     // Explosion color
     if (projectiles.child("explosion").child("color")) {
-      const SDL_Color requested_color {
-        (Uint8)projectiles.child("explosion").child("color").attribute("r").as_uint(),
-        (Uint8)projectiles.child("explosion").child("color").attribute("g").as_uint(),
-        (Uint8)projectiles.child("explosion").child("color").attribute("b").as_uint(),
-        (Uint8)255
+      const Color requested_color {
+        projectiles.child("explosion").child("color").attribute("r").as_uint(),
+        projectiles.child("explosion").child("color").attribute("g").as_uint(),
+        projectiles.child("explosion").child("color").attribute("b").as_uint(),
+        255u
       };
-      explosion_config.color_ = Colors::getNearestColor(requested_color);
+      explosion_config.color_ = Palette::getNearestColor(requested_color);
     } else {
       logMessage("Warning! Explosion color not set. Using default color.");
     }

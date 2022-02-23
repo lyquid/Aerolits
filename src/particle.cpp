@@ -37,7 +37,7 @@ void ktp::Particle::init(const ParticleData& data) {
   //                           data.position_.y - data.current_size_ * 0.5f};
 }
 
-SDL_Color ktp::Particle::interpolate2Colors(const SDL_Color& start_color, const SDL_Color& end_color, float time_step) {
+glm::vec4 ktp::Particle::interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step) {
   return {
     interpolateRange(start_color.r, end_color.r, time_step),
     interpolateRange(start_color.g, end_color.g, time_step),
@@ -46,7 +46,7 @@ SDL_Color ktp::Particle::interpolate2Colors(const SDL_Color& start_color, const 
   };
 }
 
-SDL_Color ktp::Particle::interpolate3Colors(const SDL_Color& start_color, const SDL_Color& mid_color, const SDL_Color& end_color, float time_step) {
+glm::vec4 ktp::Particle::interpolate3Colors(const glm::vec4& start_color, const glm::vec4& mid_color, const glm::vec4& end_color, float time_step) {
   return {
     interpolateRange3(start_color.r, mid_color.r, end_color.r, time_step),
     interpolateRange3(start_color.g, mid_color.g, end_color.g, time_step),
@@ -56,7 +56,7 @@ SDL_Color ktp::Particle::interpolate3Colors(const SDL_Color& start_color, const 
 }
 
 /* return true if the previously live particle gave up the ghost in that frame */
-bool ktp::Particle::update(glm::vec3& pos) {
+bool ktp::Particle::update(glm::vec3& pos, glm::vec4& color) {
   // time step increment to interpolate
   state_.live_.time_step_ += (1.f / state_.live_.start_life_);
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
@@ -73,8 +73,10 @@ bool ktp::Particle::update(glm::vec3& pos) {
   // color interpolation
   if (state_.live_.colors_.size() == 2) {
     state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
+    color = state_.live_.current_color_;
   } else if (state_.live_.colors_.size() > 2) {
     state_.live_.current_color_ = interpolate3Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.colors_[2], state_.live_.time_step_);
+    color = state_.live_.current_color_;
   }
   // rotation speed interpolation
   state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.end_rotation_speed_, state_.live_.time_step_);
@@ -99,7 +101,7 @@ bool ktp::Particle::update(glm::vec3& pos) {
 }
 
 /* return true if the previously live particle gave up the ghost in that frame */
-bool ktp::Particle::update(const Vortex& vortex, glm::vec3& pos) {
+bool ktp::Particle::update(const Vortex& vortex, glm::vec3& pos, glm::vec4& color) {
   // time step increment to interpolate
   state_.live_.time_step_ += (1.f / state_.live_.start_life_);
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
@@ -116,8 +118,10 @@ bool ktp::Particle::update(const Vortex& vortex, glm::vec3& pos) {
   // color interpolation
   if (state_.live_.colors_.size() == 2) {
     state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
+    color = state_.live_.current_color_;
   } else if (state_.live_.colors_.size() > 2) {
     state_.live_.current_color_ = interpolate3Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.colors_[2], state_.live_.time_step_);
+    color = state_.live_.current_color_;
   }
   // rotation speed interpolation
   state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.end_rotation_speed_, state_.live_.time_step_);

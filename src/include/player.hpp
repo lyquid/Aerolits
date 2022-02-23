@@ -29,8 +29,8 @@ class PlayerGraphicsComponent: public GraphicsComponent {
  private:
 
   void generateOpenGLStuff(float size);
-  
-  b2Color color_ {SDL2ColorToB2Color(ConfigParser::player_config.color_)};
+
+  Color color_ {ConfigParser::player_config.color_};
   VAO vao_ {};
   VBO vertices_ {};
   EBO vertices_indices_ {};

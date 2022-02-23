@@ -7,7 +7,7 @@
 /* GRAPHICS */
 
 ktp::PlayerGraphicsComponent::PlayerGraphicsComponent():
-  shader_(Resources::getShader("player")) {
+ shader_(Resources::getShader("player")) {
 
   generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
   exhaust_emitter_ = std::make_unique<EmitterGraphicsComponent>();

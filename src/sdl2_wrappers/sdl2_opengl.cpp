@@ -1,7 +1,6 @@
 #include "sdl2_log.hpp"
 #include "sdl2_opengl.hpp"
 #include "sdl2_window.hpp"
-#include "../include/box2d_utils.hpp"
 #include "../include/palette.hpp"
 #include <array>
 #include <fstream>
@@ -19,7 +18,7 @@ bool ktp::SDL2_GL::initGLEW(SDL2_GLContext& context, const SDL2_Window& window) 
     // glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     // glEnable(GL_CULL_FACE);
-    const auto clear_color {SDL2ColorToB2Color(Colors::black)};
+    const auto clear_color {Palette::black};
     glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
     // GLEW
     glewExperimental = GL_TRUE;

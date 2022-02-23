@@ -1,6 +1,8 @@
 #ifndef AEROLITS_SRC_INCLUDE_GRAPHICS_COMPONENT_HPP_
 #define AEROLITS_SRC_INCLUDE_GRAPHICS_COMPONENT_HPP_
 
+#include "palette.hpp"
+
 namespace ktp {
 
 class GameEntity;

@@ -8,7 +8,7 @@
 
 namespace ktp {
 
-using ColorsVector  = std::vector<SDL_Color>;
+using GLMColors     = std::vector<glm::vec4>;
 using FPointsVector = std::vector<SDL_FPoint>;
 using SizeVector    = std::vector<float>;
 
@@ -17,8 +17,8 @@ struct Vortex;
 struct ParticleData {
   unsigned int  start_life_ {};
   SDL_Rect      texture_rect_ {};
-  ColorsVector  colors_ {};
-  SDL_Color     current_color_ {};
+  GLMColors     colors_ {};
+  glm::vec4     current_color_ {};
   SizeVector    sizes_ {};
   float         current_size_ {};
   FPointsVector speeds_ {};
@@ -45,11 +45,11 @@ class Particle {
   void init(const ParticleData& data);
   bool inUse() const { return life_ > 0; }
   void setNext(Particle* next) { state_.next_ = next; }
-  bool update(glm::vec3& pos);
-  bool update(const Vortex& vortex, glm::vec3& pos);
+  bool update(glm::vec3& pos, glm::vec4& color);
+  bool update(const Vortex& vortex, glm::vec3& pos, glm::vec4& color);
 
-  inline static SDL_Color interpolate2Colors(const SDL_Color& start_color, const SDL_Color& end_color, float time_step);
-  inline static SDL_Color interpolate3Colors(const SDL_Color& start_color, const SDL_Color& mid_color, const SDL_Color& end_color, float time_step);
+  inline static glm::vec4 interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step);
+  inline static glm::vec4 interpolate3Colors(const glm::vec4& start_color, const glm::vec4& mid_color, const glm::vec4& end_color, float time_step);
 
   template<typename T>
   inline static T interpolateRange(T start, T end, T time_step) { return start + (end - start) * time_step; }

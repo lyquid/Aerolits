@@ -1,11 +1,10 @@
 #include "event.hpp"
 #include "gui_system.hpp"
-#include "../include/palette.hpp"
 #include "../include/resources.hpp"
 
 kuge::GUIStringImpl::GUIStringImpl(const GUIStringConfig& config) {
   config_ = config;
-  texture_ = ktp::Resources::loadTextureFromTextBlended(config_.name_, config_.text_, config_.font_, config_.color_);
+  texture_ = ktp::Resources::loadTextureFromTextBlended(config_.name_, config_.text_, config_.font_, ktp::Palette::colorToSDL2Color(config_.color_));
   shader_ = ktp::Resources::getShader(config_.shader_);
   vao_.bind();
   vbo_.setup(config_.vertices_);
@@ -24,7 +23,7 @@ void kuge::GUIStringImpl::draw() const {
 
 void kuge::GUIStringImpl::updateTexture(const std::string& text) {
   config_.text_ = text;
-  texture_ = ktp::Resources::loadTextureFromTextBlended(config_.name_, config_.text_, config_.font_, config_.color_);
+  texture_ = ktp::Resources::loadTextureFromTextBlended(config_.name_, config_.text_, config_.font_, ktp::Palette::colorToSDL2Color(config_.color_));
 }
 
 kuge::GUISystem& kuge::GUISystem::operator=(GUISystem&& other) noexcept {
@@ -58,7 +57,7 @@ void kuge::GUISystem::init() {
   /* TITLE TEXT */
   config.name_   = "title";
   config.text_   = kTitleText_;
-  config.color_  = ktp::Colors::white;
+  config.color_  = ktp::Palette::white;
   config.font_   = "future";
   config.shader_ = "gui_string";
   config.vertices_ = {
@@ -81,7 +80,7 @@ void kuge::GUISystem::init() {
   /* DEMO MODE TEXT */
   config.name_   = "demo";
   config.text_   = kDemoModeText_;
-  config.color_  = ktp::Colors::white;
+  config.color_  = ktp::Palette::white;
   config.font_   = "future";
   config.shader_ = "gui_string";
   config.vertices_ = {
@@ -94,7 +93,7 @@ void kuge::GUISystem::init() {
   /* PAUSED TEXT */
   config.name_   = "paused";
   config.text_   = kPausedText_;
-  config.color_  = ktp::Colors::white;
+  config.color_  = ktp::Palette::white;
   config.font_   = "future";
   config.shader_ = "gui_string";
   config.vertices_ = {
@@ -107,7 +106,7 @@ void kuge::GUISystem::init() {
   /* SCORE TEXT */
   config.name_   = "score";
   config.text_   = kScoreText_;
-  config.color_  = ktp::Colors::white;
+  config.color_  = ktp::Palette::white;
   config.font_   = "future";
   config.shader_ = "gui_string";
   config.vertices_ = {

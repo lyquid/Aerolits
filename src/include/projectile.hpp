@@ -17,11 +17,11 @@ class GameEntity;
 class ProjectileGraphicsComponent: public GraphicsComponent {
   friend class ProjectilePhysicsComponent;
  public:
-  ProjectileGraphicsComponent() noexcept;
+  ProjectileGraphicsComponent();
   virtual void update(const GameEntity& projectile) override;
  private:
   void generateOpenGLStuff(float size);
-  b2Color color_ {SDL2ColorToB2Color(ConfigParser::projectiles_config.color_)};
+  Color color_ {ConfigParser::projectiles_config.color_};
   // std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
   VAO vao_ {};
   VBO vertices_ {};

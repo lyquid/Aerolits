@@ -73,7 +73,7 @@ void ktp::BackgroundPhysicsComponent::generateStars() {
         if (graphics_->stars().size() % 2 == 0 && graphics_->stars().size() % 3 == 0) {
           star.color_ = graphics_->starColors().data()[distribution_colors(generator)];
         } else {
-          star.color_ = Colors::white;
+          star.color_ = Palette::white;
         }
         graphics_->stars().push_back(std::move(star));
       }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "graphics_component.hpp"
-#include "palette.hpp"
 #include "physics_component.hpp"
 #include <SDL.h>
 #include <array>
@@ -16,7 +15,7 @@ class GameEntity;
 class SDL2_Renderer;
 
 struct Star {
-  SDL_Color  color_{};
+  Color      color_{};
   SDL_FPoint delta_{};
   SDL_FPoint position_{};
 };
@@ -28,10 +27,10 @@ class BackgroundGraphicsComponent: public GraphicsComponent {
   virtual void update(const GameEntity& background) override;
  private:
   static inline SDL_Rect shapeToRect(const FPointsVector& render_shape);
-  static constexpr SDL_Color kBackgroundColor_ {Colors::black};
+  Color kBackgroundColor_ {Palette::black};
   std::vector<Star> stars_ {};
-  const std::array<SDL_Color, 4> star_colors_ {Colors::purple,    Colors::copper_green,
-                                               Colors::turquoise, Colors::yellow};
+  const std::array<Color, 4> star_colors_ {Palette::purple,    Palette::copper_green,
+                                           Palette::turquoise, Palette::yellow};
 };
 
 class BackgroundPhysicsComponent: public PhysicsComponent {

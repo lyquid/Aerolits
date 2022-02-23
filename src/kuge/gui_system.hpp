@@ -3,6 +3,7 @@
 
 #include "system.hpp"
 #include "../include/opengl.hpp"
+#include "../include/palette.hpp"
 
 namespace kuge {
 
@@ -14,7 +15,7 @@ struct GUIStringConfig {
   // The font to use.
   std::string font_ {};
   // The color for the font.
-  SDL_Color color_ {};
+  ktp::Color color_ {};
   // The shader to use.
   std::string shader_ {};
   ktp::GLfloatVector vertices_;
