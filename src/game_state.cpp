@@ -25,10 +25,11 @@ void ktp::GameState::setWindowTitle(Game& game) {
     + " | Frame time: " + std::to_string((int)(game.frame_time_ * 1000)) + "ms."
     + " | b2Bodies: " + std::to_string(game.world_.GetBodyCount())
     + " | Entities: " + std::to_string(GameEntity::count()) + '/' + std::to_string(GameEntity::game_entities_.capacity())
-    + " (Player: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Player) + GameEntity::entitiesCount(EntityTypes::PlayerDemo))
-    + " Aerolites: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Aerolite))
+    + " (Player: "     + std::to_string(GameEntity::entitiesCount(EntityTypes::Player) + GameEntity::entitiesCount(EntityTypes::PlayerDemo))
+    + " Aerolites: "   + std::to_string(GameEntity::entitiesCount(EntityTypes::Aerolite))
     + " Projectiles: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Projectile))
-    + " Explosions: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Explosion)) + ')'
+    + " Emitters: "    + std::to_string(GameEntity::entitiesCount(EntityTypes::Emitter))
+    + " Explosions: "  + std::to_string(GameEntity::entitiesCount(EntityTypes::Explosion)) + ')'
   );
 }
 
@@ -285,7 +286,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
       }
     }
   }
-  if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 0) AerolitePhysicsComponent::spawnMovingAerolite();
+  if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnMovingAerolite();
 
   game.event_bus_.processEvents();
 }

@@ -3,6 +3,7 @@
 #include "config_parser.hpp"
 #include "graphics_component.hpp"
 #include "physics_component.hpp"
+#include "resources.hpp"
 #include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include "../sdl2_wrappers/sdl2_timer.hpp"
 #include <utility> // std::move
@@ -10,11 +11,7 @@
 
 namespace ktp {
 
-using FPointsVector = std::vector<SDL_FPoint>;
-using B2Vec2Vector  = std::vector<b2Vec2>;
-
 class EmitterPhysicsComponent;
-class GameEntity;
 
 class PlayerGraphicsComponent: public GraphicsComponent {
 
@@ -33,7 +30,7 @@ class PlayerGraphicsComponent: public GraphicsComponent {
   VAO vao_ {};
   VBO vertices_ {};
   EBO vertices_indices_ {};
-  ShaderProgram shader_;
+  ShaderProgram shader_ {Resources::getShader("player")};
   glm::mat4 mvp_ {};
 };
 
@@ -60,11 +57,14 @@ class PlayerPhysicsComponent: public PhysicsComponent {
 
  public:
 
-  PlayerPhysicsComponent(GameEntity* owner, PlayerGraphicsComponent* graphics) noexcept;
+  PlayerPhysicsComponent(GameEntity* owner, PlayerGraphicsComponent* graphics);
   PlayerPhysicsComponent(const PlayerPhysicsComponent& other) = delete;
   PlayerPhysicsComponent(PlayerPhysicsComponent&& other) { *this = std::move(other); }
+  ~PlayerPhysicsComponent();
+
   PlayerPhysicsComponent& operator=(const PlayerPhysicsComponent& other) = delete;
-  PlayerPhysicsComponent& operator=(PlayerPhysicsComponent&& other) noexcept;
+  PlayerPhysicsComponent& operator=(PlayerPhysicsComponent&& other);
+
   virtual void collide(const GameEntity* other) override {}
   virtual void update(const GameEntity& player, float delta_time) override;
 

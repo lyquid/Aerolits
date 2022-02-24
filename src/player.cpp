@@ -2,12 +2,10 @@
 #include "include/emitter.hpp"
 #include "include/game_entity.hpp"
 #include "include/player.hpp"
-#include "include/resources.hpp"
 
 /* GRAPHICS */
 
-ktp::PlayerGraphicsComponent::PlayerGraphicsComponent():
- shader_(Resources::getShader("player")) {
+ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() {
   generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
 }
 
@@ -84,8 +82,7 @@ void ktp::PlayerInputComponent::update(GameEntity& player, float delta_time) {
 
 /* PHYSICS */
 
-ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner, PlayerGraphicsComponent* graphics) noexcept:
- graphics_(graphics) {
+ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner, PlayerGraphicsComponent* graphics): graphics_(graphics) {
   owner_ = owner;
   size_ = ConfigParser::player_config.size_;
   setBox2D();
@@ -97,7 +94,9 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner, PlayerGra
   exhaust_emitter_->setAngle(body_->GetAngle() + b2_pi);
 }
 
-ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) noexcept {
+ktp::PlayerPhysicsComponent::~PlayerPhysicsComponent() { exhaust_emitter_->owner()->deactivate(); }
+
+ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) {
   if (this != &other) {
     // inherited members
     body_     = other.body_;
@@ -185,7 +184,6 @@ void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_t
     (body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
     (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_
   });
-  exhaust_emitter_->update(player, delta_time);
   if (thrusting_) exhaust_emitter_->generateParticles();
 }
 

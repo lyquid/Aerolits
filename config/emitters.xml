@@ -118,7 +118,7 @@
     <maxParticleLife value="5" randMin="0.8" randMax="1"/>
 
     <colors>
-      <color r="255" g="50" b="5"   a="200"/>
+      <color r="255" g="0" b="5"   a="200"/>
       <color r="128" g="128"   b="128"   a="50"/>
     </colors>
 

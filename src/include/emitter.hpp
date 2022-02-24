@@ -14,8 +14,6 @@
 
 namespace ktp {
 
-class GameEntity;
-
 struct Vortex {
   SDL_FPoint position_ {};
   float scale_ {};
@@ -103,7 +101,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
 
  private:
 
-  void inflatePool(); // maybe static?
+  void inflatePool();
   void setType(const std::string& type);
   void setupOpenGL();
   void updateMVP();

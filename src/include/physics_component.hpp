@@ -11,9 +11,11 @@
 
 namespace ktp {
 
-using B2Vec2Vector = std::vector<b2Vec2>;
+using FPointsVector = std::vector<SDL_FPoint>;
+using B2Vec2Vector  = std::vector<b2Vec2>;
 
 class Camera;
+class GameEntity;
 
 class PhysicsComponent {
 
