@@ -80,7 +80,7 @@ class PlayerPhysicsComponent: public PhysicsComponent {
   bool thrusting_ {false};
   float cos_ {};
   float sin_ {};
-  std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
+  EmitterPhysicsComponent* exhaust_emitter_ {nullptr};
 };
 
 } // namespace ktp

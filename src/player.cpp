@@ -92,14 +92,12 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner, PlayerGra
   owner_ = owner;
   size_ = ConfigParser::player_config.size_;
   setBox2D();
-  exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(
-    EmitterPhysicsComponent::makeEmitter(
-      graphics_->exhaust_emitter_.get(),
-      "fire",
-      {(body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
-       (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_}
-    )
-  );
+
+  exhaust_emitter_ = static_cast<EmitterPhysicsComponent*>(GameEntity::createEntity(EntityTypes::Emitter)->physics());
+  exhaust_emitter_->init("fire",
+    {(body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
+     (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_});
+  exhaust_emitter_->setAngle(body_->GetAngle() + b2_pi);
 }
 
 ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) noexcept {
@@ -115,7 +113,7 @@ ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysic
     thrusting_       = other.thrusting_;
     cos_             = other.cos_;
     sin_             = other.sin_;
-    exhaust_emitter_ = std::move(other.exhaust_emitter_);
+    exhaust_emitter_ = std::exchange(other.exhaust_emitter_, nullptr);
   }
   return *this;
 }
@@ -181,6 +179,7 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
 void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_time) {
   checkWrap();
   updateMVP();
+  // exhaust emitter stuff
   const auto good_angle {body_->GetAngle() + b2_pi};
   cos_ = SDL_cosf(good_angle);
   sin_ = SDL_sinf(good_angle);

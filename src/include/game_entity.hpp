@@ -22,6 +22,7 @@ enum class EntityTypes {
   Undefined,
   Aerolite,
   Background,
+  Emitter,
   Explosion,
   Player,
   PlayerDemo,
@@ -95,6 +96,10 @@ class GameEntity {
       case EntityTypes::Background:
         entity->graphics_ = std::make_unique<BackgroundGraphicsComponent>();
         entity->physics_  = std::make_unique<BackgroundPhysicsComponent>(entity, static_cast<BackgroundGraphicsComponent*>(entity->graphics_.get()));
+        break;
+      case EntityTypes::Emitter:
+        entity->graphics_ = std::make_unique<EmitterGraphicsComponent>();
+        entity->physics_  = std::make_unique<EmitterPhysicsComponent>(entity, static_cast<EmitterGraphicsComponent*>(entity->graphics_.get()));
         break;
       case EntityTypes::Explosion:
         entity->graphics_ = std::make_unique<ExplosionGraphicsComponent>();

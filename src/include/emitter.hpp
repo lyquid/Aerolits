@@ -82,38 +82,30 @@ class EmitterGraphicsComponent: public GraphicsComponent {
 class EmitterPhysicsComponent: public PhysicsComponent {
  public:
 
+  EmitterPhysicsComponent(GameEntity* owner, EmitterGraphicsComponent* graphics): graphics_(graphics) { owner_ = owner; }
   EmitterPhysicsComponent(const EmitterPhysicsComponent& other) = delete;
   EmitterPhysicsComponent(EmitterPhysicsComponent&& other) { *this = std::move(other); }
 
   EmitterPhysicsComponent& operator=(const EmitterPhysicsComponent& other) = delete;
   EmitterPhysicsComponent& operator=(EmitterPhysicsComponent&& other);
 
-  inline bool canBeDeleted() const { return lifeTimeOver() && !alive_particles_count_; }
+  bool aliveParticles() const { return alive_particles_count_ != 0u; }
+  auto aliveParticlesCount() const { return alive_particles_count_; }
+  bool canBeDeleted() const { return lifeTimeOver() && !alive_particles_count_; }
   virtual void collide(const GameEntity* other) override {}
   void generateParticles();
-  inline auto getAliveParticlesCount() const { return alive_particles_count_; }
-  inline SDL_FPoint getPosition() const { return position_; }
-  inline bool lifeTimeOver() const { return SDL2_Timer::SDL2Ticks() - start_time_ >= data_->life_time_; }
-  /**
-   * @brief Factory function for emitters.
-   * @param graphics A pointer to an EmitterGraphicsComponent.
-   * @param type The type of the emitter desired.
-   * @param pos Where should spawn the emitter.
-   * @return A brand new EmitterPhysicsComponent to play with.
-   */
-  static EmitterPhysicsComponent makeEmitter(EmitterGraphicsComponent* graphics, const std::string& type, const SDL_FPoint& pos);
-  inline bool particlesAlive() const { return alive_particles_count_ != 0u; }
-  inline void setAngle(float angle) { angle_ = angle; }
-  inline void setPosition(const SDL_FPoint& pos) { position_ = pos; }
-  void setType(const std::string& type);
-  void setupOpenGL();
+  SDL_FPoint getPosition() const { return position_; }
+  void init(const std::string& type, const SDL_FPoint& pos);
+  bool lifeTimeOver() const { return SDL2_Timer::SDL2Ticks() - start_time_ >= data_->life_time_; }
+  void setAngle(float angle) { angle_ = angle; }
+  void setPosition(const SDL_FPoint& pos) { position_ = pos; }
   virtual void update(const GameEntity& emitter, float delta_time) override;
 
  private:
 
-  EmitterPhysicsComponent(EmitterGraphicsComponent* graphics): graphics_(graphics) {}
-
   void inflatePool(); // maybe static?
+  void setType(const std::string& type);
+  void setupOpenGL();
   void updateMVP();
 
   float                     angle_ {};

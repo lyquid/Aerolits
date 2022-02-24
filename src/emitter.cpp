@@ -148,13 +148,11 @@ void ktp::EmitterPhysicsComponent::inflatePool() {
   graphics_->particles_pool_[graphics_->particles_pool_size_ - 1].setNext(nullptr);
 }
 
-ktp::EmitterPhysicsComponent ktp::EmitterPhysicsComponent::makeEmitter(EmitterGraphicsComponent* graphics, const std::string& type, const SDL_FPoint& pos) {
-  EmitterPhysicsComponent emitter {graphics};
-  emitter.setType(type);
-  emitter.inflatePool();
-  emitter.setupOpenGL();
-  emitter.position_ = pos;
-  return emitter;
+void ktp::EmitterPhysicsComponent::init(const std::string& type, const SDL_FPoint& pos) {
+  setType(type);
+  inflatePool();
+  setupOpenGL();
+  position_ = pos;
 }
 
 void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
