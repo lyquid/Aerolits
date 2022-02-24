@@ -7,7 +7,7 @@
 /* GRAPHICS */
 
 ktp::EmitterGraphicsComponent::EmitterGraphicsComponent() {
-  const float size {80.f};
+  const float size {10.f};
   vertices_data_ = {                      // uv
      0.5f * size,  0.5f * size, 0.f,      1.f, 1.f, // top right      0
     -0.5f * size,  0.5f * size, 0.f,      0.f, 1.f, // top left       1

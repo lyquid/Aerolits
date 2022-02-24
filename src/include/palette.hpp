@@ -87,7 +87,7 @@ inline auto getNearestColor(const Color& color) {
 }
 
 inline glm::vec4 colorToGlmVec4(const Color& color) {
-  return {color.r, color.r, color.b, color.a};
+  return {color.r, color.g, color.b, color.a};
 }
 
 inline void colorToSDL2Color(const Color& color, SDL_Color& sdl_color) {
