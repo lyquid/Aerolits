@@ -13,7 +13,6 @@ namespace ktp {
 using FPointsVector = std::vector<SDL_FPoint>;
 using B2Vec2Vector  = std::vector<b2Vec2>;
 
-class EmitterGraphicsComponent;
 class EmitterPhysicsComponent;
 class GameEntity;
 
@@ -36,7 +35,6 @@ class PlayerGraphicsComponent: public GraphicsComponent {
   EBO vertices_indices_ {};
   ShaderProgram shader_;
   glm::mat4 mvp_ {};
-  std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
 };
 
 class DemoInputComponent: public InputComponent {

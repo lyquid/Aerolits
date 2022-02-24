@@ -10,7 +10,6 @@ namespace ktp {
 
 using B2Vec2Vector = std::vector<b2Vec2>;
 
-class EmitterGraphicsComponent;
 class EmitterPhysicsComponent;
 class GameEntity;
 
@@ -22,7 +21,6 @@ class ProjectileGraphicsComponent: public GraphicsComponent {
  private:
   void generateOpenGLStuff(float size);
   Color color_ {ConfigParser::projectiles_config.color_};
-  // std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
   VAO vao_ {};
   VBO vertices_ {};
   EBO vertices_indices_ {};
@@ -53,7 +51,7 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
   bool armed_ {false};
   unsigned int arm_time_ {ConfigParser::projectiles_config.arm_time_};
   bool detonated_ {false};
-  // std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
+  // EmitterPhysicsComponent* exhaust_emitter_ {nullptr};
   ExplosionPhysicsComponent* explosion_ {nullptr};
   unsigned int fired_time_ {};
   ProjectileGraphicsComponent* graphics_ {nullptr};

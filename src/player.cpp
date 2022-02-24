@@ -8,9 +8,7 @@
 
 ktp::PlayerGraphicsComponent::PlayerGraphicsComponent():
  shader_(Resources::getShader("player")) {
-
   generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
-  exhaust_emitter_ = std::make_unique<EmitterGraphicsComponent>();
 }
 
 void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {
@@ -40,7 +38,6 @@ void ktp::PlayerGraphicsComponent::update(const GameEntity& player) {
   shader_.setMat4f("mvp", glm::value_ptr(mvp_));
   vao_.bind();
   glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // 9 is the number of indices
-  exhaust_emitter_->update(player); // this is WROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONGGGG need to make emitter a gameentity
 }
 
 /* DEMO INPUT */
