@@ -59,7 +59,8 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
   exhaust_emitter_ = static_cast<EmitterPhysicsComponent*>(GameEntity::createEntity(EntityTypes::Emitter)->physics());
   exhaust_emitter_->init("projectile_exhaust",
     {(body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
-     (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_});
+     (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_,
+     0.f});
   exhaust_emitter_->setAngle(body_->GetAngle() + b2_pi);
 
   fired_time_ = Game::gameplay_timer_.milliseconds();
@@ -160,7 +161,8 @@ void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float
   exhaust_emitter_->setAngle(angle + b2_pi);
   exhaust_emitter_->setPosition({
     (body_->GetPosition().x * kMetersToPixels) - size_ * kMetersToPixels * sin_,
-    (body_->GetPosition().y * kMetersToPixels) + size_ * kMetersToPixels * cos_
+    (body_->GetPosition().y * kMetersToPixels) + size_ * kMetersToPixels * cos_,
+    0.f
   });
   if (armed_) exhaust_emitter_->generateParticles();
 }

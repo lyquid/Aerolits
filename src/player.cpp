@@ -90,7 +90,8 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner, PlayerGra
   exhaust_emitter_ = static_cast<EmitterPhysicsComponent*>(GameEntity::createEntity(EntityTypes::Emitter)->physics());
   exhaust_emitter_->init("fire",
     {(body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
-     (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_});
+     (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_,
+     0.f});
   exhaust_emitter_->setAngle(body_->GetAngle() + b2_pi);
 }
 
@@ -182,7 +183,8 @@ void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_t
   exhaust_emitter_->setAngle(good_angle);
   exhaust_emitter_->setPosition({
     (body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
-    (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_
+    (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_,
+    0.f
   });
   if (thrusting_) exhaust_emitter_->generateParticles();
 }

@@ -15,7 +15,7 @@
 namespace ktp {
 
 struct Vortex {
-  SDL_FPoint position_ {};
+  glm::vec3 position_ {};
   float scale_ {};
   float speed_ {};
 };
@@ -92,11 +92,11 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   bool canBeDeleted() const { return lifeTimeOver() && !alive_particles_count_; }
   virtual void collide(const GameEntity* other) override {}
   void generateParticles();
-  SDL_FPoint getPosition() const { return position_; }
-  void init(const std::string& type, const SDL_FPoint& pos);
+  auto getPosition() const { return position_; }
+  void init(const std::string& type, const glm::vec3& pos);
   bool lifeTimeOver() const { return SDL2_Timer::SDL2Ticks() - start_time_ >= data_->life_time_; }
   void setAngle(float angle) { angle_ = angle; }
-  void setPosition(const SDL_FPoint& pos) { position_ = pos; }
+  void setPosition(const glm::vec3& pos) { position_ = pos; }
   virtual void update(const GameEntity& emitter, float delta_time) override;
 
  private:
@@ -112,7 +112,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   Particle*                 first_available_ {nullptr};
   EmitterGraphicsComponent* graphics_ {nullptr};
   Uint32                    interval_time_ {};
-  SDL_FPoint                position_ {0, 0};
+  glm::vec3                 position_ {0.f, 0.f, 0.f};
   Uint32                    start_time_ {SDL2_Timer::SDL2Ticks()};
   std::vector<glm::vec3>    translations_data_ {};
   GLMColors                 colors_data_ {};

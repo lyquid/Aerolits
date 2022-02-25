@@ -27,7 +27,7 @@ struct ParticleData {
   float         start_rotation_speed_ {};
   float         current_rotation_speed_ {};
   float         end_rotation_speed_ {};
-  SDL_FPoint    position_ {};
+  glm::vec3     position_ {};
   float         time_step_ {};
 };
 

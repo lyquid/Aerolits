@@ -68,7 +68,7 @@ ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhy
     first_available_       = std::exchange(other.first_available_, nullptr);
     graphics_              = std::exchange(other.graphics_, nullptr);
     interval_time_         = other.interval_time_;
-    position_              = other.position_;
+    position_              = std::move(other.position_);
     start_time_            = other.start_time_;
     translations_data_     = std::move(other.translations_data_);
     colors_data_           = std::move(other.colors_data_);
@@ -149,7 +149,7 @@ void ktp::EmitterPhysicsComponent::inflatePool() {
   graphics_->particles_pool_[graphics_->particles_pool_size_ - 1].setNext(nullptr);
 }
 
-void ktp::EmitterPhysicsComponent::init(const std::string& type, const SDL_FPoint& pos) {
+void ktp::EmitterPhysicsComponent::init(const std::string& type, const glm::vec3& pos) {
   setType(type);
   inflatePool();
   setupOpenGL();
@@ -211,7 +211,6 @@ void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta
       }
     } else {
       // the particle is dead
-      // ojuuu with this, ugly!!
       translations_data_[i] = {0.f, 0.f, -1.f};
       colors_data_[i] = {0, 0, 0, 0};
     }
