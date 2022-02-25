@@ -3,6 +3,7 @@
 #include "include/game_entity.hpp"
 #include "include/random.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
+#include <algorithm> // std::sort
 
 /* GRAPHICS */
 
@@ -189,23 +190,35 @@ void ktp::EmitterPhysicsComponent::setupOpenGL() {
 
 void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta_time) {
   for (auto i = 0u; i < graphics_->particles_pool_size_; ++i) {
-    if (data_->vortex_) {
-      if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_}, translations_data_[i], colors_data_[i])) {
-        graphics_->particles_pool_[i].setNext(first_available_);
-        first_available_ = &graphics_->particles_pool_[i];
-        --alive_particles_count_;
-        graphics_->alive_particles_count_ = alive_particles_count_;
+    if (graphics_->particles_pool_[i].inUse()) {
+      // particle alive!
+      if (data_->vortex_) {
+        if (graphics_->particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_}, translations_data_[i], colors_data_[i])) {
+          // particle is no more
+          graphics_->particles_pool_[i].setNext(first_available_);
+          first_available_ = &graphics_->particles_pool_[i];
+          --alive_particles_count_;
+          graphics_->alive_particles_count_ = alive_particles_count_;
+        }
+      } else { // no vortex
+        if (graphics_->particles_pool_[i].update(translations_data_[i], colors_data_[i])) {
+          // particle is no more
+          graphics_->particles_pool_[i].setNext(first_available_);
+          first_available_ = &graphics_->particles_pool_[i];
+          --alive_particles_count_;
+          graphics_->alive_particles_count_ = alive_particles_count_;
+        }
       }
-    } else { // no vortex
-      if (graphics_->particles_pool_[i].inUse() && graphics_->particles_pool_[i].update(translations_data_[i], colors_data_[i])) {
-        graphics_->particles_pool_[i].setNext(first_available_);
-        first_available_ = &graphics_->particles_pool_[i];
-        --alive_particles_count_;
-        graphics_->alive_particles_count_ = alive_particles_count_;
-      }
+    } else {
+      // the particle is dead
+      // ojuuu with this, ugly!!
+      translations_data_[i] = {0.f, 0.f, -1.f};
+      colors_data_[i] = {0, 0, 0, 0};
     }
   }
+  std::sort(translations_data_.begin(), translations_data_.end(), [](const auto& a, const auto& b){return a.z > b.z;});
   graphics_->translations_.setupSubData(translations_data_.data(), translations_data_.size() * sizeof(glm::vec3));
+  std::sort(colors_data_.begin(), colors_data_.end(), [](const auto& a, const auto& b){return a.a > b.a;});
   graphics_->colors_.setupSubData(colors_data_.data(), colors_data_.size() * sizeof(glm::vec4));
   updateMVP();
 }
