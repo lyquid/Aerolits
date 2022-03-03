@@ -56,7 +56,7 @@ glm::vec4 ktp::Particle::interpolate3Colors(const glm::vec4& start_color, const 
 }
 
 /* return true if the previously live particle gave up the ghost in that frame */
-bool ktp::Particle::update(glm::vec3& pos, glm::vec4& color) {
+bool ktp::Particle::update(GLfloat* subdata) {
   // time step increment to interpolate
   state_.live_.time_step_ += (1.f / state_.live_.start_life_);
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
@@ -69,11 +69,13 @@ bool ktp::Particle::update(glm::vec3& pos, glm::vec4& color) {
   // color interpolation
   if (state_.live_.colors_.size() == 2) {
     state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
-    color = state_.live_.current_color_;
   } else if (state_.live_.colors_.size() > 2) {
     state_.live_.current_color_ = interpolate3Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.colors_[2], state_.live_.time_step_);
-    color = state_.live_.current_color_;
   }
+  subdata[3] = state_.live_.current_color_.r;
+  subdata[4] = state_.live_.current_color_.g;
+  subdata[5] = state_.live_.current_color_.b;
+  subdata[6] = state_.live_.current_color_.a;
   // rotation speed interpolation
   state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.end_rotation_speed_, state_.live_.time_step_);
   state_.live_.rotation_ += state_.live_.current_rotation_speed_;
@@ -89,16 +91,16 @@ bool ktp::Particle::update(glm::vec3& pos, glm::vec4& color) {
   state_.live_.position_.x += state_.live_.current_speed_.x;
   state_.live_.position_.y += state_.live_.current_speed_.y;
   // translation update
-  pos.x = state_.live_.position_.x;
-  pos.y = state_.live_.position_.y;
-  pos.z = 0.f;
+  subdata[0] = state_.live_.position_.x;
+  subdata[1] = state_.live_.position_.y;
+  subdata[2] = 0.f;
 
   --life_;
   return life_ == 0;
 }
 
 /* return true if the previously live particle gave up the ghost in that frame */
-bool ktp::Particle::update(const Vortex& vortex, glm::vec3& pos, glm::vec4& color) {
+bool ktp::Particle::update(const Vortex& vortex, GLfloat* subdata) {
   // time step increment to interpolate
   state_.live_.time_step_ += (1.f / state_.live_.start_life_);
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
@@ -111,11 +113,13 @@ bool ktp::Particle::update(const Vortex& vortex, glm::vec3& pos, glm::vec4& colo
   // color interpolation
   if (state_.live_.colors_.size() == 2) {
     state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
-    color = state_.live_.current_color_;
   } else if (state_.live_.colors_.size() > 2) {
     state_.live_.current_color_ = interpolate3Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.colors_[2], state_.live_.time_step_);
-    color = state_.live_.current_color_;
   }
+  subdata[3] = state_.live_.current_color_.r;
+  subdata[4] = state_.live_.current_color_.g;
+  subdata[5] = state_.live_.current_color_.b;
+  subdata[6] = state_.live_.current_color_.a;
   // rotation speed interpolation
   state_.live_.current_rotation_speed_ = interpolateRange(state_.live_.start_rotation_speed_, state_.live_.end_rotation_speed_, state_.live_.time_step_);
   state_.live_.rotation_ += state_.live_.current_rotation_speed_;
@@ -139,9 +143,9 @@ bool ktp::Particle::update(const Vortex& vortex, glm::vec3& pos, glm::vec4& colo
   state_.live_.position_.x += (vx - state_.live_.current_speed_.x) * factor;
   state_.live_.position_.y += (vy - state_.live_.current_speed_.y) * factor;
   // translation update
-  pos.x = state_.live_.position_.x;
-  pos.y = state_.live_.position_.y;
-  pos.z = 0.f;
+  subdata[0] = state_.live_.position_.x;
+  subdata[1] = state_.live_.position_.y;
+  subdata[2] = 0.f;
 
   --life_;
   return life_ == 0;

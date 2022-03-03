@@ -46,8 +46,8 @@ class Particle {
   void init(const ParticleData& data);
   bool inUse() const { return life_ > 0; }
   void setNext(Particle* next) { state_.next_ = next; }
-  bool update(glm::vec3& pos, glm::vec4& color);
-  bool update(const Vortex& vortex, glm::vec3& pos, glm::vec4& color);
+  bool update(GLfloat* subdata);
+  bool update(const Vortex& vortex, GLfloat* subdata);
 
   inline static glm::vec4 interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step);
   inline static glm::vec4 interpolate3Colors(const glm::vec4& start_color, const glm::vec4& mid_color, const glm::vec4& end_color, float time_step);

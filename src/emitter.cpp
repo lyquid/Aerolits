@@ -28,14 +28,12 @@ ktp::EmitterGraphicsComponent& ktp::EmitterGraphicsComponent::operator=(EmitterG
     blend_mode_            = other.blend_mode_;
     particles_pool_        = std::exchange(other.particles_pool_, nullptr);
     particles_pool_size_   = other.particles_pool_size_;
-    alive_particles_count_ = other.alive_particles_count_;
     vao_                   = std::move(other.vao_);
     vertices_              = std::move(other.vertices_);
     vertices_data_         = std::move(other.vertices_data_);
     indices_               = std::move(other.indices_);
     indices_data_          = std::move(other.indices_data_);
-    translations_          = std::move(other.translations_);
-    colors_                = std::move(other.colors_);
+    subdata_               = std::move(other.subdata_);
     mvp_                   = std::move(other.mvp_);
     shader_                = std::move(other.shader_);
     texture_               = std::move(other.texture_);
@@ -69,8 +67,7 @@ ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhy
     interval_time_         = other.interval_time_;
     position_              = std::move(other.position_);
     start_time_            = other.start_time_;
-    translations_data_     = std::move(other.translations_data_);
-    colors_data_           = std::move(other.colors_data_);
+    subdata_               = std::move(other.subdata_);
   }
   return *this;
 }
@@ -129,7 +126,6 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
     first_available_ = new_particle->getNext();
     new_particle->init(new_data);
     ++alive_particles_count_;
-    graphics_->alive_particles_count_ = alive_particles_count_;
 
     if (first_available_ == nullptr) return;
   }
@@ -175,15 +171,14 @@ void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
 
 void ktp::EmitterPhysicsComponent::setupOpenGL() {
   graphics_->vao_.bind();
-  // translations
-  translations_data_.resize(graphics_->particles_pool_size_);
-  graphics_->translations_.setup(nullptr, graphics_->particles_pool_size_ * sizeof(glm::vec3), GL_STREAM_DRAW);
-  graphics_->vao_.linkAttrib(graphics_->translations_, 2, 3, GL_FLOAT, 0, nullptr);
+  // subdata: translations(3), colors(4)
+  subdata_.resize(graphics_->particles_pool_size_ * kComponents);
+  graphics_->subdata_.setup(nullptr, subdata_.size() * sizeof(GLfloat), GL_STREAM_DRAW);
+  // subdata translations
+  graphics_->vao_.linkAttrib(graphics_->subdata_, 2, 3, GL_FLOAT, kComponents * sizeof(GLfloat), nullptr);
   glVertexAttribDivisor(2, 1);
-  // colors
-  colors_data_.resize(graphics_->particles_pool_size_);
-  graphics_->colors_.setup(nullptr, graphics_->particles_pool_size_ * sizeof(glm::vec4), GL_STREAM_DRAW);
-  graphics_->vao_.linkAttrib(graphics_->colors_, 3, 4, GL_FLOAT, 0, nullptr);
+  // subdata colors
+  graphics_->vao_.linkAttrib(graphics_->subdata_, 3, 4, GL_FLOAT, kComponents * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
   glVertexAttribDivisor(3, 1);
 }
 
@@ -192,28 +187,29 @@ void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta
     if (graphics_->particles_pool_[i].inUse()) {
       // particle alive!
       if (data_->vortex_) {
-        if (graphics_->particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_}, translations_data_[i], colors_data_[i])) {
-          // particle is no more
-          translations_data_[i] = {0.f, 0.f, 1.f};
+        if (graphics_->particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_}, &subdata_[i * kComponents])) {
+          // particle is no more, so we change the Z axis to 1
+          subdata_[i * kComponents + 0] = 0.f;
+          subdata_[i * kComponents + 1] = 0.f;
+          subdata_[i * kComponents + 2] = 1.f;
           graphics_->particles_pool_[i].setNext(first_available_);
           first_available_ = &graphics_->particles_pool_[i];
           --alive_particles_count_;
-          graphics_->alive_particles_count_ = alive_particles_count_;
         }
       } else { // no vortex
-        if (graphics_->particles_pool_[i].update(translations_data_[i], colors_data_[i])) {
-          // particle is no more
-          translations_data_[i] = {0.f, 0.f, 1.f};
+        if (graphics_->particles_pool_[i].update(&subdata_[i * kComponents])) {
+          // particle is no more, so we change the Z axis to 1
+          subdata_[i * kComponents + 0] = 0.f;
+          subdata_[i * kComponents + 1] = 0.f;
+          subdata_[i * kComponents + 2] = 1.f;
           graphics_->particles_pool_[i].setNext(first_available_);
           first_available_ = &graphics_->particles_pool_[i];
           --alive_particles_count_;
-          graphics_->alive_particles_count_ = alive_particles_count_;
         }
       }
     }
   }
-  graphics_->translations_.setupSubData(translations_data_.data(), translations_data_.size() * sizeof(glm::vec3));
-  graphics_->colors_.setupSubData(colors_data_.data(), colors_data_.size() * sizeof(glm::vec4));
+  graphics_->subdata_.setupSubData(subdata_.data(), subdata_.size() * sizeof(GLfloat));
   updateMVP();
 }
 

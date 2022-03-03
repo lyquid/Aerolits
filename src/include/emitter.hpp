@@ -63,15 +63,13 @@ class EmitterGraphicsComponent: public GraphicsComponent {
   SDL_BlendMode blend_mode_ {};
   Particle*     particles_pool_ {nullptr};
   unsigned int  particles_pool_size_ {};
-  unsigned int  alive_particles_count_ {};
   // opengl stuff
   VAO           vao_ {};
   VBO           vertices_ {};
   GLfloatVector vertices_data_ {};
   EBO           indices_ {};
   GLuintVector  indices_data_ { 0, 1, 2, 0, 2, 3 };
-  VBO           translations_ {};
-  VBO           colors_ {};
+  VBO           subdata_ {};
   glm::mat4     mvp_ {};
   ShaderProgram shader_ {Resources::getShader("particle")};
   Texture2D     texture_ {Resources::getTexture("particle_02")};
@@ -106,6 +104,12 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   void setupOpenGL();
   void updateMVP();
 
+  /**
+   * @brief The number of components per vertex of the subdata.
+   * Ie: xyz + rgba = 7.
+   */
+  static constexpr auto     kComponents {7u};
+
   float                     angle_ {};
   unsigned int              alive_particles_count_ {};
   const EmitterType*        data_ {nullptr};
@@ -114,8 +118,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   Uint32                    interval_time_ {};
   glm::vec3                 position_ {0.f, 0.f, 0.f};
   Uint32                    start_time_ {SDL2_Timer::SDL2Ticks()};
-  GLMPositions              translations_data_ {};
-  GLMColors                 colors_data_ {};
+  std::vector<GLfloat>      subdata_ {};
 };
 
 } // namespace ktp
