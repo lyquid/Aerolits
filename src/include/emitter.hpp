@@ -114,7 +114,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   Uint32                    interval_time_ {};
   glm::vec3                 position_ {0.f, 0.f, 0.f};
   Uint32                    start_time_ {SDL2_Timer::SDL2Ticks()};
-  std::vector<glm::vec3>    translations_data_ {};
+  GLMPositions              translations_data_ {};
   GLMColors                 colors_data_ {};
 };
 

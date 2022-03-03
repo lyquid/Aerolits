@@ -8,6 +8,7 @@
 
 namespace ktp {
 
+using GLMPositions  = std::vector<glm::vec3>;
 using GLMColors     = std::vector<glm::vec4>;
 using FPointsVector = std::vector<SDL_FPoint>;
 using SizeVector    = std::vector<float>;

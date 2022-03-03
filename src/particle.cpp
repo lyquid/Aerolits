@@ -34,7 +34,7 @@ void ktp::Particle::init(const ParticleData& data) {
   state_.live_ = data;
   // position is set to center the texture on the emitter
   // state_.live_.position_ = {data.position_.x - data.current_size_ * 0.5f,
-  //                           data.position_.y - data.current_size_ * 0.5f};
+  //                           data.position_.y - data.current_size_ * 0.5f, 0.f};
 }
 
 glm::vec4 ktp::Particle::interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step) {
@@ -61,15 +61,11 @@ bool ktp::Particle::update(glm::vec3& pos, glm::vec4& color) {
   state_.live_.time_step_ += (1.f / state_.live_.start_life_);
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
   // size interpolation
-  const float last_size {state_.live_.current_size_};
   if (state_.live_.sizes_.size() == 2) {
     state_.live_.current_size_ = interpolateRange(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.time_step_);
   } else if (state_.live_.sizes_.size() > 2) {
     state_.live_.current_size_ = interpolateRange3(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.sizes_[2], state_.live_.time_step_);
   }
-  // new position based on the new size
-  state_.live_.position_.x += ((last_size - state_.live_.current_size_) * 0.5f);
-  state_.live_.position_.y += ((last_size - state_.live_.current_size_) * 0.5f);
   // color interpolation
   if (state_.live_.colors_.size() == 2) {
     state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
@@ -95,6 +91,7 @@ bool ktp::Particle::update(glm::vec3& pos, glm::vec4& color) {
   // translation update
   pos.x = state_.live_.position_.x;
   pos.y = state_.live_.position_.y;
+  pos.z = 0.f;
 
   --life_;
   return life_ == 0;
@@ -106,15 +103,11 @@ bool ktp::Particle::update(const Vortex& vortex, glm::vec3& pos, glm::vec4& colo
   state_.live_.time_step_ += (1.f / state_.live_.start_life_);
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
   // size interpolation
-  const float last_size {state_.live_.current_size_};
   if (state_.live_.sizes_.size() == 2) {
     state_.live_.current_size_ = interpolateRange(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.time_step_);
   } else if (state_.live_.sizes_.size() > 2) {
     state_.live_.current_size_ = interpolateRange3(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.sizes_[2], state_.live_.time_step_);
   }
-  // new position based on the new size
-  state_.live_.position_.x += ((last_size - state_.live_.current_size_) * 0.5f);
-  state_.live_.position_.y += ((last_size - state_.live_.current_size_) * 0.5f);
   // color interpolation
   if (state_.live_.colors_.size() == 2) {
     state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
@@ -148,6 +141,7 @@ bool ktp::Particle::update(const Vortex& vortex, glm::vec3& pos, glm::vec4& colo
   // translation update
   pos.x = state_.live_.position_.x;
   pos.y = state_.live_.position_.y;
+  pos.z = 0.f;
 
   --life_;
   return life_ == 0;
