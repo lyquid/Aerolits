@@ -61,7 +61,7 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
     {(body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
      (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_,
      0.f});
-  exhaust_emitter_->setAngle(body_->GetAngle() + b2_pi);
+  exhaust_emitter_->setAngle(body_->GetAngle());
 
   fired_time_ = Game::gameplay_timer_.milliseconds();
 }
@@ -126,6 +126,7 @@ void ktp::ProjectilePhysicsComponent::setBox2D() {
 }
 
 void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float delta_time) {
+  // collisions
   if (collided_) {
     if (armed_) {
       detonate();
@@ -136,6 +137,7 @@ void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float
       collided_ = false;
     }
   }
+  // out of screen?
   const auto threshold {size_ * 1000.f};
   if (body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
       body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold) {
@@ -144,27 +146,28 @@ void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float
     explosion_->owner()->deactivate();
     return;
   }
-
+  // update sin & cos
   const auto angle {body_->GetAngle()};
   cos_ = SDL_cosf(angle);
   sin_ = SDL_sinf(angle);
-
+  // velocity
   if (Game::gameplay_timer_.milliseconds() - fired_time_ > arm_time_) {
     armed_ = true;
     delta_.x +=  sin_ * speed_ * delta_time;
     delta_.y += -cos_ * speed_ * delta_time;
     body_->ApplyLinearImpulseToCenter({delta_.x, delta_.y}, true);
   }
-
-  updateMVP();
-
-  exhaust_emitter_->setAngle(angle + b2_pi);
+  // exhaust emitter position and angle
+  exhaust_emitter_->setAngle(angle);
   exhaust_emitter_->setPosition({
     (body_->GetPosition().x * kMetersToPixels) - size_ * kMetersToPixels * sin_,
     (body_->GetPosition().y * kMetersToPixels) + size_ * kMetersToPixels * cos_,
     0.f
   });
+  // exhaust particles
   if (armed_) exhaust_emitter_->generateParticles();
+  // mvp
+  updateMVP();
 }
 
 void ktp::ProjectilePhysicsComponent::updateMVP() {

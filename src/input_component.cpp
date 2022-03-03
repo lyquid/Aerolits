@@ -62,7 +62,7 @@ void ktp::InputComponent::thrust(GameEntity& player, float delta_time) {
     physics_->delta_.y = max_delta_;
   }
 
-  // physics_->body_->ApplyLinearImpulseToCenter({physics_->delta_.x, physics_->delta_.y}, true);
+  physics_->body_->ApplyLinearImpulseToCenter({physics_->delta_.x, physics_->delta_.y}, true);
 
   physics_->thrusting_ = true;
 }
