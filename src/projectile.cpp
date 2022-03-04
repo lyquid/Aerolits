@@ -97,6 +97,13 @@ void ktp::ProjectilePhysicsComponent::detonate() {
   explosion_->detonate(Game::gameplay_timer_.milliseconds(), body_->GetPosition());
 }
 
+bool ktp::ProjectilePhysicsComponent::isOutOfScreen(float threshold) {
+  return (
+    body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
+    body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold
+  );
+}
+
 void ktp::ProjectilePhysicsComponent::setBox2D() {
   b2BodyDef body_def {};
   body_def.type = b2_dynamicBody;
@@ -137,10 +144,9 @@ void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float
       collided_ = false;
     }
   }
-  // out of screen?
+  // out of screen far away?
   const auto threshold {size_ * 1000.f};
-  if (body_->GetPosition().x < -threshold || body_->GetPosition().x > b2_screen_size_.x + threshold ||
-      body_->GetPosition().y < -threshold || body_->GetPosition().y > b2_screen_size_.y + threshold) {
+  if (isOutOfScreen(threshold)) {
     owner_->deactivate();
     exhaust_emitter_->owner()->deactivate();
     explosion_->owner()->deactivate();
@@ -164,8 +170,8 @@ void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float
     (body_->GetPosition().y * kMetersToPixels) + size_ * kMetersToPixels * cos_,
     0.f
   });
-  // exhaust particles
-  if (armed_) exhaust_emitter_->generateParticles();
+  // generate exhaust particles if armed and not out of screen
+  if (armed_ && !isOutOfScreen(size_ * 10.f)) exhaust_emitter_->generateParticles();
   // mvp
   updateMVP();
 }

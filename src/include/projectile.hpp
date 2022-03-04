@@ -50,6 +50,7 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
 
  private:
 
+  inline bool isOutOfScreen(float threshold = 0.f);
   void setBox2D();
   void updateMVP();
 
