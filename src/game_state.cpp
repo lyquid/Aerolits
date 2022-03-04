@@ -26,6 +26,7 @@ void ktp::GameState::setWindowTitle(Game& game) {
     + " | b2Bodies: " + std::to_string(game.world_.GetBodyCount())
     + " | Entities: " + std::to_string(GameEntity::count()) + '/' + std::to_string(GameEntity::game_entities_.capacity())
     + " (Player: "     + std::to_string(GameEntity::entitiesCount(EntityTypes::Player) + GameEntity::entitiesCount(EntityTypes::PlayerDemo))
+    + " Background: "  + std::to_string(GameEntity::entitiesCount(EntityTypes::Background))
     + " Aerolites: "   + std::to_string(GameEntity::entitiesCount(EntityTypes::Aerolite))
     + " Projectiles: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Projectile))
     + " Emitters: "    + std::to_string(GameEntity::entitiesCount(EntityTypes::Emitter))
@@ -403,12 +404,12 @@ void ktp::TestingState::update(Game& game, float delta_time) {
 void ktp::TitleState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-  //   if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Background) {
-  //     GameEntity::game_entities_[i].object_.draw(game.renderer_);
-  //     break;
-  //   }
-  // }
+  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+    if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Background) {
+      GameEntity::game_entities_[i].object_.draw();
+      break;
+    }
+  }
 
   game.gui_sys_.titleText()->draw();
 
@@ -419,7 +420,7 @@ void ktp::TitleState::draw(Game& game) {
 
 ktp::GameState* ktp::TitleState::enter(Game& game) {
   game.reset();
-  // GameEntity::createEntity(EntityTypes::Background);
+  GameEntity::createEntity(EntityTypes::Background);
   GameEntity::createEntity(EntityTypes::Player);
   demo_time_ = SDL2_Timer::SDL2Ticks();
   game.gui_sys_.resetScore();
@@ -469,7 +470,7 @@ void ktp::TitleState::update(Game& game, float delta_time) {
   setWindowTitle(game);
   // Background
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-    // GameEntity::game_entities_[i].object_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
+    GameEntity::game_entities_[i].object_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
   }
   // enter Demo mode
   if (SDL2_Timer::SDL2Ticks() - demo_time_ > kWaitForDemo_) {

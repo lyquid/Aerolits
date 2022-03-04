@@ -118,7 +118,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   Uint32                    interval_time_ {};
   glm::vec3                 position_ {0.f, 0.f, 0.f};
   Uint32                    start_time_ {SDL2_Timer::SDL2Ticks()};
-  std::vector<GLfloat>      subdata_ {};
+  GLfloatVector             subdata_ {};
 };
 
 } // namespace ktp

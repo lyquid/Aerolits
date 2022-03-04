@@ -4,7 +4,7 @@
 #include "graphics_component.hpp"
 #include "physics_component.hpp"
 #include "resources.hpp"
-#include "../sdl2_wrappers/sdl2_opengl.hpp"
+#include "opengl.hpp"
 #include <utility> // std::move std::exchange
 
 namespace ktp {
@@ -22,7 +22,7 @@ class ExplosionGraphicsComponent: public GraphicsComponent {
  private:
 
   void generateOpenGLStuff(float size);
-  const Color color_ {ConfigParser::explosion_config.color_};
+  const Color   color_ {ConfigParser::explosion_config.color_};
   const GLuint  rays_ {ConfigParser::projectiles_config.explosion_config_.rays_};
   VAO           vao_ {};
   VBO           vertices_ {};

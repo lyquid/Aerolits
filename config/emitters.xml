@@ -102,7 +102,7 @@
 
     <emissionInterval value="0" randMin="1" randMax="1"/> <!-- In miliseconds. 0 for continuous emission -->
 
-    <emissionRate value="40" randMin="0.9" randMax="1"/>
+    <emissionRate value="30" randMin="0.9" randMax="1"/>
 
     <lifeTime value="-1"/> <!-- In miliseconds. Negative for infinite -->
 
@@ -119,13 +119,13 @@
 
     <colors>
       <color r="255" g="255" b="20"   a="255"/>
-      <color r="255" g="2"   b="50"   a="100"/>
-      <color r="50" g="50"   b="50"   a="30"/>
+      <color r="255" g="2"   b="50"   a="150"/>
+      <color r="50" g="50"   b="50"   a="100"/>
     </colors>
 
     <sizes>
-      <size value="10" randMin="0.8" randMax="1"/>
-      <size value="1" randMin="0.8" randMax="1"/>
+      <size value="5" randMin="0.8" randMax="1"/>
+      <size value="40" randMin="0.8" randMax="1"/>
     </sizes>
 
     <speeds>
