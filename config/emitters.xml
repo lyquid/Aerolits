@@ -21,12 +21,12 @@
 
     <!-- Particles properties -->
 
-    <maxParticleLife value="10" randMin="0.8" randMax="1"/>
+    <maxParticleLife value="20" randMin="0.8" randMax="1"/>
 
     <colors>
-      <color r="255" g="0" b="255"  a="128"/>
-      <color r="255" g="0"   b=""   a="255"/>
-      <color r="0" g="255"   b="0"  a="255"/>
+      <color r="255" g="0" b="255"  a="255"/>
+      <color r="255" g="0"   b=""   a="230"/>
+      <color r="0" g="25"   b="255"  a="200"/>
     </colors>
 
     <sizes>
@@ -125,7 +125,7 @@
 
     <sizes>
       <size value="10" randMin="0.8" randMax="1"/>
-      <size value="40" randMin="0.8" randMax="1"/>
+      <size value="1" randMin="0.8" randMax="1"/>
     </sizes>
 
     <speeds>

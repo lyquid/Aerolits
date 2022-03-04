@@ -7,7 +7,7 @@
 /* GRAPHICS */
 
 ktp::EmitterGraphicsComponent::EmitterGraphicsComponent() {
-  const float size {10.f};
+  constexpr float size {1.f};
   vertices_data_ = {                      // uv
      0.5f * size,  0.5f * size, 0.f,      1.f, 1.f, // top right      0
     -0.5f * size,  0.5f * size, 0.f,      0.f, 1.f, // top left       1
@@ -171,7 +171,7 @@ void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
 
 void ktp::EmitterPhysicsComponent::setupOpenGL() {
   graphics_->vao_.bind();
-  // subdata: translations(3), colors(4)
+  // subdata: translations(3), colors(4), size(1)
   subdata_.resize(graphics_->particles_pool_size_ * kComponents);
   graphics_->subdata_.setup(nullptr, subdata_.size() * sizeof(GLfloat), GL_STREAM_DRAW);
   // subdata translations
@@ -180,6 +180,9 @@ void ktp::EmitterPhysicsComponent::setupOpenGL() {
   // subdata colors
   graphics_->vao_.linkAttrib(graphics_->subdata_, 3, 4, GL_FLOAT, kComponents * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
   glVertexAttribDivisor(3, 1);
+  // subdata size
+  graphics_->vao_.linkAttrib(graphics_->subdata_, 4, 1, GL_FLOAT, kComponents * sizeof(GLfloat), (void*)(7 * sizeof(GLfloat)));
+  glVertexAttribDivisor(4, 1);
 }
 
 void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta_time) {

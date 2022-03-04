@@ -108,7 +108,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
    * @brief The number of components per vertex of the subdata.
    * Ie: xyz + rgba = 7.
    */
-  static constexpr auto     kComponents {7u};
+  static constexpr auto     kComponents {8u};
 
   float                     angle_ {};
   unsigned int              alive_particles_count_ {};

@@ -66,6 +66,7 @@ bool ktp::Particle::update(GLfloat* subdata) {
   } else if (state_.live_.sizes_.size() > 2) {
     state_.live_.current_size_ = interpolateRange3(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.sizes_[2], state_.live_.time_step_);
   }
+  subdata[7] = state_.live_.current_size_;
   // color interpolation
   if (state_.live_.colors_.size() == 2) {
     state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
@@ -110,6 +111,7 @@ bool ktp::Particle::update(const Vortex& vortex, GLfloat* subdata) {
   } else if (state_.live_.sizes_.size() > 2) {
     state_.live_.current_size_ = interpolateRange3(state_.live_.sizes_[0], state_.live_.sizes_[1], state_.live_.sizes_[2], state_.live_.time_step_);
   }
+  subdata[7] = state_.live_.current_size_;
   // color interpolation
   if (state_.live_.colors_.size() == 2) {
     state_.live_.current_color_ = interpolate2Colors(state_.live_.colors_[0], state_.live_.colors_[1], state_.live_.time_step_);
