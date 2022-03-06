@@ -53,7 +53,6 @@ void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter) {
 ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhysicsComponent&& other) {
   if (this != &other) {
     // inherited members
-    body_     = other.body_;
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);

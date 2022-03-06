@@ -43,9 +43,10 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
   ProjectilePhysicsComponent& operator=(const ProjectilePhysicsComponent& other) = delete;
   ProjectilePhysicsComponent& operator=(ProjectilePhysicsComponent&& other);
 
-  inline void collide(const GameEntity* other) override { collided_ = true; }
+  auto body() { return body_; }
+  void collide(const GameEntity* other) override { collided_ = true; }
   void detonate();
-  inline auto speed() const { return speed_; }
+  auto speed() const { return speed_; }
   virtual void update(const GameEntity& projectile, float delta_time) override;
 
  private:
@@ -56,6 +57,7 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
 
   bool armed_ {false};
   unsigned int arm_time_ {ConfigParser::projectiles_config.arm_time_};
+  b2Body* body_ {nullptr};
   bool detonated_ {false};
   EmitterPhysicsComponent* exhaust_emitter_ {nullptr};
   ExplosionPhysicsComponent* explosion_ {nullptr};

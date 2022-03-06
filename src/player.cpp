@@ -100,12 +100,12 @@ ktp::PlayerPhysicsComponent::~PlayerPhysicsComponent() { exhaust_emitter_->owner
 ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) {
   if (this != &other) {
     // inherited members
-    body_     = other.body_;
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);
     size_     = other.size_;
     // own members
+    body_            = std::exchange(other.body_, nullptr);
     graphics_        = std::exchange(other.graphics_, nullptr);
     thrusting_       = other.thrusting_;
     cos_             = other.cos_;

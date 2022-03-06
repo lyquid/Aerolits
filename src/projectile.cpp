@@ -72,7 +72,6 @@ ktp::ProjectilePhysicsComponent::~ProjectilePhysicsComponent() { /* exhaust_emit
 ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(ProjectilePhysicsComponent&& other) {
   if (this != &other) {
     // inherited members
-    body_     = other.body_;
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);
@@ -80,6 +79,7 @@ ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(Proj
     // own members
     armed_            = other.armed_;
     arm_time_         = other.arm_time_;
+    body_             = std::exchange(other.body_, nullptr);
     cos_              = other.cos_;
     detonated_        = other.detonated_;
     exhaust_emitter_  = std::exchange(other.exhaust_emitter_, nullptr);

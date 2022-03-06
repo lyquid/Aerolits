@@ -62,7 +62,6 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, Aerol
 ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) noexcept {
   if (this != &other) {
     // inherited members
-    body_     = std::exchange(other.body_, nullptr);
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);
@@ -70,6 +69,7 @@ ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(Aerolite
     // own members
     graphics_       = std::exchange(other.graphics_, nullptr);
     aabb_           = std::move(other.aabb_);
+    body_           = std::exchange(other.body_, nullptr);
     born_time_      = other.born_time_;
     new_born_       = other.new_born_;
     world_manifold_ = std::move(other.world_manifold_);
@@ -177,41 +177,41 @@ void ktp::AerolitePhysicsComponent::reshape(float size) {
 }
 
 ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnAerolite(const b2Vec2& where) {
-  const auto aerolite {GameEntity::createEntity(EntityTypes::Aerolite)};
+  const auto aerolite {static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics())};
   if (!aerolite) return nullptr;
-  aerolite->physics()->body()->SetTransform({where.x * kPixelsToMeters, where.y * kPixelsToMeters}, 0);
-  return aerolite;
+  aerolite->body_->SetTransform({where.x * kPixelsToMeters, where.y * kPixelsToMeters}, 0);
+  return aerolite->owner();
 }
 
 ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnMovingAerolite() {
-  const auto aerolite {GameEntity::createEntity(EntityTypes::Aerolite)};
+  const auto aerolite {static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics())};
   if (!aerolite) return nullptr;
   static int side {};
-  aerolite->physics()->body()->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
+  aerolite->body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
   const float delta {ConfigParser::aerolites_config.speed_.value_ * generateRand(ConfigParser::aerolites_config.speed_.rand_min_, ConfigParser::aerolites_config.speed_.rand_max_)};
   switch (side) {
     case 0: // up
-      aerolite->physics()->body()->SetTransform({b2_screen_size_.x * 0.5f, -b2_screen_size_.y}, aerolite->physics()->body()->GetAngle());
-      aerolite->physics()->body()->SetLinearVelocity({0, delta});
+      aerolite->body_->SetTransform({b2_screen_size_.x * 0.5f, -b2_screen_size_.y}, aerolite->body_->GetAngle());
+      aerolite->body_->SetLinearVelocity({0, delta});
       ++side;
       break;
     case 1: // right
-      aerolite->physics()->body()->SetTransform({b2_screen_size_.x + b2_screen_size_.y, b2_screen_size_.y * 0.5f}, aerolite->physics()->body()->GetAngle());
-      aerolite->physics()->body()->SetLinearVelocity({-delta, 0});
+      aerolite->body_->SetTransform({b2_screen_size_.x + b2_screen_size_.y, b2_screen_size_.y * 0.5f}, aerolite->body_->GetAngle());
+      aerolite->body_->SetLinearVelocity({-delta, 0});
       ++side;
       break;
     case 2: // down
-      aerolite->physics()->body()->SetTransform({b2_screen_size_.x * 0.5f, b2_screen_size_.y + b2_screen_size_.y}, aerolite->physics()->body()->GetAngle());
-      aerolite->physics()->body()->SetLinearVelocity({0, -delta});
+      aerolite->body_->SetTransform({b2_screen_size_.x * 0.5f, b2_screen_size_.y + b2_screen_size_.y}, aerolite->body_->GetAngle());
+      aerolite->body_->SetLinearVelocity({0, -delta});
       ++side;
       break;
     case 3: // left
-      aerolite->physics()->body()->SetTransform({-b2_screen_size_.y, b2_screen_size_.y * 0.5f}, aerolite->physics()->body()->GetAngle());
-      aerolite->physics()->body()->SetLinearVelocity({delta, 0});
+      aerolite->body_->SetTransform({-b2_screen_size_.y, b2_screen_size_.y * 0.5f}, aerolite->body_->GetAngle());
+      aerolite->body_->SetLinearVelocity({delta, 0});
       side = 0;
       break;
   }
-  return aerolite;
+  return aerolite->owner();
 }
 
 void ktp::AerolitePhysicsComponent::split() {
@@ -238,17 +238,17 @@ void ktp::AerolitePhysicsComponent::split() {
     where.y = perpendicular.begin.y + kSpacer * (perpendicular.end.y - perpendicular.begin.y);
     body_->SetTransform({where.x, where.y}, old_angle);
     // the new Aerolite
-    const GameEntity* aerolite {nullptr};
+    AerolitePhysicsComponent* aerolite {nullptr};
     for (std::size_t i = 0; i < pieces; ++i) {
-      aerolite = GameEntity::createEntity(EntityTypes::Aerolite);
+      aerolite = static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics());
       if (!aerolite) return;
-      static_cast<AerolitePhysicsComponent*>(aerolite->physics())->new_born_ = false;
-      static_cast<AerolitePhysicsComponent*>(aerolite->physics())->reshape(piece_size); // need this until we can use the size constructor
-      aerolite->physics()->body()->SetAngularVelocity(old_angular * generateRand(-1.5f, 1.5f));
-      aerolite->physics()->body()->SetLinearVelocity({old_delta.x * generateRand(0.5f, 1.5f), old_delta.y * generateRand(0.5f, 1.5f)});
+      aerolite->new_born_ = false;
+      aerolite->reshape(piece_size); // need this until we can use the size constructor
+      aerolite->body_->SetAngularVelocity(old_angular * generateRand(-1.5f, 1.5f));
+      aerolite->body_->SetLinearVelocity({old_delta.x * generateRand(0.5f, 1.5f), old_delta.y * generateRand(0.5f, 1.5f)});
       where.x = perpendicular.end.x + kSpacer * (perpendicular.begin.x - perpendicular.end.x);
       where.y = perpendicular.end.y + kSpacer * (perpendicular.begin.y - perpendicular.end.y);
-      aerolite->physics()->body()->SetTransform({where.x, where.y}, old_angle);
+      aerolite->body_->SetTransform({where.x, where.y}, old_angle);
     }
     kuge::AeroliteSplittedEvent ev {
       kuge::KugeEventTypes::AeroliteSplitted,

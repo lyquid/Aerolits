@@ -75,6 +75,7 @@ class PlayerPhysicsComponent: public PhysicsComponent {
   void updateMVP();
 
   PlayerGraphicsComponent* graphics_ {nullptr};
+  b2Body* body_ {nullptr};
   bool thrusting_ {false};
   float cos_ {};
   float sin_ {};

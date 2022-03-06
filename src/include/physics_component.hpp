@@ -21,13 +21,11 @@ class PhysicsComponent {
 
  public:
 
-  virtual ~PhysicsComponent() { if (body_) world_->DestroyBody(body_); }
+  virtual ~PhysicsComponent() {}
 
-  inline auto body() const { return body_; }
   inline auto collided() const { return collided_; }
   inline auto delta() const { return delta_; }
   inline auto owner() const { return owner_; }
-  inline void setBody(b2Body* body) { body_ = body; }
   inline auto size() const { return size_; }
 
   virtual void collide(const GameEntity*) = 0;
@@ -47,7 +45,6 @@ class PhysicsComponent {
   static Camera&    camera_;
   static b2World*   world_;
 
-  b2Body*     body_ {nullptr};
   bool        collided_ {false};
   SDL_FPoint  delta_ {};
   GameEntity* owner_ {nullptr};

@@ -38,6 +38,7 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics) noexcept;
   AerolitePhysicsComponent(const AerolitePhysicsComponent& other) = delete;
   AerolitePhysicsComponent(AerolitePhysicsComponent&& other) { *this = std::move(other); }
+  ~AerolitePhysicsComponent() { if (body_) world_->DestroyBody(body_); }
 
   AerolitePhysicsComponent& operator=(const AerolitePhysicsComponent& other) = delete;
   AerolitePhysicsComponent& operator=(AerolitePhysicsComponent&& other) noexcept;
@@ -48,9 +49,9 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   static GameEntity* spawnMovingAerolite();
   virtual void update(const GameEntity& aerolite, float delta_time) override;
   inline auto worldManifold() { return &world_manifold_; }
-static GLfloatVector convertToUV(const GLfloatVector& v);
- private:
+  static GLfloatVector convertToUV(const GLfloatVector& v);
 
+ private:
 
   static void createB2Body(AerolitePhysicsComponent& aerolite, const GLfloatVector& triangulated_shape);
   static Geometry::Polygon generateAeroliteShape(float size, SDL_FPoint offset = {0.f, 0.f});
@@ -69,6 +70,10 @@ static GLfloatVector convertToUV(const GLfloatVector& v);
    * @brief This is used to know when an aerolite has left the screen.
    */
   b2AABB aabb_ {};
+  /**
+   * @brief The b2Body of the aerolite.
+   */
+  b2Body* body_ {nullptr};
   /**
    * @brief When the aerolite was born.
    */

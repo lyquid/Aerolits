@@ -48,7 +48,6 @@ ktp::BackgroundPhysicsComponent::BackgroundPhysicsComponent(GameEntity* owner, B
 ktp::BackgroundPhysicsComponent& ktp::BackgroundPhysicsComponent::operator=(BackgroundPhysicsComponent&& other) {
   if (this != &other) {
     // inherited members
-    body_     = other.body_;
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);
