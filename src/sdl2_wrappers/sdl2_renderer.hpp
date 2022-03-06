@@ -11,10 +11,6 @@
 
 namespace ktp {
 
-void b2ColorToSDL2Color(const b2Color& orig, SDL_Color& dest);
-
-void SDL2ColorToB2Color(const SDL_Color& orig, b2Color& dest);
-
 namespace SDL2Video {
   void logVideoDrivers();
 }
@@ -25,7 +21,7 @@ class SDL2_Renderer {
   SDL2_Renderer() = default;
   SDL2_Renderer(const SDL2_Renderer&) = delete;
   SDL2_Renderer(SDL2_Renderer&& other) noexcept { *this = std::move(other); }
-  ~SDL2_Renderer() { SDL_DestroyRenderer(renderer_); }
+  ~SDL2_Renderer() { if (renderer_) SDL_DestroyRenderer(renderer_); }
 
   SDL2_Renderer& operator=(const SDL2_Renderer&) = delete;
   SDL2_Renderer& operator=(SDL2_Renderer&& other) noexcept;

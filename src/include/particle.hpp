@@ -1,66 +1,56 @@
 #ifndef AEROLITS_SRC_INCLUDE_PARTICLE_HPP_
 #define AEROLITS_SRC_INCLUDE_PARTICLE_HPP_
 
+#include <glm/glm.hpp>
 #include <SDL.h>
 #include <utility> // std::move
 #include <vector>
 
 namespace ktp {
 
-class SDL2_Renderer;
-class SDL2_Texture;
-
-namespace ParticlesAtlas {
-
-  void loadTexture(SDL2_Renderer& ren);
-  extern SDL2_Texture particles_atlas;
-
-} // end namespace ParticlesAtlas
-
-using ColorsVector  = std::vector<SDL_Color>;
+using GLMPositions  = std::vector<glm::vec3>;
+using GLMColors     = std::vector<glm::vec4>;
 using FPointsVector = std::vector<SDL_FPoint>;
 using SizeVector    = std::vector<float>;
 
 struct Vortex;
 
 struct ParticleData {
-  unsigned int  start_life_{};
-  SDL_Rect      texture_rect_{};
-  ColorsVector  colors_{};
-  SDL_Color     current_color_{};
-  SizeVector    sizes_{};
-  float         current_size_{};
-  FPointsVector speeds_{};
-  SDL_FPoint    current_speed_{};
-  float         rotation_{};
-  float         start_rotation_speed_{};
-  float         current_rotation_speed_{};
-  float         end_rotation_speed_{};
-  SDL_FPoint    position_{};
-  float         time_step_{};
+  unsigned int  start_life_ {};
+  SDL_Rect      texture_rect_ {};
+  GLMColors     colors_ {};
+  glm::vec4     current_color_ {};
+  SizeVector    sizes_ {};
+  float         current_size_ {};
+  FPointsVector speeds_ {};
+  SDL_FPoint    current_speed_ {};
+  float         rotation_ {};
+  float         start_rotation_speed_ {};
+  float         current_rotation_speed_ {};
+  float         end_rotation_speed_ {};
+  glm::vec3     position_ {};
+  float         time_step_ {};
 };
 
 class Particle {
-
-  friend class EmitterGraphicsComponent;
-  friend class EmitterPhysicsComponent;
-
  public:
 
-  void draw(const SDL2_Renderer& ren) const;
-  inline Particle* getNext() const { return state_.next_; }
+  Particle() = default;
+  Particle(const Particle& other) { *this = other; }
+  Particle(Particle&& other) { *this = std::move(other); }
+
+  Particle& operator=(const Particle& other);
+  Particle& operator=(Particle&& other);
+
+  Particle* getNext() const { return state_.next_; }
   void init(const ParticleData& data);
-  inline bool inUse() const { return life_ > 0; }
-  inline void setNext(Particle* next) { state_.next_ = next; }
-  bool update();
-  bool update(const Vortex& vortex);
+  bool inUse() const { return life_ > 0; }
+  void setNext(Particle* next) { state_.next_ = next; }
+  bool update(GLfloat* subdata);
+  bool update(const Vortex& vortex, GLfloat* subdata);
 
-  Particle& operator=(const Particle& other) noexcept;
-  Particle& operator=(Particle&& other) noexcept;
-
-  inline static SDL_Color interpolate2Colors(const SDL_Color& start_color, const SDL_Color& end_color, float time_step);
-
-  inline static SDL_Color interpolate3Colors(const SDL_Color& start_color, const SDL_Color& mid_color, const SDL_Color& end_color, float time_step);
+  inline static glm::vec4 interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step);
+  inline static glm::vec4 interpolate3Colors(const glm::vec4& start_color, const glm::vec4& mid_color, const glm::vec4& end_color, float time_step);
 
   template<typename T>
   inline static T interpolateRange(T start, T end, T time_step) { return start + (end - start) * time_step; }
@@ -88,20 +78,16 @@ class Particle {
 
  private:
 
-  Particle() {}
-  Particle(const Particle& other) noexcept { *this = other; }
-  Particle(Particle&& other) noexcept { *this = std::move(other); }
-  ~Particle() {}
+  unsigned int life_ {};
 
-  unsigned int life_{};
   union State {
     ~State() {}
-    State& operator=(const State& other) noexcept;
-    State& operator=(State&& other) noexcept;
+    State& operator=(const State& other);
+    State& operator=(State&& other);
 
     ParticleData live_;
-    Particle* next_{nullptr};
-  } state_{};
+    Particle* next_ {nullptr};
+  } state_ {};
 };
 
 } // end namespace ktp

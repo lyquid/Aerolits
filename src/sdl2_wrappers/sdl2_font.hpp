@@ -74,27 +74,27 @@ class SDL2_Font {
    * @brief Get the Font object.
    * @return A pointer to the font object.
    */
-  inline auto getFont() const { return font_; }
+  inline auto font() const { return font_; }
 
  /**
   * Get the current font face family name from the loaded font. This function
   * may return a NULL pointer, in which case the information is not available.
   * @return The current family name of of the face of the font, or NULL perhaps.
   */
-  inline const std::string& getFaceFamilyName() const { return font_info_.face_family_name_; }
+  inline const std::string& faceFamilyName() const { return font_info_.face_family_name_; }
 
   /**
    * Get the current font face style name from the loaded font. This function
    * may return a NULL pointer, in which case the information is not available.
    * @return The current style name of of the face of the font, or NULL perhaps.
    */
-  inline const std::string& getFaceStyleName() const { return font_info_.face_style_name_; }
+  inline const std::string& faceStyleName() const { return font_info_.face_style_name_; }
 
   /**
    * Get a reference to the FontInfo struct.
    * @return A reference to the FontInfo struct.
    */
-  inline const FontInfo& getFontInfo() const { return font_info_; }
+  inline const FontInfo& fontInfo() const { return font_info_; }
 
   /**
    * Get the current hinting setting of the loaded font.
@@ -105,21 +105,21 @@ class SDL2_Font {
               3 TTF_HINTING_NONE,
             If no hinting is set then TTF_HINTING_NORMAL is returned.
    */
-  inline auto getHinting() const { return font_info_.hinting_; }
+  inline auto hinting() const { return font_info_.hinting_; }
 
   /**
    * Get the current kerning setting of the loaded font.
    * @return False if kerning is disabled. True is returned when enabled.
    *         The default for a newly loaded font is enabled(1).
    */
-  inline auto getKerning() const { return font_info_.kerning_; }
+  inline auto kerning() const { return font_info_.kerning_; }
 
   /**
    * Get the recommended pixel height of a rendered line of text of the loaded
    * font. This is usually larger than the getMaxHeight() of the font.
    * @return The recommended spacing between lines of text for this font.
    */
-  inline auto getLineSkip() const { return font_info_.line_skip_; }
+  inline auto lineSkip() const { return font_info_.line_skip_; }
 
   /**
    * Get the maximum pixel ascent of all glyphs of the loaded font. This can
@@ -130,7 +130,7 @@ class SDL2_Font {
    *
    * @return The maximum pixel ascent of all glyphs in the font.
    */
-  inline auto getMaxAscent() const { return font_info_.max_ascent_; }
+  inline auto maxAscent() const { return font_info_.max_ascent_; }
 
   /**
    * Get the maximum pixel descent of all glyphs of the loaded font. This can
@@ -142,7 +142,7 @@ class SDL2_Font {
    * @return The offset from the baseline to the bottom of the font.
    *         This is a negative value, relative to the baseline.
    */
-  inline auto getMaxDescent() const { return font_info_.max_descent_; }
+  inline auto maxDescent() const { return font_info_.max_descent_; }
 
   /**
    * Get the maximum pixel height of all glyphs of the loaded font. You may use
@@ -152,13 +152,13 @@ class SDL2_Font {
    * responsible for line spacing, see the TTF_FontLineSkip as well.
    * @return The maximum pixel height of all glyphs in the font.
    */
-  inline auto getMaxHeight() const { return font_info_.max_height_; }
+  inline auto maxHeight() const { return font_info_.max_height_; }
 
    /**
    * Get the current outline size of the loaded font.
    * @return The size of the outline currently set on the font, in pixels.
    */
-  inline auto getOutline() const { return font_info_.outline_; }
+  inline auto outline() const { return font_info_.outline_; }
 
   /**
    * Get the rendering style of the loaded font.
@@ -169,7 +169,7 @@ class SDL2_Font {
               TTF_STYLE_STRIKETHROUGH
             If no style is set then TTF_STYLE_NORMAL is returned.
    */
-  inline auto getStyle() const { return font_info_.style_; }
+  inline auto style() const { return font_info_.style_; }
 
   /**
    * Get the status of the availability of the glyph for ch from the loaded font.

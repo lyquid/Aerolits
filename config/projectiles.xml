@@ -10,12 +10,13 @@
   </Box2D>
   <explosion>
     <blastPower value="15.0"/>
+    <color r="243" g="194" b="32"/>
     <density value="6.0"/>
     <duration value="150"/>
     <friction value="0.0"/>
     <linearDamping value="5.0"/>
     <particleRadius value="0.2"/>
-    <rays value="80"/>
+    <rays value="30"/>
     <restitution value="0.99"/>
   </explosion>
 </projectiles>

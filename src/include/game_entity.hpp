@@ -22,7 +22,8 @@ enum class EntityTypes {
   Undefined,
   Aerolite,
   Background,
-  ExplosionParticle,
+  Emitter,
+  Explosion,
   Player,
   PlayerDemo,
   Projectile,
@@ -31,7 +32,6 @@ enum class EntityTypes {
 
 using EntitiesCount = std::map<EntityTypes, std::size_t>;
 using EntitiesPool  = ObjectPool<GameEntity>;
-using EntityId      = std::size_t;
 using Graphics      = std::unique_ptr<GraphicsComponent>;
 using Input         = std::unique_ptr<InputComponent>;
 using Physics       = std::unique_ptr<PhysicsComponent>;
@@ -97,9 +97,13 @@ class GameEntity {
         entity->graphics_ = std::make_unique<BackgroundGraphicsComponent>();
         entity->physics_  = std::make_unique<BackgroundPhysicsComponent>(entity, static_cast<BackgroundGraphicsComponent*>(entity->graphics_.get()));
         break;
-      case EntityTypes::ExplosionParticle:
-        entity->graphics_ = std::make_unique<XParticleGraphicsComponent>();
-        entity->physics_  = std::make_unique<XParticlePhysicsComponent>(entity, static_cast<XParticleGraphicsComponent*>(entity->graphics_.get()));
+      case EntityTypes::Emitter:
+        entity->graphics_ = std::make_unique<EmitterGraphicsComponent>();
+        entity->physics_  = std::make_unique<EmitterPhysicsComponent>(entity, static_cast<EmitterGraphicsComponent*>(entity->graphics_.get()));
+        break;
+      case EntityTypes::Explosion:
+        entity->graphics_ = std::make_unique<ExplosionGraphicsComponent>();
+        entity->physics_  = std::make_unique<ExplosionPhysicsComponent>(entity, static_cast<ExplosionGraphicsComponent*>(entity->graphics_.get()));
         break;
       case EntityTypes::Player:
         entity->graphics_ = std::make_unique<PlayerGraphicsComponent>();
@@ -141,8 +145,8 @@ class GameEntity {
    *         what the user wants.
    * @param renderer A renderer to draw things on.
    */
-  inline void draw(const SDL2_Renderer& renderer) const {
-    if (graphics_) graphics_->update(*this, renderer);
+  inline void draw() const {
+    if (graphics_) graphics_->update(*this);
   }
 
   /**

@@ -2,21 +2,6 @@
 #include "sdl2_renderer.hpp"
 #include <cctype>  // std::toupper
 
-void ktp::b2ColorToSDL2Color(const b2Color& orig, SDL_Color& dest) {
-  dest.r = (Uint8)orig.r * 255;
-  dest.g = (Uint8)orig.g * 255;
-  dest.b = (Uint8)orig.b * 255;
-  dest.a = (Uint8)orig.a * 255;
-}
-
-void ktp::SDL2ColorToB2Color(const SDL_Color& orig, b2Color& dest) {
-  constexpr float inv {1.f / 255.f};
-  dest.r = orig.r * inv;
-  dest.g = orig.g * inv;
-  dest.b = orig.b * inv;
-  dest.a = orig.a * inv;
-}
-
 void ktp::SDL2Video::logVideoDrivers() {
   const auto num {SDL_GetNumVideoDrivers()};
   if (num >= 1) {

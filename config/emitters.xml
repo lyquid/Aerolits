@@ -21,12 +21,12 @@
 
     <!-- Particles properties -->
 
-    <maxParticleLife value="10" randMin="0.8" randMax="1"/>
+    <maxParticleLife value="20" randMin="0.8" randMax="1"/>
 
     <colors>
-      <color r="255" g="0" b="255"  a="128"/>
-      <color r="255" g="0"   b=""   a="255"/>
-      <color r="255" g="0"   b="0"  a="0"/>
+      <color r="255" g="0" b="255"  a="255"/>
+      <color r="255" g="0"   b=""   a="230"/>
+      <color r="0" g="25"   b="255"  a="200"/>
     </colors>
 
     <sizes>
@@ -102,7 +102,7 @@
 
     <emissionInterval value="0" randMin="1" randMax="1"/> <!-- In miliseconds. 0 for continuous emission -->
 
-    <emissionRate value="10" randMin="1" randMax="1"/>
+    <emissionRate value="30" randMin="0.9" randMax="1"/>
 
     <lifeTime value="-1"/> <!-- In miliseconds. Negative for infinite -->
 
@@ -115,15 +115,16 @@
 
     <!-- Particles properties -->
 
-    <maxParticleLife value="5" randMin="0.8" randMax="1"/>
+    <maxParticleLife value="50" randMin="0.8" randMax="1"/>
 
     <colors>
-      <color r="255" g="50" b="5"   a="200"/>
-      <color r="128" g="128"   b="128"   a="50"/>
+      <color r="255" g="255" b="20"   a="255"/>
+      <color r="255" g="2"   b="50"   a="150"/>
+      <color r="50" g="50"   b="50"   a="100"/>
     </colors>
 
     <sizes>
-      <size value="10" randMin="0.8" randMax="1"/>
+      <size value="5" randMin="0.8" randMax="1"/>
       <size value="40" randMin="0.8" randMax="1"/>
     </sizes>
 

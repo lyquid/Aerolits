@@ -8,6 +8,7 @@
 #ifndef KTP_SDL2_WRAPPERS_SDL2_GEOMETRY_HPP_
 #define KTP_SDL2_WRAPPERS_SDL2_GEOMETRY_HPP_
 
+#include "sdl2_opengl.hpp"
 #include <SDL.h>
 #include <vector>
 
@@ -219,6 +220,14 @@ bool triangulate(const Polygon& polygon, std::vector<Triangle>& result);
 
 /**
  * @brief Divides a polygon in triangles. **Doesn't work with polygons with inner holes.**
+ * @param polygon The polygon to triangularize, or tessellate.
+ * @param result Where to store the resulting triangles.
+ * @return True if all went ok.
+ */
+bool triangulate(const Polygon& polygon, std::vector<GLfloat>& result);
+
+/**
+ * @brief Divides a polygon in triangles. **Doesn't work with polygons with inner holes.**
  * @tparam T Some object resembling a point (x, y), ie: SDL_Point, SDL_FPoint, ktp::Point.
  * @param polygon The polygon to triangularize, or tessellate.
  * @param result Where to store the resulting triangles.
@@ -279,6 +288,7 @@ bool triangulate(const std::vector<T>& polygon, std::vector<T>& result) {
  * @tparam T Some object resembling a point (x, y), ie: SDL_Point, SDL_FPoint, ktp::Point.
  * @param polygon The polygon to triangularize, or tessellate.
  * @param result Where to store the resulting triangles.
+ * @param close True if you want the last point of the triangles to equal the first.
  * @return True if all went ok.
  */
 template<typename T>

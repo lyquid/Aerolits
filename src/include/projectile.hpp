@@ -2,41 +2,46 @@
 
 #include "config_parser.hpp"
 #include "graphics_component.hpp"
-#include "palette.hpp"
 #include "physics_component.hpp"
-#include <SDL.h>
+#include "resources.hpp"
+#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include <memory>
-#include <vector>
 
 namespace ktp {
 
-using B2Vec2Vector = std::vector<b2Vec2>;
-
-class EmitterGraphicsComponent;
 class EmitterPhysicsComponent;
-class GameEntity;
-class SDL2_Renderer;
 
 class ProjectileGraphicsComponent: public GraphicsComponent {
+
   friend class ProjectilePhysicsComponent;
+
  public:
-  ProjectileGraphicsComponent() noexcept;
-  virtual void update(const GameEntity& projectile, const SDL2_Renderer& renderer) override;
+
+  ProjectileGraphicsComponent();
+  virtual void update(const GameEntity& projectile) override;
+
  private:
-  SDL_Color color_ {ConfigParser::projectiles_config.color_};
-  std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
+
+  void generateOpenGLStuff(float size);
+  Color color_ {ConfigParser::projectiles_config.color_};
+  VAO vao_ {};
+  VBO vertices_ {};
+  EBO vertices_indices_ {};
+  ShaderProgram shader_ {Resources::getShader("projectile")};
+  glm::mat4 mvp_ {};
 };
 
 class ProjectilePhysicsComponent: public PhysicsComponent {
 
  public:
 
-  ProjectilePhysicsComponent(GameEntity* owner, ProjectileGraphicsComponent* graphics) noexcept;
+  ProjectilePhysicsComponent(GameEntity* owner, ProjectileGraphicsComponent* graphics);
   ProjectilePhysicsComponent(const ProjectilePhysicsComponent& other) = delete;
   ProjectilePhysicsComponent(ProjectilePhysicsComponent&& other) { *this = std::move(other); }
+  ~ProjectilePhysicsComponent();
 
   ProjectilePhysicsComponent& operator=(const ProjectilePhysicsComponent& other) = delete;
-  ProjectilePhysicsComponent& operator=(ProjectilePhysicsComponent&& other) noexcept;
+  ProjectilePhysicsComponent& operator=(ProjectilePhysicsComponent&& other);
 
   inline void collide(const GameEntity* other) override { collided_ = true; }
   void detonate();
@@ -45,14 +50,15 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
 
  private:
 
-  static void generateProjectileShape(B2Vec2Vector& shape, float size);
-  void transformRenderShape();
+  inline bool isOutOfScreen(float threshold = 0.f);
+  void setBox2D();
+  void updateMVP();
 
   bool armed_ {false};
   unsigned int arm_time_ {ConfigParser::projectiles_config.arm_time_};
   bool detonated_ {false};
-  std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
-  ConfigParser::ExplosionConfig explosion_config_ {};
+  EmitterPhysicsComponent* exhaust_emitter_ {nullptr};
+  ExplosionPhysicsComponent* explosion_ {nullptr};
   unsigned int fired_time_ {};
   ProjectileGraphicsComponent* graphics_ {nullptr};
   float speed_ {ConfigParser::projectiles_config.speed_};

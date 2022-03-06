@@ -1,32 +1,39 @@
 #pragma once
 
-#include "random.hpp"
+#include "camera.hpp"
+#include "opengl.hpp"
 #include "../sdl2_wrappers/sdl2_geometry.hpp"
-#include "../sdl2_wrappers/sdl2_renderer.hpp"
-#include <SDL.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <vector>
 
 namespace ktp {
 
 class Testing {
  public:
-  Testing();
-  void draw(const SDL2_Renderer& ren) const;
-  inline void generateShape(float max_size) { generateShape(max_size, generateRand(15, 20)); }
-  void generateShape(float max_size, int sides);
-  // inline void drawTriangles() { draw_triangles_ = !draw_triangles_; }
+
+  void draw();
+  void init();
+  void update(float delta_time);
+  void updateMouse(float x_pos, float y_pos) { camera_.look(x_pos, -y_pos); }
+  void updateZoom(float y_offset) { camera_.zoom(y_offset); }
 
  private:
 
-  // Geometry::Polygon polygon_ {};
-  // Geometry::Polygon test_polygon_ {};
-  // std::vector<Geometry::Polygon> triangles_ {};
-  // std::vector<Geometry::Polygon> test_triangles_ {};
+  void updateCamera(float delta_time);
+  void updateMVP();
 
-  // static constexpr auto kPI {3.14159265359};
-  // const SDL_FPoint center_ {683, 384};
-  // const SDL_FPoint test_center_ {50, 50};
-  // bool draw_triangles_ {};
+  static constexpr int kNumCubes_ {1000};
+
+  VAO vao_ {};
+  VBO vertices_ {};
+  VBO colors_ {};
+  VBO translations_ {};
+  GLfloatVector vertices_data_ {};
+  ShaderProgram shader_program_ {};
+
+  Camera camera_ {glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 1.f, 0.f), -90.f, 0.f};
 };
 
 } // namespace ktp

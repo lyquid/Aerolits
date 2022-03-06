@@ -13,42 +13,52 @@ ktp::PlayingState ktp::GameState::playing_ {};
 ktp::TestingState ktp::GameState::testing_ {};
 ktp::TitleState   ktp::GameState::title_ {};
 
+bool ktp::GameState::backend_draw_ {false};
+bool ktp::GameState::culling_ {false};
+bool ktp::GameState::debug_draw_ {false};
+bool ktp::GameState::deep_test_ {false};
+bool ktp::GameState::polygon_draw_ {false};
+
 void ktp::GameState::setWindowTitle(Game& game) {
   game.main_window_.setTitle(
     kuge::GUISystem::kTitleText_
     + " | Frame time: " + std::to_string((int)(game.frame_time_ * 1000)) + "ms."
     + " | b2Bodies: " + std::to_string(game.world_.GetBodyCount())
     + " | Entities: " + std::to_string(GameEntity::count()) + '/' + std::to_string(GameEntity::game_entities_.capacity())
-    + " (Player: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Player) + GameEntity::entitiesCount(EntityTypes::PlayerDemo))
-    + " Aerolites: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Aerolite))
+    + " (Player: "     + std::to_string(GameEntity::entitiesCount(EntityTypes::Player) + GameEntity::entitiesCount(EntityTypes::PlayerDemo))
+    + " Background: "  + std::to_string(GameEntity::entitiesCount(EntityTypes::Background))
+    + " Aerolites: "   + std::to_string(GameEntity::entitiesCount(EntityTypes::Aerolite))
     + " Projectiles: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Projectile))
-    + " Explosions: " + std::to_string(GameEntity::entitiesCount(EntityTypes::ExplosionParticle)) + ')'
+    + " Emitters: "    + std::to_string(GameEntity::entitiesCount(EntityTypes::Emitter))
+    + " Explosions: "  + std::to_string(GameEntity::entitiesCount(EntityTypes::Explosion)) + ')'
   );
 }
 
 /* DEMO STATE */
 
 void ktp::DemoState::draw(Game& game) {
-  game.renderer_.clear();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw(game.renderer_);
+      GameEntity::game_entities_[i].object_.draw();
     }
   }
 
-  game.gui_sys_.scoreText().render(game.renderer_);
+  game.gui_sys_.scoreText()->draw();
 
-  if (blink_flag_) game.gui_sys_.demoText().render(game.renderer_);
+  if (blink_flag_) game.gui_sys_.demoText()->draw();
 
   if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
     blink_timer_ = SDL2_Timer::SDL2Ticks();
   }
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  if (debug_draw_) game.world_.DebugDraw();
 
-  game.renderer_.present();
+  if (backend_draw_) game.backend_sys_.draw();
+
+  SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
@@ -66,15 +76,16 @@ ktp::GameState* ktp::DemoState::enter(Game& game) {
 
 void ktp::DemoState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
+    ImGui_ImplSDL2_ProcessEvent(&sdl_event_);
     switch (sdl_event_.type) {
       case SDL_QUIT:
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
-        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN:
-        game.state_ = goToState(game, GameState::title_);
+        if (!ImGui::GetIO().WantCaptureMouse) game.state_ = goToState(game, GameState::title_);
         break;
       default:
         break;
@@ -88,7 +99,11 @@ void ktp::DemoState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.quit_ = true;
       break;
     case SDLK_F1:
-      game.debug_draw_on_ = !game.debug_draw_on_;
+      backend_draw_ = !backend_draw_;
+      break;
+    case SDLK_F2:
+      polygon_draw_ = !polygon_draw_;
+      updatePolygonDraw();
       break;
     default:
       game.state_ = goToState(game, GameState::title_);
@@ -103,26 +118,29 @@ void ktp::DemoState::update(Game& game, float delta_time) {
 /* PAUSED STATE */
 
 void ktp::PausedState::draw(Game& game) {
-  game.renderer_.clear();
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw(game.renderer_);
+      GameEntity::game_entities_[i].object_.draw();
     }
   }
 
-  game.gui_sys_.scoreText().render(game.renderer_);
+  game.gui_sys_.scoreText()->draw();
 
-  if (blink_flag_) game.gui_sys_.pausedText().render(game.renderer_);
+  if (blink_flag_) game.gui_sys_.pausedText()->draw();
 
   if (SDL2_Timer::SDL2Ticks() - blink_timer_ > 500) {
     blink_flag_ = !blink_flag_;
     blink_timer_ = SDL2_Timer::SDL2Ticks();
   }
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  if (debug_draw_) game.world_.DebugDraw();
 
-  game.renderer_.present();
+  if (backend_draw_) game.backend_sys_.draw();
+
+  SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
 ktp::GameState* ktp::PausedState::enter(Game& game) {
@@ -134,12 +152,13 @@ ktp::GameState* ktp::PausedState::enter(Game& game) {
 
 void ktp::PausedState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
+    ImGui_ImplSDL2_ProcessEvent(&sdl_event_);
     switch (sdl_event_.type) {
       case SDL_QUIT:
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
-        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       default:
         break;
@@ -153,7 +172,11 @@ void ktp::PausedState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.state_ = goToState(game, GameState::title_);
       break;
     case SDLK_F1:
-      game.debug_draw_on_ = !game.debug_draw_on_;
+      backend_draw_ = !backend_draw_;
+      break;
+    case SDLK_F2:
+      polygon_draw_ = !polygon_draw_;
+      updatePolygonDraw();
       break;
     default:
       game.state_ = goToState(game, GameState::playing_);
@@ -169,19 +192,21 @@ void ktp::PausedState::update(Game& game, float delta_time) {
 /* PLAYING STATE */
 
 void ktp::PlayingState::draw(Game& game) {
-  game.renderer_.clear();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw(game.renderer_);
+      GameEntity::game_entities_[i].object_.draw();
     }
   }
 
-  game.gui_sys_.scoreText().render(game.renderer_);
+  game.gui_sys_.scoreText()->draw();
 
-  if (game.debug_draw_on_) game.world_.DebugDraw();
+  if (debug_draw_) game.world_.DebugDraw();
 
-  game.renderer_.present();
+  if (backend_draw_) game.backend_sys_.draw();
+
+  SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
 ktp::GameState* ktp::PlayingState::enter(Game& game) {
@@ -191,23 +216,36 @@ ktp::GameState* ktp::PlayingState::enter(Game& game) {
 
 void ktp::PlayingState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
+    ImGui_ImplSDL2_ProcessEvent(&sdl_event_);
     switch (sdl_event_.type) {
       case SDL_QUIT:
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
-        // input_sys_.postEvent(kuge::EventTypes::KeyPressed, SDL_GetKeyName(sdl_event_.key.keysym.sym));
-        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN: {
-        int x{0}, y{0};
-        if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          // Emitter emi{"plasma", {static_cast<float>(x), static_cast<float>(y)}};
-          // emitters_.push_back(std::move({EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}}));
-          // game.emitters_.push_back(std::move(emi));
+        if (!ImGui::GetIO().WantCaptureMouse) {
+          int x{0}, y{0};
+          if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+            // SDL_SetRelativeMouseMode(SDL_TRUE);
+            AerolitePhysicsComponent::spawnAerolite({(float)x, (float)game.screen_size_.y - (float)y});
+            logMessage("clicked " + std::to_string(x) + ", " + std::to_string(game.screen_size_.y - y));
+          } else if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+            SDL_SetRelativeMouseMode(SDL_FALSE);
+          }
         }
         break;
       }
+      // case SDL_MOUSEBUTTONDOWN: {
+      //   int x{0}, y{0};
+      //   if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+      //     // Emitter emi{"plasma", {static_cast<float>(x), static_cast<float>(y)}};
+      //     // emitters_.push_back(std::move({EmitterTypes::Fire, {static_cast<float>(x), static_cast<float>(y)}}));
+      //     // game.emitters_.push_back(std::move(emi));
+      //   }
+      //   break;
+      // }
       default:
         break;
     }
@@ -220,7 +258,11 @@ void ktp::PlayingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.state_ = goToState(game, GameState::paused_);
       break;
     case SDLK_F1:
-      game.debug_draw_on_ = !game.debug_draw_on_;
+      backend_draw_ = !backend_draw_;
+      break;
+    case SDLK_F2:
+      polygon_draw_ = !polygon_draw_;
+      updatePolygonDraw();
       break;
     case SDLK_p:
       game.state_ = goToState(game, GameState::paused_);
@@ -253,44 +295,63 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
 /* TESTING STATE */
 
 void ktp::TestingState::draw(Game& game) {
-  game.renderer_.clear();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw(game.renderer_);
+      GameEntity::game_entities_[i].object_.draw();
     }
   }
-  game.test_.draw(game.renderer_);
-  if (game.debug_draw_on_) game.world_.DebugDraw();
-  game.renderer_.present();
+
+  test_->draw();
+
+  if (debug_draw_) game.world_.DebugDraw();
+
+  if (backend_draw_) game.backend_sys_.draw();
+
+  SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
 ktp::GameState* ktp::TestingState::enter(Game& game) {
   game.reset();
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
-  GameEntity::createEntity(EntityTypes::Background);
-  const auto player {GameEntity::createEntity(EntityTypes::Player)};
-  player->physics()->body()->SetTransform({PhysicsComponent::b2ScreenSize().x * 0.25f, PhysicsComponent::b2ScreenSize().y * 0.5f}, 1.5707963268f);
-  AerolitePhysicsComponent::spawnAerolite({PhysicsComponent::b2ScreenSize().x * 0.75f, PhysicsComponent::b2ScreenSize().y * 0.5f});
-  game.gui_sys_.resetScore();
+  delete test_;
+  test_ = new Testing;
+  test_->init();
   return this;
 }
 
 void ktp::TestingState::handleEvents(Game& game) {
-    while (SDL_PollEvent(&sdl_event_)) {
+  while (SDL_PollEvent(&sdl_event_)) {
+    ImGui_ImplSDL2_ProcessEvent(&sdl_event_);
     switch (sdl_event_.type) {
       case SDL_QUIT:
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
-        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN: {
-        int x{0}, y{0};
-        if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          AerolitePhysicsComponent::spawnAerolite({(float)x * kPixelsToMeters, (float)y * kPixelsToMeters});
+        if (!ImGui::GetIO().WantCaptureMouse) {
+          int x{0}, y{0};
+          if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+            SDL_SetRelativeMouseMode(SDL_TRUE);
+            // AerolitePhysicsComponent::spawnAerolite({(float)x, (float)y});
+            // logMessage("clicked " + std::to_string(x) + ", " + std::to_string(y));
+          } else if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+            SDL_SetRelativeMouseMode(SDL_FALSE);
+          }
         }
         break;
       }
+      case SDL_MOUSEMOTION:
+        if (SDL_GetRelativeMouseMode())
+          test_->updateMouse((float)sdl_event_.motion.xrel, (float)sdl_event_.motion.yrel);
+        break;
+      case SDL_MOUSEWHEEL:
+        if (SDL_GetRelativeMouseMode())
+          test_->updateZoom(((float)sdl_event_.wheel.y));
+        break;
       default: break;
     }
   }
@@ -302,13 +363,13 @@ void ktp::TestingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
       game.quit_ = true;
       break;
     case SDLK_F1:
-      game.debug_draw_on_ = !game.debug_draw_on_;
+      backend_draw_ = !backend_draw_;
       break;
     case SDLK_F2:
-      // game.test_.drawTriangles();
+      polygon_draw_ = !polygon_draw_;
+      updatePolygonDraw();
       break;
     case SDLK_SPACE:
-      // game.test_.generateShape(100);
       break;
     case SDLK_r:
       game.state_ = goToState(game, GameState::testing_);
@@ -333,25 +394,28 @@ void ktp::TestingState::update(Game& game, float delta_time) {
       }
     }
   }
-  //if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnMovingAerolite();
+  test_->update(delta_time);
+  // if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 1) AerolitePhysicsComponent::spawnMovingAerolite();
   game.event_bus_.processEvents();
 }
 
 /* TITLE STATE */
 
 void ktp::TitleState::draw(Game& game) {
-  game.renderer_.clear();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
     if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Background) {
-      GameEntity::game_entities_[i].object_.draw(game.renderer_);
+      GameEntity::game_entities_[i].object_.draw();
       break;
     }
   }
 
-  game.gui_sys_.titleText().render(game.renderer_);
+  game.gui_sys_.titleText()->draw();
 
-  game.renderer_.present();
+  if (backend_draw_) game.backend_sys_.draw();
+
+  SDL_GL_SwapWindow(game.main_window_.getWindow());
 }
 
 ktp::GameState* ktp::TitleState::enter(Game& game) {
@@ -365,13 +429,13 @@ ktp::GameState* ktp::TitleState::enter(Game& game) {
 
 void ktp::TitleState::handleEvents(Game& game) {
   while (SDL_PollEvent(&sdl_event_)) {
+    ImGui_ImplSDL2_ProcessEvent(&sdl_event_);
     switch (sdl_event_.type) {
       case SDL_QUIT:
         game.quit_ = true;
         break;
       case SDL_KEYDOWN:
-        // input_sys_.postEvent(kuge::EventTypes::KeyPressed, SDL_GetKeyName(sdl_event_.key.keysym.sym));
-        handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN:
         demo_time_ = SDL2_Timer::SDL2Ticks();
@@ -386,6 +450,13 @@ void ktp::TitleState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
       game.quit_ = true;
+      break;
+    case SDLK_F1:
+      backend_draw_ = !backend_draw_;
+      break;
+    case SDLK_F2:
+      polygon_draw_ = !polygon_draw_;
+      updatePolygonDraw();
       break;
     default:
       demo_time_ = SDL2_Timer::SDL2Ticks();

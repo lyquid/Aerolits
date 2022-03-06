@@ -1,21 +1,41 @@
-#include "include/box2d_scale.hpp"
+#include "include/camera.hpp"
 #include "include/emitter.hpp"
 #include "include/game_entity.hpp"
 #include "include/player.hpp"
-#include "sdl2_wrappers/sdl2_geometry.hpp" // to be deleted
-#include "sdl2_wrappers/sdl2_renderer.hpp"
-#include <box2d/box2d.h>
 
 /* GRAPHICS */
 
-ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() noexcept {
-  exhaust_emitter_ = std::make_unique<EmitterGraphicsComponent>();
+ktp::PlayerGraphicsComponent::PlayerGraphicsComponent() {
+  generateOpenGLStuff(ConfigParser::player_config.size_ * kMetersToPixels);
 }
 
-void ktp::PlayerGraphicsComponent::update(const GameEntity& player, const SDL2_Renderer& renderer) {
-  renderer.setDrawColor(color_);
-  renderer.drawLines(render_shape_);
-  exhaust_emitter_->update(player, renderer);
+void ktp::PlayerGraphicsComponent::generateOpenGLStuff(float size) {
+  const GLfloatVector player_shape {
+     0.00f * size,  0.50f * size, 0.f,  color_.r,  color_.g,  color_.b,   // top        0
+    -0.33f * size, -0.50f * size, 0.f,  color_.r,  color_.g,  color_.b,   // left       1
+    -0.15f * size, -0.33f * size, 0.f,  color_.r,  color_.g,  color_.b,   // left flap  2
+     0.15f * size, -0.33f * size, 0.f,  color_.r,  color_.g,  color_.b,   // right flap 3
+     0.33f * size, -0.50f * size, 0.f,  color_.r,  color_.g,  color_.b    // right      4
+  };
+  const GLuintVector player_shape_indices {
+    0, 1, 2,
+    0, 2, 3,
+    0, 3, 4
+  };
+  vertices_.setup(player_shape);
+  // vertices
+  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+  // colors
+  vao_.linkAttrib(vertices_, 1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+  // EBO
+  vertices_indices_.setup(player_shape_indices);
+}
+
+void ktp::PlayerGraphicsComponent::update(const GameEntity& player) {
+  shader_.use();
+  shader_.setMat4f("mvp", glm::value_ptr(mvp_));
+  vao_.bind();
+  glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // 9 is the number of indices
 }
 
 /* DEMO INPUT */
@@ -47,12 +67,12 @@ void ktp::PlayerInputComponent::update(GameEntity& player, float delta_time) {
 
   if (state[SDL_SCANCODE_A] || state[SDL_SCANCODE_LEFT]) {
     // steer left
-    steer(-angular_impulse_);
+    steer(angular_impulse_);
   }
 
   if (state[SDL_SCANCODE_D] || state[SDL_SCANCODE_RIGHT]) {
     // steer right
-    steer(angular_impulse_);
+    steer(-angular_impulse_);
   }
 
   if (state[SDL_SCANCODE_SPACE]) {
@@ -62,31 +82,35 @@ void ktp::PlayerInputComponent::update(GameEntity& player, float delta_time) {
 
 /* PHYSICS */
 
-ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner,PlayerGraphicsComponent* graphics) noexcept:
- graphics_(graphics) {
+ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner, PlayerGraphicsComponent* graphics): graphics_(graphics) {
   owner_ = owner;
   size_ = ConfigParser::player_config.size_;
-  generatePlayerShape(shape_, size_);
-  graphics_->render_shape_.resize(shape_.size());
   setBox2D();
-  exhaust_emitter_ = std::make_unique<EmitterPhysicsComponent>(EmitterPhysicsComponent::makeEmitter(graphics_->exhaust_emitter_.get(), "fire", {body_->GetPosition().x, body_->GetPosition().y}));
+
+  exhaust_emitter_ = static_cast<EmitterPhysicsComponent*>(GameEntity::createEntity(EntityTypes::Emitter)->physics());
+  exhaust_emitter_->init("fire",
+    {(body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
+     (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_,
+     0.f});
+  exhaust_emitter_->setAngle(body_->GetAngle() + b2_pi);
 }
 
-ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) noexcept {
+ktp::PlayerPhysicsComponent::~PlayerPhysicsComponent() { exhaust_emitter_->owner()->deactivate(); }
+
+ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) {
   if (this != &other) {
     // inherited members
     body_     = other.body_;
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);
-    shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
     graphics_        = std::exchange(other.graphics_, nullptr);
     thrusting_       = other.thrusting_;
     cos_             = other.cos_;
     sin_             = other.sin_;
-    exhaust_emitter_ = std::move(other.exhaust_emitter_);
+    exhaust_emitter_ = std::exchange(other.exhaust_emitter_, nullptr);
   }
   return *this;
 }
@@ -105,16 +129,6 @@ void ktp::PlayerPhysicsComponent::checkWrap() {
   }
 }
 
-void ktp::PlayerPhysicsComponent::generatePlayerShape(B2Vec2Vector& shape, float size) {
-  shape.push_back({          0.f, -size * 0.50f}); // top
-  shape.push_back({-size * 0.33f,  size * 0.50f}); // left
-  shape.push_back({-size * 0.15f,  size * 0.33f}); // left flap
-  shape.push_back({ size * 0.15f,  size * 0.33f}); // right flap
-  shape.push_back({ size * 0.33f,  size * 0.50f}); // right
-  shape.push_back({          0.f, -size * 0.50f}); // top again
-  shape.shrink_to_fit();
-}
-
 void ktp::PlayerPhysicsComponent::setBox2D() {
   // Player
   b2BodyDef body_def {};
@@ -126,9 +140,9 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
   body_ = world_->CreateBody(&body_def);
   // middle triangle CCW
   b2Vec2 vertices[3];
-  vertices[0].Set(           0.f, -size_ * 0.50f); // top
-  vertices[1].Set(-size_ * 0.15f,  size_ * 0.33f); // left
-  vertices[2].Set( size_ * 0.15f,  size_ * 0.33f); // right
+  vertices[0].Set(           0.f,  size_ * 0.50f); // top
+  vertices[1].Set(-size_ * 0.15f, -size_ * 0.33f); // left
+  vertices[2].Set( size_ * 0.15f, -size_ * 0.33f); // right
   b2PolygonShape triangle {};
   triangle.Set(vertices, 3);
 
@@ -141,41 +155,43 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
   body_->CreateFixture(&fixture_def);
 
   // left triangle CCW
-  vertices[0].Set(           0.f, -size_ * 0.50f); // top
-  vertices[1].Set(-size_ * 0.33f,  size_ * 0.50f); // left
-  vertices[2].Set(-size_ * 0.15f,  size_ * 0.33f); // right
+  vertices[0].Set(           0.f,  size_ * 0.50f); // top
+  vertices[1].Set(-size_ * 0.33f, -size_ * 0.50f); // left
+  vertices[2].Set(-size_ * 0.15f, -size_ * 0.33f); // right
   triangle.Set(vertices, 3);
   fixture_def.shape = &triangle;
 
   body_->CreateFixture(&fixture_def);
 
   // right triangle CCW
-  vertices[0].Set(          0.f, -size_ * 0.50f); // top
-  vertices[1].Set(size_ * 0.15f,  size_ * 0.33f); // left
-  vertices[2].Set(size_ * 0.33f,  size_ * 0.50f); // right
+  vertices[0].Set(          0.f,  size_ * 0.50f); // top
+  vertices[1].Set(size_ * 0.15f, -size_ * 0.33f); // left
+  vertices[2].Set(size_ * 0.33f, -size_ * 0.50f); // right
   triangle.Set(vertices, 3);
   fixture_def.shape = &triangle;
 
   body_->CreateFixture(&fixture_def);
 }
 
-void ktp::PlayerPhysicsComponent::transformRenderShape() {
-  for (auto i = 0u; i < shape_.size(); ++i) {
-    graphics_->render_shape_[i].x = ((shape_[i].x * cos_ - shape_[i].y * sin_) + body_->GetPosition().x) * kMetersToPixels;
-    graphics_->render_shape_[i].y = ((shape_[i].x * sin_ + shape_[i].y * cos_) + body_->GetPosition().y) * kMetersToPixels;
-  }
-}
-
 void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_time) {
   checkWrap();
-  cos_ = SDL_cosf(body_->GetAngle());
-  sin_ = SDL_sinf(body_->GetAngle());
-  transformRenderShape();
-  exhaust_emitter_->setAngle(body_->GetAngle());
+  updateMVP();
+  // exhaust emitter stuff
+  const auto good_angle {body_->GetAngle() + b2_pi};
+  cos_ = SDL_cosf(good_angle);
+  sin_ = SDL_sinf(good_angle);
+  exhaust_emitter_->setAngle(good_angle);
   exhaust_emitter_->setPosition({
     (body_->GetPosition().x * kMetersToPixels) - size_ * 0.33f * kMetersToPixels * sin_,
-    (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_
+    (body_->GetPosition().y * kMetersToPixels) + size_ * 0.33f * kMetersToPixels * cos_,
+    0.f
   });
-  exhaust_emitter_->update(player, delta_time);
   if (thrusting_) exhaust_emitter_->generateParticles();
+}
+
+void ktp::PlayerPhysicsComponent::updateMVP() {
+  glm::mat4 model {1.f};
+  model = glm::translate(model, glm::vec3(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels, 0.f));
+  model = glm::rotate(model, body_->GetAngle(), glm::vec3(0.f, 0.f, 1.f));
+  graphics_->mvp_ = camera_.projectionMatrix() * camera_.viewMatrix() * model;
 }

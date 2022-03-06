@@ -1,30 +1,31 @@
 #include "include/aerolite.hpp"
-#include "include/box2d_scale.hpp"
+#include "include/camera.hpp"
 #include "include/game.hpp"
 #include "include/game_entity.hpp"
-#include "include/paths.hpp"
 #include "include/random.hpp"
+#include "include/resources.hpp"
 #include "kuge/kuge.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
-#include "sdl2_wrappers/sdl2_renderer.hpp"
-#include "sdl2_wrappers/sdl2_texture.hpp"
+#include <algorithm>
 #include <limits>
-
-/* TEXTURES */
-
-ktp::SDL2_Texture ktp::AerolitesTextures::aerolites_textures {};
-
-void ktp::AerolitesTextures::loadTexture(SDL2_Renderer& ren) {
-  const std::string file {"asteroid.png"};
-  const std::string path {getResourcesPath("textures") + file};
-  aerolites_textures.loadFromFile(ren, path);
-}
 
 /* GRAPHICS */
 
-void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite, const SDL2_Renderer& renderer) {
-  renderer.setDrawColor(color_);
-  renderer.drawLines(render_shape_);
+ktp::AeroliteGraphicsComponent::AeroliteGraphicsComponent() noexcept:
+  shader_(Resources::getShader("aerolite")),
+  texture_(Resources::getTexture("aerolite_00")) {
+
+  const glm::vec4 uniform_color {color_.r, color_.g, color_.b, color_.a};
+  shader_.use();
+  shader_.setFloat4("aerolite_color", glm::value_ptr(uniform_color));
+}
+
+void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite) {
+  shader_.use();
+  shader_.setMat4f("mvp", glm::value_ptr(mvp_));
+  texture_.bind();
+  vao_.bind();
+  glDrawElements(GL_TRIANGLES, indices_count_, GL_UNSIGNED_INT, 0);
 }
 
 /* PHYSICS */
@@ -34,19 +35,28 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, Aerol
   born_time_ = Game::gameplay_timer_.milliseconds();
   owner_ = owner;
   size_ = ConfigParser::aerolites_config.size_.value_ * generateRand(ConfigParser::aerolites_config.size_.rand_min_, ConfigParser::aerolites_config.size_.rand_max_);
-  generateAeroliteShape(shape_, size_);
-  graphics_->renderShape().resize(shape_.size() + 1);
-  createB2Body(*this);
-}
-
-ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics, float size) noexcept:
- graphics_(graphics) {
-  born_time_ = Game::gameplay_timer_.milliseconds();
-  owner_ = owner;
-  size_ = size;
-  generateAeroliteShape(shape_, size_);
-  graphics_->renderShape().resize(shape_.size() + 1);
-  createB2Body(*this);
+  // shape is a vector of points: {[x,y], [x,y], ...} with center at [0,0]
+  const auto shape {generateAeroliteShape(size_)};
+  // triangulated_shape is a vector of floats: {x, y, z, x, y, z, x, y, ...}
+  GLfloatVector triangulated_shape {};
+  Geometry::triangulate(shape, triangulated_shape);
+  // Box2D
+  createB2Body(*this, triangulated_shape);
+  // generate a EBO based on the triangulated_shape
+  GLuintVector indices {};
+  EBO::generateEBO(triangulated_shape, indices);
+  // convert cartesian coords to UV coords and set up the uv VBO
+  const GLfloatVector texture_coords {convertToUV(triangulated_shape)};
+  graphics_->uv_.setup(texture_coords);
+  // convert box2d coords to pixels and set up the vertices VBO
+  std::transform(triangulated_shape.begin(), triangulated_shape.end(), triangulated_shape.begin(), [](auto& coord){return coord * kMetersToPixels;});
+  graphics_->vertices_.setup(triangulated_shape);
+  // link the attributes
+  graphics_->vao_.linkAttrib(graphics_->vertices_, 0, 3, GL_FLOAT, 0, nullptr);
+  graphics_->vao_.linkAttrib(graphics_->uv_,       1, 2, GL_FLOAT, 0, nullptr);
+  // setup the EBO
+  graphics_->indices_count_ = indices.size();
+  graphics_->ebo_.setup(indices);
 }
 
 ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) noexcept {
@@ -56,7 +66,6 @@ ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(Aerolite
     collided_ = other.collided_;
     delta_    = std::move(other.delta_);
     owner_    = std::exchange(other.owner_, nullptr);
-    shape_    = std::move(other.shape_);
     size_     = other.size_;
     // own members
     graphics_       = std::exchange(other.graphics_, nullptr);
@@ -68,7 +77,25 @@ ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(Aerolite
   return *this;
 }
 
-void ktp::AerolitePhysicsComponent::createB2Body(AerolitePhysicsComponent& aerolite) {
+ktp::GLfloatVector ktp::AerolitePhysicsComponent::convertToUV(const GLfloatVector& v) {
+  GLfloat max_x{v[0]}, min_x{v[0]}, max_y{v[1]}, min_y{v[1]};
+  for (std::size_t i = 0; i < v.size(); i += 3) {
+    if (v[i] > max_x) max_x = v[i];
+    else if (v[i] < min_x) min_x = v[i];
+    if (v[i + 1] > max_y) max_y = v[i + 1];
+    else if (v[i + 1] < min_y) min_y = v[i + 1];
+  }
+  const auto diagonal_inv {1.f / SDL_sqrtf((max_x - min_x) * (max_x - min_x) + (max_y - min_y) * (max_y - min_y))};
+  GLfloatVector result {};
+  result.reserve(static_cast<std::size_t>(v.size() * 0.66f));
+  for (std::size_t i = 0; i < v.size(); i += 3) {
+    result.push_back((v[i] - min_x) * diagonal_inv);
+    result.push_back((v[i + 1] - min_y) * diagonal_inv);
+  }
+  return result;
+}
+
+void ktp::AerolitePhysicsComponent::createB2Body(AerolitePhysicsComponent& aerolite, const GLfloatVector& triangulated_shape) {
   if (aerolite.body_) world_->DestroyBody(aerolite.body_);
 
   b2BodyDef body_def {};
@@ -77,7 +104,14 @@ void ktp::AerolitePhysicsComponent::createB2Body(AerolitePhysicsComponent& aerol
   aerolite.body_ = world_->CreateBody(&body_def);
 
   std::vector<B2Vec2Vector> fixtures_shapes {};
-  Geometry::triangulate(aerolite.shape_, fixtures_shapes);
+  for (std::size_t i = 0; i < triangulated_shape.size(); i += 9) {
+    B2Vec2Vector vec;
+    vec.push_back(b2Vec2{triangulated_shape[i + 0], triangulated_shape[i + 1]});
+    vec.push_back(b2Vec2{triangulated_shape[i + 3], triangulated_shape[i + 4]});
+    vec.push_back(b2Vec2{triangulated_shape[i + 6], triangulated_shape[i + 7]});
+    fixtures_shapes.push_back(vec);
+  }
+
   for (const auto& shape: fixtures_shapes) {
     b2PolygonShape fixture_shape {};
     fixture_shape.Set(shape.data(), shape.size());
@@ -91,42 +125,61 @@ void ktp::AerolitePhysicsComponent::createB2Body(AerolitePhysicsComponent& aerol
   }
 }
 
-void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, float size) {
-  generateAeroliteShape(shape, size, generateRand(kMinSides_, kMaxSides_));
+ktp::Geometry::Polygon ktp::AerolitePhysicsComponent::generateAeroliteShape(float size, SDL_FPoint offset) {
+  return generateAeroliteShape(size, generateRand(kMinSides_, kMaxSides_), offset);
 }
 
-void ktp::AerolitePhysicsComponent::generateAeroliteShape(B2Vec2Vector& shape, float size, unsigned int sides) {
-  shape.clear();
-  b2Vec2 point {};
+ktp::Geometry::Polygon ktp::AerolitePhysicsComponent::generateAeroliteShape(float size, unsigned int sides, SDL_FPoint offset) {
+  Geometry::Polygon shape {};
+  shape.reserve(sides);
+  GLfloat x {}, y {};
+  // Generates a shape around coord [0,0], CCW, length based on the size specified
   for (auto i = 0u; i < sides; ++i) {
-    const auto f_size {size * generateRand(0.8f, 1.f)};
-    point.x = f_size * SDL_cosf(2 * b2_pi * i / sides);
-    point.y = f_size * SDL_sinf(2 * b2_pi * i / sides);
-    shape.push_back(point);
+    const auto f_size {size * generateRand(0.82f, 1.f)};
+    x = f_size * SDL_cosf(2 * b2_pi * i / sides) + offset.x;
+    y = f_size * SDL_sinf(2 * b2_pi * i / sides) + offset.y;
+    shape.push_back({x, y});
   }
-  shape.shrink_to_fit();
+  return shape;
 }
 
 void ktp::AerolitePhysicsComponent::reshape(float size) {
   size_ = size;
-  generateAeroliteShape(shape_, size_, shape_.size());
-  graphics_->renderShape().clear();
-  graphics_->renderShape().resize(shape_.size() + 1);
+  const auto new_shape {generateAeroliteShape(size_)};
+  GLfloatVector triangulated_shape {};
+  Geometry::triangulate(new_shape, triangulated_shape);
   // Box2D
   const auto old_angle   {body_->GetAngle()};
   const auto old_angular {body_->GetAngularVelocity()};
   const auto old_delta   {body_->GetLinearVelocity()};
   const auto old_pos     {body_->GetPosition()};
-  createB2Body(*this);
+  createB2Body(*this, triangulated_shape);
   body_->SetAngularVelocity(old_angular);
   body_->SetLinearVelocity(old_delta);
   body_->SetTransform(old_pos, old_angle);
+  // generate a new EBO based on the triangulated_shape
+  GLuintVector indices {};
+  EBO::generateEBO(triangulated_shape, indices);
+  // normalize texture
+  const GLfloatVector texture_coords {convertToUV(triangulated_shape)};
+  graphics_->uv_.setup(texture_coords);
+  // convert box2d coords to pixels
+  std::transform(triangulated_shape.begin(), triangulated_shape.end(), triangulated_shape.begin(), [](auto& coord){return coord * kMetersToPixels;});
+  // setup VBO and link the attributes
+  graphics_->vertices_.setup(triangulated_shape);
+  graphics_->vao_.linkAttrib(graphics_->vertices_, 0, 3, GL_FLOAT, 0, nullptr);
+  graphics_->vao_.linkAttrib(graphics_->uv_, 1, 2, GL_FLOAT, 0, nullptr);
+  // setup the EBO
+  graphics_->indices_count_ = indices.size();
+  graphics_->ebo_.setup(indices);
+  // change the texture
+  // graphics_->texture_ = Resources::getTexture("aerolite_01");
 }
 
 ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnAerolite(const b2Vec2& where) {
   const auto aerolite {GameEntity::createEntity(EntityTypes::Aerolite)};
   if (!aerolite) return nullptr;
-  aerolite->physics()->body()->SetTransform(where, 0);
+  aerolite->physics()->body()->SetTransform({where.x * kPixelsToMeters, where.y * kPixelsToMeters}, 0);
   return aerolite;
 }
 
@@ -165,11 +218,7 @@ void ktp::AerolitePhysicsComponent::split() {
   if (size_ < kMinSize_) {
     // very small, destroyed on impact
     owner_->deactivate();
-    kuge::AeroliteDestroyedEvent ev {
-      kuge::KugeEventTypes::AeroliteDestroyed,
-      {owner_->physics()->body()->GetPosition().x * kMetersToPixels,
-       owner_->physics()->body()->GetPosition().y * kMetersToPixels},
-       (int)(kScore_ / size_)};
+    kuge::AeroliteDestroyedEvent ev {kuge::KugeEventTypes::AeroliteDestroyed, (int)(kScore_ / size_)};
     owner_->event_bus_->postEvent(ev);
     return;
   } else {
@@ -201,23 +250,13 @@ void ktp::AerolitePhysicsComponent::split() {
       where.y = perpendicular.end.y + kSpacer * (perpendicular.begin.y - perpendicular.end.y);
       aerolite->physics()->body()->SetTransform({where.x, where.y}, old_angle);
     }
-
     kuge::AeroliteSplittedEvent ev {
       kuge::KugeEventTypes::AeroliteSplitted,
-      {old_pos.x * kMetersToPixels, old_pos.y * kMetersToPixels},
       pieces,
       (int)(((kScore_ / 10u) / size_) * (pieces + 1u))
     };
     owner_->event_bus_->postEvent(ev);
   }
-}
-
-void ktp::AerolitePhysicsComponent::transformRenderShape() {
-  for (auto i = 0u; i < shape_.size(); ++i) {
-    graphics_->renderShape().data()[i].x = ((shape_[i].x * SDL_cosf(body_->GetAngle()) - shape_[i].y * SDL_sinf(body_->GetAngle())) + body_->GetPosition().x) * kMetersToPixels;
-    graphics_->renderShape().data()[i].y = ((shape_[i].x * SDL_sinf(body_->GetAngle()) + shape_[i].y * SDL_cosf(body_->GetAngle())) + body_->GetPosition().y) * kMetersToPixels;
-  }
-  graphics_->renderShape().back() = graphics_->renderShape().front();
 }
 
 void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float delta_time) {
@@ -226,8 +265,6 @@ void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float del
     collided_ = false;
     split();
   }
-
-  transformRenderShape();
 
   aabb_.lowerBound = b2Vec2{ std::numeric_limits<float>::max(),  std::numeric_limits<float>::max()};
   aabb_.upperBound = b2Vec2{-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max()};
@@ -244,4 +281,13 @@ void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float del
     new_born_ = false;
   }
   if (new_born_ && Game::gameplay_timer_.milliseconds() - born_time_ > kNewBornTime_) new_born_ = false;
+
+  updateMVP();
+}
+
+void ktp::AerolitePhysicsComponent::updateMVP() {
+  glm::mat4 model {1.f};
+  model = glm::translate(model, glm::vec3(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels, 0.f));
+  model = glm::rotate(model, body_->GetAngle(), glm::vec3(0.f, 0.f, 1.f));
+  graphics_->mvp_ = camera_.projectionMatrix() * camera_.viewMatrix() * model;
 }

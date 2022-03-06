@@ -87,29 +87,25 @@ class KugeEvent {
 
 class AeroliteDestroyedEvent: public KugeEvent {
  public:
-  AeroliteDestroyedEvent(KugeEventTypes type, SDL_FPoint pos, int score):
-    KugeEvent(type, "Aerolite destroyed"), position_(pos), score_(score) {}
+  AeroliteDestroyedEvent(KugeEventTypes type, int score):
+    KugeEvent(type, "Aerolite destroyed"), score_(score) {}
 
   virtual void print() const override;
-  inline auto position() const { return position_; }
   inline auto score() const { return score_; }
  private:
-  const SDL_FPoint position_;
   int score_;
 };
 
 class AeroliteSplittedEvent: public KugeEvent {
  public:
-  AeroliteSplittedEvent(KugeEventTypes type, SDL_FPoint pos, Uint32 pieces, int score):
-    KugeEvent(type, "Aerolite splitted"), pieces_(pieces), position_(pos), score_(score) {}
+  AeroliteSplittedEvent(KugeEventTypes type, Uint32 pieces, int score):
+    KugeEvent(type, "Aerolite splitted"), pieces_(pieces), score_(score) {}
 
   inline auto pieces() const { return pieces_; }
   virtual void print() const override;
-  inline auto position() const { return position_; }
   inline auto score() const { return score_; }
  private:
   const Uint32 pieces_;
-  const SDL_FPoint position_;
   int score_;
 };
 

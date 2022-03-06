@@ -1,6 +1,6 @@
 #include "include/config_parser.hpp"
 #include "include/emitter.hpp"
-#include "include/paths.hpp"
+#include "include/resources.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include <algorithm> // std::transform
 #include <sstream> // std::ostringstream
@@ -18,7 +18,7 @@ void ktp::ConfigParser::loadConfigFiles() {
 ktp::ConfigParser::AerolitesConfig ktp::ConfigParser::aerolites_config {};
 
 void ktp::ConfigParser::loadAerolitesConfig() {
-  const std::string path {getConfigPath() + kAerolitesFile};
+  const std::string path {Resources::getConfigPath() + kAerolitesFile};
   pugi::xml_document doc {};
   const auto result {doc.load_file(path.c_str())};
   if (result) {
@@ -28,13 +28,13 @@ void ktp::ConfigParser::loadAerolitesConfig() {
       aerolites_config.colors_.clear();
       auto color = aerolites.child("colors").begin();
       while (color != aerolites.child("colors").end()) {
-        const SDL_Color requested_color {
-          (Uint8)color->attribute("r").as_uint(),
-          (Uint8)color->attribute("g").as_uint(),
-          (Uint8)color->attribute("b").as_uint(),
-          (Uint8)255
+        const Color requested_color {
+          color->attribute("r").as_uint() * Color::inv255(),
+          color->attribute("g").as_uint() * Color::inv255(),
+          color->attribute("b").as_uint() * Color::inv255(),
+          255u * Color::inv255()
         };
-        SDL_Color final_color {Colors::getNearestColor(requested_color)};
+        Color final_color {Palette::getNearestColor(requested_color)};
         final_color.a = requested_color.a;
         aerolites_config.colors_.push_back(final_color);
         ++color;
@@ -216,13 +216,13 @@ void ktp::ConfigParser::constructEmitterTypesVector(const pugi::xml_document& do
     /* COLORS */
     auto it = emitter.child("colors").begin();
     while (it != emitter.child("colors").end()) {
-      const SDL_Color requested_color {
-        static_cast<Uint8>(it->attribute("r").as_uint()),
-        static_cast<Uint8>(it->attribute("g").as_uint()),
-        static_cast<Uint8>(it->attribute("b").as_uint()),
-        static_cast<Uint8>(it->attribute("a").as_uint())
+      const Color requested_color {
+        it->attribute("r").as_uint(),
+        it->attribute("g").as_uint(),
+        it->attribute("b").as_uint(),
+        it->attribute("a").as_uint()
       };
-      SDL_Color final_color {Colors::getNearestColor(requested_color)};
+      glm::vec4 final_color {Palette::colorToGlmVec4(Palette::getNearestColor(requested_color))};
       final_color.a = requested_color.a;
       emi.colors_.push_back(final_color);
       ++it;
@@ -280,7 +280,7 @@ void ktp::ConfigParser::constructEmitterTypesVector(const pugi::xml_document& do
 }
 
 void ktp::ConfigParser::loadEmittersConfig() {
-  const std::string path {getConfigPath() + kEmittersFile};
+  const std::string path {Resources::getConfigPath() + kEmittersFile};
   pugi::xml_document doc {};
   const auto result {doc.load_file(path.c_str())};
   if (result) {
@@ -355,7 +355,7 @@ void ktp::ConfigParser::printLoadedEmitterTypes(const pugi::xml_document& doc) {
 ktp::ConfigParser::GameConfig ktp::ConfigParser::game_config {};
 
 void ktp::ConfigParser::loadGameConfig() {
-  const std::string path {getConfigPath() + kGameFile};
+  const std::string path {Resources::getConfigPath() + kGameFile};
   pugi::xml_document doc {};
   const auto result {doc.load_file(path.c_str())};
   if (result) {
@@ -394,20 +394,20 @@ void ktp::ConfigParser::loadGameConfig() {
 ktp::ConfigParser::PlayerConfig ktp::ConfigParser::player_config {};
 
 void ktp::ConfigParser::loadPlayerConfig() {
-  const std::string path {getConfigPath() + kPlayerFile};
+  const std::string path {Resources::getConfigPath() + kPlayerFile};
   pugi::xml_document doc {};
   const auto result {doc.load_file(path.c_str())};
   if (result) {
     const auto player {doc.child("player")};
     // Color
     if (player.child("color")) {
-      const SDL_Color requested_color {
-        (Uint8)player.child("color").attribute("r").as_uint(),
-        (Uint8)player.child("color").attribute("g").as_uint(),
-        (Uint8)player.child("color").attribute("b").as_uint(),
-        (Uint8)255
+      const Color requested_color {
+        player.child("color").attribute("r").as_uint(),
+        player.child("color").attribute("g").as_uint(),
+        player.child("color").attribute("b").as_uint(),
+        255u
       };
-      player_config.color_ = Colors::getNearestColor(requested_color);
+      player_config.color_ = Palette::getNearestColor(requested_color);
     } else {
       logMessage("Warning! Player color not set. Using default color.");
     }
@@ -499,10 +499,11 @@ void ktp::ConfigParser::loadPlayerConfig() {
 
 // PROJECTILES
 
+ktp::ConfigParser::ExplosionConfig   ktp::ConfigParser::explosion_config {};
 ktp::ConfigParser::ProjectilesConfig ktp::ConfigParser::projectiles_config {};
 
 void ktp::ConfigParser::loadProjectilesConfig() {
-  const std::string path {getConfigPath() + kProjectilesFile};
+  const std::string path {Resources::getConfigPath() + kProjectilesFile};
   pugi::xml_document doc {};
   const auto result {doc.load_file(path.c_str())};
   if (result) {
@@ -520,13 +521,13 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     }
     // Color
     if (projectiles.child("color")) {
-      const SDL_Color requested_color {
-        (Uint8)projectiles.child("color").attribute("r").as_uint(),
-        (Uint8)projectiles.child("color").attribute("g").as_uint(),
-        (Uint8)projectiles.child("color").attribute("b").as_uint(),
-        (Uint8)255
+      const Color requested_color {
+        projectiles.child("color").attribute("r").as_uint(),
+        projectiles.child("color").attribute("g").as_uint(),
+        projectiles.child("color").attribute("b").as_uint(),
+        255u
       };
-      projectiles_config.color_ = Colors::getNearestColor(requested_color);
+      projectiles_config.color_ = Palette::getNearestColor(requested_color);
     } else {
       logMessage("Warning! Projectiles color not set. Using default color.");
     }
@@ -585,22 +586,34 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     } else {
       logMessage("Warning! Projectiles speed not set. Using default speed.");
     }
-    // Blast power
+    // Explosion blast power
     if (projectiles.child("explosion").child("blastPower")) {
       const auto blast_power {projectiles.child("explosion").child("blastPower").attribute("value").as_float()};
       if (blast_power >= 0) {
-        projectiles_config.explosion_config_.blast_power_ = blast_power;
+        explosion_config.blast_power_ = blast_power;
       } else {
         logMessage("Warning! Projectiles explosion blast power less than 0. Using default blast power.");
       }
     } else {
       logMessage("Warning! Projectiles explosion blast power not set. Using default blast power.");
     }
+    // Explosion color
+    if (projectiles.child("explosion").child("color")) {
+      const Color requested_color {
+        projectiles.child("explosion").child("color").attribute("r").as_uint(),
+        projectiles.child("explosion").child("color").attribute("g").as_uint(),
+        projectiles.child("explosion").child("color").attribute("b").as_uint(),
+        255u
+      };
+      explosion_config.color_ = Palette::getNearestColor(requested_color);
+    } else {
+      logMessage("Warning! Explosion color not set. Using default color.");
+    }
     // Explosion density
     if (projectiles.child("explosion").child("density")) {
       const auto density {projectiles.child("explosion").child("density").attribute("value").as_float()};
       if (density >= 0) {
-        projectiles_config.explosion_config_.density_ = density;
+        explosion_config.density_ = density;
       } else {
         logMessage("Warning! Projectiles explosion density less than 0. Using default density.");
       }
@@ -611,7 +624,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("duration")) {
       const auto explosion_duration {projectiles.child("explosion").child("duration").attribute("value").as_uint()};
       if (explosion_duration >= 0) {
-        projectiles_config.explosion_config_.duration_ = explosion_duration;
+        explosion_config.duration_ = explosion_duration;
       } else {
         logMessage("Warning! Projectiles explosion duration less than 0. Using default duration.");
       }
@@ -622,7 +635,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("friction")) {
       const auto friction {projectiles.child("explosion").child("friction").attribute("value").as_float()};
       if (checkWithinRange(friction, 0.f, 1.f)) {
-        projectiles_config.explosion_config_.friction_ = friction;
+        explosion_config.friction_ = friction;
       } else {
         logMessage("Warning! Projectiles explosion friction not in range [0, 1]. Using default friction.");
       }
@@ -633,7 +646,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("linearDamping")) {
       const auto damping {projectiles.child("explosion").child("linearDamping").attribute("value").as_float()};
       if (damping >= 0) {
-        projectiles_config.explosion_config_.linear_damping_ = damping;
+        explosion_config.linear_damping_ = damping;
       } else {
         logMessage("Warning! Projectiles explosion linear damping less than 0. Using default linear damping.");
       }
@@ -644,7 +657,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("particleRadius")) {
       const auto radius {projectiles.child("explosion").child("particleRadius").attribute("value").as_float()};
       if (radius > 0) {
-        projectiles_config.explosion_config_.particle_radius_ = radius;
+        explosion_config.particle_radius_ = radius;
       } else {
         logMessage("Warning! Projectiles explosion particle radius 0 or less. Using default particle radius.");
       }
@@ -655,7 +668,7 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("rays")) {
       const auto rays {projectiles.child("explosion").child("rays").attribute("value").as_uint()};
       if (rays >= 0) {
-        projectiles_config.explosion_config_.rays_ = rays;
+        explosion_config.rays_ = rays;
       } else {
         logMessage("Warning! Projectiles explosion rays less than 0. Using default rays.");
       }
@@ -666,13 +679,14 @@ void ktp::ConfigParser::loadProjectilesConfig() {
     if (projectiles.child("explosion").child("restitution")) {
       const auto restitution {projectiles.child("explosion").child("restitution").attribute("value").as_float()};
       if (checkWithinRange(restitution, 0.f, 1.f)) {
-        projectiles_config.explosion_config_.restitution_ = restitution;
+        explosion_config.restitution_ = restitution;
       } else {
         logMessage("Warning! Projectiles explosion restitution not in range [0, 1]. Using default restitution.");
       }
     } else {
       logMessage("Warning! Projectiles explosion restitution not set. Using default restitution.");
     }
+    projectiles_config.explosion_config_ = explosion_config;
   } else {
     const std::string error_msg {
             "WARNING! " + kProjectilesFile + " parsed with errors\n"

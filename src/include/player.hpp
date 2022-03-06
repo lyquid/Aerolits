@@ -2,32 +2,36 @@
 
 #include "config_parser.hpp"
 #include "graphics_component.hpp"
-#include "palette.hpp"
 #include "physics_component.hpp"
+#include "resources.hpp"
+#include "../sdl2_wrappers/sdl2_opengl.hpp"
 #include "../sdl2_wrappers/sdl2_timer.hpp"
-#include <SDL.h>
-#include <memory>
 #include <utility> // std::move
-#include <vector>
+#include <memory>
 
 namespace ktp {
 
-using FPointsVector = std::vector<SDL_FPoint>;
-using B2Vec2Vector = std::vector<b2Vec2>;
-
-class EmitterGraphicsComponent;
 class EmitterPhysicsComponent;
-class GameEntity;
-class SDL2_Renderer;
 
 class PlayerGraphicsComponent: public GraphicsComponent {
+
   friend class PlayerPhysicsComponent;
+
  public:
-  PlayerGraphicsComponent() noexcept;
-  virtual void update(const GameEntity& player, const SDL2_Renderer& renderer) override;
+
+  PlayerGraphicsComponent();
+  virtual void update(const GameEntity& player) override;
+
  private:
-  SDL_Color color_ {ConfigParser::player_config.color_};
-  std::unique_ptr<EmitterGraphicsComponent> exhaust_emitter_ {nullptr};
+
+  void generateOpenGLStuff(float size);
+
+  Color color_ {ConfigParser::player_config.color_};
+  VAO vao_ {};
+  VBO vertices_ {};
+  EBO vertices_indices_ {};
+  ShaderProgram shader_ {Resources::getShader("player")};
+  glm::mat4 mvp_ {};
 };
 
 class DemoInputComponent: public InputComponent {
@@ -53,28 +57,28 @@ class PlayerPhysicsComponent: public PhysicsComponent {
 
  public:
 
-  PlayerPhysicsComponent(GameEntity* owner, PlayerGraphicsComponent* graphics) noexcept;
+  PlayerPhysicsComponent(GameEntity* owner, PlayerGraphicsComponent* graphics);
   PlayerPhysicsComponent(const PlayerPhysicsComponent& other) = delete;
   PlayerPhysicsComponent(PlayerPhysicsComponent&& other) { *this = std::move(other); }
+  ~PlayerPhysicsComponent();
 
   PlayerPhysicsComponent& operator=(const PlayerPhysicsComponent& other) = delete;
-  PlayerPhysicsComponent& operator=(PlayerPhysicsComponent&& other) noexcept;
+  PlayerPhysicsComponent& operator=(PlayerPhysicsComponent&& other);
 
   virtual void collide(const GameEntity* other) override {}
   virtual void update(const GameEntity& player, float delta_time) override;
 
  private:
 
-  static void generatePlayerShape(B2Vec2Vector& shape, float size);
   void checkWrap();
   void setBox2D();
-  void transformRenderShape();
+  void updateMVP();
 
   PlayerGraphicsComponent* graphics_ {nullptr};
   bool thrusting_ {false};
   float cos_ {};
   float sin_ {};
-  std::unique_ptr<EmitterPhysicsComponent> exhaust_emitter_ {nullptr};
+  EmitterPhysicsComponent* exhaust_emitter_ {nullptr};
 };
 
 } // namespace ktp

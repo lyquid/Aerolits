@@ -1,87 +1,102 @@
-#ifndef KTP_SRC_INCLUDE_DEBUG_DRAW_HPP_
-#define KTP_SRC_INCLUDE_DEBUG_DRAW_HPP_
+// MIT License
 
-#include "box2d_scale.hpp"
-#include "../sdl2_wrappers/sdl2_wrappers.hpp"
-#include <box2d/box2d.h>
-#include <vector>
+// Copyright (c) 2019 Erin Catto
 
-namespace ktp {
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 
-class DebugDraw: public b2Draw {
- public:
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
 
-  void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) {
-    renderer_->setDrawColor(color);
-    renderer_->drawCircle(SDL_FPoint{center.x * kMetersToPixels, center.y * kMetersToPixels}, radius * kMetersToPixels);
-  }
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
-  void DrawPoint(const b2Vec2& p, float size, const b2Color &color) {
-    renderer_->setDrawColor(color);
-    if (size <= 1) {
-      renderer_->drawPoint(p.x * kMetersToPixels, p.y * kMetersToPixels);
-    } else {
-      renderer_->drawCircle(p, size * kMetersToPixels);
-    }
-  }
+#ifndef DRAW_H
+#define DRAW_H
 
-  void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) {
-    renderer_->setDrawColor(color);
-    std::vector<SDL_FPoint> points(vertexCount + 1);
-    for (auto i = 0; i < vertexCount; ++i) {
-      points[i].x = vertices[i].x * kMetersToPixels;
-      points[i].y = vertices[i].y * kMetersToPixels;
-    }
-    points[vertexCount] = points[0];
-    SDL_RenderDrawLinesF(renderer_->renderer(), points.data(), vertexCount + 1);
-  }
+#define GLFW_INCLUDE_NONE
+// #include "glad/gl.h"
+// #include "GLFW/glfw3.h"
+#include "../sdl2_wrappers/sdl2_opengl.hpp"
+#include "box2d/box2d.h"
 
-  void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) {
-    //logMessage("DrawSolidCircle not implemented");
-    renderer_->setDrawColor(color);
-    renderer_->drawCircle(SDL_FPoint{center.x * kMetersToPixels, center.y * kMetersToPixels}, radius * kMetersToPixels);
-  }
+struct b2AABB;
+struct GLRenderPoints;
+struct GLRenderLines;
+struct GLRenderTriangles;
+struct GLFWwindow;
 
-  void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) {
-    // logMessage("DrawSolidPolygon not implemented.");
-    renderer_->setDrawColor(color.r * 255, color.g * 255, color.b * 255, color.a * 255);
-    std::vector<SDL_FPoint> points(vertexCount + 1);
-    for (auto i = 0; i < vertexCount; ++i) {
-      points[i].x = vertices[i].x * kMetersToPixels;
-      points[i].y = vertices[i].y * kMetersToPixels;
-    }
-    points[vertexCount] = points[0];
-    SDL_RenderDrawLinesF(renderer_->renderer(), points.data(), vertexCount + 1);
-  }
+//
+struct Camera
+{
+	Camera()
+	{
+		m_center.Set(0.0f, 20.0f);
+		m_zoom = 1.0f;
+		m_width = 1366;
+		m_height = 768;
+	}
 
-  void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) {
-    renderer_->setDrawColor(color);
-    renderer_->drawLine(p1.x * kMetersToPixels, p1.y * kMetersToPixels, p2.x * kMetersToPixels, p2.y * kMetersToPixels);
-  }
+	b2Vec2 ConvertScreenToWorld(const b2Vec2& screenPoint);
+	b2Vec2 ConvertWorldToScreen(const b2Vec2& worldPoint);
+	void BuildProjectionMatrix(float* m, float zBias);
 
-  void DrawTransform(const b2Transform& xf) {
-    constexpr float axis_scale {0.4f};
-
-    const b2Vec2 p1 {xf.p};
-    b2Vec2 p2 {};
-
-    renderer_->setDrawColor(255, 0, 0, 0);
-    p2 = p1 + axis_scale * xf.q.GetXAxis();
-    renderer_->drawLine(p1.x * kMetersToPixels, p1.y * kMetersToPixels, p2.x * kMetersToPixels, p2.y * kMetersToPixels);
-
-    renderer_->setDrawColor(0, 255, 0, 0);
-    p2 = p1 - axis_scale * xf.q.GetYAxis();
-    renderer_->drawLine(p1.x * kMetersToPixels, p1.y * kMetersToPixels, p2.x * kMetersToPixels, p2.y * kMetersToPixels);
-  }
-
-  inline void setRenderer(const SDL2_Renderer* ren) { renderer_ = ren; }
-
- private:
-
-  const SDL2_Renderer* renderer_ {nullptr};
-
+	b2Vec2 m_center;
+	float m_zoom;
+	int32 m_width;
+	int32 m_height;
 };
 
-} // namespace ktp
+// This class implements debug drawing callbacks that are invoked
+// inside b2World::Step.
+class DebugDraw : public b2Draw
+{
+public:
+	DebugDraw();
+	~DebugDraw();
 
-#endif // KTP_SRC_INCLUDE_DEBUG_DRAW_HPP_
+	void Create();
+	void Destroy();
+
+	void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
+
+	void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
+
+	void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override;
+
+	void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override;
+
+	void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) override;
+
+	void DrawTransform(const b2Transform& xf) override;
+
+	void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override;
+
+	//void DrawString(int x, int y, const char* string, ...);
+
+	//void DrawString(const b2Vec2& p, const char* string, ...);
+
+	void DrawAABB(b2AABB* aabb, const b2Color& color);
+
+	void Flush();
+
+	bool m_showUI;
+	GLRenderPoints* m_points;
+	GLRenderLines* m_lines;
+	GLRenderTriangles* m_triangles;
+};
+
+extern DebugDraw g_debugDraw;
+extern Camera g_camera;
+// extern GLFWwindow* g_mainWindow;
+
+#endif

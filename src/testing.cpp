@@ -1,57 +1,87 @@
+#include "include/aerolite.hpp"
+#include "include/box2d_utils.hpp"
 #include "include/palette.hpp"
+#include "include/random.hpp"
+#include "include/resources.hpp"
 #include "include/testing.hpp"
+#include "imgui.h"
 #include "sdl2_wrappers/sdl2_geometry.hpp"
-#include <iostream>
+#include "sdl2_wrappers/sdl2_log.hpp"
+#include "sdl2_wrappers/sdl2_timer.hpp"
 
-ktp::Testing::Testing() {
-  // test_polygon_.push_back( {0 * test_center_.x,6 * test_center_.y});
-  // test_polygon_.push_back( {0 * test_center_.x,0 * test_center_.y});
-  // test_polygon_.push_back( {3 * test_center_.x,0 * test_center_.y});
-  // test_polygon_.push_back( {4 * test_center_.x,1 * test_center_.y});
-  // test_polygon_.push_back( {6 * test_center_.x,1 * test_center_.y});
-  // test_polygon_.push_back( {8 * test_center_.x,0 * test_center_.y});
-  // test_polygon_.push_back( {12 * test_center_.x,0 * test_center_.y});
-  // test_polygon_.push_back( {13 * test_center_.x,2 * test_center_.y});
-  // test_polygon_.push_back( {8 * test_center_.x,2 * test_center_.y});
-  // test_polygon_.push_back( {8 * test_center_.x,4 * test_center_.y});
-  // test_polygon_.push_back( {11 * test_center_.x,4 * test_center_.y});
-  // test_polygon_.push_back( {11 * test_center_.x,6 * test_center_.y});
-  // test_polygon_.push_back( {6 * test_center_.x,6 * test_center_.y});
-  // test_polygon_.push_back( {4 * test_center_.x,3 * test_center_.y});
-  // test_polygon_.push_back( {2 * test_center_.x,6 * test_center_.y});
-  // Geometry::triangulate(test_polygon_, test_triangles_, true);
-  // test_polygon_.push_back(test_polygon_.front());
+void ktp::Testing::draw() {
+  shader_program_.use();
+  vao_.bind();
+  glDrawArraysInstanced(GL_TRIANGLES, 0, vertices_data_.size(), kNumCubes_);
 }
 
-void ktp::Testing::draw(const SDL2_Renderer& ren) const {
-  // ren.setDrawColor(Colors::red);
-  // ren.drawLines(polygon_);
-  // ren.drawLines(test_polygon_);
-  // if (draw_triangles_) {
-  //   ren.setDrawColor(Colors::copper_green);
-  //   for (const auto& triangle: triangles_) {
-  //     ren.drawLines(triangle);
-  //   }
-  //   for (const auto& triangle: test_triangles_) {
-  //     ren.drawLines(triangle);
-  //   }
-  // }
+void ktp::Testing::init() {
+  // camera
+  // camera_.setOrthographicMatrix(glm::ortho(
+  //   0.f, 1366.f, // left, right
+  //   0.f, 768.f, // bottom, top
+  //   -1.f, 1.f) // zNear, zFar
+  // );
+  // camera_.setProjection(Projection::Orthographic);
+  // shader
+  shader_program_ = Resources::getShader("test");
+  // vertices
+  vertices_data_ = cube(0.05f);
+  vertices_.setup(vertices_data_);
+  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 0, nullptr);
+  // colors
+  GLfloatVector colors_data_ {};
+  colors_data_.resize(vertices_data_.size());
+  for (auto& color_c: colors_data_) {
+    color_c = generateRand(0.f, 1.f);
+  }
+  colors_.setup(colors_data_);
+  vao_.linkAttrib(colors_, 1, 3, GL_FLOAT, 0, nullptr);
+  // translations
+  std::vector<glm::vec3> translations(kNumCubes_);
+  int index {};
+  float offset {0.1f};
+  for (int z = -10; z < 10; z += 2) {
+    for (int y = -10; y < 10; y += 2) {
+      for (int x = -10; x < 10; x += 2) {
+        glm::vec3 translation {};
+        translation.x = (float)x / 10.0f + offset;
+        translation.y = (float)y / 10.0f + offset;
+        translation.z = (float)z / 10.0f + offset;
+        translations[index++] = translation;
+      }
+    }
+  }
+  translations_.setup(translations.data(), kNumCubes_ * sizeof(glm::vec3));
+  vao_.linkAttrib(translations_, 2, 3, GL_FLOAT, 0, nullptr);
+  glVertexAttribDivisor(2, 1);
 }
 
-void ktp::Testing::generateShape(float max_size, int sides) {
-  // if (sides < 3) return;
-  // polygon_.clear();
-  // triangles_.clear();
+void ktp::Testing::update(float delta_time) {
+  updateCamera(delta_time);
+  updateMVP();
+}
 
-  // SDL_FPoint point {};
-  // for (auto i = 0; i < sides; ++i) {
-  //   const auto f_size {max_size * generateRand(0.8f, 1.f)};
-  //   point.x = f_size * SDL_cosf(2 * kPI * i / sides) + center_.x;
-  //   point.y = f_size * SDL_sinf(2 * kPI * i / sides) + center_.y;
-  //   polygon_.push_back({point.x, point.y});
-  // }
-  // Geometry::triangulate(polygon_, triangles_, true);
-  // // this is the closing point == first point
-  // polygon_.push_back(polygon_.front());
-  // std::cout << "Polygon 1 area: " << std::to_string(Geometry::area(polygon_)) << '\n';
+void ktp::Testing::updateCamera(float delta_time) {
+  if (ImGui::GetIO().WantCaptureKeyboard) return;
+  const auto state {SDL_GetKeyboardState(nullptr)};
+  if (state[SDL_SCANCODE_W]) {
+    camera_.move(CameraMovement::Forward, delta_time);
+  }
+  if (state[SDL_SCANCODE_S]) {
+    camera_.move(CameraMovement::Backward, delta_time);
+  }
+  if (state[SDL_SCANCODE_A]) {
+    camera_.move(CameraMovement::Left, delta_time);
+  }
+  if (state[SDL_SCANCODE_D]) {
+    camera_.move(CameraMovement::Right, delta_time);
+  }
+}
+
+void ktp::Testing::updateMVP() {
+  glm::mat4 model {1.f};
+  const glm::mat4 mvp {camera_.projectionMatrix() * camera_.viewMatrix() * model};
+  shader_program_.use();
+  shader_program_.setMat4f("mvp", glm::value_ptr(mvp));
 }

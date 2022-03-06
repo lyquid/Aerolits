@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_INCLUDE_GAME_HPP_
 
 #include "background.hpp"
+#include "camera.hpp"
 #include "config_parser.hpp"
 #include "contact_listener.hpp"
 #include "debug_draw.hpp"
@@ -11,6 +12,9 @@
 #include "../kuge/kuge.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <box2d/box2d.h>
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
 #include <string>
 
 namespace ktp {
@@ -36,11 +40,12 @@ class Game {
 
   inline void draw() { state_->draw(*this); }
   inline void handleEvents() { state_->handleEvents(*this); }
-  bool init();
   inline void setFrameTime(double time) { frame_time_ = time; }
   inline bool quit() const { return quit_; }
   void reset();
   inline void update(float delta_time) { state_->update(*this, delta_time); }
+
+  static Camera camera_;
 
   /**
    * @brief This timer only goes when playing or in demo state.
@@ -50,6 +55,7 @@ class Game {
  private:
 
   void clean();
+  bool initImgui();
   bool initSDL2();
   bool loadResources();
 
@@ -57,7 +63,7 @@ class Game {
   bool paused_ {false};
   bool quit_ {false};
   SDL2_Window main_window_ {};
-  SDL2_Renderer renderer_ {};
+  SDL2_GLContext context_ {};
   // State
   GameState* state_ {nullptr};
   // FPS
@@ -65,18 +71,16 @@ class Game {
   // KUGE engine
   kuge::EventBus event_bus_ {};
   kuge::AudioSystem audio_sys_ {};
-  kuge::GUISystem gui_sys_ {screen_size_};
+  kuge::BackendSystem backend_sys_ {};
+  kuge::GUISystem gui_sys_ {};
   kuge::InputSystem input_sys_ {};
   kuge::OutputSystem output_sys_ {ConfigParser::game_config.output_};
   // Box2D
   b2World world_ {b2Vec2{0.f, 0.f}};
   int32 velocity_iterations_ {8};
   int32 position_iterations_ {3};
-  DebugDraw debug_draw_ {};
-  bool debug_draw_on_ {false};
+  //DebugDraw debug_draw_ {};
   ContactListener contact_listener_ {};
-  // Testing
-  Testing test_ {};
 };
 
 } // end namespace ktp

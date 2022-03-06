@@ -2,7 +2,6 @@
 #include "include/game_entity.hpp"
 #include "include/input_component.hpp"
 #include <SDL.h>
-#include <utility> // std::move
 
 /* INPUT COMPONENT */
 
@@ -16,14 +15,14 @@ void ktp::InputComponent::shoot(GameEntity& player) {
     const auto cos {SDL_cosf(physics_->body_->GetAngle())};
 
     projectile_phy->body()->SetTransform({
-      physics_->body_->GetPosition().x + projectile_phy->size() * 5.2f * sin,
-      physics_->body_->GetPosition().y - projectile_phy->size() * 5.2f * cos},
-      physics_->body_->GetAngle()
+      physics_->body_->GetPosition().x - projectile_phy->size() * 5.2f * sin,
+      physics_->body_->GetPosition().y + projectile_phy->size() * 5.2f * cos},
+      physics_->body_->GetAngle() - b2_pi
     );
 
     projectile_phy->body()->SetLinearVelocity({
-       projectile_phy->speed() * sin * 30,
-      -projectile_phy->speed() * cos * 30
+      -projectile_phy->speed() * sin * 30,
+       projectile_phy->speed() * cos * 30
     });
 
     shooting_timer_ = SDL2_Timer::SDL2Ticks();
@@ -50,13 +49,13 @@ void ktp::InputComponent::stopThrusting(GameEntity& player) {
 }
 
 void ktp::InputComponent::thrust(GameEntity& player, float delta_time) {
-  physics_->delta_.x += SDL_sinf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
+  physics_->delta_.x += -SDL_sinf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
   if (physics_->delta_.x < -max_delta_ ) {
     physics_->delta_.x = -max_delta_;
   } else if (physics_->delta_.x > max_delta_) {
     physics_->delta_.x = max_delta_;
   }
-  physics_->delta_.y += -SDL_cosf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
+  physics_->delta_.y += SDL_cosf(physics_->body_->GetAngle()) * linear_impulse_ * delta_time;
   if (physics_->delta_.y < -max_delta_) {
     physics_->delta_.y = -max_delta_;
   } else if (physics_->delta_.y > max_delta_) {

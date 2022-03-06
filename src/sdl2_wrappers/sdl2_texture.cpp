@@ -37,7 +37,7 @@ bool ktp::SDL2_Texture::loadFromFile(const SDL2_Renderer& ren, const std::string
 }
 
 bool ktp::SDL2_Texture::loadFromTextBlended(const SDL2_Renderer& ren, const ktp::SDL2_Font& font, const std::string& text, const SDL_Color& color) {
-  const auto surface {TTF_RenderText_Blended(font.getFont(), text.c_str(), color)};
+  const auto surface {TTF_RenderText_Blended(font.font(), text.c_str(), color)};
   if (!surface) {
     logSDL2Error("TTF_RenderText_Blended: ", SDL_LOG_CATEGORY_RENDER);
     return false;
@@ -48,7 +48,7 @@ bool ktp::SDL2_Texture::loadFromTextBlended(const SDL2_Renderer& ren, const ktp:
 }
 
 bool ktp::SDL2_Texture::loadFromTextShaded(const SDL2_Renderer& ren, const ktp::SDL2_Font& font, const std::string& text, const SDL_Color& fg_color, const SDL_Color& bg_color) {
-  const auto surface {TTF_RenderText_Shaded(font.getFont(), text.c_str(), fg_color, bg_color)};
+  const auto surface {TTF_RenderText_Shaded(font.font(), text.c_str(), fg_color, bg_color)};
   if (!surface) {
     logSDL2Error("TTF_RenderText_Shaded: ", SDL_LOG_CATEGORY_RENDER);
     return false;
@@ -59,7 +59,7 @@ bool ktp::SDL2_Texture::loadFromTextShaded(const SDL2_Renderer& ren, const ktp::
 }
 
 bool ktp::SDL2_Texture::loadFromTextSolid(const SDL2_Renderer& ren, const ktp::SDL2_Font& font, const std::string& text, const SDL_Color& color) {
-  const auto surface {TTF_RenderText_Solid(font.getFont(), text.c_str(), color)};
+  const auto surface {TTF_RenderText_Solid(font.font(), text.c_str(), color)};
   if (!surface) {
     logSDL2Error("TTF_RenderText_Solid: ", SDL_LOG_CATEGORY_RENDER);
     return false;

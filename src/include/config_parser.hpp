@@ -1,7 +1,8 @@
 #pragma once
 
+#include "colors.hpp"
 #include "palette.hpp"
-#include "../../lib/pugixml1.11/pugixml.hpp"
+#include "pugixml.hpp"
 #include <SDL.h>
 #include <string>
 #include <vector>
@@ -15,7 +16,6 @@ using RRVInt   = RandomRangeValue<int>;
 using RRVUint  = RandomRangeValue<unsigned int>;
 using RRVFloat = RandomRangeValue<float>;
 
-using ColorsVector = std::vector<SDL_Color>;
 using RRVFVector   = std::vector<RRVFloat>;
 
 struct EmitterType;
@@ -45,7 +45,7 @@ namespace ConfigParser {
 
   // AEROLITES
   struct AerolitesConfig {
-    ColorsVector colors_ {Colors::orange};
+    ColorsVector colors_ {Palette::orange};
     float density_ {3.f};
     float friction_ {1.f};
     float restitution_ {0.f};
@@ -78,11 +78,11 @@ namespace ConfigParser {
    * @brief A struct with some attributes that represents the player.
    */
   struct PlayerConfig {
-    SDL_Color color_ {Colors::white};
+    Color color_ {Palette::white};
     float density_ {1.5f};
     float friction_ {0.8f};
     float restitution_ {0.f};
-    float size_ {1.2f};
+    float size_ {1.2f}; // adjust the default
     float angular_impulse_ {5.f};
     float linear_impulse_ {0.05f};
     float max_delta_ {0.1f};
@@ -94,6 +94,7 @@ namespace ConfigParser {
 
   struct ExplosionConfig {
     float blast_power_ {50.f};
+    Color color_ {Palette::red};
     float density_ {60.f};
     unsigned int duration_ {500u};
     float friction_ {0.f};
@@ -102,16 +103,16 @@ namespace ConfigParser {
     unsigned int rays_ {100u};
     float restitution_ {0.99f};
   };
+  extern ExplosionConfig explosion_config;
 
   struct ProjectilesConfig {
     unsigned int arm_time_ {300u};
-    SDL_Color color_ {Colors::copper_green};
+    Color color_ {Palette::copper_green};
     float density_ {10.f};
     float friction_ {0.1f};
     float restitution_ {0.35f};
     float size_ {0.15f};
     float speed_ {0.1f};
-    // explosion
     ExplosionConfig explosion_config_ {};
   };
   extern ProjectilesConfig projectiles_config;

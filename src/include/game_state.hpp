@@ -2,6 +2,7 @@
 #define AEROLITS_SRC_INCLUDE_GAME_STATE_HPP_
 
 #include "../sdl2_wrappers/sdl2_timer.hpp"
+#include "testing.hpp"
 
 // https://gameprogrammingpatterns.com/state.html
 
@@ -24,6 +25,16 @@ class GameState {
   virtual void update(Game&, float) = 0;
 
   inline static GameState* goToState(Game& game, GameState& state) { return state.enter(game); }
+
+  static inline void updateCulling() { culling_ ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE); }
+  static inline void updateDeepTest() { deep_test_ ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST); }
+  static inline void updatePolygonDraw() { polygon_draw_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+
+  static bool backend_draw_;
+  static bool culling_;
+  static bool debug_draw_;
+  static bool deep_test_;
+  static bool polygon_draw_;
 
   static DemoState    demo_;
   static PausedState  paused_;
@@ -75,12 +86,14 @@ class PlayingState: public GameState {
 
 class TestingState: public GameState {
  public:
+  ~TestingState() { delete test_; }
   virtual void draw(Game& game) override;
   virtual void handleEvents(Game& game) override;
   virtual void update(Game& game, float delta_time) override;
  private:
   virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
+  Testing* test_ {nullptr};
 };
 
 class TitleState: public GameState {

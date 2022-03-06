@@ -2,13 +2,10 @@
 
 #include "config_parser.hpp"
 #include "graphics_component.hpp"
-#include "palette.hpp"
+#include "opengl.hpp"
 #include "physics_component.hpp"
 #include "../sdl2_wrappers/sdl2_geometry.hpp"
-#include <box2d/box2d.h>
-#include <SDL.h>
 #include <utility> // std::move std::exchange
-#include <vector>
 
 namespace ktp {
 
@@ -16,21 +13,22 @@ using B2Vec2Vector = std::vector<b2Vec2>;
 using B2Line = Geometry::Line<b2Vec2>;
 
 class GameEntity;
-class SDL2_Renderer;
-class SDL2_Texture;
-
-namespace AerolitesTextures {
-
-  void loadTexture(SDL2_Renderer& ren);
-  extern SDL2_Texture aerolites_textures;
-
-} // end namespace AerolitesTextures
 
 class AeroliteGraphicsComponent: public GraphicsComponent {
+  friend class AerolitePhysicsComponent;
  public:
-  virtual void update(const GameEntity& aerolite, const SDL2_Renderer& renderer) override;
+  AeroliteGraphicsComponent() noexcept;
+  virtual void update(const GameEntity& aerolite) override;
  private:
-  SDL_Color color_ {ConfigParser::aerolites_config.colors_.front()};
+  const Color color_ {ConfigParser::aerolites_config.colors_[1]};
+  VAO vao_ {};
+  VBO vertices_ {};
+  VBO uv_ {};
+  EBO ebo_ {};
+  ShaderProgram shader_;
+  Texture2D texture_;
+  GLuint indices_count_ {};
+  glm::mat4 mvp_ {};
 };
 
 class AerolitePhysicsComponent: public PhysicsComponent {
@@ -38,7 +36,6 @@ class AerolitePhysicsComponent: public PhysicsComponent {
  public:
 
   AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics) noexcept;
-  AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics, float size) noexcept;
   AerolitePhysicsComponent(const AerolitePhysicsComponent& other) = delete;
   AerolitePhysicsComponent(AerolitePhysicsComponent&& other) { *this = std::move(other); }
 
@@ -51,18 +48,19 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   static GameEntity* spawnMovingAerolite();
   virtual void update(const GameEntity& aerolite, float delta_time) override;
   inline auto worldManifold() { return &world_manifold_; }
-
+static GLfloatVector convertToUV(const GLfloatVector& v);
  private:
 
-  static void createB2Body(AerolitePhysicsComponent& aerolite);
-  static void generateAeroliteShape(B2Vec2Vector& shape, float size);
-  static void generateAeroliteShape(B2Vec2Vector& shape, float size, unsigned int sides);
-  void split();
-  void transformRenderShape();
 
-  static constexpr float kMinSize_ {0.8f};
-  static constexpr unsigned int kMaxSides_ {30u};
-  static constexpr unsigned int kMinSides_ {25u};
+  static void createB2Body(AerolitePhysicsComponent& aerolite, const GLfloatVector& triangulated_shape);
+  static Geometry::Polygon generateAeroliteShape(float size, SDL_FPoint offset = {0.f, 0.f});
+  static Geometry::Polygon generateAeroliteShape(float size, unsigned int sides, SDL_FPoint offset = {0.f, 0.f});
+  void split();
+  void updateMVP();
+
+  static constexpr float kMinSize_ {1.4f};
+  static constexpr unsigned int kMaxSides_ {40u};
+  static constexpr unsigned int kMinSides_ {30u};
   static constexpr unsigned int kScore_ {1000u};
   static constexpr unsigned int kNewBornTime_ {10000u}; // 10 seconds
 

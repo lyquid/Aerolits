@@ -2,15 +2,13 @@
   "name": "aerolits",
   "version": "0.1.0",
   "dependencies": [
-      "sdl2",
-      "sdl2-image",
-      "sdl2-mixer",
-      "sdl2-ttf",
-      "box2d",
-      "gtest"
-  ],
-  "builtin-baseline": "59a3f35e7e5a3281e59863a4a0123c325899f8f9",
-  "overrides": [
-    { "name": "freetype", "version": "2.10.4" }
+    "box2d",
+    "glew",
+    "glm",
+    "gtest",
+    "sdl2",
+    "sdl2-image",
+    "sdl2-mixer",
+    "sdl2-ttf"
   ]
 }
