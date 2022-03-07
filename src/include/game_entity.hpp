@@ -36,8 +36,6 @@ using Graphics      = std::unique_ptr<GraphicsComponent>;
 using Input         = std::unique_ptr<InputComponent>;
 using Physics       = std::unique_ptr<PhysicsComponent>;
 
-class SDL2_Renderer;
-
 class GameEntity {
 
   // this friend is needed b/c the constructor is private

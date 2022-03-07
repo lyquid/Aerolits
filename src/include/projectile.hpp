@@ -38,7 +38,7 @@ class ProjectilePhysicsComponent: public PhysicsComponent {
   ProjectilePhysicsComponent(GameEntity* owner, ProjectileGraphicsComponent* graphics);
   ProjectilePhysicsComponent(const ProjectilePhysicsComponent& other) = delete;
   ProjectilePhysicsComponent(ProjectilePhysicsComponent&& other) { *this = std::move(other); }
-  ~ProjectilePhysicsComponent();
+  ~ProjectilePhysicsComponent() { if (body_) world_->DestroyBody(body_); }
 
   ProjectilePhysicsComponent& operator=(const ProjectilePhysicsComponent& other) = delete;
   ProjectilePhysicsComponent& operator=(ProjectilePhysicsComponent&& other);

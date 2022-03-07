@@ -66,9 +66,6 @@ ktp::ProjectilePhysicsComponent::ProjectilePhysicsComponent(GameEntity* owner, P
   fired_time_ = Game::gameplay_timer_.milliseconds();
 }
 
-// why this gives "NO FIRST AVAILABLE" warning?? and some error in resources.cpp
-ktp::ProjectilePhysicsComponent::~ProjectilePhysicsComponent() { /* exhaust_emitter_->owner()->deactivate(); */ }
-
 ktp::ProjectilePhysicsComponent& ktp::ProjectilePhysicsComponent::operator=(ProjectilePhysicsComponent&& other) {
   if (this != &other) {
     // inherited members
