@@ -4,12 +4,12 @@
 #include "graphics_component.hpp"
 #include "opengl.hpp"
 #include "physics_component.hpp"
+#include "resources.hpp"
 #include "../sdl2_wrappers/sdl2_geometry.hpp"
 #include <utility> // std::move std::exchange
 
 namespace ktp {
 
-using B2Vec2Vector = std::vector<b2Vec2>;
 using B2Line = Geometry::Line<b2Vec2>;
 
 class GameEntity;
@@ -17,16 +17,16 @@ class GameEntity;
 class AeroliteGraphicsComponent: public GraphicsComponent {
   friend class AerolitePhysicsComponent;
  public:
-  AeroliteGraphicsComponent() noexcept;
+  AeroliteGraphicsComponent();
   virtual void update(const GameEntity& aerolite) override;
  private:
-  const Color color_ {ConfigParser::aerolites_config.colors_[1]};
+  const glm::vec4 color_ {Palette::colorToGlmVec4(ConfigParser::aerolites_config.colors_[1])};
   VAO vao_ {};
   VBO vertices_ {};
   VBO uv_ {};
   EBO ebo_ {};
-  ShaderProgram shader_;
-  Texture2D texture_;
+  ShaderProgram shader_ {Resources::getShader("aerolite")};
+  Texture2D texture_ {Resources::getTexture("aerolite_00")};
   GLuint indices_count_ {};
   glm::mat4 mvp_ {};
 };
@@ -35,20 +35,20 @@ class AerolitePhysicsComponent: public PhysicsComponent {
 
  public:
 
-  AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics) noexcept;
+  AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics);
   AerolitePhysicsComponent(const AerolitePhysicsComponent& other) = delete;
   AerolitePhysicsComponent(AerolitePhysicsComponent&& other) { *this = std::move(other); }
   ~AerolitePhysicsComponent() { if (body_) world_->DestroyBody(body_); }
 
   AerolitePhysicsComponent& operator=(const AerolitePhysicsComponent& other) = delete;
-  AerolitePhysicsComponent& operator=(AerolitePhysicsComponent&& other) noexcept;
+  AerolitePhysicsComponent& operator=(AerolitePhysicsComponent&& other);
 
-  inline void collide(const GameEntity* other) override { collided_ = true; }
+  void collide(const GameEntity* other) override { collided_ = true; }
   void reshape(float size);
   static GameEntity* spawnAerolite(const b2Vec2& where);
   static GameEntity* spawnMovingAerolite();
   virtual void update(const GameEntity& aerolite, float delta_time) override;
-  inline auto worldManifold() { return &world_manifold_; }
+  auto worldManifold() { return &world_manifold_; }
   static GLfloatVector convertToUV(const GLfloatVector& v);
 
  private:

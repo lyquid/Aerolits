@@ -3,7 +3,6 @@
 #include "include/game.hpp"
 #include "include/game_entity.hpp"
 #include "include/random.hpp"
-#include "include/resources.hpp"
 #include "kuge/kuge.hpp"
 #include "sdl2_wrappers/sdl2_log.hpp"
 #include <algorithm>
@@ -11,13 +10,9 @@
 
 /* GRAPHICS */
 
-ktp::AeroliteGraphicsComponent::AeroliteGraphicsComponent() noexcept:
-  shader_(Resources::getShader("aerolite")),
-  texture_(Resources::getTexture("aerolite_00")) {
-
-  const glm::vec4 uniform_color {color_.r, color_.g, color_.b, color_.a};
+ktp::AeroliteGraphicsComponent::AeroliteGraphicsComponent() {
   shader_.use();
-  shader_.setFloat4("aerolite_color", glm::value_ptr(uniform_color));
+  shader_.setFloat4("aerolite_color", glm::value_ptr(color_));
 }
 
 void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite) {
@@ -30,8 +25,7 @@ void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite) {
 
 /* PHYSICS */
 
-ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics) noexcept:
- graphics_(graphics) {
+ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, AeroliteGraphicsComponent* graphics): graphics_(graphics) {
   born_time_ = Game::gameplay_timer_.milliseconds();
   owner_ = owner;
   size_ = ConfigParser::aerolites_config.size_.value_ * generateRand(ConfigParser::aerolites_config.size_.rand_min_, ConfigParser::aerolites_config.size_.rand_max_);
@@ -59,7 +53,7 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, Aerol
   graphics_->ebo_.setup(indices);
 }
 
-ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) noexcept {
+ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) {
   if (this != &other) {
     // inherited members
     collided_ = other.collided_;
@@ -85,7 +79,7 @@ ktp::GLfloatVector ktp::AerolitePhysicsComponent::convertToUV(const GLfloatVecto
     if (v[i + 1] > max_y) max_y = v[i + 1];
     else if (v[i + 1] < min_y) min_y = v[i + 1];
   }
-  const auto diagonal_inv {1.f / SDL_sqrtf((max_x - min_x) * (max_x - min_x) + (max_y - min_y) * (max_y - min_y))};
+  const auto diagonal_inv {1.f / glm::sqrt((max_x - min_x) * (max_x - min_x) + (max_y - min_y) * (max_y - min_y))};
   GLfloatVector result {};
   result.reserve(static_cast<std::size_t>(v.size() * 0.66f));
   for (std::size_t i = 0; i < v.size(); i += 3) {
