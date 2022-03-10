@@ -1,102 +1,110 @@
-// MIT License
+#ifndef KTP_SRC_INCLUDE_DEBUG_DRAW_HPP_
+#define KTP_SRC_INCLUDE_DEBUG_DRAW_HPP_
 
-// Copyright (c) 2019 Erin Catto
+#include "opengl.hpp"
+#include "resources.hpp"
+#include <box2d/box2d.h>
+#include <glm/glm.hpp>
+#include <memory>
 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+namespace ktp {
 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+inline constexpr auto kMaxVertices {512u};
 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+class GLRenderLines {
+ public:
 
-#ifndef DRAW_H
-#define DRAW_H
+  GLRenderLines();
+  void addVertex(const b2Vec2& vertex, const b2Color& color);
+  void update();
 
-#define GLFW_INCLUDE_NONE
-// #include "glad/gl.h"
-// #include "GLFW/glfw3.h"
-#include "../sdl2_wrappers/sdl2_opengl.hpp"
-#include "box2d/box2d.h"
+ private:
 
-struct b2AABB;
-struct GLRenderPoints;
-struct GLRenderLines;
-struct GLRenderTriangles;
-struct GLFWwindow;
+  void updateMVP();
 
-//
-struct Camera
-{
-	Camera()
-	{
-		m_center.Set(0.0f, 20.0f);
-		m_zoom = 1.0f;
-		m_width = 1366;
-		m_height = 768;
-	}
+	b2Vec2 vertices_[kMaxVertices * 2];
+	b2Color colors_[kMaxVertices * 2];
 
-	b2Vec2 ConvertScreenToWorld(const b2Vec2& screenPoint);
-	b2Vec2 ConvertWorldToScreen(const b2Vec2& worldPoint);
-	void BuildProjectionMatrix(float* m, float zBias);
+	int32 count_ {0};
 
-	b2Vec2 m_center;
-	float m_zoom;
-	int32 m_width;
-	int32 m_height;
+	VAO vao_ {};
+  VBO vertices_attr_ {};
+  VBO colors_attr_ {};
+	ShaderProgram shader_ {Resources::getShader("debug_draw_lines")};
+  glm::mat4 mvp_ {};
 };
 
-// This class implements debug drawing callbacks that are invoked
-// inside b2World::Step.
-class DebugDraw : public b2Draw
-{
-public:
-	DebugDraw();
-	~DebugDraw();
+class GLRenderPoints {
+ public:
 
-	void Create();
-	void Destroy();
+  GLRenderPoints();
+  void addVertex(const b2Vec2& vertex, const b2Color& color, float size);
+  void update();
 
-	void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
+ private:
 
-	void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
+  void updateMVP();
 
-	void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override;
+	b2Vec2 vertices_[kMaxVertices];
+	b2Color colors_[kMaxVertices];
+  float sizes_[kMaxVertices];
 
-	void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override;
+	int32 count_ {0};
 
-	void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) override;
-
-	void DrawTransform(const b2Transform& xf) override;
-
-	void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override;
-
-	//void DrawString(int x, int y, const char* string, ...);
-
-	//void DrawString(const b2Vec2& p, const char* string, ...);
-
-	void DrawAABB(b2AABB* aabb, const b2Color& color);
-
-	void Flush();
-
-	bool m_showUI;
-	GLRenderPoints* m_points;
-	GLRenderLines* m_lines;
-	GLRenderTriangles* m_triangles;
+	VAO vao_ {};
+  VBO vertices_attr_ {};
+  VBO colors_attr_ {};
+  VBO sizes_attr_ {};
+	ShaderProgram shader_ {Resources::getShader("debug_draw_points")};
+  glm::mat4 mvp_ {};
 };
 
-extern DebugDraw g_debugDraw;
-extern Camera g_camera;
-// extern GLFWwindow* g_mainWindow;
+class GLRenderTriangles {
+ public:
 
-#endif
+  GLRenderTriangles();
+  void addVertex(const b2Vec2& vertex, const b2Color& color);
+  void update();
+
+ private:
+
+  void updateMVP();
+
+	b2Vec2 vertices_[kMaxVertices * 3];
+	b2Color colors_[kMaxVertices * 3];
+
+	int32 count_ {0};
+
+	VAO vao_ {};
+  VBO vertices_attr_ {};
+  VBO colors_attr_ {};
+	ShaderProgram shader_ {Resources::getShader("debug_draw_triangles")};
+  glm::mat4 mvp_ {};
+};
+
+/**
+ * @brief Debug draw class heavily based on Erin Catto's testbed implementation. Thanks!
+ */
+class DebugDraw: public b2Draw {
+ public:
+
+  void Draw();
+  void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override;
+  void DrawPoint(const b2Vec2& point, float size, const b2Color& color) override;
+  void DrawPolygon(const b2Vec2* vertices, int32 vertex_count, const b2Color& color) override;
+  void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override;
+  void DrawSolidPolygon(const b2Vec2* vertices, int32 vertex_count, const b2Color& color) override;
+  void DrawSegment(const b2Vec2& start, const b2Vec2& end, const b2Color& color) override;
+  void DrawTransform(const b2Transform& xf) override;
+  void Init();
+
+ private:
+
+  std::unique_ptr<GLRenderLines>     lines_ {};
+  std::unique_ptr<GLRenderPoints>    points_ {};
+  std::unique_ptr<GLRenderTriangles> triangles_ {};
+};
+
+} // namespace ktp
+
+#endif // KTP_SRC_INCLUDE_DEBUG_DRAW_HPP_

@@ -35,14 +35,21 @@ class ShaderProgram {
   /**
    * @return The id of the shader program.
    */
-  inline auto id() const { return id_; }
+  auto id() const { return id_; }
+
+  /**
+   * @brief Gets the uniform location.
+   * @param name The name of the uniform.
+   * @return The id of the uniform.
+   */
+  auto getUniformLocation(const char* name) const { return glGetUniformLocation(id_, name); }
 
   /**
    * @brief Sets a boolean uniform. Uses glUniform1i()
    * @param name The name of the uniform.
    * @param value The value to be set.
    */
-  inline void setBool(const char* name, bool value) const {
+  void setBool(const char* name, bool value) const {
     glUniform1i(glGetUniformLocation(id_, name), (int)value);
   }
 
@@ -51,7 +58,7 @@ class ShaderProgram {
    * @param name The name of the uniform.
    * @param value The value to be set.
    */
-  inline void setInt(const char* name, GLint value) const {
+  void setInt(const char* name, GLint value) const {
     glUniform1i(glGetUniformLocation(id_, name), value);
   }
 
@@ -60,7 +67,7 @@ class ShaderProgram {
    * @param name The name of the uniform.
    * @param value The value to be set.
    */
-  inline void setFloat(const char* name, GLfloat value) const {
+  void setFloat(const char* name, GLfloat value) const {
     glUniform1f(glGetUniformLocation(id_, name), value);
   }
 
@@ -69,7 +76,7 @@ class ShaderProgram {
    * @param name The name of the uniform.
    * @param value A pointer to the values to be set.
    */
-  inline void setFloat4(const char* name, const GLfloat* value) const {
+  void setFloat4(const char* name, const GLfloat* value) const {
     glUniform4f(glGetUniformLocation(id_, name), value[0], value[1], value[2], value[3]);
   }
 
@@ -78,7 +85,7 @@ class ShaderProgram {
    * @param name The name of the uniform.
    * @param value A pointer to the values to be set.
    */
-  inline void setMat2f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
+  void setMat2f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
     glUniformMatrix2fv(glGetUniformLocation(id_, name), 1, transpose, value);
   }
 
@@ -87,7 +94,7 @@ class ShaderProgram {
    * @param name The name of the uniform.
    * @param value A pointer to the values to be set.
    */
-  inline void setMat3f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
+  void setMat3f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
     glUniformMatrix3fv(glGetUniformLocation(id_, name), 1, transpose, value);
   }
 
@@ -96,7 +103,7 @@ class ShaderProgram {
    * @param name The name of the uniform.
    * @param value A pointer to the values to be set.
    */
-  inline void setMat4f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
+  void setMat4f(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const {
     glUniformMatrix4fv(glGetUniformLocation(id_, name), 1, transpose, value);
   }
 
@@ -105,7 +112,7 @@ class ShaderProgram {
    * @param name The name of the uniform.
    * @param value The value to be set.
    */
-  inline void setUint(const char* name, GLuint value) const {
+  void setUint(const char* name, GLuint value) const {
     glUniform1ui(glGetUniformLocation(id_, name), value);
   }
 
@@ -114,7 +121,7 @@ class ShaderProgram {
    * @param name The name of the uniform.
    * @param value A pointer to the values to be set.
    */
-  inline void setVec2(const char* name, const GLfloat* value) const {
+  void setVec2(const char* name, const GLfloat* value) const {
     glUniform2fv(glGetUniformLocation(id_, name), 1, value);
   }
 
@@ -124,7 +131,7 @@ class ShaderProgram {
    * @param x value.
    * @param y value.
    */
-  inline void setVec2(const char* name, GLfloat x, GLfloat y) const {
+  void setVec2(const char* name, GLfloat x, GLfloat y) const {
     glUniform2f(glGetUniformLocation(id_, name), x, y);
   }
 
@@ -133,7 +140,7 @@ class ShaderProgram {
    * @param name The name of the uniform.
    * @param value A pointer to the values to be set.
    */
-  inline void setVec3(const char* name, const GLfloat* value) const {
+  void setVec3(const char* name, const GLfloat* value) const {
     glUniform3fv(glGetUniformLocation(id_, name), 1, value);
   }
 
@@ -144,7 +151,7 @@ class ShaderProgram {
    * @param y value.
    * @param z value.
    */
-  inline void setVec3(const char* name, GLfloat x, GLfloat y, GLfloat z) const {
+  void setVec3(const char* name, GLfloat x, GLfloat y, GLfloat z) const {
     glUniform3f(glGetUniformLocation(id_, name), x, y, z);
   }
 
@@ -153,7 +160,7 @@ class ShaderProgram {
    * @param name The name of the uniform.
    * @param value A pointer to the values to be set.
    */
-  inline void setVec4(const char* name, const GLfloat* value) const {
+  void setVec4(const char* name, const GLfloat* value) const {
     glUniform4fv(glGetUniformLocation(id_, name), 1, value);
   }
 
@@ -165,14 +172,14 @@ class ShaderProgram {
    * @param z value.
    * @param w value.
    */
-  inline void setVec4(const char* name, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const {
+  void setVec4(const char* name, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const {
     glUniform4f(glGetUniformLocation(id_, name), x, y, z, w);
   }
 
   /**
    * @brief Activates the shader.
    */
-  inline void use() const { glUseProgram(id_); }
+  void use() const { glUseProgram(id_); }
 
  private:
 

@@ -24,11 +24,11 @@ class GameState {
   virtual void handleEvents(Game&) = 0;
   virtual void update(Game&, float) = 0;
 
-  inline static GameState* goToState(Game& game, GameState& state) { return state.enter(game); }
+  static GameState* goToState(Game& game, GameState& state) { return state.enter(game); }
 
-  static inline void updateCulling() { culling_ ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE); }
-  static inline void updateDeepTest() { deep_test_ ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST); }
-  static inline void updatePolygonDraw() { polygon_draw_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+  static void updateCulling() { culling_ ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE); }
+  static void updateDeepTest() { deep_test_ ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST); }
+  static void updatePolygonDraw() { polygon_draw_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
 
   static bool backend_draw_;
   static bool culling_;
@@ -44,7 +44,7 @@ class GameState {
 
  protected:
 
-  inline virtual GameState* enter(Game& game) { return this; }
+  virtual GameState* enter(Game& game) { return this; }
   virtual void handleSDL2KeyEvents(Game&, SDL_Keycode) = 0;
   void setWindowTitle(Game& game);
   SDL_Event sdl_event_ {};

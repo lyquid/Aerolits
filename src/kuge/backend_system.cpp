@@ -18,16 +18,21 @@ void kuge::BackendSystem::draw() {
 void kuge::BackendSystem::mainMenuBar() {
   if (ImGui::BeginMainMenuBar()) {
     if (ImGui::BeginMenu("Draw options")) {
-      // ImGui::Checkbox("Box2D debug draw", &ktp::GameState::debug_draw_);
-      if (ImGui::Checkbox("Culling", &ktp::GameState::culling_)) {
+
+      ImGui::Checkbox("Box2D debug draw", &ktp::GameState::debug_draw_);
+
+      if (ImGui::Checkbox("OpenGL culling", &ktp::GameState::culling_)) {
         ktp::GameState::updateCulling();
       }
-      if (ImGui::Checkbox("Deep test", &ktp::GameState::deep_test_)) {
+
+      if (ImGui::Checkbox("OpenGL deep test", &ktp::GameState::deep_test_)) {
         ktp::GameState::updateDeepTest();
       }
-      if (ImGui::Checkbox("Polygon mode", &ktp::GameState::polygon_draw_)) {
+
+      if (ImGui::Checkbox("OpenGL polygon mode", &ktp::GameState::polygon_draw_)) {
         ktp::GameState::updatePolygonDraw();
       }
+
       ImGui::EndMenu();
     }
     ImGui::EndMainMenuBar();

@@ -4,8 +4,7 @@
 #include "graphics_component.hpp"
 #include "physics_component.hpp"
 #include "resources.hpp"
-#include "../sdl2_wrappers/sdl2_opengl.hpp"
-#include <memory>
+#include <utility>
 
 namespace ktp {
 

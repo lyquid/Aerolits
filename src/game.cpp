@@ -40,8 +40,9 @@ ktp::Game::Game() {
   if (!loadResources()) return;
   gui_sys_.init();
 
-  // world_.SetDebugDraw(&g_debugDraw);
-  // g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
+  world_.SetDebugDraw(&debug_draw_);
+  debug_draw_.Init();
+  debug_draw_.SetFlags(b2Draw::e_shapeBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
   world_.SetContactListener(&contact_listener_);
 
   PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});
@@ -118,6 +119,15 @@ bool ktp::Game::loadResources() {
   vertex_shader_path = Resources::getResourcesPath("shaders") + "cube.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "cube.frag";
   if (!Resources::loadShader("cube", vertex_shader_path, fragment_shader_path)) return false;
+  vertex_shader_path = Resources::getResourcesPath("shaders") + "debug_draw_lines.vert";
+  fragment_shader_path = Resources::getResourcesPath("shaders") + "debug_draw.frag";
+  if (!Resources::loadShader("debug_draw_lines", vertex_shader_path, fragment_shader_path)) return false;
+  vertex_shader_path = Resources::getResourcesPath("shaders") + "debug_draw_points.vert";
+  fragment_shader_path = Resources::getResourcesPath("shaders") + "debug_draw.frag";
+  if (!Resources::loadShader("debug_draw_points", vertex_shader_path, fragment_shader_path)) return false;
+  vertex_shader_path = Resources::getResourcesPath("shaders") + "debug_draw_triangles.vert";
+  fragment_shader_path = Resources::getResourcesPath("shaders") + "debug_draw.frag";
+  if (!Resources::loadShader("debug_draw_triangles", vertex_shader_path, fragment_shader_path)) return false;
   vertex_shader_path = Resources::getResourcesPath("shaders") + "explosion.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "explosion.frag";
   if (!Resources::loadShader("explosion", vertex_shader_path, fragment_shader_path)) return false;

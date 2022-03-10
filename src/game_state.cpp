@@ -15,7 +15,7 @@ ktp::TitleState   ktp::GameState::title_ {};
 
 bool ktp::GameState::backend_draw_ {false};
 bool ktp::GameState::culling_ {false};
-bool ktp::GameState::debug_draw_ {false};
+bool ktp::GameState::debug_draw_ {true};
 bool ktp::GameState::deep_test_ {false};
 bool ktp::GameState::polygon_draw_ {false};
 
@@ -54,7 +54,10 @@ void ktp::DemoState::draw(Game& game) {
     blink_timer_ = SDL2_Timer::SDL2Ticks();
   }
 
-  if (debug_draw_) game.world_.DebugDraw();
+  if (debug_draw_) {
+    game.world_.DebugDraw();
+    game.debug_draw_.Draw();
+  }
 
   if (backend_draw_) game.backend_sys_.draw();
 
@@ -136,7 +139,10 @@ void ktp::PausedState::draw(Game& game) {
     blink_timer_ = SDL2_Timer::SDL2Ticks();
   }
 
-  if (debug_draw_) game.world_.DebugDraw();
+  if (debug_draw_) {
+    game.world_.DebugDraw();
+    game.debug_draw_.Draw();
+  }
 
   if (backend_draw_) game.backend_sys_.draw();
 
@@ -202,7 +208,10 @@ void ktp::PlayingState::draw(Game& game) {
 
   game.gui_sys_.scoreText()->draw();
 
-  if (debug_draw_) game.world_.DebugDraw();
+  if (debug_draw_) {
+    game.world_.DebugDraw();
+    game.debug_draw_.Draw();
+  }
 
   if (backend_draw_) game.backend_sys_.draw();
 
@@ -305,7 +314,10 @@ void ktp::TestingState::draw(Game& game) {
 
   test_->draw();
 
-  if (debug_draw_) game.world_.DebugDraw();
+  if (debug_draw_) {
+    game.world_.DebugDraw();
+    game.debug_draw_.Draw();
+  }
 
   if (backend_draw_) game.backend_sys_.draw();
 
@@ -412,6 +424,11 @@ void ktp::TitleState::draw(Game& game) {
   }
 
   game.gui_sys_.titleText()->draw();
+
+  if (debug_draw_) {
+    game.world_.DebugDraw();
+    game.debug_draw_.Draw();
+  }
 
   if (backend_draw_) game.backend_sys_.draw();
 
