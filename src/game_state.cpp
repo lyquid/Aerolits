@@ -1,6 +1,8 @@
+#include "include/debug_draw.hpp"
 #include "include/game.hpp"
 #include "include/game_state.hpp"
 #include "include/physics_component.hpp"
+#include "kuge/backend_system.hpp"
 #include "kuge/system.hpp" // GUISystem
 #include <SDL.h>
 #include <memory>
@@ -15,9 +17,30 @@ ktp::TitleState   ktp::GameState::title_ {};
 
 bool ktp::GameState::backend_draw_ {false};
 bool ktp::GameState::culling_ {false};
-bool ktp::GameState::debug_draw_ {true};
+ktp::DebugDraw ktp::GameState::b2_debug_ {};
+bool ktp::GameState::debug_draw_ {false};
 bool ktp::GameState::deep_test_ {false};
 bool ktp::GameState::polygon_draw_ {false};
+
+void ktp::GameState::setDebugDrawFlags(const kuge::B2DebugFlags& debug_flags) {
+  Uint32 final_flags {};
+  if (debug_flags.aabb) {
+    final_flags |= b2Draw::e_aabbBit;
+  }
+  if (debug_flags.center) {
+    final_flags |= b2Draw::e_centerOfMassBit;
+  }
+  if (debug_flags.joints) {
+    final_flags |= b2Draw::e_jointBit;
+  }
+  if (debug_flags.pairs) {
+    final_flags |= b2Draw::e_pairBit;
+  }
+  if (debug_flags.shapes) {
+    final_flags |= b2Draw::e_shapeBit;
+  }
+  b2_debug_.SetFlags(final_flags);
+}
 
 void ktp::GameState::setWindowTitle(Game& game) {
   game.main_window_.setTitle(
@@ -56,7 +79,7 @@ void ktp::DemoState::draw(Game& game) {
 
   if (debug_draw_) {
     game.world_.DebugDraw();
-    game.debug_draw_.Draw();
+    b2_debug_.Draw();
   }
 
   if (backend_draw_) game.backend_sys_.draw();
@@ -141,7 +164,7 @@ void ktp::PausedState::draw(Game& game) {
 
   if (debug_draw_) {
     game.world_.DebugDraw();
-    game.debug_draw_.Draw();
+    b2_debug_.Draw();
   }
 
   if (backend_draw_) game.backend_sys_.draw();
@@ -210,7 +233,7 @@ void ktp::PlayingState::draw(Game& game) {
 
   if (debug_draw_) {
     game.world_.DebugDraw();
-    game.debug_draw_.Draw();
+    b2_debug_.Draw();
   }
 
   if (backend_draw_) game.backend_sys_.draw();
@@ -316,7 +339,7 @@ void ktp::TestingState::draw(Game& game) {
 
   if (debug_draw_) {
     game.world_.DebugDraw();
-    game.debug_draw_.Draw();
+    b2_debug_.Draw();
   }
 
   if (backend_draw_) game.backend_sys_.draw();
@@ -427,7 +450,7 @@ void ktp::TitleState::draw(Game& game) {
 
   if (debug_draw_) {
     game.world_.DebugDraw();
-    game.debug_draw_.Draw();
+    b2_debug_.Draw();
   }
 
   if (backend_draw_) game.backend_sys_.draw();

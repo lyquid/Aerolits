@@ -9,11 +9,13 @@
 namespace ktp {
 
 class Game;
+class DebugDraw;
 class DemoState;
 class PausedState;
 class PlayingState;
 class TestingState;
 class TitleState;
+struct B2DebugFlags;
 
 class GameState {
 
@@ -26,12 +28,14 @@ class GameState {
 
   static GameState* goToState(Game& game, GameState& state) { return state.enter(game); }
 
+  static void setDebugDrawFlags(const kuge::B2DebugFlags& debug_flags);
   static void updateCulling() { culling_ ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE); }
   static void updateDeepTest() { deep_test_ ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST); }
   static void updatePolygonDraw() { polygon_draw_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
 
   static bool backend_draw_;
   static bool culling_;
+  static DebugDraw b2_debug_;
   static bool debug_draw_;
   static bool deep_test_;
   static bool polygon_draw_;

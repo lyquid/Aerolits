@@ -1,3 +1,4 @@
+#include "include/debug_draw.hpp"
 #include "include/game.hpp"
 #include "include/palette.hpp"
 #include "include/particle.hpp"
@@ -40,9 +41,8 @@ ktp::Game::Game() {
   if (!loadResources()) return;
   gui_sys_.init();
 
-  world_.SetDebugDraw(&debug_draw_);
-  debug_draw_.Init();
-  debug_draw_.SetFlags(b2Draw::e_shapeBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
+  world_.SetDebugDraw(&GameState::b2_debug_);
+  GameState::b2_debug_.Init();
   world_.SetContactListener(&contact_listener_);
 
   PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});

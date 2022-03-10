@@ -5,7 +5,6 @@
 #include "camera.hpp"
 #include "config_parser.hpp"
 #include "contact_listener.hpp"
-#include "debug_draw.hpp"
 #include "game_entity.hpp"
 #include "game_state.hpp"
 #include "testing.hpp"
@@ -79,7 +78,6 @@ class Game {
   b2World world_ {b2Vec2{0.f, 0.f}};
   int32 velocity_iterations_ {8};
   int32 position_iterations_ {3};
-  DebugDraw debug_draw_ {};
   ContactListener contact_listener_ {};
 };
 
