@@ -7,6 +7,7 @@ add_executable(Aerolits
   contact_listener.cpp
   debug_draw.cpp
   emitter.cpp
+  entity_manager.cpp
   explosion.cpp
   game.cpp
   game_state.cpp

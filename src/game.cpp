@@ -11,24 +11,25 @@ const kuge::EventBus* kuge::System::event_bus_ {event_bus_};
 const ktp::SDL2_Timer& kuge::KugeEvent::gameplay_timer_ {ktp::Game::gameplay_timer_};
 
 /* include/game_entity.hpp */
-kuge::EventBus*    ktp::GameEntity::event_bus_ {nullptr};
-ktp::EntitiesCount ktp::GameEntity::entities_count_ {};
-ktp::EntitiesPool  ktp::GameEntity::game_entities_ {2000};
+// kuge::EventBus*    ktp::GameEntity::event_bus_ {nullptr};
+// ktp::EntitiesCount ktp::GameEntity::entities_count_ {};
+// ktp::EntitiesPool  ktp::GameEntity::game_entities_ {2000};
 
 /* include/physics_component.hpp */
-SDL_FPoint   ktp::PhysicsComponent::b2_screen_size_ {};
-ktp::Camera& ktp::PhysicsComponent::camera_ {Game::camera_};
-b2World*     ktp::PhysicsComponent::world_ {nullptr};
+// SDL_FPoint   ktp::PhysicsComponent::b2_screen_size_ {};
+// ktp::Camera& ktp::PhysicsComponent::camera_ {Game::camera_};
+// b2World*     ktp::PhysicsComponent::world_ {nullptr};
 
 /* GAME */
 
-ktp::Camera ktp::Game::camera_ {};
-
+ktp::Camera     ktp::Game::camera_ {};
 ktp::SDL2_Timer ktp::Game::gameplay_timer_ {};
+// Box2D
+b2World              ktp::Game::world_ {b2Vec2{0.f, 0.f}};
+ktp::ContactListener ktp::Game::contact_listener_ {};
 
 ktp::Game::Game() {
   event_bus_.setSystems(&audio_sys_, &backend_sys_, &input_sys_, &gui_sys_, &output_sys_);
-  GameEntity::event_bus_ = &event_bus_;
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
   if (!initSDL2()) return;
   logMessage("Box2D version: " + std::to_string(b2_version.major) + '.' + std::to_string(b2_version.minor) + '.' + std::to_string(b2_version.revision));
@@ -64,7 +65,6 @@ void ktp::Game::clean() {
   ImGui_ImplSDL2_Shutdown();
   ImGui::DestroyContext();
   Resources::cleanOpenGL();
-  GameEntity::clear();
   clearB2World(world_);
   SDL2_Audio::closeMixer();
 	SDL_Quit();
@@ -154,7 +154,6 @@ bool ktp::Game::loadResources() {
 }
 
 void ktp::Game::reset() {
-  GameEntity::clear();
   // we need to do this to prevent some of the bodies not being destroyed
   // ie: explosion particles if you pause and go to title
   clearB2World(world_);

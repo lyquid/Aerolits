@@ -9,47 +9,48 @@ class ObjectPool {
 
  public:
 
-  ObjectPool(std::size_t size) noexcept: size_(size) { inflatePool(); }
-  ObjectPool(const ObjectPool& other) noexcept { *this = other; }
-  ObjectPool(ObjectPool&& other) noexcept { *this = std::move(other); }
+  ObjectPool(std::size_t size): size_(size) { inflatePool(); }
+  ObjectPool(const ObjectPool& other) = delete;
+  ObjectPool(ObjectPool&& other) { *this = std::move(other); }
   ~ObjectPool() { delete[] pool_; }
 
   // WARNING! this operators haven't been tested yet.
-  ObjectPool& operator=(const ObjectPool& other) {
-    if (this != &other) {
-      active_count_ = other.active_count_;
-      first_available_ = nullptr;
-      size_ = other.size_;
-      delete[] pool_;
-      pool_ = new PoolUnit[size_];
-      for (std::size_t i = 0; i < size_; ++i) {
-        pool_[i].active_ = other.pool_[i].active_;
-        pool_[i].object_ = other.pool_[i].object_;
-        if (&other.pool_[i] == other.first_available_) {
-          first_available_ = &pool_[i];
-        }
-        if (!other.pool_[i].next_) {
-          pool_[i].next_ = nullptr;
-        } else {
-          for (std::size_t j = 0; j < size_; ++j) {
-            if (other.pool_[i].next_ == &other.pool_[j]) {
-              pool_[i].next_ = &pool_[j];
-              break;
-            }
-          }
-        }
-      }
-    }
-    return *this;
-  }
-  ObjectPool& operator=(ObjectPool&& other) noexcept {
+  ObjectPool& operator=(const ObjectPool& other) = delete;
+  //   if (this != &other) {
+  //     active_count_ = other.active_count_;
+  //     first_available_ = nullptr;
+  //     size_ = other.size_;
+  //     delete[] pool_;
+  //     pool_ = new PoolUnit[size_];
+  //     for (std::size_t i = 0; i < size_; ++i) {
+  //       pool_[i].active_ = other.pool_[i].active_;
+  //       pool_[i].object_ = other.pool_[i].object_;
+  //       if (&other.pool_[i] == other.first_available_) {
+  //         first_available_ = &pool_[i];
+  //       }
+  //       if (!other.pool_[i].next_) {
+  //         pool_[i].next_ = nullptr;
+  //       } else {
+  //         for (std::size_t j = 0; j < size_; ++j) {
+  //           if (other.pool_[i].next_ == &other.pool_[j]) {
+  //             pool_[i].next_ = &pool_[j];
+  //             break;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return *this;
+  // }
+
+  ObjectPool& operator=(ObjectPool&& other) {
     if (this != &other) {
       // copy/move members
       active_count_ = other.active_count_;
       size_ = other.size_;
       // clean up memory
       delete[] pool_;
-      // tricky things
+      // exchange pointer
       first_available_ = std::exchange(other.first_available_, nullptr);
       pool_ = std::exchange(other.pool_, nullptr);
     }
@@ -62,7 +63,7 @@ class ObjectPool {
   /**
    * @return The number of objects that are currently active.
    */
-  inline auto activeCount() const { return active_count_; }
+  auto activeCount() const { return active_count_; }
 
   /**
    * @brief Use this to access the requested index in the pool.
@@ -70,14 +71,14 @@ class ObjectPool {
    * @param index The desired index to be returned.
    * @return A pointer to the index requested or nullptr.
    */
-  inline auto at(std::size_t index) const {
+  auto at(std::size_t index) const {
     return index < size_ ? &pool_[index] : nullptr;
   }
 
   /**
    * @return The number of objects that can be stored in the pool.
    */
-  inline auto capacity() const { return size_; }
+  auto capacity() const { return size_; }
 
   /**
    * @brief Sets all the objects to inactive state and reconstruct the list
@@ -147,7 +148,7 @@ class ObjectPool {
   PoolUnit* pool_ {nullptr};
 
   std::size_t active_count_ {0};
-  std::size_t size_;
+  std::size_t size_ {0};
 };
 
 } // namespace ktp

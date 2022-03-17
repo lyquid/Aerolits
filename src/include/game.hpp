@@ -5,7 +5,6 @@
 #include "camera.hpp"
 #include "config_parser.hpp"
 #include "contact_listener.hpp"
-#include "game_entity.hpp"
 #include "game_state.hpp"
 #include "testing.hpp"
 #include "../kuge/kuge.hpp"
@@ -37,12 +36,13 @@ class Game {
   Game& operator=(const Game& other) = delete;
   Game& operator=(Game&& other) = delete;
 
-  inline void draw() { state_->draw(*this); }
-  inline void handleEvents() { state_->handleEvents(*this); }
-  inline void setFrameTime(double time) { frame_time_ = time; }
-  inline bool quit() const { return quit_; }
+  void draw() { state_->draw(*this); }
+  void handleEvents() { state_->handleEvents(*this); }
+  void setFrameTime(double time) { frame_time_ = time; }
+  bool quit() const { return quit_; }
   void reset();
-  inline void update(float delta_time) { state_->update(*this, delta_time); }
+  void update(float delta_time) { state_->update(*this, delta_time); }
+  static auto world() { return &world_; }
 
   static Camera camera_;
 
@@ -75,10 +75,10 @@ class Game {
   kuge::InputSystem input_sys_ {};
   kuge::OutputSystem output_sys_ {ConfigParser::game_config.output_};
   // Box2D
-  b2World world_ {b2Vec2{0.f, 0.f}};
-  int32 velocity_iterations_ {8};
-  int32 position_iterations_ {3};
-  ContactListener contact_listener_ {};
+  static b2World world_;
+  static constexpr int32 velocity_iterations_ {8};
+  static constexpr int32 position_iterations_ {3};
+  static ContactListener contact_listener_;
 };
 
 } // end namespace ktp
