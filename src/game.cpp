@@ -24,8 +24,9 @@ const ktp::SDL2_Timer& kuge::KugeEvent::gameplay_timer_ {ktp::Game::gameplay_tim
 
 ktp::Camera     ktp::Game::camera_ {};
 ktp::SDL2_Timer ktp::Game::gameplay_timer_ {};
+SDL_Point       ktp::Game::screen_size_ {ConfigParser::game_config.screen_size_};
 // Box2D
-b2World              ktp::Game::world_ {b2Vec2{0.f, 0.f}};
+b2World              ktp::Game::world_ {b2Vec2{0.f, 0.f}}; // gravity
 ktp::ContactListener ktp::Game::contact_listener_ {};
 
 ktp::Game::Game() {

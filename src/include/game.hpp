@@ -42,9 +42,11 @@ class Game {
   bool quit() const { return quit_; }
   void reset();
   void update(float delta_time) { state_->update(*this, delta_time); }
-  static auto world() { return &world_; }
 
-  static Camera camera_;
+  static b2Vec2 b2ScreenSize() { return {screen_size_.x * kPixelsToMeters, screen_size_.y * kPixelsToMeters}; }
+  static auto& camera() { return camera_; }
+  static auto screenSize() { return screen_size_; }
+  static auto& world() { return world_; }
 
   /**
    * @brief This timer only goes when playing or in demo state.
@@ -58,7 +60,9 @@ class Game {
   bool initSDL2();
   bool loadResources();
 
-  SDL_Point screen_size_ {ConfigParser::game_config.screen_size_};
+  static Camera camera_;
+
+  static SDL_Point screen_size_;
   bool paused_ {false};
   bool quit_ {false};
   SDL2_Window main_window_ {};

@@ -67,7 +67,7 @@ void AeroliteManager::init() {
 void AeroliteManager::update(float delta_time) {
   std::partition(aerolite_render_.begin(), aerolite_render_.end(), [](const auto& i){ return i.active(); });
   std::partition(aerolite_physics_.begin(), aerolite_physics_.end(), [](const auto& i){ return i.active(); });
-  for (auto i = 0; i < count_; ++i) {
+  for (auto i = 0u; i < count_; ++i) {
     aerolite_physics_[i].update(delta_time);
   }
 }
@@ -77,7 +77,9 @@ void AeroliteManager::update(float delta_time) {
 ShaderProgram AeroliteRenderComponent::shader_ {Resources::getShader("aerolite")};
 Texture2D     AeroliteRenderComponent::texture_ {Resources::getTexture("aerolite_00")};
 
-AeroliteRenderComponent::AeroliteRenderComponent() {
+void AeroliteRenderComponent::activate(EntityId id) {
+  id_ = id;
+  active_ = true;
   shader_.use();
   shader_.setFloat4("aerolite_color", glm::value_ptr(color_)); // can't this be an attribute??
 }
@@ -90,8 +92,27 @@ void AeroliteRenderComponent::update() {
 
 /* PHYSICS */
 
-AerolitePhysicsComponent::AerolitePhysicsComponent() {
+AerolitePhysicsComponent& AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) {
+  if (this != &other) {
+    id_             = other.id_;
+    aabb_           = std::move(other.aabb_);
+    active_         = other.active_;
+    body_           = std::exchange(other.body_, nullptr);
+    born_time_      = other.born_time_;
+    collided_       = other.collided_;
+    new_born_       = other.new_born_;
+    size_           = other.size_;
+    world_manifold_ = std::move(other.world_manifold_);
+  }
+  return *this;
+}
+
+void AerolitePhysicsComponent::activate(EntityId id) {
+  id_ = id;
+  active_ = true;
   born_time_ = Game::gameplay_timer_.milliseconds();
+  collided_ = false;
+  new_born_ = true;
   size_ = ConfigParser::aerolites_config.size_.value_ * generateRand(ConfigParser::aerolites_config.size_.rand_min_, ConfigParser::aerolites_config.size_.rand_max_);
   // shape is a vector of points: {[x,y], [x,y], ...} with center at [0,0]
   const auto shape {generateAeroliteShape(size_)};
@@ -104,36 +125,18 @@ AerolitePhysicsComponent::AerolitePhysicsComponent() {
   GLuintVector indices {};
   EBO::generateEBO(triangulated_shape, indices);
   // convert cartesian coords to UV coords and set up the uv VBO
-  const GLfloatVector texture_coords {convertToUV(triangulated_shape)};
-  const auto graphics {AeroliteManager::findRender(id_)}; // DEAD END :( the components don't have the id_ stablished
-  graphics_->uv_.setup(texture_coords);
+  const auto texture_coords {convertToUV(triangulated_shape)};
+  const auto graphics {AeroliteManager::findRender(id_)};
+  graphics->uv_.setup(texture_coords);
   // convert box2d coords to pixels and set up the vertices VBO
   std::transform(triangulated_shape.begin(), triangulated_shape.end(), triangulated_shape.begin(), [](auto& coord){return coord * kMetersToPixels;});
-  graphics_->vertices_.setup(triangulated_shape);
+  graphics->vertices_.setup(triangulated_shape);
   // link the attributes
-  graphics_->vao_.linkAttrib(graphics_->vertices_, 0, 3, GL_FLOAT, 0, nullptr);
-  graphics_->vao_.linkAttrib(graphics_->uv_,       1, 2, GL_FLOAT, 0, nullptr);
+  graphics->vao_.linkAttrib(graphics->vertices_, 0, 3, GL_FLOAT, 0, nullptr);
+  graphics->vao_.linkAttrib(graphics->uv_,       1, 2, GL_FLOAT, 0, nullptr);
   // setup the EBO
-  graphics_->indices_count_ = indices.size();
-  graphics_->ebo_.setup(indices);
-}
-
-AerolitePhysicsComponent& AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) {
-  if (this != &other) {
-    // inherited members
-    collided_ = other.collided_;
-    delta_    = std::move(other.delta_);
-    owner_    = std::exchange(other.owner_, nullptr);
-    size_     = other.size_;
-    // own members
-    graphics_       = std::exchange(other.graphics_, nullptr);
-    aabb_           = std::move(other.aabb_);
-    body_           = std::exchange(other.body_, nullptr);
-    born_time_      = other.born_time_;
-    new_born_       = other.new_born_;
-    world_manifold_ = std::move(other.world_manifold_);
-  }
-  return *this;
+  graphics->indices_count_ = indices.size();
+  graphics->ebo_.setup(indices);
 }
 
 GLfloatVector AerolitePhysicsComponent::convertToUV(const GLfloatVector& v) {
@@ -155,12 +158,10 @@ GLfloatVector AerolitePhysicsComponent::convertToUV(const GLfloatVector& v) {
 }
 
 void AerolitePhysicsComponent::createB2Body(AerolitePhysicsComponent& aerolite, const GLfloatVector& triangulated_shape) {
-  if (aerolite.body_) world_->DestroyBody(aerolite.body_);
-
   b2BodyDef body_def {};
   body_def.type = b2_dynamicBody;
-  body_def.userData.pointer = reinterpret_cast<uintptr_t>(aerolite.owner_);
-  aerolite.body_ = world_->CreateBody(&body_def);
+  body_def.userData.pointer = static_cast<uintptr_t>(aerolite.id_);
+  aerolite.body_ = Game::world().CreateBody(&body_def);
 
   std::vector<B2Vec2Vector> fixtures_shapes {};
   for (std::size_t i = 0; i < triangulated_shape.size(); i += 9) {
@@ -181,6 +182,14 @@ void AerolitePhysicsComponent::createB2Body(AerolitePhysicsComponent& aerolite, 
     fixture_def.friction = ConfigParser::aerolites_config.friction_;
     fixture_def.restitution = ConfigParser::aerolites_config.restitution_;
     aerolite.body_->CreateFixture(&fixture_def);
+  }
+}
+
+void AerolitePhysicsComponent::deactivate() {
+  active_ = false;
+  if (body_) {
+    Game::world().DestroyBody(body_);
+    body_ = nullptr;
   }
 }
 
@@ -208,7 +217,7 @@ void AerolitePhysicsComponent::reshape(float size) {
   GLfloatVector triangulated_shape {};
   Geometry::triangulate(new_shape, triangulated_shape);
   // Box2D
-  const auto old_angle   {body_->GetAngle()};
+  const auto old_angle   {body_->GetAngle()};                      // we can get rid off those const
   const auto old_angular {body_->GetAngularVelocity()};
   const auto old_delta   {body_->GetLinearVelocity()};
   const auto old_pos     {body_->GetPosition()};
@@ -220,65 +229,67 @@ void AerolitePhysicsComponent::reshape(float size) {
   GLuintVector indices {};
   EBO::generateEBO(triangulated_shape, indices);
   // normalize texture
-  const GLfloatVector texture_coords {convertToUV(triangulated_shape)};
-  graphics_->uv_.setup(texture_coords);
+  const auto texture_coords {convertToUV(triangulated_shape)};
+  const auto graphics {AeroliteManager::findRender(id_)};
+  graphics->uv_.setup(texture_coords);
   // convert box2d coords to pixels
   std::transform(triangulated_shape.begin(), triangulated_shape.end(), triangulated_shape.begin(), [](auto& coord){return coord * kMetersToPixels;});
   // setup VBO and link the attributes
-  graphics_->vertices_.setup(triangulated_shape);
-  graphics_->vao_.linkAttrib(graphics_->vertices_, 0, 3, GL_FLOAT, 0, nullptr);
-  graphics_->vao_.linkAttrib(graphics_->uv_, 1, 2, GL_FLOAT, 0, nullptr);
+  graphics->vertices_.setup(triangulated_shape);
+  graphics->vao_.linkAttrib(graphics->vertices_, 0, 3, GL_FLOAT, 0, nullptr);
+  graphics->vao_.linkAttrib(graphics->uv_, 1, 2, GL_FLOAT, 0, nullptr);
   // setup the EBO
-  graphics_->indices_count_ = indices.size();
-  graphics_->ebo_.setup(indices);
+  graphics->indices_count_ = indices.size();
+  graphics->ebo_.setup(indices);
   // change the texture
   // graphics_->texture_ = Resources::getTexture("aerolite_01");
 }
 
-GameEntity* AerolitePhysicsComponent::spawnAerolite(const b2Vec2& where) {
-  const auto aerolite {static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics())};
-  if (!aerolite) return nullptr;
-  aerolite->body_->SetTransform({where.x * kPixelsToMeters, where.y * kPixelsToMeters}, 0);
-  return aerolite->owner();
+EntityId AerolitePhysicsComponent::spawnAerolite(const b2Vec2& where) {
+  const auto aerolite {EntityManager::createEntity(EntityType::Aerolite)};
+  if (!aerolite) return aerolite;
+  AeroliteManager::findPhysics(aerolite)->body_->SetTransform({where.x * kPixelsToMeters, where.y * kPixelsToMeters}, 0);
+  return aerolite;
 }
 
-GameEntity* AerolitePhysicsComponent::spawnMovingAerolite() {
-  const auto aerolite {static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics())};
-  if (!aerolite) return nullptr;
+EntityId AerolitePhysicsComponent::spawnMovingAerolite() {
+  const auto aerolite {EntityManager::createEntity(EntityType::Aerolite)};
+  if (!aerolite) return aerolite;
   static int side {};
-  aerolite->body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
+  const auto physics {AeroliteManager::findPhysics(aerolite)};
+  physics->body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
   const float delta {ConfigParser::aerolites_config.speed_.value_ * generateRand(ConfigParser::aerolites_config.speed_.rand_min_, ConfigParser::aerolites_config.speed_.rand_max_)};
   switch (side) {
     case 0: // up
-      aerolite->body_->SetTransform({b2_screen_size_.x * 0.5f, -b2_screen_size_.y}, aerolite->body_->GetAngle());
-      aerolite->body_->SetLinearVelocity({0, delta});
+      physics->body_->SetTransform({Game::b2ScreenSize().x * 0.5f, -Game::b2ScreenSize().y}, physics->body_->GetAngle());
+      physics->body_->SetLinearVelocity({0, delta});
       ++side;
       break;
     case 1: // right
-      aerolite->body_->SetTransform({b2_screen_size_.x + b2_screen_size_.y, b2_screen_size_.y * 0.5f}, aerolite->body_->GetAngle());
-      aerolite->body_->SetLinearVelocity({-delta, 0});
+      physics->body_->SetTransform({Game::b2ScreenSize().x + Game::b2ScreenSize().y, Game::b2ScreenSize().y * 0.5f}, physics->body_->GetAngle());
+      physics->body_->SetLinearVelocity({-delta, 0});
       ++side;
       break;
     case 2: // down
-      aerolite->body_->SetTransform({b2_screen_size_.x * 0.5f, b2_screen_size_.y + b2_screen_size_.y}, aerolite->body_->GetAngle());
-      aerolite->body_->SetLinearVelocity({0, -delta});
+      physics->body_->SetTransform({Game::b2ScreenSize().x * 0.5f, Game::b2ScreenSize().y + Game::b2ScreenSize().y}, physics->body_->GetAngle());
+      physics->body_->SetLinearVelocity({0, -delta});
       ++side;
       break;
     case 3: // left
-      aerolite->body_->SetTransform({-b2_screen_size_.y, b2_screen_size_.y * 0.5f}, aerolite->body_->GetAngle());
-      aerolite->body_->SetLinearVelocity({delta, 0});
+      physics->body_->SetTransform({-Game::b2ScreenSize().y, Game::b2ScreenSize().y * 0.5f}, physics->body_->GetAngle());
+      physics->body_->SetLinearVelocity({delta, 0});
       side = 0;
       break;
   }
-  return aerolite->owner();
+  return aerolite;
 }
 
 void AerolitePhysicsComponent::split() {
   if (size_ < kMinSize_) {
     // very small, destroyed on impact
-    owner_->deactivate();
+    AeroliteManager::deactivate(id_);
     kuge::AeroliteDestroyedEvent ev {kuge::KugeEventTypes::AeroliteDestroyed, (int)(kScore_ / size_)};
-    owner_->event_bus_->postEvent(ev);
+    // owner_->event_bus_->postEvent(ev);
     return;
   } else {
     // good sized aerolite
@@ -299,10 +310,10 @@ void AerolitePhysicsComponent::split() {
     // the new Aerolite
     AerolitePhysicsComponent* aerolite {nullptr};
     for (std::size_t i = 0; i < pieces; ++i) {
-      aerolite = static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics());
+      aerolite = AeroliteManager::findPhysics(EntityManager::createEntity(EntityType::Aerolite));
       if (!aerolite) return;
       aerolite->new_born_ = false;
-      aerolite->reshape(piece_size); // need this until we can use the size constructor
+      aerolite->reshape(piece_size);
       aerolite->body_->SetAngularVelocity(old_angular * generateRand(-1.5f, 1.5f));
       aerolite->body_->SetLinearVelocity({old_delta.x * generateRand(0.5f, 1.5f), old_delta.y * generateRand(0.5f, 1.5f)});
       where.x = perpendicular.end.x + kSpacer * (perpendicular.begin.x - perpendicular.end.x);
@@ -314,7 +325,7 @@ void AerolitePhysicsComponent::split() {
       pieces,
       (int)(((kScore_ / 10u) / size_) * (pieces + 1u))
     };
-    owner_->event_bus_->postEvent(ev);
+    // owner_->event_bus_->postEvent(ev);
   }
 }
 
@@ -332,11 +343,11 @@ void AerolitePhysicsComponent::update(float delta_time) {
     aabb_.Combine(aabb_, fixture->GetAABB(0)); /// wtf is childIndex
   }
   constexpr auto kThreshold {0.1f};
-  if (!new_born_ && (aabb_.upperBound.x < -kThreshold || aabb_.lowerBound.x > b2_screen_size_.x + kThreshold
-                  || aabb_.upperBound.y < -kThreshold || aabb_.lowerBound.y > b2_screen_size_.y + kThreshold)) {
-    owner_->deactivate();
-  } else if (new_born_ && aabb_.upperBound.x > -kThreshold && aabb_.lowerBound.x < b2_screen_size_.x
-                       && aabb_.upperBound.y > -kThreshold && aabb_.lowerBound.y < b2_screen_size_.y) {
+  if (!new_born_ && (aabb_.upperBound.x < -kThreshold || aabb_.lowerBound.x > Game::b2ScreenSize().x + kThreshold
+                  || aabb_.upperBound.y < -kThreshold || aabb_.lowerBound.y > Game::b2ScreenSize().y + kThreshold)) {
+    AeroliteManager::deactivate(id_);
+  } else if (new_born_ && aabb_.upperBound.x > -kThreshold && aabb_.lowerBound.x < Game::b2ScreenSize().x
+                       && aabb_.upperBound.y > -kThreshold && aabb_.lowerBound.y < Game::b2ScreenSize().y) {
     new_born_ = false;
   }
   if (new_born_ && Game::gameplay_timer_.milliseconds() - born_time_ > kNewBornTime_) new_born_ = false;
@@ -348,5 +359,5 @@ void AerolitePhysicsComponent::updateMVP() {
   glm::mat4 model {1.f};
   model = glm::translate(model, glm::vec3(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels, 0.f));
   model = glm::rotate(model, body_->GetAngle(), glm::vec3(0.f, 0.f, 1.f));
-  graphics_->mvp_ = camera_.projectionMatrix() * camera_.viewMatrix() * model;
+  AeroliteManager::findRender(id_)->mvp_ = Game::camera().projectionMatrix() * Game::camera().viewMatrix() * model;
 }

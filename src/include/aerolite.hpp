@@ -33,10 +33,10 @@ class AeroliteManager {
 class AeroliteRenderComponent {
   friend class AerolitePhysicsComponent;
  public:
-  AeroliteRenderComponent();
+  AeroliteRenderComponent() = default;
   static auto& shader() { return shader_; }
   static auto& texture() { return texture_; }
-  void activate(EntityId id) { id_ = id; active_ = true; }
+  void activate(EntityId id);
   bool active() const { return active_; }
   void deactivate() { active_ = false; }
   auto id() const { return id_; }
@@ -59,22 +59,22 @@ class AerolitePhysicsComponent {
 
  public:
 
-  AerolitePhysicsComponent();
+  AerolitePhysicsComponent() = default;
   AerolitePhysicsComponent(const AerolitePhysicsComponent& other) = delete;
   AerolitePhysicsComponent(AerolitePhysicsComponent&& other) { *this = std::move(other); }
-  ~AerolitePhysicsComponent() { if (body_) Game::world()->DestroyBody(body_); }
+  ~AerolitePhysicsComponent() { if (body_) Game::world().DestroyBody(body_); }
 
   AerolitePhysicsComponent& operator=(const AerolitePhysicsComponent& other) = delete;
   AerolitePhysicsComponent& operator=(AerolitePhysicsComponent&& other);
 
-  void activate(EntityId id) { id_ = id; active_ = true; }
+  void activate(EntityId id);
   bool active() const { return active_; }
-  void deactivate() { active_ = false; }
+  void deactivate();
   void collide(const GameEntity* other) { collided_ = true; }
   auto id() const { return id_; }
   void reshape(float size);
-  static GameEntity* spawnAerolite(const b2Vec2& where);
-  static GameEntity* spawnMovingAerolite();
+  static EntityId spawnAerolite(const b2Vec2& where);
+  static EntityId spawnMovingAerolite();
   void update(float delta_time);
   auto worldManifold() { return &world_manifold_; }
   static GLfloatVector convertToUV(const GLfloatVector& v);
@@ -99,14 +99,14 @@ class AerolitePhysicsComponent {
   EntityId id_ {};
 
   /**
-   * @brief
-   */
-  bool active_ {false};
-
-  /**
    * @brief This is used to know when an aerolite has left the screen.
    */
   b2AABB aabb_ {};
+
+  /**
+   * @brief
+   */
+  bool active_ {false};
 
   /**
    * @brief The b2Body of the aerolite.
