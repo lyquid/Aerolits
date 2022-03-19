@@ -40,6 +40,7 @@ class GameEntity {
 
   // this friend is needed b/c the constructor is private
   friend class ObjectPool<GameEntity>;
+  friend struct PoolUnit<GameEntity>;
 
  public:
 
@@ -62,7 +63,7 @@ class GameEntity {
   /**
    * @return The status of the deactivate flag.
    */
-  inline auto canBeDeactivated() const { return deactivate_; }
+  auto canBeDeactivated() const { return deactivate_; }
 
   /**
    * @brief Clears all the GameEntities in the object pool by calling reset()
@@ -131,19 +132,19 @@ class GameEntity {
   /**
    * @return The number of GameEntities currently active.
    */
-  inline static auto count() { return game_entities_.activeCount(); }
+  static auto count() { return game_entities_.activeCount(); }
 
   /**
    * @brief Sets the deactivate flag to true.
    */
-  inline void deactivate() { deactivate_ = true; }
+  void deactivate() { deactivate_ = true; }
 
   /**
    * @brief Uses the graphics component to draw something hopefully ressembling
    *         what the user wants.
    * @param renderer A renderer to draw things on.
    */
-  inline void draw() const {
+  void draw() const {
     if (graphics_) graphics_->update(*this);
   }
 
@@ -152,7 +153,7 @@ class GameEntity {
    * @param type The type of entity to look for.
    * @return The number of active entities of the type requested.
    */
-  inline static auto entitiesCount(EntityTypes type) { return entities_count_[type]; }
+  static auto entitiesCount(EntityTypes type) { return entities_count_[type]; }
 
   /**
    * @brief Resets the GameEntity and sets it the first available in the pool.
@@ -166,28 +167,28 @@ class GameEntity {
   /**
    * @return A pointer to the graphics component.
    */
-  inline auto graphics() const { return graphics_.get(); }
+  auto graphics() const { return graphics_.get(); }
 
   /**
    * @return A pointer to the input component.
    */
-  inline auto input() const { return input_.get(); }
+  auto input() const { return input_.get(); }
 
   /**
    * @return A pointer to the physics component.
    */
-  inline auto physics() const { return physics_.get(); }
+  auto physics() const { return physics_.get(); }
 
   /**
    * @return The type of the GameEntity.
    */
-  inline auto type() const { return type_; }
+  auto type() const { return type_; }
 
   /**
    * @brief Updates the input and physics components of the GameEntity.
    * @param delta_time A time that goes between gamma_time and epsilon_time.
    */
-  inline void update(float delta_time) {
+  void update(float delta_time) {
     if (input_) input_->update(*this, delta_time);
     if (physics_) physics_->update(*this, delta_time);
   }
