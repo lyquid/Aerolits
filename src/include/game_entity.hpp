@@ -71,7 +71,7 @@ class GameEntity {
    */
   static void clear() {
     for (auto i = 0u; i < game_entities_.capacity(); ++i) {
-      game_entities_[i].object_.reset();
+      game_entities_[i].reset();
     }
     game_entities_.clear();
     entities_count_.clear();
@@ -83,7 +83,7 @@ class GameEntity {
    * @return A pointer to the newly created GameEntity or nullptr.
    */
   static auto createEntity(EntityTypes type) {
-    const auto entity {game_entities_.create()};
+    const auto entity {game_entities_.activate()};
     if (!entity) return entity;
     entity->deactivate_ = false;
     entity->type_ = type;
@@ -161,7 +161,7 @@ class GameEntity {
    */
   void free(std::size_t index) {
     reset();
-    game_entities_.destroy(index);
+    game_entities_.deactivate(index);
   }
 
   /**

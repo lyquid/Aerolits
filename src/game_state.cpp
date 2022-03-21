@@ -63,8 +63,8 @@ void ktp::DemoState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw();
+    if (GameEntity::game_entities_.isActive(i)) {
+      GameEntity::game_entities_[i].draw();
     }
   }
 
@@ -90,8 +90,8 @@ void ktp::DemoState::draw(Game& game) {
 ktp::GameState* ktp::DemoState::enter(Game& game) {
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
   for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
-    if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Player) {
-      GameEntity::game_entities_[i].object_.free(i);
+    if (GameEntity::game_entities_[i].type() == EntityTypes::Player) {
+      GameEntity::game_entities_[i].free(i);
     }
   }
   GameEntity::createEntity(EntityTypes::PlayerDemo);
@@ -148,8 +148,8 @@ void ktp::PausedState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw();
+    if (GameEntity::game_entities_.isActive(i)) {
+      GameEntity::game_entities_[i].draw();
     }
   }
 
@@ -224,8 +224,8 @@ void ktp::PlayingState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw();
+    if (GameEntity::game_entities_.isActive(i)) {
+      GameEntity::game_entities_[i].draw();
     }
   }
 
@@ -311,11 +311,11 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_[i].active_) {
-      if (GameEntity::game_entities_[i].object_.canBeDeactivated()) {
-        GameEntity::game_entities_[i].object_.free(i);
+    if (GameEntity::game_entities_.isActive(i)) {
+      if (GameEntity::game_entities_[i].canBeDeactivated()) {
+        GameEntity::game_entities_[i].free(i);
       } else {
-        GameEntity::game_entities_[i].object_.update(delta_time);
+        GameEntity::game_entities_[i].update(delta_time);
       }
     }
   }
@@ -330,8 +330,8 @@ void ktp::TestingState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_[i].active_) {
-      GameEntity::game_entities_[i].object_.draw();
+    if (GameEntity::game_entities_.isActive(i)) {
+      GameEntity::game_entities_[i].draw();
     }
   }
 
@@ -421,11 +421,11 @@ void ktp::TestingState::update(Game& game, float delta_time) {
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_[i].active_) {
-      if (GameEntity::game_entities_[i].object_.canBeDeactivated()) {
-        GameEntity::game_entities_[i].object_.free(i);
+    if (GameEntity::game_entities_.isActive(i)) {
+      if (GameEntity::game_entities_[i].canBeDeactivated()) {
+        GameEntity::game_entities_[i].free(i);
       } else {
-        GameEntity::game_entities_[i].object_.update(delta_time);
+        GameEntity::game_entities_[i].update(delta_time);
       }
     }
   }
@@ -440,8 +440,8 @@ void ktp::TitleState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Background) {
-      GameEntity::game_entities_[i].object_.draw();
+    if (GameEntity::game_entities_[i].type() == EntityTypes::Background) {
+      GameEntity::game_entities_[i].draw();
       break;
     }
   }
@@ -510,7 +510,7 @@ void ktp::TitleState::update(Game& game, float delta_time) {
   setWindowTitle(game);
   // Background
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    GameEntity::game_entities_[i].object_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
+    GameEntity::game_entities_[i].update(delta_time * kDefaultBackgroundDeltaInMenu_);
   }
   // enter Demo mode
   if (SDL2_Timer::SDL2Ticks() - demo_time_ > kWaitForDemo_) {

@@ -44,7 +44,25 @@ class ObjectPool {
     return *this;
   }
 
-  auto& operator[](std::size_t index) { return pool_[index]; }
+  auto& operator[](std::size_t index) { return pool_[index].object_; }
+
+  /**
+   * @brief If there's an object available, it gets activated and returned as
+   *        pointer. This doesn't actually create anything.
+   * @return A pointer to the first available object in the pool or *WARNING*
+   *         nullptr if there's no object available.
+   */
+  T* activate() {
+    if (first_available_) {
+      first_available_->active_ = true;
+      const auto aux {&first_available_->object_};
+      first_available_ = first_available_->next_;
+      ++active_count_;
+      return aux;
+    } else {
+      return nullptr;
+    }
+  }
 
   /**
    * @return The number of objects that are currently active.
@@ -79,29 +97,11 @@ class ObjectPool {
   }
 
   /**
-   * @brief If there's an object available, it gets activated and returned as
-   *        pointer. This doesn't actually create anything.
-   * @return A pointer to the first available object in the pool or *WARNING*
-   *         nullptr if there's no object available.
-   */
-  T* create() {
-    if (first_available_) {
-      first_available_->active_ = true;
-      const auto aux {&first_available_->object_};
-      first_available_ = first_available_->next_;
-      ++active_count_;
-      return aux;
-    } else {
-      return nullptr;
-    }
-  }
-
-  /**
    * @brief Deactivates the requested object and sets it to be the first
    *        available. It doesn't destroy or delete anything.
    * @param index The index of the object to be deactivated.
    */
-  void destroy(std::size_t index) {
+  void deactivate(std::size_t index) {
     if (index < capacity_) {
       pool_[index].active_ = false;
       pool_[index].next_ = first_available_;
@@ -109,6 +109,13 @@ class ObjectPool {
       --active_count_;
     }
   }
+
+  /**
+  * @brief Checks if a given poolunit is active.
+  * @param The index to check.
+  * @return True if the poolunit is active.
+  */
+  auto isActive(std::size_t index) const { return pool_[index].active_; }
 
  private:
 
@@ -150,7 +157,30 @@ class IndexedObjectPool {
     return *this;
   }
 
-  auto& operator[](std::size_t index) { return pool_[index]; }
+  auto& operator[](std::size_t index) { return pool_[index].object_ ; }
+
+  /**
+   * @brief If there's an object available, it gets activated and returned as
+   *        pointer. This doesn't actually create anything.
+   * @return A pointer to the first available object in the pool or *WARNING*
+   *         nullptr if there's no object available.
+   */
+  T* activate() {
+    if (first_available_) {
+      first_available_->active_ = true;
+
+      if (first_available_->index_ > highest_active_index_) {
+        highest_active_index_ = first_available_->index_;
+      }
+
+      const auto aux {&first_available_->object_};
+      first_available_ = first_available_->next_;
+      ++active_count_;
+      return aux;
+    } else {
+      return nullptr;
+    }
+  }
 
   /**
    * @return The number of objects that are currently active.
@@ -187,34 +217,11 @@ class IndexedObjectPool {
   }
 
   /**
-   * @brief If there's an object available, it gets activated and returned as
-   *        pointer. This doesn't actually create anything.
-   * @return A pointer to the first available object in the pool or *WARNING*
-   *         nullptr if there's no object available.
-   */
-  T* create() {
-    if (first_available_) {
-      first_available_->active_ = true;
-
-      if (first_available_->index_ > highest_active_index_) {
-        highest_active_index_ = first_available_->index_;
-      }
-
-      const auto aux {&first_available_->object_};
-      first_available_ = first_available_->next_;
-      ++active_count_;
-      return aux;
-    } else {
-      return nullptr;
-    }
-  }
-
-  /**
    * @brief Deactivates the requested object and sets it to be the first
    *        available. It doesn't destroy or delete anything.
    * @param index The index of the object to be deactivated.
    */
-  void destroy(std::size_t index) {
+  void deactivate(std::size_t index) {
     if (index < capacity_) {
       pool_[index].active_ = false;
       pool_[index].next_ = first_available_;
@@ -237,6 +244,13 @@ class IndexedObjectPool {
    * @return The highest index of the active elements in the pool.
    */
   auto highestActiveIndex() { return highest_active_index_; }
+
+ /**
+  * @brief Checks if a given poolunit is active.
+  * @param The index to check.
+  * @return True if the poolunit is active.
+  */
+  auto isActive(std::size_t index) const { return pool_[index].active_; }
 
  private:
 
