@@ -62,7 +62,7 @@ void ktp::GameState::setWindowTitle(Game& game) {
 void ktp::DemoState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+  for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
       GameEntity::game_entities_[i].object_.draw();
     }
@@ -147,7 +147,7 @@ void ktp::PausedState::draw(Game& game) {
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+  for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
       GameEntity::game_entities_[i].object_.draw();
     }
@@ -223,7 +223,7 @@ void ktp::PausedState::update(Game& game, float delta_time) {
 void ktp::PlayingState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+  for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
       GameEntity::game_entities_[i].object_.draw();
     }
@@ -310,7 +310,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   // Box2D
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
-  for (std::size_t i = 0; i < GameEntity::game_entities_.capacity(); ++i) {
+  for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
       if (GameEntity::game_entities_[i].object_.canBeDeactivated()) {
         GameEntity::game_entities_[i].object_.free(i);
@@ -329,7 +329,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
 void ktp::TestingState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+  for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
       GameEntity::game_entities_[i].object_.draw();
     }
@@ -420,7 +420,7 @@ void ktp::TestingState::update(Game& game, float delta_time) {
   // Box2D
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
-  for (std::size_t i = 0; i < GameEntity::game_entities_.capacity(); ++i) {
+  for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     if (GameEntity::game_entities_[i].active_) {
       if (GameEntity::game_entities_[i].object_.canBeDeactivated()) {
         GameEntity::game_entities_[i].object_.free(i);
@@ -439,7 +439,7 @@ void ktp::TestingState::update(Game& game, float delta_time) {
 void ktp::TitleState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+  for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     if (GameEntity::game_entities_[i].object_.type() == EntityTypes::Background) {
       GameEntity::game_entities_[i].object_.draw();
       break;
@@ -509,7 +509,7 @@ void ktp::TitleState::update(Game& game, float delta_time) {
   // Window title
   setWindowTitle(game);
   // Background
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+  for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     GameEntity::game_entities_[i].object_.update(delta_time * kDefaultBackgroundDeltaInMenu_);
   }
   // enter Demo mode

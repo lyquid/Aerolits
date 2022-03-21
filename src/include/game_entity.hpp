@@ -31,7 +31,7 @@ enum class EntityTypes {
 };
 
 using EntitiesCount = std::map<EntityTypes, std::size_t>;
-using EntitiesPool  = ObjectPool<GameEntity>;
+using EntitiesPool  = IndexedObjectPool<GameEntity>;
 using Graphics      = std::unique_ptr<GraphicsComponent>;
 using Input         = std::unique_ptr<InputComponent>;
 using Physics       = std::unique_ptr<PhysicsComponent>;
@@ -39,7 +39,8 @@ using Physics       = std::unique_ptr<PhysicsComponent>;
 class GameEntity {
 
   // this friend is needed b/c the constructor is private
-  friend class ObjectPool<GameEntity>;
+  friend class IndexedObjectPool<GameEntity>;
+  friend struct IndexedPoolUnit<GameEntity>;
 
  public:
 
