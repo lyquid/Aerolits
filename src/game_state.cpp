@@ -63,7 +63,7 @@ void ktp::DemoState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_.isActive(i)) {
+    if (GameEntity::game_entities_.active(i)) {
       GameEntity::game_entities_[i].draw();
     }
   }
@@ -148,7 +148,7 @@ void ktp::PausedState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_.isActive(i)) {
+    if (GameEntity::game_entities_.active(i)) {
       GameEntity::game_entities_[i].draw();
     }
   }
@@ -224,7 +224,7 @@ void ktp::PlayingState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_.isActive(i)) {
+    if (GameEntity::game_entities_.active(i)) {
       GameEntity::game_entities_[i].draw();
     }
   }
@@ -311,7 +311,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_.isActive(i)) {
+    if (GameEntity::game_entities_.active(i)) {
       if (GameEntity::game_entities_[i].canBeDeactivated()) {
         GameEntity::game_entities_[i].free(i);
       } else {
@@ -330,7 +330,7 @@ void ktp::TestingState::draw(Game& game) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_.isActive(i)) {
+    if (GameEntity::game_entities_.active(i)) {
       GameEntity::game_entities_[i].draw();
     }
   }
@@ -421,7 +421,7 @@ void ktp::TestingState::update(Game& game, float delta_time) {
   game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    if (GameEntity::game_entities_.isActive(i)) {
+    if (GameEntity::game_entities_.active(i)) {
       if (GameEntity::game_entities_[i].canBeDeactivated()) {
         GameEntity::game_entities_[i].free(i);
       } else {

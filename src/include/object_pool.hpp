@@ -19,6 +19,10 @@ struct IndexedPoolUnit {
   T                   object_ {};
 };
 
+/**
+ * @brief Basic pool. It never modifies the addressess of the stored contents.
+ * @tparam T The type to be stored on the pool.
+ */
 template <class T>
 class ObjectPool {
 
@@ -39,7 +43,7 @@ class ObjectPool {
       delete[] pool_;
       // exchange pointers
       first_available_ = std::exchange(other.first_available_, nullptr);
-      pool_ = std::exchange(other.pool_, nullptr);
+      pool_            = std::exchange(other.pool_, nullptr);
     }
     return *this;
   }
@@ -63,6 +67,13 @@ class ObjectPool {
       return nullptr;
     }
   }
+
+  /**
+  * @brief Checks if a given poolunit is active.
+  * @param index The index to check.
+  * @return True if the poolunit is active.
+  */
+  auto active(std::size_t index) const { return pool_[index].active_; }
 
   /**
    * @return The number of objects that are currently active.
@@ -110,13 +121,6 @@ class ObjectPool {
     }
   }
 
-  /**
-  * @brief Checks if a given poolunit is active.
-  * @param The index to check.
-  * @return True if the poolunit is active.
-  */
-  auto isActive(std::size_t index) const { return pool_[index].active_; }
-
  private:
 
   /**
@@ -128,9 +132,15 @@ class ObjectPool {
   PoolUnit<T>* pool_ {nullptr};
 
   std::size_t active_count_ {0};
-  std::size_t capacity_ {};
+  std::size_t capacity_;
 };
 
+/**
+ * @brief Pool that keeps track of the highest active index, which is useful to
+ * avoid having to traverse all the pool. It prioritizes activating lower indices.
+ * It never modifies the addressess of the stored contents.
+ * @tparam T The type to be stored on the pool.
+ */
 template <class T>
 class IndexedObjectPool {
 
@@ -183,6 +193,13 @@ class IndexedObjectPool {
   }
 
   /**
+  * @brief Checks if a given poolunit is active.
+  * @param index The index to check.
+  * @return True if the poolunit is active.
+  */
+  auto active(std::size_t index) const { return pool_[index].active_; }
+
+  /**
    * @return The number of objects that are currently active.
    */
   auto activeCount() const { return active_count_; }
@@ -224,33 +241,40 @@ class IndexedObjectPool {
   void deactivate(std::size_t index) {
     if (index < capacity_) {
       pool_[index].active_ = false;
-      pool_[index].next_ = first_available_;
-      first_available_ = &pool_[index];
+      // we are interested in filling the lowest indices first.
+      if (first_available_ < pool_[index].next_) {
+        // first_available_ is lower so it should not be changed
+        // we store the address of the current next
+        const auto aux {first_available_->next_};
+        // first_available_ now points to the newly deactivated poolunit
+        first_available_->next_ = &pool_[index];
+        // thread back the pointers
+        pool_[index].next_ = aux;
+      } else {
+        // first_available_ is higher so we can change it
+        pool_[index].next_ = first_available_;
+        first_available_ = &pool_[index];
+      }
       --active_count_;
-
+      // I'm sure there are better solutions for finding the previous highest_active_index.
+      // reverse loop iterating based on overflow by:
+      // https://jdhao.github.io/2017/10/07/loop-forward-backward-with-cpp-vector/
       if (highest_active_index_ == pool_[index].index_) {
-        for (std::size_t i = highest_active_index_ - 1; i >= 0; --i) {
+        for (auto i = highest_active_index_ - 1; i != (size_t) - 1; --i) {
           if (pool_[i].active_) {
             highest_active_index_ = i;
             return;
           }
         }
       }
-
     }
   }
 
   /**
    * @return The highest index of the active elements in the pool.
+   *  ***CAUTION*** 0 can be either active or inactive >:(
    */
-  auto highestActiveIndex() { return highest_active_index_; }
-
- /**
-  * @brief Checks if a given poolunit is active.
-  * @param The index to check.
-  * @return True if the poolunit is active.
-  */
-  auto isActive(std::size_t index) const { return pool_[index].active_; }
+  auto highestActiveIndex() const { return highest_active_index_; }
 
  private:
 
