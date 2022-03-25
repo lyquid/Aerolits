@@ -188,26 +188,14 @@ void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta
   for (auto i = 0u; i < graphics_->particles_pool_size_; ++i) {
     if (graphics_->particles_pool_[i].inUse()) {
       // particle alive!
-      if (data_->vortex_) {
-        if (graphics_->particles_pool_[i].update(Vortex{position_, data_->vortex_scale_, data_->vortex_speed_}, &subdata_[i * kComponents])) {
-          // particle is no more, so we change the Z axis to 1
-          subdata_[i * kComponents + 0] = 0.f;
-          subdata_[i * kComponents + 1] = 0.f;
-          subdata_[i * kComponents + 2] = 1.f;
-          graphics_->particles_pool_[i].setNext(first_available_);
-          first_available_ = &graphics_->particles_pool_[i];
-          --alive_particles_count_;
-        }
-      } else { // no vortex
-        if (graphics_->particles_pool_[i].update(&subdata_[i * kComponents])) {
-          // particle is no more, so we change the Z axis to 1
-          subdata_[i * kComponents + 0] = 0.f;
-          subdata_[i * kComponents + 1] = 0.f;
-          subdata_[i * kComponents + 2] = 1.f;
-          graphics_->particles_pool_[i].setNext(first_available_);
-          first_available_ = &graphics_->particles_pool_[i];
-          --alive_particles_count_;
-        }
+      if (graphics_->particles_pool_[i].update(&subdata_[i * kComponents])) {
+        // particle is no more, so we change the Z axis to 1
+        subdata_[i * kComponents + 0] = 0.f;
+        subdata_[i * kComponents + 1] = 0.f;
+        subdata_[i * kComponents + 2] = 1.f;
+        graphics_->particles_pool_[i].setNext(first_available_);
+        first_available_ = &graphics_->particles_pool_[i];
+        --alive_particles_count_;
       }
     }
   }

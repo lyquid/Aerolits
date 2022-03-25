@@ -14,12 +14,6 @@
 
 namespace ktp {
 
-struct Vortex {
-  glm::vec3 position_ {};
-  float scale_ {};
-  float speed_ {};
-};
-
 struct EmitterType {
   // Emitter properties
   std::string   type_ {};

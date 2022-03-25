@@ -13,8 +13,6 @@ using GLMColors     = std::vector<glm::vec4>;
 using FPointsVector = std::vector<SDL_FPoint>;
 using SizeVector    = std::vector<float>;
 
-struct Vortex;
-
 struct ParticleData {
   unsigned int  start_life_ {};
   SDL_Rect      texture_rect_ {};
@@ -47,7 +45,6 @@ class Particle {
   bool inUse() const { return life_ > 0; }
   void setNext(Particle* next) { state_.next_ = next; }
   bool update(GLfloat* subdata);
-  bool update(const Vortex& vortex, GLfloat* subdata);
 
   inline static glm::vec4 interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step);
   inline static glm::vec4 interpolate3Colors(const glm::vec4& start_color, const glm::vec4& mid_color, const glm::vec4& end_color, float time_step);
