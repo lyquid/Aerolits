@@ -256,16 +256,22 @@ class IndexedObjectPool {
         first_available_ = &pool_[index];
       }
       --active_count_;
-      // I'm sure there are better solutions for finding the previous highest_active_index.
-      // reverse loop iterating based on overflow by:
-      // https://jdhao.github.io/2017/10/07/loop-forward-backward-with-cpp-vector/
-      if (highest_active_index_ == pool_[index].index_) {
-        for (auto i = highest_active_index_ - 1; i != (size_t) - 1; --i) {
+      // if the highest_active_index_ is the one we are deactivating, we need to update it
+      if (highest_active_index_ == index) {
+        // if the index is already 0, return
+        if (index == 0) return;
+        // I'm sure there are better solutions for finding the previous highest_active_index.
+        // reverse loop iterating based on overflow by:
+        // https://jdhao.github.io/2017/10/07/loop-forward-backward-with-cpp-vector/
+        for (std::size_t i = highest_active_index_ - 1; i != (size_t)-1; --i) {
           if (pool_[i].active_) {
             highest_active_index_ = i;
             return;
           }
         }
+        // if we haven't found any other active unit it's because this one was
+        // the last active unit, so we set to 0 highest_active_index_
+        highest_active_index_ = 0u;
       }
     }
   }
