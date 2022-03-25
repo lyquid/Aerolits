@@ -207,10 +207,10 @@ void ktp::ConfigParser::constructEmitterTypesVector(const pugi::xml_document& do
       }
     }
     /* PARTICLE LIFE */
-    if (emitter.child("maxParticleLife").attribute("value").as_uint() <= 0) {
+    if (emitter.child("maxParticleLife").attribute("value").as_float() <= 0) {
       logMessage("WARNING! Emitter \"" + type + "\" has a particle starting life of 0 or less.");
     }
-    emi.max_particle_life_.value_    = emitter.child("maxParticleLife").attribute("value").as_uint();
+    emi.max_particle_life_.value_    = emitter.child("maxParticleLife").attribute("value").as_float() / 1000.f;
     emi.max_particle_life_.rand_min_ = emitter.child("maxParticleLife").attribute("randMin").as_float();
     emi.max_particle_life_.rand_max_ = emitter.child("maxParticleLife").attribute("randMax").as_float();
     /* COLORS */

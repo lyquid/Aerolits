@@ -27,7 +27,7 @@ struct EmitterType {
   float         vortex_scale_ {};
   float         vortex_speed_ {};
   // Particles properties
-  RRVUint      max_particle_life_ {};
+  RRVFloat     max_particle_life_ {};
   GLMColors    colors_ {};
   RRVFVector   sizes_ {};
   RRVFVector   speeds_ {};

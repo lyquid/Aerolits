@@ -84,10 +84,10 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
   const auto how_many {static_cast<unsigned int>(std::round(data_->emission_rate_.value_ * generateRand(data_->emission_rate_.rand_min_, data_->emission_rate_.rand_max_)))};
   for (auto i = 0u; i < how_many; ++i) {
     ParticleData new_data {};
-    new_data.start_life_ = std::round(data_->max_particle_life_.value_ * generateRand(data_->max_particle_life_.rand_min_, data_->max_particle_life_.rand_max_));
+    new_data.start_life_ = data_->max_particle_life_.value_ * generateRand(data_->max_particle_life_.rand_min_, data_->max_particle_life_.rand_max_);
     // we need to do this in order for the particle to be update()d at least one time,
     // so we avoid the "not first available" plague
-    if (new_data.start_life_ <= 0u) new_data.start_life_ = 1u;
+    if (new_data.start_life_ <= 0.f) new_data.start_life_ = 1.f;
 
     new_data.texture_rect_ = data_->texture_rect_;
 
@@ -156,7 +156,7 @@ void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
     if (emitter_type.type_ == type) {
       data_ = &emitter_type;
       graphics_->blend_mode_ = emitter_type.blend_mode_;
-      graphics_->particles_pool_size_ = (emitter_type.max_particle_life_.value_ + 1u) * emitter_type.emission_rate_.value_;
+      graphics_->particles_pool_size_ = (emitter_type.max_particle_life_.value_ + 1u) * emitter_type.emission_rate_.value_ * 60;
       interval_time_ = emitter_type.emission_interval_.value_;
       emitter_found = true;
       break;
@@ -188,7 +188,7 @@ void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta
   for (auto i = 0u; i < graphics_->particles_pool_size_; ++i) {
     if (graphics_->particles_pool_[i].inUse()) {
       // particle alive!
-      if (graphics_->particles_pool_[i].update(&subdata_[i * kComponents])) {
+      if (graphics_->particles_pool_[i].update(delta_time, &subdata_[i * kComponents])) {
         // particle is no more, so we change the Z axis to 1
         subdata_[i * kComponents + 0] = 0.f;
         subdata_[i * kComponents + 1] = 0.f;

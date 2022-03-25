@@ -14,7 +14,7 @@ using FPointsVector = std::vector<SDL_FPoint>;
 using SizeVector    = std::vector<float>;
 
 struct ParticleData {
-  unsigned int  start_life_ {};
+  float         start_life_ {};
   SDL_Rect      texture_rect_ {};
   GLMColors     colors_ {};
   glm::vec4     current_color_ {};
@@ -44,19 +44,19 @@ class Particle {
   void init(const ParticleData& data);
   bool inUse() const { return life_ > 0; }
   void setNext(Particle* next) { state_.next_ = next; }
-  bool update(GLfloat* subdata);
+  bool update(float delta_time, GLfloat* subdata);
 
-  inline static glm::vec4 interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step);
-  inline static glm::vec4 interpolate3Colors(const glm::vec4& start_color, const glm::vec4& mid_color, const glm::vec4& end_color, float time_step);
+  static glm::vec4 interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step);
+  static glm::vec4 interpolate3Colors(const glm::vec4& start_color, const glm::vec4& mid_color, const glm::vec4& end_color, float time_step);
 
   template<typename T>
-  inline static T interpolateRange(T start, T end, T time_step) { return start + (end - start) * time_step; }
+  static T interpolateRange(T start, T end, T time_step) { return start + (end - start) * time_step; }
 
   template<typename T, typename U>
-  inline static T interpolateRange(T start, T end, U time_step) { return start + (end - start) * time_step; }
+  static T interpolateRange(T start, T end, U time_step) { return start + (end - start) * time_step; }
 
   template<typename T>
-  inline static T interpolateRange3(T start, T mid, T end, T time_step) {
+  static T interpolateRange3(T start, T mid, T end, T time_step) {
     if (time_step < 0.5) {
       return (mid * time_step * 2.0) + start * (0.5 - time_step) * 2.0;
     } else {
@@ -65,7 +65,7 @@ class Particle {
   }
 
   template<typename T, typename U>
-  inline static T interpolateRange3(T start, T mid, T end, U time_step) {
+  static T interpolateRange3(T start, T mid, T end, U time_step) {
     if (time_step < 0.5) {
       return (mid * time_step * 2.0) + start * (0.5 - time_step) * 2.0;
     } else {
@@ -75,7 +75,7 @@ class Particle {
 
  private:
 
-  unsigned int life_ {};
+  float life_ {};
 
   union State {
     ~State() {}

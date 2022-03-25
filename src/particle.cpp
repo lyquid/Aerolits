@@ -32,9 +32,6 @@ ktp::Particle::State& ktp::Particle::State::operator=(State&& other) {
 void ktp::Particle::init(const ParticleData& data) {
   life_ = data.start_life_;
   state_.live_ = data;
-  // position is set to center the texture on the emitter
-  // state_.live_.position_ = {data.position_.x - data.current_size_ * 0.5f,
-  //                           data.position_.y - data.current_size_ * 0.5f, 0.f};
 }
 
 glm::vec4 ktp::Particle::interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step) {
@@ -56,9 +53,9 @@ glm::vec4 ktp::Particle::interpolate3Colors(const glm::vec4& start_color, const 
 }
 
 /* return true if the previously live particle gave up the ghost in that frame */
-bool ktp::Particle::update(GLfloat* subdata) {
+bool ktp::Particle::update(float delta_time, GLfloat* subdata) {
   // time step increment to interpolate
-  state_.live_.time_step_ += (1.f / state_.live_.start_life_);
+  state_.live_.time_step_ += (1.f / state_.live_.start_life_) * delta_time;
   if (state_.live_.time_step_ >= 1.f) state_.live_.time_step_ = 0.f;
   // size interpolation
   if (state_.live_.sizes_.size() == 2) {
@@ -89,13 +86,13 @@ bool ktp::Particle::update(GLfloat* subdata) {
     state_.live_.current_speed_.y = interpolateRange3(state_.live_.speeds_[0].y, state_.live_.speeds_[1].y, state_.live_.speeds_[2].y, state_.live_.time_step_);
   }
   // position update
-  state_.live_.position_.x += state_.live_.current_speed_.x;
-  state_.live_.position_.y += state_.live_.current_speed_.y;
+  state_.live_.position_.x += state_.live_.current_speed_.x * delta_time;
+  state_.live_.position_.y += state_.live_.current_speed_.y * delta_time;
   // translation update
   subdata[0] = state_.live_.position_.x;
   subdata[1] = state_.live_.position_.y;
   subdata[2] = 0.f;
 
-  --life_;
-  return life_ == 0;
+  life_ -= delta_time;
+  return life_ <= 0.f;
 }
