@@ -49,10 +49,10 @@ class Particle {
 
   template<typename T>
   static T interpolateRange3(T start, T mid, T end, T time_step) {
-    if (time_step < 0.5) {
-      return (mid * time_step * 2.0) + start * (0.5 - time_step) * 2.0;
+    if (time_step < 0.5f) {
+      return (mid * time_step * 2.f) + start * (0.5f - time_step) * 2.f;
     } else {
-      return end * (time_step - 0.5) * 2.0 + mid * (1.0 - time_step) * 2.0;
+      return end * (time_step - 0.5f) * 2.f + mid * (1.f - time_step) * 2.f;
     }
   }
 
