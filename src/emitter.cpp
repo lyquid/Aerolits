@@ -25,18 +25,18 @@ ktp::EmitterGraphicsComponent::EmitterGraphicsComponent() {
 
 ktp::EmitterGraphicsComponent& ktp::EmitterGraphicsComponent::operator=(EmitterGraphicsComponent&& other) {
   if (this != &other) {
-    blend_mode_            = other.blend_mode_;
-    particles_pool_        = std::exchange(other.particles_pool_, nullptr);
-    particles_pool_size_   = other.particles_pool_size_;
-    vao_                   = std::move(other.vao_);
-    vertices_              = std::move(other.vertices_);
-    vertices_data_         = std::move(other.vertices_data_);
-    indices_               = std::move(other.indices_);
-    indices_data_          = std::move(other.indices_data_);
-    subdata_               = std::move(other.subdata_);
-    mvp_                   = std::move(other.mvp_);
-    shader_                = std::move(other.shader_);
-    texture_               = std::move(other.texture_);
+    blend_mode_          = other.blend_mode_;
+    particles_pool_      = std::exchange(other.particles_pool_, nullptr);
+    particles_pool_size_ = other.particles_pool_size_;
+    vao_                 = std::move(other.vao_);
+    vertices_            = std::move(other.vertices_);
+    vertices_data_       = std::move(other.vertices_data_);
+    indices_             = std::move(other.indices_);
+    indices_data_        = std::move(other.indices_data_);
+    subdata_             = std::move(other.subdata_);
+    mvp_                 = std::move(other.mvp_);
+    shader_              = std::move(other.shader_);
+    texture_             = std::move(other.texture_);
   }
   return *this;
 }
@@ -85,12 +85,7 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
   for (auto i = 0u; i < how_many; ++i) {
     ParticleData new_data {};
     new_data.start_life_ = data_->max_particle_life_.value_ * generateRand(data_->max_particle_life_.rand_min_, data_->max_particle_life_.rand_max_);
-    // we need to do this in order for the particle to be update()d at least one time,
-    // so we avoid the "not first available" plague
-    if (new_data.start_life_ <= 0.f) new_data.start_life_ = 1.f;
-
-    new_data.texture_rect_ = data_->texture_rect_;
-
+    
     for (const auto& size: data_->sizes_) {
       const auto final_size {size.value_ * generateRand(size.rand_min_, size.rand_max_)};
       new_data.sizes_.push_back(final_size);

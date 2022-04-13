@@ -13,7 +13,7 @@ const ktp::SDL2_Timer& kuge::KugeEvent::gameplay_timer_ {ktp::Game::gameplay_tim
 /* include/game_entity.hpp */
 kuge::EventBus*    ktp::GameEntity::event_bus_ {nullptr};
 ktp::EntitiesCount ktp::GameEntity::entities_count_ {};
-ktp::EntitiesPool  ktp::GameEntity::game_entities_ {2000};
+ktp::EntitiesPool  ktp::GameEntity::game_entities_ {1000};
 
 /* include/physics_component.hpp */
 SDL_FPoint   ktp::PhysicsComponent::b2_screen_size_ {};

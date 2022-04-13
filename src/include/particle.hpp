@@ -15,7 +15,6 @@ using SizeVector    = std::vector<float>;
 
 struct ParticleData {
   float         start_life_ {};
-  SDL_Rect      texture_rect_ {};
   GLMColors     colors_ {};
   glm::vec4     current_color_ {};
   SizeVector    sizes_ {};
@@ -33,21 +32,14 @@ struct ParticleData {
 class Particle {
  public:
 
-  Particle() = default;
-  Particle(const Particle& other) { *this = other; }
-  Particle(Particle&& other) { *this = std::move(other); }
-
-  Particle& operator=(const Particle& other);
-  Particle& operator=(Particle&& other);
-
-  Particle* getNext() const { return state_.next_; }
+  Particle* getNext() const { return next_; }
   void init(const ParticleData& data);
-  bool inUse() const { return life_ > 0; }
-  void setNext(Particle* next) { state_.next_ = next; }
+  bool inUse() const { return current_life_ > 0; }
+  void setNext(Particle* next) { next_ = next; }
   bool update(float delta_time, GLfloat* subdata);
 
-  static glm::vec4 interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step);
-  static glm::vec4 interpolate3Colors(const glm::vec4& start_color, const glm::vec4& mid_color, const glm::vec4& end_color, float time_step);
+  static inline glm::vec4 interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step);
+  static inline glm::vec4 interpolate3Colors(const glm::vec4& start_color, const glm::vec4& mid_color, const glm::vec4& end_color, float time_step);
 
   template<typename T>
   static T interpolateRange(T start, T end, T time_step) { return start + (end - start) * time_step; }
@@ -75,16 +67,29 @@ class Particle {
 
  private:
 
-  float life_ {};
-
-  union State {
-    ~State() {}
-    State& operator=(const State& other);
-    State& operator=(State&& other);
-
-    ParticleData live_;
-    Particle* next_ {nullptr};
-  } state_ {};
+  // life
+  float start_life_ {};
+  float current_life_ {};
+  // colors
+  GLMColors colors_ {};
+  glm::vec4 current_color_ {};
+  // sizes
+  SizeVector sizes_ {};
+  float      current_size_ {};
+  // speeds
+  FPointsVector speeds_ {};
+  SDL_FPoint    current_speed_ {};
+  // rotations
+  float rotation_ {};
+  float start_rotation_speed_ {};
+  float current_rotation_speed_ {};
+  float end_rotation_speed_ {};
+  // position
+  glm::vec3 position_ {};
+  // timestep
+  float time_step_ {};
+  // next free particle
+  Particle* next_ {nullptr};
 };
 
 } // end namespace ktp

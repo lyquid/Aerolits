@@ -79,14 +79,10 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   EmitterPhysicsComponent& operator=(const EmitterPhysicsComponent& other) = delete;
   EmitterPhysicsComponent& operator=(EmitterPhysicsComponent&& other);
 
-  bool aliveParticles() const { return alive_particles_count_ != 0u; }
-  auto aliveParticlesCount() const { return alive_particles_count_; }
-  bool canBeDeleted() const { return lifeTimeOver() && !alive_particles_count_; }
   virtual void collide(const GameEntity* other) override {}
   void generateParticles();
   auto getPosition() const { return position_; }
   void init(const std::string& type, const glm::vec3& pos);
-  bool lifeTimeOver() const { return SDL2_Timer::SDL2Ticks() - start_time_ >= data_->life_time_; }
   void setAngle(float angle) { angle_ = angle; }
   void setPosition(const glm::vec3& pos) { position_ = pos; }
   virtual void update(const GameEntity& emitter, float delta_time) override;
