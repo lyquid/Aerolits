@@ -85,7 +85,7 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
   for (auto i = 0u; i < how_many; ++i) {
     ParticleData new_data {};
     new_data.start_life_ = data_->max_particle_life_.value_ * generateRand(data_->max_particle_life_.rand_min_, data_->max_particle_life_.rand_max_);
-    
+
     for (const auto& size: data_->sizes_) {
       const auto final_size {size.value_ * generateRand(size.rand_min_, size.rand_max_)};
       new_data.sizes_.push_back(final_size);
@@ -184,10 +184,10 @@ void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta
     if (graphics_->particles_pool_[i].inUse()) {
       // particle alive!
       if (graphics_->particles_pool_[i].update(delta_time, &subdata_[i * kComponents])) {
-        // particle is no more, so we change the Z axis to 1
+        // particle is no more, so we change the Z axis to 10
         subdata_[i * kComponents + 0] = 0.f;
         subdata_[i * kComponents + 1] = 0.f;
-        subdata_[i * kComponents + 2] = 1.f;
+        subdata_[i * kComponents + 2] = 10.f;
         graphics_->particles_pool_[i].setNext(first_available_);
         first_available_ = &graphics_->particles_pool_[i];
         --alive_particles_count_;
