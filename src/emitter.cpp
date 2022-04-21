@@ -26,8 +26,7 @@ ktp::EmitterGraphicsComponent::EmitterGraphicsComponent() {
 ktp::EmitterGraphicsComponent& ktp::EmitterGraphicsComponent::operator=(EmitterGraphicsComponent&& other) {
   if (this != &other) {
     blend_mode_          = other.blend_mode_;
-    particles_pool_      = std::exchange(other.particles_pool_, nullptr);
-    particles_pool_size_ = other.particles_pool_size_;
+    particles_pool_size_ = std::exchange(other.particles_pool_size_, nullptr);
     vao_                 = std::move(other.vao_);
     vertices_            = std::move(other.vertices_);
     vertices_data_       = std::move(other.vertices_data_);
@@ -45,7 +44,7 @@ void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter) {
   shader_.use();
   texture_.bind();
   vao_.bind();
-  glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(indices_data_.size()), GL_UNSIGNED_INT, 0, particles_pool_size_);
+  glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(indices_data_.size()), GL_UNSIGNED_INT, 0, *particles_pool_size_);
 }
 
 /* PHYSICS */
@@ -58,15 +57,16 @@ ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhy
     owner_    = std::exchange(other.owner_, nullptr);
     size_     = other.size_;
     // own members
-    angle_                 = other.angle_;
-    alive_particles_count_ = other.alive_particles_count_;
-    data_                  = std::exchange(other.data_, nullptr);
-    first_available_       = std::exchange(other.first_available_, nullptr);
-    graphics_              = std::exchange(other.graphics_, nullptr);
-    interval_time_         = other.interval_time_;
-    position_              = std::move(other.position_);
-    start_time_            = other.start_time_;
-    subdata_               = std::move(other.subdata_);
+    angle_               = other.angle_;
+    data_                = std::exchange(other.data_, nullptr);
+    first_available_     = std::exchange(other.first_available_, nullptr);
+    graphics_            = std::exchange(other.graphics_, nullptr);
+    interval_time_       = other.interval_time_;
+    particles_pool_      = std::exchange(other.particles_pool_, nullptr);
+    particles_pool_size_ = other.particles_pool_size_;
+    position_            = std::move(other.position_);
+    start_time_          = other.start_time_;
+    subdata_             = std::move(other.subdata_);
   }
   return *this;
 }
@@ -119,7 +119,6 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
     Particle* new_particle {first_available_};
     first_available_ = new_particle->getNext();
     new_particle->init(new_data);
-    ++alive_particles_count_;
 
     if (first_available_ == nullptr) return;
   }
@@ -127,15 +126,15 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
 }
 
 void ktp::EmitterPhysicsComponent::inflatePool() {
-  delete[] graphics_->particles_pool_;
-  graphics_->particles_pool_ = new Particle[graphics_->particles_pool_size_];
+  delete[] particles_pool_;
+  particles_pool_ = new Particle[particles_pool_size_];
 
-  first_available_ = &graphics_->particles_pool_[0];
+  first_available_ = &particles_pool_[0];
 
-  for (auto i = 0u; i < graphics_->particles_pool_size_; ++i) {
-    graphics_->particles_pool_[i].setNext(&graphics_->particles_pool_[i + 1]);
+  for (auto i = 0u; i < particles_pool_size_; ++i) {
+    particles_pool_[i].setNext(&particles_pool_[i + 1]);
   }
-  graphics_->particles_pool_[graphics_->particles_pool_size_ - 1].setNext(nullptr);
+  particles_pool_[particles_pool_size_ - 1].setNext(nullptr);
 }
 
 void ktp::EmitterPhysicsComponent::init(const std::string& type, const glm::vec3& pos) {
@@ -151,7 +150,8 @@ void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
     if (emitter_type.type_ == type) {
       data_ = &emitter_type;
       graphics_->blend_mode_ = emitter_type.blend_mode_;
-      graphics_->particles_pool_size_ = static_cast<unsigned int>((emitter_type.max_particle_life_.value_ + 1.f) * (float)emitter_type.emission_rate_.value_ * 60.f);
+      particles_pool_size_ = static_cast<unsigned int>((emitter_type.max_particle_life_.value_ + 1.f) * (float)emitter_type.emission_rate_.value_ * 60.f);
+      graphics_->particles_pool_size_ = &particles_pool_size_;
       interval_time_ = emitter_type.emission_interval_.value_;
       emitter_found = true;
       break;
@@ -166,7 +166,7 @@ void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
 void ktp::EmitterPhysicsComponent::setupOpenGL() {
   graphics_->vao_.bind();
   // subdata: translations(3), colors(4), size(1)
-  subdata_.resize(graphics_->particles_pool_size_ * kComponents);
+  subdata_.resize(particles_pool_size_ * kComponents);
   graphics_->subdata_.setup(nullptr, subdata_.size() * sizeof(GLfloat), GL_STREAM_DRAW);
   // subdata translations
   graphics_->vao_.linkAttrib(graphics_->subdata_, 2, 3, GL_FLOAT, kComponents * sizeof(GLfloat), nullptr);
@@ -180,17 +180,16 @@ void ktp::EmitterPhysicsComponent::setupOpenGL() {
 }
 
 void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta_time) {
-  for (auto i = 0u; i < graphics_->particles_pool_size_; ++i) {
-    if (graphics_->particles_pool_[i].inUse()) {
+  for (auto i = 0u; i < particles_pool_size_; ++i) {
+    if (particles_pool_[i].inUse()) {
       // particle alive!
-      if (graphics_->particles_pool_[i].update(delta_time, &subdata_[i * kComponents])) {
+      if (particles_pool_[i].update(delta_time, &subdata_[i * kComponents])) {
         // particle is no more, so we change the Z axis to 10
         subdata_[i * kComponents + 0] = 0.f;
         subdata_[i * kComponents + 1] = 0.f;
         subdata_[i * kComponents + 2] = 10.f;
-        graphics_->particles_pool_[i].setNext(first_available_);
-        first_available_ = &graphics_->particles_pool_[i];
-        --alive_particles_count_;
+        particles_pool_[i].setNext(first_available_);
+        first_available_ = &particles_pool_[i];
       }
     }
   }

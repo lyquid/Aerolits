@@ -45,18 +45,16 @@ class EmitterGraphicsComponent: public GraphicsComponent {
   EmitterGraphicsComponent();
   EmitterGraphicsComponent(const EmitterGraphicsComponent& other) = delete;
   EmitterGraphicsComponent(EmitterGraphicsComponent&& other) { *this = std::move(other); }
-  ~EmitterGraphicsComponent() { delete[] particles_pool_; }
 
   EmitterGraphicsComponent& operator=(const EmitterGraphicsComponent& other) = delete;
   EmitterGraphicsComponent& operator=(EmitterGraphicsComponent&& other);
 
-  virtual void update(const GameEntity& emitter) override;
+  void update(const GameEntity& emitter) override;
 
  private:
 
   SDL_BlendMode blend_mode_ {};
-  Particle*     particles_pool_ {nullptr};
-  unsigned int  particles_pool_size_ {};
+  unsigned int* particles_pool_size_ {nullptr};
   // opengl stuff
   VAO           vao_ {};
   VBO           vertices_ {};
@@ -75,6 +73,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   EmitterPhysicsComponent(GameEntity* owner, EmitterGraphicsComponent* graphics): graphics_(graphics) { owner_ = owner; }
   EmitterPhysicsComponent(const EmitterPhysicsComponent& other) = delete;
   EmitterPhysicsComponent(EmitterPhysicsComponent&& other) { *this = std::move(other); }
+  ~EmitterPhysicsComponent() { delete[] particles_pool_; }
 
   EmitterPhysicsComponent& operator=(const EmitterPhysicsComponent& other) = delete;
   EmitterPhysicsComponent& operator=(EmitterPhysicsComponent&& other);
@@ -96,16 +95,17 @@ class EmitterPhysicsComponent: public PhysicsComponent {
 
   /**
    * @brief The number of components per vertex of the subdata.
-   * Ie: xyz + rgba = 7.
+   * Ie: xyz + rgba + size = 8.
    */
   static constexpr auto     kComponents {8u};
 
   float                     angle_ {};
-  unsigned int              alive_particles_count_ {};
   const EmitterType*        data_ {nullptr};
   Particle*                 first_available_ {nullptr};
   EmitterGraphicsComponent* graphics_ {nullptr};
   Uint32                    interval_time_ {};
+  Particle*                 particles_pool_ {nullptr};
+  unsigned int              particles_pool_size_ {};
   glm::vec3                 position_ {0.f, 0.f, 0.f};
   Uint32                    start_time_ {SDL2_Timer::SDL2Ticks()};
   GLfloatVector             subdata_ {};
