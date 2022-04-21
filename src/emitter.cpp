@@ -81,7 +81,7 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
   if (current_time - start_time_ > data_->life_time_) return;
   if (current_time - interval_time_ < data_->emission_interval_.value_) return;
 
-  const auto how_many {static_cast<unsigned int>(std::round(data_->emission_rate_.value_ * generateRand(data_->emission_rate_.rand_min_, data_->emission_rate_.rand_max_)))};
+  const auto how_many {static_cast<unsigned int>(std::round((float)data_->emission_rate_.value_ * generateRand(data_->emission_rate_.rand_min_, data_->emission_rate_.rand_max_)))};
   for (auto i = 0u; i < how_many; ++i) {
     ParticleData new_data {};
     new_data.start_life_ = data_->max_particle_life_.value_ * generateRand(data_->max_particle_life_.rand_min_, data_->max_particle_life_.rand_max_);
@@ -151,7 +151,7 @@ void ktp::EmitterPhysicsComponent::setType(const std::string& type) {
     if (emitter_type.type_ == type) {
       data_ = &emitter_type;
       graphics_->blend_mode_ = emitter_type.blend_mode_;
-      graphics_->particles_pool_size_ = (emitter_type.max_particle_life_.value_ + 1u) * emitter_type.emission_rate_.value_ * 60;
+      graphics_->particles_pool_size_ = static_cast<unsigned int>((emitter_type.max_particle_life_.value_ + 1.f) * (float)emitter_type.emission_rate_.value_ * 60.f);
       interval_time_ = emitter_type.emission_interval_.value_;
       emitter_found = true;
       break;

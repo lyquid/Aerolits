@@ -21,7 +21,7 @@ struct EmitterType {
   SDL_BlendMode blend_mode_ {};
   RRVUint       emission_interval_ {};
   RRVUint       emission_rate_ {};
-  int           life_time_ {};
+  unsigned int  life_time_ {};
   SDL_Rect      texture_rect_ {};
   bool          vortex_ {};
   float         vortex_scale_ {};
