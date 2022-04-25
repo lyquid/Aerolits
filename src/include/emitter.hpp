@@ -78,6 +78,7 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   EmitterPhysicsComponent& operator=(const EmitterPhysicsComponent& other) = delete;
   EmitterPhysicsComponent& operator=(EmitterPhysicsComponent&& other);
 
+  void canBeDeactivated() { can_be_deactivated_ = true; }
   virtual void collide(const GameEntity* other) override {}
   void generateParticles();
   auto getPosition() const { return position_; }
@@ -99,7 +100,9 @@ class EmitterPhysicsComponent: public PhysicsComponent {
    */
   static constexpr auto     kComponents {8u};
 
+  unsigned int              alive_particles_count_ {};
   float                     angle_ {};
+  bool                      can_be_deactivated_ {false};
   const EmitterType*        data_ {nullptr};
   Particle*                 first_available_ {nullptr};
   EmitterGraphicsComponent* graphics_ {nullptr};

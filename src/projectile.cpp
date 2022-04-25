@@ -135,7 +135,7 @@ void ktp::ProjectilePhysicsComponent::update(const GameEntity& projectile, float
     if (armed_) {
       detonate();
       owner_->deactivate();
-      exhaust_emitter_->owner()->deactivate();
+      exhaust_emitter_->canBeDeactivated();
       return;
     } else {
       collided_ = false;

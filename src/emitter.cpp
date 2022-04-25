@@ -57,16 +57,18 @@ ktp::EmitterPhysicsComponent& ktp::EmitterPhysicsComponent::operator=(EmitterPhy
     owner_    = std::exchange(other.owner_, nullptr);
     size_     = other.size_;
     // own members
-    angle_               = other.angle_;
-    data_                = std::exchange(other.data_, nullptr);
-    first_available_     = std::exchange(other.first_available_, nullptr);
-    graphics_            = std::exchange(other.graphics_, nullptr);
-    interval_time_       = other.interval_time_;
-    particles_pool_      = std::exchange(other.particles_pool_, nullptr);
-    particles_pool_size_ = other.particles_pool_size_;
-    position_            = std::move(other.position_);
-    start_time_          = other.start_time_;
-    subdata_             = std::move(other.subdata_);
+    alive_particles_count_ = other.alive_particles_count_;
+    angle_                 = other.angle_;
+    can_be_deactivated_    = other.can_be_deactivated_;
+    data_                  = std::exchange(other.data_, nullptr);
+    first_available_       = std::exchange(other.first_available_, nullptr);
+    graphics_              = std::exchange(other.graphics_, nullptr);
+    interval_time_         = other.interval_time_;
+    particles_pool_        = std::exchange(other.particles_pool_, nullptr);
+    particles_pool_size_   = other.particles_pool_size_;
+    position_              = std::move(other.position_);
+    start_time_            = other.start_time_;
+    subdata_               = std::move(other.subdata_);
   }
   return *this;
 }
@@ -119,6 +121,7 @@ void ktp::EmitterPhysicsComponent::generateParticles() {
     Particle* new_particle {first_available_};
     first_available_ = new_particle->getNext();
     new_particle->init(new_data);
+    ++alive_particles_count_;
 
     if (first_available_ == nullptr) return;
   }
@@ -180,6 +183,10 @@ void ktp::EmitterPhysicsComponent::setupOpenGL() {
 }
 
 void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta_time) {
+  if (can_be_deactivated_ && alive_particles_count_ == 0u) {
+    owner_->deactivate();
+    return;
+  }
   for (auto i = 0u; i < particles_pool_size_; ++i) {
     if (particles_pool_[i].inUse()) {
       // particle alive!
@@ -190,6 +197,7 @@ void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta
         subdata_[i * kComponents + 2] = 10.f;
         particles_pool_[i].setNext(first_available_);
         first_available_ = &particles_pool_[i];
+        --alive_particles_count_;
       }
     }
   }
