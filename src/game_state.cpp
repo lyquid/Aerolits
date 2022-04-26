@@ -89,7 +89,7 @@ void ktp::DemoState::draw(Game& game) {
 
 ktp::GameState* ktp::DemoState::enter(Game& game) {
   Game::gameplay_timer_.paused() ? Game::gameplay_timer_.resume() : Game::gameplay_timer_.start();
-  for (auto i = 0u; i < GameEntity::game_entities_.capacity(); ++i) {
+  for (auto i = 0u; i < GameEntity::game_entities_.highestActiveIndex(); ++i) {
     if (GameEntity::game_entities_[i].type() == EntityTypes::Player) {
       GameEntity::game_entities_[i].free(i);
     }
