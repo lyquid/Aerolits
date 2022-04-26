@@ -180,31 +180,34 @@ ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnAerolite(const b2Vec2& wher
 ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnMovingAerolite() {
   const auto aerolite {static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics())};
   if (!aerolite) return nullptr;
-  static int side {};
-  aerolite->body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
-  const float delta {ConfigParser::aerolites_config.speed_.value_ * generateRand(ConfigParser::aerolites_config.speed_.rand_min_, ConfigParser::aerolites_config.speed_.rand_max_)};
-  switch (side) {
-    case 0: // up
-      aerolite->body_->SetTransform({b2_screen_size_.x * 0.5f, -b2_screen_size_.y}, aerolite->body_->GetAngle());
-      aerolite->body_->SetLinearVelocity({0, delta});
-      ++side;
+
+  const glm::vec2 screen_center {b2_screen_size_.x / 2.f, b2_screen_size_.y / 2.f};
+  constexpr auto total_spokes {64u};
+  const auto spoke {generateRand(0u, total_spokes - 1u)};
+  glm::vec2 spawn_point {};
+  // first we find or spawn_point
+  for (auto i = 0u; i < total_spokes; ++i) {
+    if (i == spoke) {
+      spawn_point.x = b2_screen_size_.x * glm::cos(2 * b2_pi * i / total_spokes) + screen_center.x;
+      spawn_point.y = b2_screen_size_.x * glm::sin(2 * b2_pi * i / total_spokes) + screen_center.y;
       break;
-    case 1: // right
-      aerolite->body_->SetTransform({b2_screen_size_.x + b2_screen_size_.y, b2_screen_size_.y * 0.5f}, aerolite->body_->GetAngle());
-      aerolite->body_->SetLinearVelocity({-delta, 0});
-      ++side;
-      break;
-    case 2: // down
-      aerolite->body_->SetTransform({b2_screen_size_.x * 0.5f, b2_screen_size_.y + b2_screen_size_.y}, aerolite->body_->GetAngle());
-      aerolite->body_->SetLinearVelocity({0, -delta});
-      ++side;
-      break;
-    case 3: // left
-      aerolite->body_->SetTransform({-b2_screen_size_.y, b2_screen_size_.y * 0.5f}, aerolite->body_->GetAngle());
-      aerolite->body_->SetLinearVelocity({delta, 0});
-      side = 0;
-      break;
+    }
   }
+  // move away from the center to create more randomness
+  const auto displacement {screen_center.y * generateRand(-1.f, 1.f)};
+  spawn_point = displacement + spawn_point;
+  const glm::vec2 final_point {displacement + screen_center};
+  // now we have to find the direction we want the aerolite to go (towards the center)
+  // the directional vector can be determined by subtracting the start from the terminal point
+  const glm::vec2 direction {glm::normalize(spawn_point - final_point)};
+  // linear velocity
+  const auto linear_velocity {ConfigParser::aerolites_config.speed_.value_ * generateRand(ConfigParser::aerolites_config.speed_.rand_min_, ConfigParser::aerolites_config.speed_.rand_max_)};
+  aerolite->body_->SetLinearVelocity(-linear_velocity * b2Vec2{direction.x, direction.y});
+  // angular velocity
+  aerolite->body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
+  // position
+  aerolite->body_->SetTransform(b2Vec2{spawn_point.x, spawn_point.y}, aerolite->body_->GetAngle());
+
   return aerolite->owner();
 }
 
