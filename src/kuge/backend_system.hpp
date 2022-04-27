@@ -20,8 +20,10 @@ class BackendSystem: public System {
   void draw();
  private:
   void mainMenuBar();
+  void statisticsWindow(bool* show);
 
   B2DebugFlags debug_flags_ {};
+  bool statistics_ {true};
 };
 
 } // namespace kuge

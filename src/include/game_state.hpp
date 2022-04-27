@@ -33,9 +33,9 @@ class GameState {
   static void updateDeepTest() { deep_test_ ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST); }
   static void updatePolygonDraw() { polygon_draw_ ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
 
+  static DebugDraw b2_debug_;
   static bool backend_draw_;
   static bool culling_;
-  static DebugDraw b2_debug_;
   static bool debug_draw_;
   static bool deep_test_;
   static bool polygon_draw_;
@@ -50,7 +50,6 @@ class GameState {
 
   virtual GameState* enter(Game& game) { return this; }
   virtual void handleSDL2KeyEvents(Game&, SDL_Keycode) = 0;
-  void setWindowTitle(Game& game);
   SDL_Event sdl_event_ {};
 };
 

@@ -12,17 +12,16 @@ int main(int argv, char* args[]) {
 
   Game game {};
 
-  constexpr double dt = 0.01;
-  double current_time = SDL_GetTicks() / 1000.0;
-  double accumulator = 0.0;
+  constexpr double dt {0.01};
+  double current_time {SDL_GetTicks() / 1000.0};
+  double accumulator {0.0};
 
   while (!game.quit()) {
 
-    double new_time = SDL_GetTicks() / 1000.0;
-    double frame_time = new_time - current_time;
-    game.setFrameTime(frame_time);
+    const double new_time {SDL_GetTicks() / 1000.0};
+    Game::frame_time_ = new_time - current_time;
     current_time = new_time;
-    accumulator += frame_time;
+    accumulator += Game::frame_time_;
 
     game.handleEvents();
 

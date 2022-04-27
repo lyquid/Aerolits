@@ -37,19 +37,26 @@ class Game {
   Game& operator=(const Game& other) = delete;
   Game& operator=(Game&& other) = delete;
 
-  inline void draw() { state_->draw(*this); }
-  inline void handleEvents() { state_->handleEvents(*this); }
-  inline void setFrameTime(double time) { frame_time_ = time; }
-  inline bool quit() const { return quit_; }
+  void draw() { state_->draw(*this); }
+  void handleEvents() { state_->handleEvents(*this); }
+  bool quit() const { return quit_; }
   void reset();
-  inline void update(float delta_time) { state_->update(*this, delta_time); }
+  void update(float delta_time) { state_->update(*this, delta_time); }
 
   static Camera camera_;
+
+  // FPS
+  static double frame_time_;
 
   /**
    * @brief This timer only goes when playing or in demo state.
    */
   static SDL2_Timer gameplay_timer_;
+
+  /**
+   * @brief
+   */
+  static b2World b2_world_;
 
  private:
 
@@ -65,8 +72,6 @@ class Game {
   SDL2_GLContext context_ {};
   // State
   GameState* state_ {nullptr};
-  // FPS
-  double frame_time_ {};
   // KUGE engine
   kuge::EventBus event_bus_ {};
   kuge::AudioSystem audio_sys_ {};
@@ -75,7 +80,6 @@ class Game {
   kuge::InputSystem input_sys_ {};
   kuge::OutputSystem output_sys_ {ConfigParser::game_config.output_};
   // Box2D
-  b2World world_ {b2Vec2{0.f, 0.f}};
   int32 velocity_iterations_ {8};
   int32 position_iterations_ {3};
   ContactListener contact_listener_ {};

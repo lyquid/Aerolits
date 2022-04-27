@@ -24,7 +24,11 @@ b2World*     ktp::PhysicsComponent::world_ {nullptr};
 
 ktp::Camera ktp::Game::camera_ {};
 
+double ktp::Game::frame_time_ {};
+
 ktp::SDL2_Timer ktp::Game::gameplay_timer_ {};
+
+b2World ktp::Game::b2_world_ {b2Vec2{0.f, 0.f}};
 
 ktp::Game::Game() {
   event_bus_.setSystems(&audio_sys_, &backend_sys_, &input_sys_, &gui_sys_, &output_sys_);
@@ -41,12 +45,12 @@ ktp::Game::Game() {
   if (!loadResources()) return;
   gui_sys_.init();
 
-  world_.SetDebugDraw(&GameState::b2_debug_);
+  b2_world_.SetDebugDraw(&GameState::b2_debug_);
   GameState::b2_debug_.Init();
-  world_.SetContactListener(&contact_listener_);
+  b2_world_.SetContactListener(&contact_listener_);
 
   PhysicsComponent::setScreenSize({(float)screen_size_.x, (float)screen_size_.y});
-  PhysicsComponent::setWorld(&world_);
+  PhysicsComponent::setWorld(&b2_world_);
 
   camera_.setOrthographicMatrix(glm::ortho(
     0.f, (float)screen_size_.x, // left, right
@@ -65,7 +69,7 @@ void ktp::Game::clean() {
   ImGui::DestroyContext();
   Resources::cleanOpenGL();
   GameEntity::clear();
-  clearB2World(world_);
+  clearB2World(b2_world_);
   SDL2_Audio::closeMixer();
 	SDL_Quit();
 }
@@ -157,5 +161,5 @@ void ktp::Game::reset() {
   GameEntity::clear();
   // we need to do this to prevent some of the bodies not being destroyed
   // ie: explosion particles if you pause and go to title
-  clearB2World(world_);
+  clearB2World(b2_world_);
 }

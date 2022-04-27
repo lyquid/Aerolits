@@ -15,9 +15,9 @@ ktp::PlayingState ktp::GameState::playing_ {};
 ktp::TestingState ktp::GameState::testing_ {};
 ktp::TitleState   ktp::GameState::title_ {};
 
-bool ktp::GameState::backend_draw_ {false};
-bool ktp::GameState::culling_ {false};
 ktp::DebugDraw ktp::GameState::b2_debug_ {};
+bool ktp::GameState::backend_draw_ {true};
+bool ktp::GameState::culling_ {false};
 bool ktp::GameState::debug_draw_ {false};
 bool ktp::GameState::deep_test_ {false};
 bool ktp::GameState::polygon_draw_ {false};
@@ -42,21 +42,6 @@ void ktp::GameState::setDebugDrawFlags(const kuge::B2DebugFlags& debug_flags) {
   b2_debug_.SetFlags(final_flags);
 }
 
-void ktp::GameState::setWindowTitle(Game& game) {
-  game.main_window_.setTitle(
-    kuge::GUISystem::kTitleText_
-    + " | Frame time: " + std::to_string((int)(game.frame_time_ * 1000)) + "ms."
-    + " | b2Bodies: " + std::to_string(game.world_.GetBodyCount())
-    + " | Entities: " + std::to_string(GameEntity::count()) + '/' + std::to_string(GameEntity::game_entities_.capacity())
-    + " (Player: "     + std::to_string(GameEntity::entitiesCount(EntityTypes::Player) + GameEntity::entitiesCount(EntityTypes::PlayerDemo))
-    + " Background: "  + std::to_string(GameEntity::entitiesCount(EntityTypes::Background))
-    + " Aerolites: "   + std::to_string(GameEntity::entitiesCount(EntityTypes::Aerolite))
-    + " Projectiles: " + std::to_string(GameEntity::entitiesCount(EntityTypes::Projectile))
-    + " Emitters: "    + std::to_string(GameEntity::entitiesCount(EntityTypes::Emitter))
-    + " Explosions: "  + std::to_string(GameEntity::entitiesCount(EntityTypes::Explosion)) + ')'
-  );
-}
-
 /* DEMO STATE */
 
 void ktp::DemoState::draw(Game& game) {
@@ -78,7 +63,7 @@ void ktp::DemoState::draw(Game& game) {
   }
 
   if (debug_draw_) {
-    game.world_.DebugDraw();
+    Game::b2_world_.DebugDraw();
     b2_debug_.Draw();
   }
 
@@ -163,7 +148,7 @@ void ktp::PausedState::draw(Game& game) {
   }
 
   if (debug_draw_) {
-    game.world_.DebugDraw();
+    Game::b2_world_.DebugDraw();
     b2_debug_.Draw();
   }
 
@@ -213,10 +198,7 @@ void ktp::PausedState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
   }
 }
 
-void ktp::PausedState::update(Game& game, float delta_time) {
-  // Window title
-  setWindowTitle(game);
-}
+void ktp::PausedState::update(Game& game, float delta_time) {}
 
 /* PLAYING STATE */
 
@@ -232,7 +214,7 @@ void ktp::PlayingState::draw(Game& game) {
   game.gui_sys_.scoreText()->draw();
 
   if (debug_draw_) {
-    game.world_.DebugDraw();
+    Game::b2_world_.DebugDraw();
     b2_debug_.Draw();
   }
 
@@ -305,10 +287,8 @@ void ktp::PlayingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
 }
 
 void ktp::PlayingState::update(Game& game, float delta_time) {
-  // Window title
-  setWindowTitle(game);
   // Box2D
-  game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
+  Game::b2_world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     if (GameEntity::game_entities_.active(i)) {
@@ -338,7 +318,7 @@ void ktp::TestingState::draw(Game& game) {
   test_->draw();
 
   if (debug_draw_) {
-    game.world_.DebugDraw();
+    Game::b2_world_.DebugDraw();
     b2_debug_.Draw();
   }
 
@@ -415,10 +395,8 @@ void ktp::TestingState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
 }
 
 void ktp::TestingState::update(Game& game, float delta_time) {
-  // Window title
-  setWindowTitle(game);
   // Box2D
-  game.world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
+  Game::b2_world_.Step(delta_time, game.velocity_iterations_, game.position_iterations_);
   // Entities
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     if (GameEntity::game_entities_.active(i)) {
@@ -449,7 +427,7 @@ void ktp::TitleState::draw(Game& game) {
   game.gui_sys_.titleText()->draw();
 
   if (debug_draw_) {
-    game.world_.DebugDraw();
+    Game::b2_world_.DebugDraw();
     b2_debug_.Draw();
   }
 
@@ -506,8 +484,6 @@ void ktp::TitleState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
 }
 
 void ktp::TitleState::update(Game& game, float delta_time) {
-  // Window title
-  setWindowTitle(game);
   // Background
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     GameEntity::game_entities_[i].update(delta_time * kDefaultBackgroundDeltaInMenu_);
