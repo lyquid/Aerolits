@@ -1,8 +1,12 @@
 #include "include/debug_draw.hpp"
 #include "include/game.hpp"
+#include "include/game_entity.hpp"
 #include "include/palette.hpp"
 #include "include/particle.hpp"
 #include "include/resources.hpp"
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
 
 /* kuge/system.hpp */
 const kuge::EventBus* kuge::System::event_bus_ {event_bus_};

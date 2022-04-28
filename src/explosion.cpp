@@ -1,5 +1,6 @@
 #include "include/explosion.hpp"
-#include "include/game.hpp"
+#include "include/game.hpp" // gameplay timer
+#include "include/game_entity.hpp"
 
 // GRAPHICS
 

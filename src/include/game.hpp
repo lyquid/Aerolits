@@ -1,20 +1,13 @@
 #ifndef AEROLITS_SRC_INCLUDE_GAME_HPP_
 #define AEROLITS_SRC_INCLUDE_GAME_HPP_
 
-#include "background.hpp"
 #include "camera.hpp"
 #include "config_parser.hpp"
 #include "contact_listener.hpp"
-#include "game_entity.hpp"
 #include "game_state.hpp"
-#include "testing.hpp"
 #include "../kuge/kuge.hpp"
 #include "../sdl2_wrappers/sdl2_wrappers.hpp"
 #include <box2d/box2d.h>
-#include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_opengl3.h"
-#include <string>
 
 namespace ktp {
 

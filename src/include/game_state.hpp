@@ -1,10 +1,13 @@
 #ifndef AEROLITS_SRC_INCLUDE_GAME_STATE_HPP_
 #define AEROLITS_SRC_INCLUDE_GAME_STATE_HPP_
 
-#include "../sdl2_wrappers/sdl2_timer.hpp"
-#include "testing.hpp"
+#include "opengl.hpp"
 
 // https://gameprogrammingpatterns.com/state.html
+
+namespace kuge {
+  struct B2DebugFlags;
+}
 
 namespace ktp {
 
@@ -15,7 +18,6 @@ class PausedState;
 class PlayingState;
 class TestingState;
 class TitleState;
-struct B2DebugFlags;
 
 class GameState {
 
@@ -86,6 +88,8 @@ class PlayingState: public GameState {
   virtual GameState* enter(Game& game) override;
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
 };
+
+class Testing;
 
 class TestingState: public GameState {
  public:

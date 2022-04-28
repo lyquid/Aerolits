@@ -1,9 +1,15 @@
 #include "include/debug_draw.hpp"
 #include "include/game.hpp"
+#include "include/game_entity.hpp"
 #include "include/game_state.hpp"
 #include "include/physics_component.hpp"
+#include "include/testing.hpp"
 #include "kuge/backend_system.hpp"
 #include "kuge/system.hpp" // GUISystem
+#include "sdl2_wrappers/sdl2_timer.hpp"
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
 #include <SDL.h>
 #include <memory>
 #include <string> // std::to_string
