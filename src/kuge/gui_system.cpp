@@ -67,8 +67,8 @@ void kuge::GUISystem::init() {
     -0.8f,  0.4f, 0.0f   // top left
   };
   config.indices_ = {
-    0, 1, 3,   // first triangle
-    1, 2, 3    // second triangle
+    0, 3, 1,   // first triangle
+    3, 2, 1    // second triangle
   };
   config.texture_coords_ = {
     1.0f, 0.0f,   // top right

@@ -34,7 +34,7 @@ class BackgroundGraphicsComponent: public GraphicsComponent {
   VBO           vertices_ {};
   GLfloatVector vertices_data_ {};
   EBO           indices_ {};
-  GLuintVector  indices_data_ {0, 1, 2, 0, 3, 2};
+  GLuintVector  indices_data_ {0, 3, 2, 0, 2, 1};
   ShaderProgram shader_ {Resources::getShader("star")};
   VBO           subdata_ {};
   glm::mat4     mvp_ {};
