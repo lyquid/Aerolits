@@ -2,15 +2,18 @@
 #include "../include/game.hpp"
 #include "../include/game_entity.hpp"
 #include "../include/game_state.hpp"
+#include "../sdl2_wrappers/sdl2_timer.hpp"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl.h"
+#include "algorithm" // std::copy
 
 void kuge::BackendSystem::draw() {
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplSDL2_NewFrame();
   ImGui::NewFrame();
 
+  // ImGui::ShowDemoWindow();
   mainMenuBar();
   if (statistics_) statisticsWindow(&statistics_);
 
@@ -67,6 +70,16 @@ void kuge::BackendSystem::mainMenuBar() {
   }
 }
 
+void kuge::BackendSystem::resetStatistics() {
+  frame_index_ = 0u;
+  frame_accumulator_ = 0;
+  frame_accumulator_count_ = 0;
+  time_last_added_ = 0;
+  max_frame_time_ = 0.f;
+  min_frame_time_ = std::numeric_limits<double>::max();
+  for (auto& time: frame_times_) time = 0.f;
+}
+
 void kuge::BackendSystem::statisticsWindow(bool* show) {
   static int corner {1};
   ImGuiIO& io {ImGui::GetIO()};
@@ -85,20 +98,51 @@ void kuge::BackendSystem::statisticsWindow(bool* show) {
     ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
     window_flags |= ImGuiWindowFlags_NoMove;
   }
-
+  // transparency
   ImGui::SetNextWindowBgAlpha(0.3f);
-
+  // statistics main section
   if (ImGui::Begin("Statistics", show, window_flags)) {
-    ImGui::Text("Frame time: %.3fs.", ktp::Game::frame_time_);
+    const auto frame_time {ktp::Game::frame_time_};
+    // check max and min
+    if (frame_time > max_frame_time_) {
+      max_frame_time_ = frame_time;
+    } else if (frame_time < min_frame_time_) {
+      min_frame_time_ = frame_time;
+    }
+    // frame text
+    ImGui::Text("Frame time: %.3fs. Max: %.3fs. Min: %.3fs.", frame_time, max_frame_time_, min_frame_time_);
+    // we sum a bunch of frame times and how many of them to make an average
+    frame_accumulator_ += static_cast<int>(frame_time * 1000); // ms
+    ++frame_accumulator_count_;
+    // when the polling time has arrived we process the results
+    if (ktp::SDL2_Timer::SDL2Ticks() - time_last_added_ >= kPollInterval_) {
+      // time to add the average result to the vector
+      if (frame_index_ == kFrameBufferSize_) { // buffer full
+        // copy from the second element to the last to give a sense of movement
+        std::copy(frame_times_.begin() + 1, frame_times_.end() - 1, frame_times_.begin());
+        frame_times_.push_back(frame_accumulator_ / frame_accumulator_count_);
+      } else { // buffer not yet full, put at the current index
+        frame_times_[frame_index_] = frame_accumulator_ / frame_accumulator_count_;
+        ++frame_index_;
+      }
+      frame_accumulator_ = 0.f;
+      frame_accumulator_count_ = 0;
+      time_last_added_ = ktp::SDL2_Timer::SDL2Ticks();
+    }
+    // plot the result
+    ImGui::PlotLines("", frame_times_.data(), kFrameBufferSize_);
+    // and a button to reset them
+    if (ImGui::Button("Reset")) resetStatistics();
+    // mouse coordinates
     if (ImGui::IsMousePosValid())
       ImGui::Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
     else
       ImGui::Text("Mouse Position: <invalid>");
-
     ImGui::Separator();
+    // Box2D bodies
     ImGui::Text("B2Bodies: %i", ktp::Game::b2_world_.GetBodyCount());
-
     ImGui::Separator();
+    // GameEntities
     ImGui::Text("Entities\t%i/%i", ktp::GameEntity::count(), ktp::GameEntity::game_entities_.capacity());
     ImGui::Text("Player:     %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Player) + ktp::GameEntity::entitiesCount(ktp::EntityTypes::PlayerDemo));
     ImGui::Text("Background: %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Background));
@@ -106,7 +150,7 @@ void kuge::BackendSystem::statisticsWindow(bool* show) {
     ImGui::Text("Projectile: %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Projectile));
     ImGui::Text("Emitter:    %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Emitter));
     ImGui::Text("Explosion:  %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Explosion));
-
+    // pop-up window for position
     if (ImGui::BeginPopupContextWindow()) {
       if (ImGui::MenuItem("Custom",       nullptr, corner == -1)) corner = -1;
       if (ImGui::MenuItem("Top-left",     nullptr, corner ==  0)) corner =  0;
