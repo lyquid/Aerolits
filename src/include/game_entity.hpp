@@ -21,6 +21,7 @@ namespace ktp {
 enum class EntityTypes {
   Undefined,
   Aerolite,
+  AeroliteArrow,
   Background,
   Emitter,
   Explosion,
@@ -91,6 +92,10 @@ class GameEntity {
       case EntityTypes::Aerolite:
         entity->graphics_ = std::make_unique<AeroliteGraphicsComponent>();
         entity->physics_  = std::make_unique<AerolitePhysicsComponent>(entity, static_cast<AeroliteGraphicsComponent*>(entity->graphics_.get()));
+        break;
+      case EntityTypes::AeroliteArrow:
+        entity->graphics_ = std::make_unique<AeroliteArrowGraphicsComponent>();
+        entity->physics_  = std::make_unique<AeroliteArrowPhysicsComponent>(entity, static_cast<AeroliteArrowGraphicsComponent*>(entity->graphics_.get()));
         break;
       case EntityTypes::Background:
         entity->graphics_ = std::make_unique<BackgroundGraphicsComponent>();

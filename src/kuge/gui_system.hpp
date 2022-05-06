@@ -61,9 +61,12 @@ class GUISystem: public System {
   inline auto& scoreText() const { return score_text_; }
   inline auto& titleText() const { return title_text_; }
 
-  inline static const std::string kDemoModeText_ {"DEMOSTRACIÓ"};
-  inline static const std::string kPausedText_ {"PAUSAT"};
-  inline static const std::string kScoreText_ {"PUNTUACIÓ "};
+  // inline static const std::string kDemoModeText_ {"DEMOSTRACIÓ"};
+  // inline static const std::string kPausedText_ {"PAUSAT"};
+  // inline static const std::string kScoreText_ {"PUNTUACIÓ "};
+  inline static const std::string kDemoModeText_ {"DEMO"};
+  inline static const std::string kPausedText_ {"PAUSED"};
+  inline static const std::string kScoreText_ {"SCORE "};
   inline static const std::string kTitleText_ {"Aeròlits"};
 
  private:

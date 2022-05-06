@@ -147,6 +147,7 @@ void kuge::BackendSystem::statisticsWindow(bool* show) {
     ImGui::Text("Player:     %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Player) + ktp::GameEntity::entitiesCount(ktp::EntityTypes::PlayerDemo));
     ImGui::Text("Background: %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Background));
     ImGui::Text("Aerolite:   %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Aerolite));
+    ImGui::Text("Arrow:      %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::AeroliteArrow));
     ImGui::Text("Projectile: %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Projectile));
     ImGui::Text("Emitter:    %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Emitter));
     ImGui::Text("Explosion:  %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Explosion));

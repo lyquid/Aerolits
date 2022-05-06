@@ -126,6 +126,9 @@ bool ktp::Game::loadResources() {
   auto vertex_shader_path {Resources::getResourcesPath("shaders") + "aerolite.vert"};
   auto fragment_shader_path {Resources::getResourcesPath("shaders") + "aerolite.frag"};
   if (!Resources::loadShader("aerolite", vertex_shader_path, fragment_shader_path)) return false;
+  vertex_shader_path = Resources::getResourcesPath("shaders") + "aerolite_arrow.vert";
+  fragment_shader_path = Resources::getResourcesPath("shaders") + "aerolite_arrow.frag";
+  if (!Resources::loadShader("aerolite_arrow", vertex_shader_path, fragment_shader_path)) return false;
   vertex_shader_path = Resources::getResourcesPath("shaders") + "cube.vert";
   fragment_shader_path = Resources::getResourcesPath("shaders") + "cube.frag";
   if (!Resources::loadShader("cube", vertex_shader_path, fragment_shader_path)) return false;
