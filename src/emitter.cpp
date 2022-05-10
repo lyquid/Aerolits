@@ -42,6 +42,7 @@ ktp::EmitterGraphicsComponent& ktp::EmitterGraphicsComponent::operator=(EmitterG
 
 void ktp::EmitterGraphicsComponent::update(const GameEntity& emitter) {
   shader_.use();
+  shader_.setMat4f("mvp", glm::value_ptr(mvp_));
   texture_.bind();
   vao_.bind();
   glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(indices_data_.size()), GL_UNSIGNED_INT, 0, *particles_pool_size_);
@@ -202,12 +203,6 @@ void ktp::EmitterPhysicsComponent::update(const GameEntity& emitter, float delta
     }
   }
   graphics_->subdata_.setupSubData(subdata_.data(), subdata_.size() * sizeof(GLfloat));
-  updateMVP();
-}
-
-void ktp::EmitterPhysicsComponent::updateMVP() {
-  glm::mat4 model {1.f};
-  const glm::mat4 mvp {camera_.projectionMatrix() * camera_.viewMatrix() * model};
-  graphics_->shader_.use();
-  graphics_->shader_.setMat4f("mvp", glm::value_ptr(mvp));
+  // update the mvp matrix
+  graphics_->mvp_ = camera_.projectionMatrix() * camera_.viewMatrix() * glm::mat4(1.f);
 }
