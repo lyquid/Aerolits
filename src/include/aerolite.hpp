@@ -120,6 +120,11 @@ class AeroliteArrowPhysicsComponent: public PhysicsComponent {
   friend class AerolitePhysicsComponent;
  public:
   AeroliteArrowPhysicsComponent(GameEntity* owner, AeroliteArrowGraphicsComponent* graphics);
+  AeroliteArrowPhysicsComponent(const AeroliteArrowPhysicsComponent& other) = delete;
+  AeroliteArrowPhysicsComponent(AeroliteArrowPhysicsComponent&& other) { *this = std::move(other); }
+  AeroliteArrowPhysicsComponent& operator=(const AeroliteArrowPhysicsComponent& other) = delete;
+  AeroliteArrowPhysicsComponent& operator=(AeroliteArrowPhysicsComponent&& other);
+
   void collide(const GameEntity* other) override {}
   void update(const GameEntity& aerolite_arrow, float delta_time) override;
  private:

@@ -385,6 +385,16 @@ ktp::AeroliteArrowPhysicsComponent::AeroliteArrowPhysicsComponent(GameEntity* ow
   owner_ = owner;
 }
 
+ktp::AeroliteArrowPhysicsComponent& ktp::AeroliteArrowPhysicsComponent::operator=(AeroliteArrowPhysicsComponent&& other) {
+  if (this != &other) {
+    angle_              = other.angle_;
+    graphics_           = std::exchange(other.graphics_, nullptr);
+    incoming_direction_ = other.incoming_direction_;
+    position_           = std::move(other.position_);
+  }
+  return *this;
+}
+
 void ktp::AeroliteArrowPhysicsComponent::update(const GameEntity& aerolite_arrow, float delta_time) {
   updateMVP();
 }
