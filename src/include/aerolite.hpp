@@ -70,7 +70,7 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   static constexpr unsigned int kMaxSides_ {40u};
   static constexpr unsigned int kMinSides_ {30u};
   static constexpr unsigned int kScore_ {1000u};
-  static constexpr unsigned int kNewBornTime_ {10000u}; // 10 seconds
+  static constexpr unsigned int kNewBornTime_ {20000u}; // 20 seconds
 
   AeroliteArrowPhysicsComponent* arrow_ {nullptr};
 
@@ -121,15 +121,13 @@ class AeroliteArrowPhysicsComponent: public PhysicsComponent {
  public:
   AeroliteArrowPhysicsComponent(GameEntity* owner, AeroliteArrowGraphicsComponent* graphics);
   void collide(const GameEntity* other) override {}
-  // void setPosition(const glm::vec3& pos) { position_ = pos; }
   void update(const GameEntity& aerolite_arrow, float delta_time) override;
  private:
   void updateMVP();
   float angle_ {};
   AeroliteArrowGraphicsComponent* graphics_;
-  glm::vec3 position_ {};
-
   Direction incoming_direction_ {};
+  glm::vec3 position_ {};
 };
 
 } // namespace ktp

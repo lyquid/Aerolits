@@ -189,7 +189,7 @@ ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnMovingAerolite() {
   const auto aerolite {static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics())};
   if (!aerolite) return nullptr;
 
-  const glm::vec2 screen_center {b2_screen_size_.x / 2.f, b2_screen_size_.y / 2.f};
+  const glm::vec2 screen_center {b2_screen_size_.x * 0.5f, b2_screen_size_.y * 0.5f};
   constexpr auto total_spokes {64u};
   const auto spoke {generateRand(0u, total_spokes - 1u)};
   glm::vec2 spawn_point {};
@@ -209,29 +209,23 @@ ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnMovingAerolite() {
   // the directional vector can be determined by subtracting the start from the terminal point
   const glm::vec2 direction {glm::normalize(spawn_point - final_point)};
   // linear velocity
-  const auto linear_velocity {ConfigParser::aerolites_config.speed_.value_ * generateRand(ConfigParser::aerolites_config.speed_.rand_min_, ConfigParser::aerolites_config.speed_.rand_max_)};
-  aerolite->body_->SetLinearVelocity(-linear_velocity * b2Vec2{direction.x, direction.y});
+  const auto linear_speed {ConfigParser::aerolites_config.speed_.value_ * generateRand(ConfigParser::aerolites_config.speed_.rand_min_, ConfigParser::aerolites_config.speed_.rand_max_)};
+  aerolite->body_->SetLinearVelocity(-linear_speed * b2Vec2{direction.x, direction.y});
   // angular velocity
   aerolite->body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
   // position
   aerolite->body_->SetTransform(b2Vec2{spawn_point.x, spawn_point.y}, aerolite->body_->GetAngle());
-  // arrow
-  const glm::vec2 aerolite_center {aerolite->body_->GetPosition().x * kMetersToPixels, aerolite->body_->GetPosition().y * kMetersToPixels};
-  // calculate the angle of attack respect to the screen's center
-  const auto theta {atan2Normalized(aerolite_center.y - (screen_center.y * kMetersToPixels), aerolite_center.x - (screen_center.x * kMetersToPixels))};
+  // arrow: calculate the angle of attack respect to the screen's center
+  const auto theta {atan2Normalized(aerolite->body_->GetPosition().y - screen_center.y, aerolite->body_->GetPosition().x - screen_center.x)};
   // asign an incoming direction
   if (theta >= b2_pi / 6.f && theta < 5.f * b2_pi / 6.f) {
     aerolite->arrow_->incoming_direction_ = Direction::Top;
-    aerolite->arrow_->angle_  = 0.f;
   } else if (theta >= 5.f * b2_pi / 6.f && theta < 7.f * b2_pi / 6.f) {
     aerolite->arrow_->incoming_direction_ = Direction::Left;
-    aerolite->arrow_->angle_  = b2_pi / 2.f;
   } else if (theta >= 7.f * b2_pi / 6.f && theta < 11.f * b2_pi / 6.f) {
     aerolite->arrow_->incoming_direction_ = Direction::Bottom;
-    aerolite->arrow_->angle_  = b2_pi;
   } else {
     aerolite->arrow_->incoming_direction_ = Direction::Right;
-    aerolite->arrow_->angle_  = 3.f * b2_pi / 2.f;
   }
   return aerolite->owner();
 }
@@ -309,48 +303,51 @@ void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float del
 }
 
 void ktp::AerolitePhysicsComponent::updateArrow() {
-  const glm::vec2 aerolite_position {body_->GetPosition().x, body_->GetPosition().y};
+  const glm::vec2 aerolite_position {body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels};
+  const glm::vec2 screen {b2_screen_size_.x * kMetersToPixels, b2_screen_size_.y * kMetersToPixels};
   constexpr auto size {AeroliteArrowGraphicsComponent::kSize_ / 2.f};
   switch (arrow_->incoming_direction_) {
     case Direction::Top:
-      if (aerolite_position.x < 0.f) {
-        arrow_->position_ = glm::vec3(0.f, b2_screen_size_.y * kMetersToPixels - size, 0.f);
-      } else if (aerolite_position.x > b2_screen_size_.x) {
-        arrow_->position_ = glm::vec3(b2_screen_size_.x * kMetersToPixels, b2_screen_size_.y * kMetersToPixels - size, 0.f);
+      if (aerolite_position.x < size) {
+        arrow_->position_ = glm::vec3(size, screen.y - size, 0.f);
+      } else if (aerolite_position.x > screen.x - size) {
+        arrow_->position_ = glm::vec3(screen.x - size, screen.y - size, 0.f);
       } else {
-        arrow_->position_ = glm::vec3(aerolite_position.x * kMetersToPixels, b2_screen_size_.y * kMetersToPixels - size, 0.f);
+        arrow_->position_ = glm::vec3(aerolite_position.x, screen.y - size, 0.f);
       }
       break;
     case Direction::Left:
-      if (aerolite_position.y < 0.f) {
-        arrow_->position_ = glm::vec3(size, 0.f, 0.f);
-      } else if (aerolite_position.y > b2_screen_size_.y) {
-        arrow_->position_ = glm::vec3(size, b2_screen_size_.y * kMetersToPixels, 0.f);
+      if (aerolite_position.y < size) {
+        arrow_->position_ = glm::vec3(size, size, 0.f);
+      } else if (aerolite_position.y > screen.y - size) {
+        arrow_->position_ = glm::vec3(size, screen.y - size, 0.f);
       } else {
-        arrow_->position_ = glm::vec3(size, aerolite_position.y * kMetersToPixels, 0.f);
+        arrow_->position_ = glm::vec3(size, aerolite_position.y, 0.f);
       }
       break;
     case Direction::Bottom:
-      if (aerolite_position.x < 0.f) {
-        arrow_->position_ = glm::vec3(0.f, size, 0.f);
-      } else if (aerolite_position.x > b2_screen_size_.x) {
-        arrow_->position_ = glm::vec3(b2_screen_size_.x * kMetersToPixels, size, 0.f);
+      if (aerolite_position.x < size) {
+        arrow_->position_ = glm::vec3(size, size, 0.f);
+      } else if (aerolite_position.x > screen.x - size) {
+        arrow_->position_ = glm::vec3(screen.x - size, size, 0.f);
       } else {
-        arrow_->position_ = glm::vec3(aerolite_position.x * kMetersToPixels, size, 0.f);
+        arrow_->position_ = glm::vec3(aerolite_position.x, size, 0.f);
       }
       break;
     case Direction::Right:
-      if (aerolite_position.y < 0.f) {
-        arrow_->position_ = glm::vec3(b2_screen_size_.x * kMetersToPixels - size, 0.f, 0.f);
-      } else if (aerolite_position.y > b2_screen_size_.y) {
-        arrow_->position_ = glm::vec3(b2_screen_size_.x * kMetersToPixels - size, b2_screen_size_.y * kMetersToPixels, 0.f);
+      if (aerolite_position.y < size) {
+        arrow_->position_ = glm::vec3(screen.x - size, size, 0.f);
+      } else if (aerolite_position.y > screen.y - size) {
+        arrow_->position_ = glm::vec3(screen.x - size, screen.y - size, 0.f);
       } else {
-        arrow_->position_ = glm::vec3(b2_screen_size_.x * kMetersToPixels - size, aerolite_position.y * kMetersToPixels, 0.f);
+        arrow_->position_ = glm::vec3(screen.x - size, aerolite_position.y, 0.f);
       }
       break;
     default:
       break;
   }
+  // angle of the arrow
+  arrow_->angle_ = atan2f(aerolite_position.y - arrow_->position_.y, aerolite_position.x - arrow_->position_.x) - b2_pi / 2.f;
 }
 
 void ktp::AerolitePhysicsComponent::updateMVP() {
