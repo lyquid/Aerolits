@@ -193,11 +193,11 @@ ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnMovingAerolite() {
   constexpr auto total_spokes {64u};
   const auto spoke {generateRand(0u, total_spokes - 1u)};
   glm::vec2 spawn_point {};
-  // first we find or spawn_point
+  // first we find our spawn_point
   for (auto i = 0u; i < total_spokes; ++i) {
     if (i == spoke) {
-      spawn_point.x = b2_screen_size_.x * glm::cos(2.f * b2_pi * (float)i / (float)total_spokes) + screen_center.x;
-      spawn_point.y = b2_screen_size_.x * glm::sin(2.f * b2_pi * (float)i / (float)total_spokes) + screen_center.y;
+      spawn_point.x = 1.5f * b2_screen_size_.x * glm::cos(2.f * b2_pi * (float)i / (float)total_spokes) + screen_center.x;
+      spawn_point.y = 1.5f * b2_screen_size_.x * glm::sin(2.f * b2_pi * (float)i / (float)total_spokes) + screen_center.y;
       break;
     }
   }
@@ -215,19 +215,112 @@ ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnMovingAerolite() {
   aerolite->body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
   // position
   aerolite->body_->SetTransform(b2Vec2{spawn_point.x, spawn_point.y}, aerolite->body_->GetAngle());
+  // this will be useful to calculate incoming side and angle
+  const auto aerolite_pos {aerolite->body_->GetPosition()};
+  // delta V of the aerolite, useful to calculate the time it will take for the aerolite to enter the screen
+  const auto delta_v {aerolite->body_->GetLinearVelocity()};
+  // the slope of the line
+  float slope {delta_v.y / delta_v.x};
+  // if (std::abs(delta_v.y) < std::numeric_limits<float>::epsilon()) {
+  //   // horizontal line
+  //   slope = 0.f;
+  // } else if (std::abs(delta_v.x) < std::numeric_limits<float>::epsilon()) {
+  //   // vertical line, problem :(
+
+  // } else {
+  //   slope = delta_v.y / delta_v.x;
+  // }
+  //
+  b2Vec2 intersect_point {};
+  // a threshold for the arrow to go red before the center of the aerolite
+  const auto threshold {aerolite->size_ * 1.1f};
   // arrow: calculate the angle of attack respect to the screen's center
-  const auto theta {atan2Normalized(aerolite->body_->GetPosition().y - screen_center.y, aerolite->body_->GetPosition().x - screen_center.x)};
-  // asign an incoming direction
-  if (theta >= b2_pi / 6.f && theta < 5.f * b2_pi / 6.f) {
+  const auto theta {atan2Normalized(aerolite_pos.y - screen_center.y, aerolite_pos.x - screen_center.x)};
+  // asign an incoming direction so we can position the arrow
+  if (theta >= top_right && theta < top_left) {
+    // TOP
     aerolite->arrow_->incoming_direction_ = Direction::Top;
-  } else if (theta >= 5.f * b2_pi / 6.f && theta < 7.f * b2_pi / 6.f) {
+    const auto y_intersect = -aerolite_pos.y - (slope * aerolite_pos.x);
+    intersect_point.Set(-y_intersect / slope, b2_screen_size_.y);
+
+  } else if (theta >= top_left && theta < bottom_left) {
+    // LEFT
     aerolite->arrow_->incoming_direction_ = Direction::Left;
-  } else if (theta >= 7.f * b2_pi / 6.f && theta < 11.f * b2_pi / 6.f) {
+    intersect_point.Set(0.f, aerolite_pos.y - (slope * aerolite_pos.x));
+
+  } else if (theta >= bottom_left && theta < bottom_right) {
+    // BOTTOM
     aerolite->arrow_->incoming_direction_ = Direction::Bottom;
+    const auto y_intersect = -aerolite_pos.y - (slope * aerolite_pos.x);
+    intersect_point.Set(-y_intersect / slope , 0.f);
+
   } else {
+    // RIGHT
     aerolite->arrow_->incoming_direction_ = Direction::Right;
+    slope = delta_v.y / (delta_v.x + b2_screen_size_.x);
+    intersect_point.Set(b2_screen_size_.x, aerolite_pos.y - (slope * (aerolite_pos.x + b2_screen_size_.x)));
   }
+  // distance from spawn point to intersect point
+  const float distance {b2Distance(aerolite_pos, intersect_point)};
+  // calculate the time for the aerolite to enter the screen, minus 10% to compensate for the aerolite radius
+  aerolite->arrow_->time_to_enter_ = (distance / delta_v.Length()) * 0.9f;
+
+  logMessage("spawn@(" + std::to_string(aerolite_pos.x) + ", " + std::to_string(aerolite_pos.y)
+    + ")\tlinearV(" + std::to_string(delta_v.x) + ", " + std::to_string(delta_v.y)
+    + ")\ttheta=" + std::to_string(theta * 180.f / b2_pi));
+  (aerolite->arrow_->incoming_direction_ == Direction::Left || aerolite->arrow_->incoming_direction_ == Direction::Right) ?
+    logMessage("\tY_intersect=" + std::to_string((b2_screen_size_.y * kMetersToPixels) - intersect_point.y * kMetersToPixels) + "\n") :
+    logMessage("\tX_intersect=" + std::to_string((b2_screen_size_.x * kMetersToPixels) - intersect_point.x * kMetersToPixels) + "\n");
+
   return aerolite->owner();
+}
+
+void ktp::AerolitePhysicsComponent::positionArrow() {
+  const glm::vec2 aerolite_position {body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels};
+  const glm::vec2 screen {b2_screen_size_.x * kMetersToPixels, b2_screen_size_.y * kMetersToPixels};
+  constexpr auto size {AeroliteArrowGraphicsComponent::kSize_ / 2.f};
+  switch (arrow_->incoming_direction_) {
+    case Direction::Top:
+      if (aerolite_position.x < size) {
+        arrow_->position_ = glm::vec3(size, screen.y - size, 0.f);
+      } else if (aerolite_position.x > screen.x - size) {
+        arrow_->position_ = glm::vec3(screen.x - size, screen.y - size, 0.f);
+      } else {
+        arrow_->position_ = glm::vec3(aerolite_position.x, screen.y - size, 0.f);
+      }
+      break;
+    case Direction::Left:
+      if (aerolite_position.y < size) {
+        arrow_->position_ = glm::vec3(size, size, 0.f);
+      } else if (aerolite_position.y > screen.y - size) {
+        arrow_->position_ = glm::vec3(size, screen.y - size, 0.f);
+      } else {
+        arrow_->position_ = glm::vec3(size, aerolite_position.y, 0.f);
+      }
+      break;
+    case Direction::Bottom:
+      if (aerolite_position.x < size) {
+        arrow_->position_ = glm::vec3(size, size, 0.f);
+      } else if (aerolite_position.x > screen.x - size) {
+        arrow_->position_ = glm::vec3(screen.x - size, size, 0.f);
+      } else {
+        arrow_->position_ = glm::vec3(aerolite_position.x, size, 0.f);
+      }
+      break;
+    case Direction::Right:
+      if (aerolite_position.y < size) {
+        arrow_->position_ = glm::vec3(screen.x - size, size, 0.f);
+      } else if (aerolite_position.y > screen.y - size) {
+        arrow_->position_ = glm::vec3(screen.x - size, screen.y - size, 0.f);
+      } else {
+        arrow_->position_ = glm::vec3(screen.x - size, aerolite_position.y, 0.f);
+      }
+      break;
+    default:
+      break;
+  }
+  // angle of the arrow
+  arrow_->angle_ = atan2f(aerolite_position.y - arrow_->position_.y, aerolite_position.x - arrow_->position_.x) - b2_pi * 0.5f;
 }
 
 void ktp::AerolitePhysicsComponent::split() {
@@ -299,55 +392,7 @@ void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float del
   if (new_born_ && Game::gameplay_timer_.milliseconds() - born_time_ > kNewBornTime_) new_born_ = false;
 
   updateMVP();
-  updateArrow();
-}
-
-void ktp::AerolitePhysicsComponent::updateArrow() {
-  const glm::vec2 aerolite_position {body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels};
-  const glm::vec2 screen {b2_screen_size_.x * kMetersToPixels, b2_screen_size_.y * kMetersToPixels};
-  constexpr auto size {AeroliteArrowGraphicsComponent::kSize_ / 2.f};
-  switch (arrow_->incoming_direction_) {
-    case Direction::Top:
-      if (aerolite_position.x < size) {
-        arrow_->position_ = glm::vec3(size, screen.y - size, 0.f);
-      } else if (aerolite_position.x > screen.x - size) {
-        arrow_->position_ = glm::vec3(screen.x - size, screen.y - size, 0.f);
-      } else {
-        arrow_->position_ = glm::vec3(aerolite_position.x, screen.y - size, 0.f);
-      }
-      break;
-    case Direction::Left:
-      if (aerolite_position.y < size) {
-        arrow_->position_ = glm::vec3(size, size, 0.f);
-      } else if (aerolite_position.y > screen.y - size) {
-        arrow_->position_ = glm::vec3(size, screen.y - size, 0.f);
-      } else {
-        arrow_->position_ = glm::vec3(size, aerolite_position.y, 0.f);
-      }
-      break;
-    case Direction::Bottom:
-      if (aerolite_position.x < size) {
-        arrow_->position_ = glm::vec3(size, size, 0.f);
-      } else if (aerolite_position.x > screen.x - size) {
-        arrow_->position_ = glm::vec3(screen.x - size, size, 0.f);
-      } else {
-        arrow_->position_ = glm::vec3(aerolite_position.x, size, 0.f);
-      }
-      break;
-    case Direction::Right:
-      if (aerolite_position.y < size) {
-        arrow_->position_ = glm::vec3(screen.x - size, size, 0.f);
-      } else if (aerolite_position.y > screen.y - size) {
-        arrow_->position_ = glm::vec3(screen.x - size, screen.y - size, 0.f);
-      } else {
-        arrow_->position_ = glm::vec3(screen.x - size, aerolite_position.y, 0.f);
-      }
-      break;
-    default:
-      break;
-  }
-  // angle of the arrow
-  arrow_->angle_ = atan2f(aerolite_position.y - arrow_->position_.y, aerolite_position.x - arrow_->position_.x) - b2_pi / 2.f;
+  positionArrow();
 }
 
 void ktp::AerolitePhysicsComponent::updateMVP() {
@@ -361,20 +406,19 @@ void ktp::AerolitePhysicsComponent::updateMVP() {
 
 ktp::AeroliteArrowGraphicsComponent::AeroliteArrowGraphicsComponent() {
   const GLfloatVector arrow_shape {
-     0.00f * kSize_,  0.5f * kSize_, 0.f,  color_.r, color_.g, color_.b, color_.a, // top
-    -0.25f * kSize_, -0.5f * kSize_, 0.f,  color_.r, color_.g, color_.b, color_.a, // left
-     0.25f * kSize_, -0.5f * kSize_, 0.f,  color_.r, color_.g, color_.b, color_.a  // right
+     0.00f * kSize_,  0.5f * kSize_, 0.f, // top
+    -0.25f * kSize_, -0.5f * kSize_, 0.f, // left
+     0.25f * kSize_, -0.5f * kSize_, 0.f  // right
   };
   vertices_.setup(arrow_shape);
   // shape
-  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 7 * sizeof(GLfloat), nullptr);
-  // color
-  vao_.linkAttrib(vertices_, 1, 4, GL_FLOAT, 7 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 3 * sizeof(GLfloat), nullptr);
 }
 
 void ktp::AeroliteArrowGraphicsComponent::update(const GameEntity& aerolite_arrow) {
   shader_.use();
   shader_.setMat4f("mvp", glm::value_ptr(mvp_));
+  shader_.setFloat4("color", glm::value_ptr(color_));
   vao_.bind();
   glDrawArrays(GL_TRIANGLES, 0, 3);
 }
@@ -396,6 +440,9 @@ ktp::AeroliteArrowPhysicsComponent& ktp::AeroliteArrowPhysicsComponent::operator
 }
 
 void ktp::AeroliteArrowPhysicsComponent::update(const GameEntity& aerolite_arrow, float delta_time) {
+  time_step_ += (1.f / time_to_enter_) * delta_time;
+  current_color_ = Palette::interpolate2Colors(start_color_, end_color_, time_step_);
+  graphics_->color_ = current_color_;
   updateMVP();
 }
 

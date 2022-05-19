@@ -305,7 +305,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
       }
     }
   }
-  if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 4) AerolitePhysicsComponent::spawnMovingAerolite();
+  if (GameEntity::entitiesCount(EntityTypes::Aerolite) < 1) AerolitePhysicsComponent::spawnMovingAerolite();
 
   game.event_bus_.processEvents();
 }

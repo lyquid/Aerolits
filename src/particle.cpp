@@ -18,56 +18,38 @@ void ktp::Particle::init(const ParticleData& data) {
   time_step_              = data.time_step_;
 }
 
-glm::vec4 ktp::Particle::interpolate2Colors(const glm::vec4& start_color, const glm::vec4& end_color, float time_step) {
-  return {
-    interpolateRange(start_color.r, end_color.r, time_step),
-    interpolateRange(start_color.g, end_color.g, time_step),
-    interpolateRange(start_color.b, end_color.b, time_step),
-    interpolateRange(start_color.a, end_color.a, time_step)
-  };
-}
-
-glm::vec4 ktp::Particle::interpolate3Colors(const glm::vec4& start_color, const glm::vec4& mid_color, const glm::vec4& end_color, float time_step) {
-  return {
-    interpolateRange3(start_color.r, mid_color.r, end_color.r, time_step),
-    interpolateRange3(start_color.g, mid_color.g, end_color.g, time_step),
-    interpolateRange3(start_color.b, mid_color.b, end_color.b, time_step),
-    interpolateRange3(start_color.a, mid_color.a, end_color.a, time_step)
-  };
-}
-
-// returnS true if the particle has died in this frame
+// returns true if the particle has died in this frame
 bool ktp::Particle::update(float delta_time, GLfloat* subdata) {
   // time step increment to interpolate
   time_step_ += (1.f / start_life_) * delta_time;
   if (time_step_ >= 1.f) time_step_ = 0.f;
   // size interpolation
   if (sizes_.size() == 2) {
-    current_size_ = interpolateRange(sizes_[0], sizes_[1], time_step_);
+    current_size_ = Palette::interpolateRange(sizes_[0], sizes_[1], time_step_);
   } else if (sizes_.size() > 2) {
-    current_size_ = interpolateRange3(sizes_[0], sizes_[1], sizes_[2], time_step_);
+    current_size_ = Palette::interpolateRange3(sizes_[0], sizes_[1], sizes_[2], time_step_);
   }
   subdata[7] = current_size_;
   // color interpolation
   if (colors_.size() == 2) {
-    current_color_ = interpolate2Colors(colors_[0], colors_[1], time_step_);
+    current_color_ = Palette::interpolate2Colors(colors_[0], colors_[1], time_step_);
   } else if (colors_.size() > 2) {
-    current_color_ = interpolate3Colors(colors_[0], colors_[1], colors_[2], time_step_);
+    current_color_ = Palette::interpolate3Colors(colors_[0], colors_[1], colors_[2], time_step_);
   }
   subdata[3] = current_color_.r;
   subdata[4] = current_color_.g;
   subdata[5] = current_color_.b;
   subdata[6] = current_color_.a;
   // rotation speed interpolation
-  current_rotation_speed_ = interpolateRange(start_rotation_speed_, end_rotation_speed_, time_step_);
+  current_rotation_speed_ = Palette::interpolateRange(start_rotation_speed_, end_rotation_speed_, time_step_);
   rotation_ += current_rotation_speed_;
   // speed interpolation
   if (speeds_.size() == 2) {
-    current_speed_.x = interpolateRange(speeds_[0].x, speeds_[1].x, time_step_);
-    current_speed_.y = interpolateRange(speeds_[0].y, speeds_[1].y, time_step_);
+    current_speed_.x = Palette::interpolateRange(speeds_[0].x, speeds_[1].x, time_step_);
+    current_speed_.y = Palette::interpolateRange(speeds_[0].y, speeds_[1].y, time_step_);
   } else if (speeds_.size() > 2) {
-    current_speed_.x = interpolateRange3(speeds_[0].x, speeds_[1].x, speeds_[2].x, time_step_);
-    current_speed_.y = interpolateRange3(speeds_[0].y, speeds_[1].y, speeds_[2].y, time_step_);
+    current_speed_.x = Palette::interpolateRange3(speeds_[0].x, speeds_[1].x, speeds_[2].x, time_step_);
+    current_speed_.y = Palette::interpolateRange3(speeds_[0].y, speeds_[1].y, speeds_[2].y, time_step_);
   }
   // position update
   position_.x += current_speed_.x * delta_time;

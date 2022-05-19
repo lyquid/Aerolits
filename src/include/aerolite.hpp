@@ -45,7 +45,7 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   AerolitePhysicsComponent& operator=(const AerolitePhysicsComponent& other) = delete;
   AerolitePhysicsComponent& operator=(AerolitePhysicsComponent&& other);
 
-  static auto atan2Normalized(float y, float x) {
+  static const auto atan2Normalized(float y, float x) {
     const auto theta {atan2f(y, x)};
     return theta < 0.f ? theta + 2.f * b2_pi : theta;
   }
@@ -62,15 +62,20 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   static void createB2Body(AerolitePhysicsComponent& aerolite, const GLfloatVector& triangulated_shape);
   static Geometry::Polygon generateAeroliteShape(float size, SDL_FPoint offset = {0.f, 0.f});
   static Geometry::Polygon generateAeroliteShape(float size, unsigned int sides, SDL_FPoint offset = {0.f, 0.f});
+  void positionArrow();
   void split();
-  void updateArrow();
   void updateMVP();
 
   static constexpr float kMinSize_ {1.4f};
   static constexpr unsigned int kMaxSides_ {40u};
   static constexpr unsigned int kMinSides_ {30u};
   static constexpr unsigned int kScore_ {1000u};
-  static constexpr unsigned int kNewBornTime_ {20000u}; // 20 seconds
+  static constexpr unsigned int kNewBornTime_ {40000u}; // 40 seconds
+  // corners' angles in radians for 16:9 aspect ratio only!!
+  static inline constexpr float top_right {0.512389f};
+  static inline constexpr float top_left {2.629203f};
+  static inline constexpr float bottom_left {3.653982f};
+  static inline constexpr float bottom_right {5.770796f};
 
   AeroliteArrowPhysicsComponent* arrow_ {nullptr};
 
@@ -107,13 +112,13 @@ class AeroliteArrowGraphicsComponent: public GraphicsComponent {
  public:
   AeroliteArrowGraphicsComponent();
   void update(const GameEntity& aerolite_arrow) override;
-  static constexpr auto kSize_ {30.f};
+  static constexpr auto kSize_ {50.f};
  private:
-  Color color_ {Palette::red};
-  VAO vao_ {};
-  VBO vertices_ {};
+  VAO           vao_ {};
+  VBO           vertices_ {};
   ShaderProgram shader_ {Resources::getShader("aerolite_arrow")};
-  glm::mat4 mvp_ {};
+  glm::mat4     mvp_ {};
+  glm::vec4     color_ {};
 };
 
 class AeroliteArrowPhysicsComponent: public PhysicsComponent {
@@ -129,10 +134,16 @@ class AeroliteArrowPhysicsComponent: public PhysicsComponent {
   void update(const GameEntity& aerolite_arrow, float delta_time) override;
  private:
   void updateMVP();
-  float angle_ {};
+  float                           angle_ {};
   AeroliteArrowGraphicsComponent* graphics_;
-  Direction incoming_direction_ {};
-  glm::vec3 position_ {};
+  Direction                       incoming_direction_ {};
+  glm::vec3                       position_ {};
+  // color's interpolation
+  static inline constexpr glm::vec4 start_color_ {Palette::colorToGlmVec4(Palette::green)};
+  static inline constexpr glm::vec4 end_color_ {Palette::colorToGlmVec4(Palette::red)};
+  glm::vec4 current_color_ {start_color_};
+  float time_step_ {};
+  float time_to_enter_ {};
 };
 
 } // namespace ktp
