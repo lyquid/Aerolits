@@ -92,7 +92,6 @@ class EmitterPhysicsComponent: public PhysicsComponent {
   void inflatePool();
   void setType(const std::string& type);
   void setupOpenGL();
-  void updateMVP();
 
   /**
    * @brief The number of components per vertex of the subdata.

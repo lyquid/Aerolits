@@ -22,7 +22,7 @@ ktp::TestingState ktp::GameState::testing_ {};
 ktp::TitleState   ktp::GameState::title_ {};
 
 ktp::DebugDraw ktp::GameState::b2_debug_ {};
-bool ktp::GameState::backend_draw_ {true};
+bool ktp::GameState::backend_draw_ {false};
 bool ktp::GameState::culling_ {false};
 bool ktp::GameState::debug_draw_ {false};
 bool ktp::GameState::deep_test_ {false};

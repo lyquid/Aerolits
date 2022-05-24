@@ -20,7 +20,7 @@ void ktp::AeroliteGraphicsComponent::update(const GameEntity& aerolite) {
   shader_.setMat4f("mvp", glm::value_ptr(mvp_));
   texture_.bind();
   vao_.bind();
-  glDrawElements(GL_TRIANGLES, indices_count_, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, (int)indices_count_, GL_UNSIGNED_INT, 0);
 }
 
 /* PHYSICS */
@@ -43,7 +43,7 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, Aerol
   const GLfloatVector texture_coords {convertToUV(triangulated_shape)};
   graphics_->uv_.setup(texture_coords);
   // convert box2d coords to pixels and set up the vertices VBO
-  std::transform(triangulated_shape.begin(), triangulated_shape.end(), triangulated_shape.begin(), [](auto& coord){return coord * kMetersToPixels;});
+  std::transform(triangulated_shape.begin(), triangulated_shape.end(), triangulated_shape.begin(), [](auto coord){return coord * kMetersToPixels;});
   graphics_->vertices_.setup(triangulated_shape);
   // link the attributes
   graphics_->vao_.linkAttrib(graphics_->vertices_, 0, 3, GL_FLOAT, 0, nullptr);
@@ -51,6 +51,13 @@ ktp::AerolitePhysicsComponent::AerolitePhysicsComponent(GameEntity* owner, Aerol
   // setup the EBO
   graphics_->indices_count_ = indices.size();
   graphics_->ebo_.setup(indices);
+  // the pointing arrow
+  arrow_ = static_cast<AeroliteArrowPhysicsComponent*>(GameEntity::createEntity(EntityTypes::AeroliteArrow)->physics());
+}
+
+ktp::AerolitePhysicsComponent::~AerolitePhysicsComponent() {
+  if (arrow_) arrow_->owner()->deactivate();
+  if (body_) world_->DestroyBody(body_);
 }
 
 ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(AerolitePhysicsComponent&& other) {
@@ -61,6 +68,8 @@ ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(Aerolite
     owner_    = std::exchange(other.owner_, nullptr);
     size_     = other.size_;
     // own members
+    arrow_          = std::exchange(other.arrow_, nullptr);
+    arrow_needed_   = other.arrow_needed_;
     graphics_       = std::exchange(other.graphics_, nullptr);
     aabb_           = std::move(other.aabb_);
     body_           = std::exchange(other.body_, nullptr);
@@ -130,11 +139,34 @@ ktp::Geometry::Polygon ktp::AerolitePhysicsComponent::generateAeroliteShape(floa
   // Generates a shape around coord [0,0], CCW, length based on the size specified
   for (auto i = 0u; i < sides; ++i) {
     const auto f_size {size * generateRand(0.82f, 1.f)};
-    x = f_size * SDL_cosf(2 * b2_pi * i / sides) + offset.x;
-    y = f_size * SDL_sinf(2 * b2_pi * i / sides) + offset.y;
+    x = f_size * SDL_cosf(2.f * b2_pi * (float)i / (float)sides) + offset.x;
+    y = f_size * SDL_sinf(2.f * b2_pi * (float)i / (float)sides) + offset.y;
     shape.push_back({x, y});
   }
   return shape;
+}
+
+bool ktp::AerolitePhysicsComponent::intersectPoint(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c, const glm::vec2& d, glm::vec2& result) {
+  // Line AB represented as a1x + b1y = c1
+  const auto a1 {b.y - a.y};
+  const auto b1 {a.x - b.x};
+  const auto c1 {a1 * a.x + b1 * a.y};
+  // Line CD represented as a2x + b2y = c2
+  const auto a2 {d.y - c.y};
+  const auto b2 {c.x - d.x};
+  const auto c2 {a2 * c.x + b2 * c.y};
+
+  const auto determinant {a1 * b2 - a2 * b1};
+
+  if (determinant == 0.f) { // ugly comparison
+    //paralel lines
+    return false;
+  }
+  else {
+    result.x = (b2 * c1 - b1 * c2) / determinant;
+    result.y = (a1 * c2 - a2 * c1) / determinant;
+    return true;
+  }
 }
 
 void ktp::AerolitePhysicsComponent::reshape(float size) {
@@ -181,34 +213,110 @@ ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnMovingAerolite() {
   const auto aerolite {static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics())};
   if (!aerolite) return nullptr;
 
-  const glm::vec2 screen_center {b2_screen_size_.x / 2.f, b2_screen_size_.y / 2.f};
+  const glm::vec2 screen_center {b2_screen_size_.x * 0.5f, b2_screen_size_.y * 0.5f};
   constexpr auto total_spokes {64u};
   const auto spoke {generateRand(0u, total_spokes - 1u)};
-  glm::vec2 spawn_point {};
-  // first we find or spawn_point
-  for (auto i = 0u; i < total_spokes; ++i) {
-    if (i == spoke) {
-      spawn_point.x = b2_screen_size_.x * glm::cos(2 * b2_pi * i / total_spokes) + screen_center.x;
-      spawn_point.y = b2_screen_size_.x * glm::sin(2 * b2_pi * i / total_spokes) + screen_center.y;
-      break;
-    }
-  }
+  // first we find our spawn_point
+  glm::vec2 spawn_point {
+    1.5f * b2_screen_size_.x * glm::cos(2.f * b2_pi * (float)spoke / (float)total_spokes) + screen_center.x,
+    1.5f * b2_screen_size_.x * glm::sin(2.f * b2_pi * (float)spoke / (float)total_spokes) + screen_center.y
+  };
   // move away from the center to create more randomness
   const auto displacement {screen_center.y * generateRand(-1.f, 1.f)};
   spawn_point = displacement + spawn_point;
-  const glm::vec2 final_point {displacement + screen_center};
+  // a far away point in the line of the trajectory of the aerolite
+  const glm::vec2 end_point {displacement + screen_center};
   // now we have to find the direction we want the aerolite to go (towards the center)
   // the directional vector can be determined by subtracting the start from the terminal point
-  const glm::vec2 direction {glm::normalize(spawn_point - final_point)};
+  const glm::vec2 direction {glm::normalize(spawn_point - end_point)};
   // linear velocity
-  const auto linear_velocity {ConfigParser::aerolites_config.speed_.value_ * generateRand(ConfigParser::aerolites_config.speed_.rand_min_, ConfigParser::aerolites_config.speed_.rand_max_)};
-  aerolite->body_->SetLinearVelocity(-linear_velocity * b2Vec2{direction.x, direction.y});
+  const auto linear_speed {ConfigParser::aerolites_config.speed_.value_ * generateRand(ConfigParser::aerolites_config.speed_.rand_min_, ConfigParser::aerolites_config.speed_.rand_max_)};
+  aerolite->body_->SetLinearVelocity(-linear_speed * b2Vec2{direction.x, direction.y});
   // angular velocity
   aerolite->body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
   // position
   aerolite->body_->SetTransform(b2Vec2{spawn_point.x, spawn_point.y}, aerolite->body_->GetAngle());
+  // another point of the aerolite trajectory
+  const glm::vec2 aerolite_pos2 {
+    spawn_point.x + aerolite->body_->GetLinearVelocity().x,
+    spawn_point.y + aerolite->body_->GetLinearVelocity().y
+  };
+  // where the aerolite will cross the screen
+  glm::vec2 intersect_point {};
+  // arrow: calculate the angle of attack respect to the screen's center
+  const auto theta {atan2Normalized(spawn_point.y - screen_center.y, spawn_point.x - screen_center.x)};
+  // asign an incoming direction so we can position the arrow
+  if (theta >= top_right && theta < top_left) {
+    // TOP
+    aerolite->arrow_->incoming_direction_ = Direction::Top;
+    intersectPoint(spawn_point, aerolite_pos2, {0.f, b2_screen_size_.y}, {b2_screen_size_.x, b2_screen_size_.y}, intersect_point);
+  } else if (theta >= top_left && theta < bottom_left) {
+    // LEFT
+    aerolite->arrow_->incoming_direction_ = Direction::Left;
+    intersectPoint(spawn_point, aerolite_pos2, {0.f, 0.f}, {0.f, b2_screen_size_.y}, intersect_point);
+  } else if (theta >= bottom_left && theta < bottom_right) {
+    // BOTTOM
+    aerolite->arrow_->incoming_direction_ = Direction::Bottom;
+    intersectPoint(spawn_point, aerolite_pos2, {0.f, 0.f}, {b2_screen_size_.x, 0.f}, intersect_point);
+  } else {
+    // RIGHT
+    aerolite->arrow_->incoming_direction_ = Direction::Right;
+    intersectPoint(spawn_point, aerolite_pos2, {b2_screen_size_.x, 0.f}, {b2_screen_size_.x, b2_screen_size_.y}, intersect_point);
+  }
+  // distance from spawn point to intersect point
+  const auto distance {glm::distance(spawn_point, intersect_point)};
+  // calculate the time for the aerolite to enter the screen, minus 5% to compensate for the aerolite radius
+  aerolite->arrow_->time_to_enter_ = (distance / aerolite->body_->GetLinearVelocity().Length()) * 0.95f;
 
   return aerolite->owner();
+}
+
+void ktp::AerolitePhysicsComponent::positionArrow() {
+  const glm::vec2 aerolite_position {body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels};
+  const glm::vec2 screen {b2_screen_size_.x * kMetersToPixels, b2_screen_size_.y * kMetersToPixels};
+  constexpr auto size {AeroliteArrowGraphicsComponent::kSize_ / 2.f};
+  switch (arrow_->incoming_direction_) {
+    case Direction::Top:
+      if (aerolite_position.x < size) {
+        arrow_->position_ = glm::vec3(size, screen.y - size, 0.f);
+      } else if (aerolite_position.x > screen.x - size) {
+        arrow_->position_ = glm::vec3(screen.x - size, screen.y - size, 0.f);
+      } else {
+        arrow_->position_ = glm::vec3(aerolite_position.x, screen.y - size, 0.f);
+      }
+      break;
+    case Direction::Left:
+      if (aerolite_position.y < size) {
+        arrow_->position_ = glm::vec3(size, size, 0.f);
+      } else if (aerolite_position.y > screen.y - size) {
+        arrow_->position_ = glm::vec3(size, screen.y - size, 0.f);
+      } else {
+        arrow_->position_ = glm::vec3(size, aerolite_position.y, 0.f);
+      }
+      break;
+    case Direction::Bottom:
+      if (aerolite_position.x < size) {
+        arrow_->position_ = glm::vec3(size, size, 0.f);
+      } else if (aerolite_position.x > screen.x - size) {
+        arrow_->position_ = glm::vec3(screen.x - size, size, 0.f);
+      } else {
+        arrow_->position_ = glm::vec3(aerolite_position.x, size, 0.f);
+      }
+      break;
+    case Direction::Right:
+      if (aerolite_position.y < size) {
+        arrow_->position_ = glm::vec3(screen.x - size, size, 0.f);
+      } else if (aerolite_position.y > screen.y - size) {
+        arrow_->position_ = glm::vec3(screen.x - size, screen.y - size, 0.f);
+      } else {
+        arrow_->position_ = glm::vec3(screen.x - size, aerolite_position.y, 0.f);
+      }
+      break;
+    default:
+      break;
+  }
+  // angle of the arrow
+  arrow_->angle_ = atan2f(aerolite_position.y - arrow_->position_.y, aerolite_position.x - arrow_->position_.x) - b2_pi * 0.5f;
 }
 
 void ktp::AerolitePhysicsComponent::split() {
@@ -240,6 +348,7 @@ void ktp::AerolitePhysicsComponent::split() {
       aerolite = static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics());
       if (!aerolite) return;
       aerolite->new_born_ = false;
+      aerolite->arrow_needed_ = false;
       aerolite->reshape(piece_size); // need this until we can use the size constructor
       aerolite->body_->SetAngularVelocity(old_angular * generateRand(-1.5f, 1.5f));
       aerolite->body_->SetLinearVelocity({old_delta.x * generateRand(0.5f, 1.5f), old_delta.y * generateRand(0.5f, 1.5f)});
@@ -257,6 +366,8 @@ void ktp::AerolitePhysicsComponent::split() {
 }
 
 void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float delta_time) {
+  // if collided remove the new_born status and
+  // deactivate the collided flag for the new aerolite
   if (collided_) {
     new_born_ = false;
     collided_ = false;
@@ -265,26 +376,87 @@ void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float del
 
   aabb_.lowerBound = b2Vec2{ std::numeric_limits<float>::max(),  std::numeric_limits<float>::max()};
   aabb_.upperBound = b2Vec2{-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max()};
-
+  // combine all the fixtures of the body to make a "big" AABB
   for (b2Fixture* fixture = body_->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
-    aabb_.Combine(aabb_, fixture->GetAABB(0)); /// wtf is childIndex
+    aabb_.Combine(aabb_, fixture->GetAABB(0));
   }
   constexpr auto kThreshold {0.1f};
   if (!new_born_ && (aabb_.upperBound.x < -kThreshold || aabb_.lowerBound.x > b2_screen_size_.x + kThreshold
                   || aabb_.upperBound.y < -kThreshold || aabb_.lowerBound.y > b2_screen_size_.y + kThreshold)) {
+    // aerolite entered and then exit the screen
     owner_->deactivate();
   } else if (new_born_ && aabb_.upperBound.x > -kThreshold && aabb_.lowerBound.x < b2_screen_size_.x
                        && aabb_.upperBound.y > -kThreshold && aabb_.lowerBound.y < b2_screen_size_.y) {
+    // aerolite entered the screen
     new_born_ = false;
+    arrow_needed_ = false;
+    if (arrow_) arrow_->owner()->deactivate();
+    arrow_ = nullptr;
   }
   if (new_born_ && Game::gameplay_timer_.milliseconds() - born_time_ > kNewBornTime_) new_born_ = false;
 
   updateMVP();
+  if (arrow_needed_) positionArrow();
 }
 
 void ktp::AerolitePhysicsComponent::updateMVP() {
   glm::mat4 model {1.f};
   model = glm::translate(model, glm::vec3(body_->GetPosition().x * kMetersToPixels, body_->GetPosition().y * kMetersToPixels, 0.f));
   model = glm::rotate(model, body_->GetAngle(), glm::vec3(0.f, 0.f, 1.f));
+  graphics_->mvp_ = camera_.projectionMatrix() * camera_.viewMatrix() * model;
+}
+
+// ARROW GRAPHICS
+
+ktp::AeroliteArrowGraphicsComponent::AeroliteArrowGraphicsComponent() {
+  const GLfloatVector arrow_shape {
+     0.00f * kSize_,  0.5f * kSize_, 0.f, // top
+    -0.25f * kSize_, -0.5f * kSize_, 0.f, // left
+     0.25f * kSize_, -0.5f * kSize_, 0.f  // right
+  };
+  vertices_.setup(arrow_shape);
+  // shape
+  vao_.linkAttrib(vertices_, 0, 3, GL_FLOAT, 3 * sizeof(GLfloat), nullptr);
+}
+
+void ktp::AeroliteArrowGraphicsComponent::update(const GameEntity& aerolite_arrow) {
+  shader_.use();
+  shader_.setMat4f("mvp", glm::value_ptr(mvp_));
+  shader_.setFloat4("color", glm::value_ptr(color_));
+  vao_.bind();
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+// ARROW PHYSICS
+
+ktp::AeroliteArrowPhysicsComponent::AeroliteArrowPhysicsComponent(GameEntity* owner, AeroliteArrowGraphicsComponent* graphics): graphics_(graphics) {
+  owner_ = owner;
+}
+
+ktp::AeroliteArrowPhysicsComponent& ktp::AeroliteArrowPhysicsComponent::operator=(AeroliteArrowPhysicsComponent&& other) {
+  if (this != &other) {
+    angle_              = other.angle_;
+    graphics_           = std::exchange(other.graphics_, nullptr);
+    incoming_direction_ = other.incoming_direction_;
+    position_           = std::move(other.position_);
+    current_color_      = std::move(other.current_color_);
+    time_step_          = other.time_step_;
+    time_to_enter_      = other.time_to_enter_;
+  }
+  return *this;
+}
+
+void ktp::AeroliteArrowPhysicsComponent::update(const GameEntity& aerolite_arrow, float delta_time) {
+  time_step_ += (1.f / time_to_enter_) * delta_time;
+  if (time_step_ > 1.f) time_step_ = 1.f;
+  current_color_ = Palette::interpolate2Colors(start_color_, end_color_, time_step_);
+  graphics_->color_ = current_color_;
+  updateMVP();
+}
+
+void ktp::AeroliteArrowPhysicsComponent::updateMVP() {
+  glm::mat4 model {1.f};
+  model = glm::translate(model, position_);
+  model = glm::rotate(model, angle_, glm::vec3(0.f, 0.f, 1.f));
   graphics_->mvp_ = camera_.projectionMatrix() * camera_.viewMatrix() * model;
 }
