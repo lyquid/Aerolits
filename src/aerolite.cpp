@@ -145,6 +145,29 @@ ktp::Geometry::Polygon ktp::AerolitePhysicsComponent::generateAeroliteShape(floa
   return shape;
 }
 
+bool ktp::AerolitePhysicsComponent::intersectPoint(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c, const glm::vec2& d, glm::vec2& result) {
+  // Line AB represented as a1x + b1y = c1
+  const auto a1 {b.y - a.y};
+  const auto b1 {a.x - b.x};
+  const auto c1 {a1 * a.x + b1 * a.y};
+  // Line CD represented as a2x + b2y = c2
+  const auto a2 {d.y - c.y};
+  const auto b2 {c.x - d.x};
+  const auto c2 {a2 * c.x + b2 * c.y};
+
+  const auto determinant {a1 * b2 - a2 * b1};
+
+  if (determinant == 0.f) { // ugly comparison
+    //paralel lines
+    return false;
+  }
+  else {
+    result.x = (b2 * c1 - b1 * c2) / determinant;
+    result.y = (a1 * c2 - a2 * c1) / determinant;
+    return true;
+  }
+}
+
 void ktp::AerolitePhysicsComponent::reshape(float size) {
   size_ = size;
   const auto new_shape {generateAeroliteShape(size_)};
@@ -192,22 +215,19 @@ ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnMovingAerolite() {
   const glm::vec2 screen_center {b2_screen_size_.x * 0.5f, b2_screen_size_.y * 0.5f};
   constexpr auto total_spokes {64u};
   const auto spoke {generateRand(0u, total_spokes - 1u)};
-  glm::vec2 spawn_point {};
   // first we find our spawn_point
-  for (auto i = 0u; i < total_spokes; ++i) {
-    if (i == spoke) {
-      spawn_point.x = 1.5f * b2_screen_size_.x * glm::cos(2.f * b2_pi * (float)i / (float)total_spokes) + screen_center.x;
-      spawn_point.y = 1.5f * b2_screen_size_.x * glm::sin(2.f * b2_pi * (float)i / (float)total_spokes) + screen_center.y;
-      break;
-    }
-  }
+  glm::vec2 spawn_point {
+    1.5f * b2_screen_size_.x * glm::cos(2.f * b2_pi * (float)spoke / (float)total_spokes) + screen_center.x,
+    1.5f * b2_screen_size_.x * glm::sin(2.f * b2_pi * (float)spoke / (float)total_spokes) + screen_center.y
+  };
   // move away from the center to create more randomness
   const auto displacement {screen_center.y * generateRand(-1.f, 1.f)};
   spawn_point = displacement + spawn_point;
-  const glm::vec2 final_point {displacement + screen_center};
+  // a far away point in the line of the trajectory of the aerolite
+  const glm::vec2 end_point {displacement + screen_center};
   // now we have to find the direction we want the aerolite to go (towards the center)
   // the directional vector can be determined by subtracting the start from the terminal point
-  const glm::vec2 direction {glm::normalize(spawn_point - final_point)};
+  const glm::vec2 direction {glm::normalize(spawn_point - end_point)};
   // linear velocity
   const auto linear_speed {ConfigParser::aerolites_config.speed_.value_ * generateRand(ConfigParser::aerolites_config.speed_.rand_min_, ConfigParser::aerolites_config.speed_.rand_max_)};
   aerolite->body_->SetLinearVelocity(-linear_speed * b2Vec2{direction.x, direction.y});
@@ -215,62 +235,37 @@ ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnMovingAerolite() {
   aerolite->body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
   // position
   aerolite->body_->SetTransform(b2Vec2{spawn_point.x, spawn_point.y}, aerolite->body_->GetAngle());
-  // this will be useful to calculate incoming side and angle
-  const auto aerolite_pos {aerolite->body_->GetPosition()};
-  // delta V of the aerolite, useful to calculate the time it will take for the aerolite to enter the screen
-  const auto delta_v {aerolite->body_->GetLinearVelocity()};
-  // the slope of the line
-  float slope {delta_v.y / delta_v.x};
-  // if (std::abs(delta_v.y) < std::numeric_limits<float>::epsilon()) {
-  //   // horizontal line
-  //   slope = 0.f;
-  // } else if (std::abs(delta_v.x) < std::numeric_limits<float>::epsilon()) {
-  //   // vertical line, problem :(
-
-  // } else {
-  //   slope = delta_v.y / delta_v.x;
-  // }
-  //
-  b2Vec2 intersect_point {};
-  // a threshold for the arrow to go red before the center of the aerolite
-  const auto threshold {aerolite->size_ * 1.1f};
+  // another point of the aerolite trajectory
+  const glm::vec2 aerolite_pos2 {
+    spawn_point.x + aerolite->body_->GetLinearVelocity().x,
+    spawn_point.y + aerolite->body_->GetLinearVelocity().y
+  };
+  // where the aerolite will cross the screen
+  glm::vec2 intersect_point {};
   // arrow: calculate the angle of attack respect to the screen's center
-  const auto theta {atan2Normalized(aerolite_pos.y - screen_center.y, aerolite_pos.x - screen_center.x)};
+  const auto theta {atan2Normalized(spawn_point.y - screen_center.y, spawn_point.x - screen_center.x)};
   // asign an incoming direction so we can position the arrow
   if (theta >= top_right && theta < top_left) {
     // TOP
     aerolite->arrow_->incoming_direction_ = Direction::Top;
-    const auto y_intersect = -aerolite_pos.y - (slope * aerolite_pos.x);
-    intersect_point.Set(-y_intersect / slope, b2_screen_size_.y);
-
+    intersectPoint(spawn_point, aerolite_pos2, {0.f, b2_screen_size_.y}, {b2_screen_size_.x, b2_screen_size_.y}, intersect_point);
   } else if (theta >= top_left && theta < bottom_left) {
     // LEFT
     aerolite->arrow_->incoming_direction_ = Direction::Left;
-    intersect_point.Set(0.f, aerolite_pos.y - (slope * aerolite_pos.x));
-
+    intersectPoint(spawn_point, aerolite_pos2, {0.f, 0.f}, {0.f, b2_screen_size_.y}, intersect_point);
   } else if (theta >= bottom_left && theta < bottom_right) {
     // BOTTOM
     aerolite->arrow_->incoming_direction_ = Direction::Bottom;
-    const auto y_intersect = -aerolite_pos.y - (slope * aerolite_pos.x);
-    intersect_point.Set(-y_intersect / slope , 0.f);
-
+    intersectPoint(spawn_point, aerolite_pos2, {0.f, 0.f}, {b2_screen_size_.x, 0.f}, intersect_point);
   } else {
     // RIGHT
     aerolite->arrow_->incoming_direction_ = Direction::Right;
-    slope = delta_v.y / (delta_v.x + b2_screen_size_.x);
-    intersect_point.Set(b2_screen_size_.x, aerolite_pos.y - (slope * (aerolite_pos.x + b2_screen_size_.x)));
+    intersectPoint(spawn_point, aerolite_pos2, {b2_screen_size_.x, 0.f}, {b2_screen_size_.x, b2_screen_size_.y}, intersect_point);
   }
   // distance from spawn point to intersect point
-  const float distance {b2Distance(aerolite_pos, intersect_point)};
-  // calculate the time for the aerolite to enter the screen, minus 10% to compensate for the aerolite radius
-  aerolite->arrow_->time_to_enter_ = (distance / delta_v.Length()) * 0.9f;
-
-  logMessage("spawn@(" + std::to_string(aerolite_pos.x) + ", " + std::to_string(aerolite_pos.y)
-    + ")\tlinearV(" + std::to_string(delta_v.x) + ", " + std::to_string(delta_v.y)
-    + ")\ttheta=" + std::to_string(theta * 180.f / b2_pi));
-  (aerolite->arrow_->incoming_direction_ == Direction::Left || aerolite->arrow_->incoming_direction_ == Direction::Right) ?
-    logMessage("\tY_intersect=" + std::to_string((b2_screen_size_.y * kMetersToPixels) - intersect_point.y * kMetersToPixels) + "\n") :
-    logMessage("\tX_intersect=" + std::to_string((b2_screen_size_.x * kMetersToPixels) - intersect_point.x * kMetersToPixels) + "\n");
+  const auto distance {glm::distance(spawn_point, intersect_point)};
+  // calculate the time for the aerolite to enter the screen, minus 5% to compensate for the aerolite radius
+  aerolite->arrow_->time_to_enter_ = (distance / aerolite->body_->GetLinearVelocity().Length()) * 0.95f;
 
   return aerolite->owner();
 }
@@ -435,12 +430,16 @@ ktp::AeroliteArrowPhysicsComponent& ktp::AeroliteArrowPhysicsComponent::operator
     graphics_           = std::exchange(other.graphics_, nullptr);
     incoming_direction_ = other.incoming_direction_;
     position_           = std::move(other.position_);
+    current_color_      = std::move(other.current_color_);
+    time_step_          = other.time_step_;
+    time_to_enter_      = other.time_to_enter_;
   }
   return *this;
 }
 
 void ktp::AeroliteArrowPhysicsComponent::update(const GameEntity& aerolite_arrow, float delta_time) {
   time_step_ += (1.f / time_to_enter_) * delta_time;
+  if (time_step_ > 1.f) time_step_ = 1.f;
   current_color_ = Palette::interpolate2Colors(start_color_, end_color_, time_step_);
   graphics_->color_ = current_color_;
   updateMVP();

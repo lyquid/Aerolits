@@ -50,6 +50,7 @@ class AerolitePhysicsComponent: public PhysicsComponent {
     return theta < 0.f ? theta + 2.f * b2_pi : theta;
   }
   void collide(const GameEntity* other) override { collided_ = true; }
+  static bool intersectPoint(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c, const glm::vec2& d, glm::vec2& result);
   void reshape(float size);
   static GameEntity* spawnAerolite(const b2Vec2& where);
   static GameEntity* spawnMovingAerolite();
