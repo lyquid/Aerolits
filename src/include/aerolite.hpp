@@ -73,10 +73,10 @@ class AerolitePhysicsComponent: public PhysicsComponent {
   static constexpr unsigned int kScore_ {1000u};
   static constexpr unsigned int kNewBornTime_ {40000u}; // 40 seconds
   // corners' angles in radians for 16:9 aspect ratio only!!
-  static inline constexpr float top_right {0.512389f};
-  static inline constexpr float top_left {2.629203f};
-  static inline constexpr float bottom_left {3.653982f};
-  static inline constexpr float bottom_right {5.770796f};
+  static constexpr float top_right {0.512389f};
+  static constexpr float top_left {2.629203f};
+  static constexpr float bottom_left {3.653982f};
+  static constexpr float bottom_right {5.770796f};
 
   AeroliteArrowPhysicsComponent* arrow_ {nullptr};
 
@@ -85,6 +85,10 @@ class AerolitePhysicsComponent: public PhysicsComponent {
    * @brief This is used to know when an aerolite has left the screen.
    */
   b2AABB aabb_ {};
+  /**
+   * @brief To know if the arrow is needed
+   */
+  bool arrow_needed_ {true};
   /**
    * @brief The b2Body of the aerolite.
    */
@@ -113,7 +117,7 @@ class AeroliteArrowGraphicsComponent: public GraphicsComponent {
  public:
   AeroliteArrowGraphicsComponent();
   void update(const GameEntity& aerolite_arrow) override;
-  static constexpr auto kSize_ {50.f};
+  static constexpr auto kSize_ {30.f};
  private:
   VAO           vao_ {};
   VBO           vertices_ {};
@@ -140,8 +144,8 @@ class AeroliteArrowPhysicsComponent: public PhysicsComponent {
   Direction                       incoming_direction_ {};
   glm::vec3                       position_ {};
   // color's interpolation
-  static inline constexpr glm::vec4 start_color_ {Palette::colorToGlmVec4(Palette::green)};
-  static inline constexpr glm::vec4 end_color_ {Palette::colorToGlmVec4(Palette::red)};
+  static constexpr glm::vec4 start_color_ {Palette::colorToGlmVec4(Palette::green)};
+  static constexpr glm::vec4 end_color_ {Palette::colorToGlmVec4(Palette::red)};
   glm::vec4 current_color_ {start_color_};
   float time_step_ {};
   float time_to_enter_ {};

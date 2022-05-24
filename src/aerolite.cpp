@@ -69,6 +69,7 @@ ktp::AerolitePhysicsComponent& ktp::AerolitePhysicsComponent::operator=(Aerolite
     size_     = other.size_;
     // own members
     arrow_          = std::exchange(other.arrow_, nullptr);
+    arrow_needed_   = other.arrow_needed_;
     graphics_       = std::exchange(other.graphics_, nullptr);
     aabb_           = std::move(other.aabb_);
     body_           = std::exchange(other.body_, nullptr);
@@ -347,6 +348,7 @@ void ktp::AerolitePhysicsComponent::split() {
       aerolite = static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics());
       if (!aerolite) return;
       aerolite->new_born_ = false;
+      aerolite->arrow_needed_ = false;
       aerolite->reshape(piece_size); // need this until we can use the size constructor
       aerolite->body_->SetAngularVelocity(old_angular * generateRand(-1.5f, 1.5f));
       aerolite->body_->SetLinearVelocity({old_delta.x * generateRand(0.5f, 1.5f), old_delta.y * generateRand(0.5f, 1.5f)});
@@ -364,6 +366,8 @@ void ktp::AerolitePhysicsComponent::split() {
 }
 
 void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float delta_time) {
+  // if collided remove the new_born status and
+  // deactivate the collided flag for the new aerolite
   if (collided_) {
     new_born_ = false;
     collided_ = false;
@@ -372,22 +376,27 @@ void ktp::AerolitePhysicsComponent::update(const GameEntity& aerolite, float del
 
   aabb_.lowerBound = b2Vec2{ std::numeric_limits<float>::max(),  std::numeric_limits<float>::max()};
   aabb_.upperBound = b2Vec2{-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max()};
-
+  // combine all the fixtures of the body to make a "big" AABB
   for (b2Fixture* fixture = body_->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
     aabb_.Combine(aabb_, fixture->GetAABB(0));
   }
   constexpr auto kThreshold {0.1f};
   if (!new_born_ && (aabb_.upperBound.x < -kThreshold || aabb_.lowerBound.x > b2_screen_size_.x + kThreshold
                   || aabb_.upperBound.y < -kThreshold || aabb_.lowerBound.y > b2_screen_size_.y + kThreshold)) {
+    // aerolite entered and then exit the screen
     owner_->deactivate();
   } else if (new_born_ && aabb_.upperBound.x > -kThreshold && aabb_.lowerBound.x < b2_screen_size_.x
                        && aabb_.upperBound.y > -kThreshold && aabb_.lowerBound.y < b2_screen_size_.y) {
+    // aerolite entered the screen
     new_born_ = false;
+    arrow_needed_ = false;
+    if (arrow_) arrow_->owner()->deactivate();
+    arrow_ = nullptr;
   }
   if (new_born_ && Game::gameplay_timer_.milliseconds() - born_time_ > kNewBornTime_) new_born_ = false;
 
   updateMVP();
-  positionArrow();
+  if (arrow_needed_) positionArrow();
 }
 
 void ktp::AerolitePhysicsComponent::updateMVP() {
