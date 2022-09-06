@@ -15,6 +15,7 @@ using B2Line = Geometry::Line<b2Vec2>;
 
 class AeroliteArrowPhysicsComponent;
 class GameEntity;
+struct AeroliteSpawnData;
 
 class AeroliteGraphicsComponent: public GraphicsComponent {
   friend class AerolitePhysicsComponent;
@@ -149,6 +150,35 @@ class AeroliteArrowPhysicsComponent: public PhysicsComponent {
   glm::vec4 current_color_ {start_color_};
   float time_step_ {};
   float time_to_enter_ {};
+};
+
+// SPAWNER
+
+struct AeroliteSpawnData {
+  glm::vec2 start_point_ {};
+  glm::vec2 end_point_ {};
+};
+
+class AeroliteSpawnerPhysicsComponent: public PhysicsComponent {
+ public:
+  AeroliteSpawnerPhysicsComponent(GameEntity* owner);
+  AeroliteSpawnerPhysicsComponent(const AeroliteSpawnerPhysicsComponent& other) = delete;
+  AeroliteSpawnerPhysicsComponent(AeroliteSpawnerPhysicsComponent&& other) { *this = std::move(other); }
+  ~AeroliteSpawnerPhysicsComponent() { if (body_) world_->DestroyBody(body_); }
+
+  AeroliteSpawnerPhysicsComponent& operator=(const AeroliteSpawnerPhysicsComponent& other) = delete;
+  AeroliteSpawnerPhysicsComponent& operator=(AeroliteSpawnerPhysicsComponent&& other);
+
+  void collide(const GameEntity* other) override { collided_ = true; }
+  bool maybeTouching() const { return maybe_touching_something_; }
+  void relocateSpawnPoint();
+  const AeroliteSpawnData* spawnPoint() const { return maybe_touching_something_ ? nullptr : &spawn_data_; }
+  void update(const GameEntity& aerolite_spawner, float delta_time) override;
+
+ private:
+  b2Body*           body_ {nullptr};
+  bool              maybe_touching_something_ {false};
+  AeroliteSpawnData spawn_data_ {};
 };
 
 } // namespace ktp

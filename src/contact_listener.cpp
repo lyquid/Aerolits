@@ -3,56 +3,82 @@
 #include "include/game_entity.hpp"
 
 void ktp::ContactListener::BeginContact(b2Contact* contact) {
-    if (!contact->GetFixtureA()->GetBody()->GetUserData().pointer
-     || !contact->GetFixtureB()->GetBody()->GetUserData().pointer) return;
+  if (!contact->GetFixtureA()->GetBody()->GetUserData().pointer
+   || !contact->GetFixtureB()->GetBody()->GetUserData().pointer) return;
 
-    const auto fixture_A {reinterpret_cast<GameEntity*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer)};
-    const auto fixture_B {reinterpret_cast<GameEntity*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer)};
+  const auto entity_a {reinterpret_cast<GameEntity*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer)};
+  const auto entity_b {reinterpret_cast<GameEntity*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer)};
 
-    switch (fixture_A->type()) {
-      case EntityTypes::Aerolite:
-        if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
-          // kill player
-        } else if (fixture_B->type() == EntityTypes::Explosion) {
-          contact->GetWorldManifold(static_cast<AerolitePhysicsComponent*>(fixture_A->physics())->worldManifold());
-          fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
-        } else if (fixture_B->type() == EntityTypes::Projectile) {
-          fixture_B->physics()->collide(fixture_A);
-        }
-        break;
-      case EntityTypes::Background:
-        break;
-      case EntityTypes::Explosion:
-        if (fixture_B->type() == EntityTypes::Aerolite) {
-          contact->GetWorldManifold(static_cast<AerolitePhysicsComponent*>(fixture_B->physics())->worldManifold());
-          fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
-        } else if (fixture_B->type() == EntityTypes::Projectile) {
-          fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
-        }
-        break;
-      case EntityTypes::Player:
-        break;
-      case EntityTypes::PlayerDemo:
-        break;
-      case EntityTypes::Projectile:
-        if (fixture_B->type() == EntityTypes::Aerolite) {
-          fixture_A->physics()->collide(fixture_B);
-        } else if (fixture_B->type() == EntityTypes::Player || fixture_B->type() == EntityTypes::PlayerDemo) {
-          // kill player or something
-        } else if (fixture_B->type() == EntityTypes::Explosion) {
-          fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
-        } else if (fixture_B->type() == EntityTypes::Projectile) {
-          fixture_A->physics()->collide(fixture_B);
-          fixture_B->physics()->collide(fixture_A);
-        }
-        break;
-      case EntityTypes::Undefined:
-      case EntityTypes::count:
-      default:
-        return;
-    }
+  if (entity_a->type() == EntityTypes::Aerolite) {
+    aeroliteCollision(entity_a, entity_b, contact);
+  } else if (entity_b->type() == EntityTypes::Aerolite) {
+    aeroliteCollision(entity_b, entity_a, contact);
+  } else if (entity_a->type() == EntityTypes::Explosion) {
+    explosionCollision(entity_a, entity_b);
+  } else if (entity_b->type() == EntityTypes::Explosion) {
+    explosionCollision(entity_b, entity_a);
+  } else if (entity_a->type() == EntityTypes::Projectile) {
+    projectileCollision(entity_a, entity_b);
+  } else if (entity_b->type() == EntityTypes::Projectile) {
+    projectileCollision(entity_b, entity_a);
   }
+}
+
+void ktp::ContactListener::EndContact(b2Contact* contact) {}
+
+void ktp::ContactListener::aeroliteCollision(GameEntity* aerolite, GameEntity* other, b2Contact* contact) {
+  switch(other->type()) {
+    case EntityTypes::Aerolite:
+      // play sound?
+      break;
+    case EntityTypes::AeroliteSpawner:
+      other->physics()->collide(aerolite);
+      break;
+    case EntityTypes::Explosion:
+      contact->GetWorldManifold(static_cast<AerolitePhysicsComponent*>(aerolite->physics())->worldManifold());
+      aerolite->physics()->collide(other);
+      other->physics()->collide(aerolite);
+      break;
+    case EntityTypes::Player:
+      // kill player?
+      break;
+    case EntityTypes::PlayerDemo:
+      // kill!!
+      break;
+    case EntityTypes::Projectile:
+      other->physics()->collide(aerolite);
+      break;
+  }
+}
+
+void ktp::ContactListener::explosionCollision(GameEntity* explosion, GameEntity* other) {
+  switch (other->type()) {
+    case EntityTypes::AeroliteSpawner:
+      // do something
+      break;
+    case EntityTypes::Projectile:
+      explosion->physics()->collide(other);
+      other->physics()->collide(explosion);
+      break;
+    case EntityTypes::Player:
+      // bum!
+      break;
+    case EntityTypes::PlayerDemo:
+      // kabum!
+      break;
+  }
+}
+
+void ktp::ContactListener::projectileCollision(GameEntity* projectile, GameEntity* other) {
+  switch (other->type()) {
+    case EntityTypes::AeroliteSpawner:
+      other->physics()->collide(projectile);
+      break;
+    case EntityTypes::Player:
+      // bum!
+      break;
+    case EntityTypes::PlayerDemo:
+      // kabum!
+      break;
+  }
+}

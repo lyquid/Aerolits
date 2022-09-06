@@ -95,7 +95,10 @@ ktp::PlayerPhysicsComponent::PlayerPhysicsComponent(GameEntity* owner, PlayerGra
   exhaust_emitter_->setAngle(body_->GetAngle() + b2_pi);
 }
 
-ktp::PlayerPhysicsComponent::~PlayerPhysicsComponent() { exhaust_emitter_->owner()->deactivate(); }
+ktp::PlayerPhysicsComponent::~PlayerPhysicsComponent() {
+  exhaust_emitter_->owner()->deactivate();
+  if (body_) world_->DestroyBody(body_);
+}
 
 ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysicsComponent&& other) {
   if (this != &other) {

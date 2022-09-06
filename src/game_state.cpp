@@ -446,6 +446,7 @@ ktp::GameState* ktp::TitleState::enter(Game& game) {
   game.reset();
   GameEntity::createEntity(EntityTypes::Background);
   GameEntity::createEntity(EntityTypes::Player);
+  GameEntity::createEntity(EntityTypes::AeroliteSpawner);
   demo_time_ = SDL2_Timer::SDL2Ticks();
   game.gui_sys_.resetScore();
   return this;

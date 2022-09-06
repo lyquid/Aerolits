@@ -144,13 +144,14 @@ void kuge::BackendSystem::statisticsWindow(bool* show) {
     ImGui::Separator();
     // GameEntities
     ImGui::Text("Entities\t%i/%i", ktp::GameEntity::count(), ktp::GameEntity::game_entities_.capacity());
-    ImGui::Text("Player:     %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Player) + ktp::GameEntity::entitiesCount(ktp::EntityTypes::PlayerDemo));
-    ImGui::Text("Background: %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Background));
-    ImGui::Text("Aerolite:   %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Aerolite));
-    ImGui::Text("Arrow:      %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::AeroliteArrow));
-    ImGui::Text("Projectile: %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Projectile));
-    ImGui::Text("Emitter:    %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Emitter));
-    ImGui::Text("Explosion:  %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Explosion));
+    ImGui::Text("Player:          %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Player) + ktp::GameEntity::entitiesCount(ktp::EntityTypes::PlayerDemo));
+    ImGui::Text("Background:      %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Background));
+    ImGui::Text("Aerolite:        %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Aerolite));
+    ImGui::Text("Arrow:           %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::AeroliteArrow));
+    ImGui::Text("AeroliteSpawner: %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::AeroliteSpawner));
+    ImGui::Text("Projectile:      %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Projectile));
+    ImGui::Text("Emitter:         %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Emitter));
+    ImGui::Text("Explosion:       %i",  ktp::GameEntity::entitiesCount(ktp::EntityTypes::Explosion));
     // pop-up window for position
     if (ImGui::BeginPopupContextWindow()) {
       if (ImGui::MenuItem("Custom",       nullptr, corner == -1)) corner = -1;

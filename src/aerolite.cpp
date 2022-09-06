@@ -210,61 +210,53 @@ ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnAerolite(const b2Vec2& wher
 }
 
 ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnMovingAerolite() {
+  const auto spawner {static_cast<AeroliteSpawnerPhysicsComponent*>(GameEntity::findFirstOf(EntityTypes::AeroliteSpawner)->physics())};
+  // check if spawner maybe touching something
+  if (!spawner || spawner->maybeTouching()) return nullptr;
   const auto aerolite {static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics())};
+  // check if we are allowed to create a new entity
   if (!aerolite) return nullptr;
-
-  const glm::vec2 screen_center {b2_screen_size_.x * 0.5f, b2_screen_size_.y * 0.5f};
-  constexpr auto total_spokes {64u};
-  const auto spoke {generateRand(0u, total_spokes - 1u)};
-  // first we find our spawn_point
-  glm::vec2 spawn_point {
-    1.5f * b2_screen_size_.x * glm::cos(2.f * b2_pi * (float)spoke / (float)total_spokes) + screen_center.x,
-    1.5f * b2_screen_size_.x * glm::sin(2.f * b2_pi * (float)spoke / (float)total_spokes) + screen_center.y
-  };
-  // move away from the center to create more randomness
-  const auto displacement {screen_center.y * generateRand(-1.f, 1.f)};
-  spawn_point = displacement + spawn_point;
-  // a far away point in the line of the trajectory of the aerolite
-  const glm::vec2 end_point {displacement + screen_center};
+  // all good to go!
+  const auto spawn_data {*spawner->spawnPoint()};
   // now we have to find the direction we want the aerolite to go (towards the center)
   // the directional vector can be determined by subtracting the start from the terminal point
-  const glm::vec2 direction {glm::normalize(spawn_point - end_point)};
+  const glm::vec2 direction {glm::normalize(spawn_data.start_point_ - spawn_data.end_point_)};
   // linear velocity
   const auto linear_speed {ConfigParser::aerolites_config.speed_.value_ * generateRand(ConfigParser::aerolites_config.speed_.rand_min_, ConfigParser::aerolites_config.speed_.rand_max_)};
   aerolite->body_->SetLinearVelocity(-linear_speed * b2Vec2{direction.x, direction.y});
   // angular velocity
   aerolite->body_->SetAngularVelocity(ConfigParser::aerolites_config.rotation_speed_.value_ * generateRand(ConfigParser::aerolites_config.rotation_speed_.rand_min_, ConfigParser::aerolites_config.rotation_speed_.rand_max_));
   // position
-  aerolite->body_->SetTransform(b2Vec2{spawn_point.x, spawn_point.y}, aerolite->body_->GetAngle());
+  aerolite->body_->SetTransform(b2Vec2{spawn_data.start_point_.x, spawn_data.start_point_.y}, aerolite->body_->GetAngle());
   // another point of the aerolite trajectory
   const glm::vec2 aerolite_pos2 {
-    spawn_point.x + aerolite->body_->GetLinearVelocity().x,
-    spawn_point.y + aerolite->body_->GetLinearVelocity().y
+    spawn_data.start_point_.x + aerolite->body_->GetLinearVelocity().x,
+    spawn_data.start_point_.y + aerolite->body_->GetLinearVelocity().y
   };
   // where the aerolite will cross the screen
   glm::vec2 intersect_point {};
   // arrow: calculate the angle of attack respect to the screen's center
-  const auto theta {atan2Normalized(spawn_point.y - screen_center.y, spawn_point.x - screen_center.x)};
+  const auto theta {atan2Normalized(spawn_data.start_point_.y - b2_screen_size_.y * 0.5f, spawn_data.start_point_.x - b2_screen_size_.x * 0.5f)};
   // asign an incoming direction so we can position the arrow
   if (theta >= top_right && theta < top_left) {
     // TOP
     aerolite->arrow_->incoming_direction_ = Direction::Top;
-    intersectPoint(spawn_point, aerolite_pos2, {0.f, b2_screen_size_.y}, {b2_screen_size_.x, b2_screen_size_.y}, intersect_point);
+    intersectPoint(spawn_data.start_point_, aerolite_pos2, {0.f, b2_screen_size_.y}, {b2_screen_size_.x, b2_screen_size_.y}, intersect_point);
   } else if (theta >= top_left && theta < bottom_left) {
     // LEFT
     aerolite->arrow_->incoming_direction_ = Direction::Left;
-    intersectPoint(spawn_point, aerolite_pos2, {0.f, 0.f}, {0.f, b2_screen_size_.y}, intersect_point);
+    intersectPoint(spawn_data.start_point_, aerolite_pos2, {0.f, 0.f}, {0.f, b2_screen_size_.y}, intersect_point);
   } else if (theta >= bottom_left && theta < bottom_right) {
     // BOTTOM
     aerolite->arrow_->incoming_direction_ = Direction::Bottom;
-    intersectPoint(spawn_point, aerolite_pos2, {0.f, 0.f}, {b2_screen_size_.x, 0.f}, intersect_point);
+    intersectPoint(spawn_data.start_point_, aerolite_pos2, {0.f, 0.f}, {b2_screen_size_.x, 0.f}, intersect_point);
   } else {
     // RIGHT
     aerolite->arrow_->incoming_direction_ = Direction::Right;
-    intersectPoint(spawn_point, aerolite_pos2, {b2_screen_size_.x, 0.f}, {b2_screen_size_.x, b2_screen_size_.y}, intersect_point);
+    intersectPoint(spawn_data.start_point_, aerolite_pos2, {b2_screen_size_.x, 0.f}, {b2_screen_size_.x, b2_screen_size_.y}, intersect_point);
   }
   // distance from spawn point to intersect point
-  const auto distance {glm::distance(spawn_point, intersect_point)};
+  const auto distance {glm::distance(spawn_data.start_point_, intersect_point)};
   // calculate the time for the aerolite to enter the screen, minus 5% to compensate for the aerolite radius
   aerolite->arrow_->time_to_enter_ = (distance / aerolite->body_->GetLinearVelocity().Length()) * 0.95f;
 
@@ -435,6 +427,12 @@ ktp::AeroliteArrowPhysicsComponent::AeroliteArrowPhysicsComponent(GameEntity* ow
 
 ktp::AeroliteArrowPhysicsComponent& ktp::AeroliteArrowPhysicsComponent::operator=(AeroliteArrowPhysicsComponent&& other) {
   if (this != &other) {
+    // inherited
+    collided_ = other.collided_;
+    delta_    = std::move(other.delta_);
+    owner_    = std::exchange(other.owner_, nullptr);
+    size_     = other.size_;
+    // own
     angle_              = other.angle_;
     graphics_           = std::exchange(other.graphics_, nullptr);
     incoming_direction_ = other.incoming_direction_;
@@ -459,4 +457,70 @@ void ktp::AeroliteArrowPhysicsComponent::updateMVP() {
   model = glm::translate(model, position_);
   model = glm::rotate(model, angle_, glm::vec3(0.f, 0.f, 1.f));
   graphics_->mvp_ = camera_.projectionMatrix() * camera_.viewMatrix() * model;
+}
+
+// AEROLITE SPAWNER
+
+ktp::AeroliteSpawnerPhysicsComponent::AeroliteSpawnerPhysicsComponent(GameEntity* owner) {
+  owner_ = owner;
+
+  b2BodyDef body_def {};
+  body_def.type = b2_staticBody;
+  body_def.userData.pointer = reinterpret_cast<uintptr_t>(owner_);
+  body_ = world_->CreateBody(&body_def);
+
+  b2CircleShape shape {};
+  shape.m_radius = 4.f;
+
+  b2FixtureDef fixture_def {};
+  fixture_def.shape = &shape;
+  fixture_def.isSensor = true;
+
+  body_->CreateFixture(&fixture_def);
+  relocateSpawnPoint();
+}
+
+ktp::AeroliteSpawnerPhysicsComponent& ktp::AeroliteSpawnerPhysicsComponent::operator=(AeroliteSpawnerPhysicsComponent&& other) {
+  if (this != &other) {
+    // inherited
+    collided_ = other.collided_;
+    delta_    = std::move(other.delta_);
+    owner_    = std::exchange(other.owner_, nullptr);
+    size_     = other.size_;
+    // own
+    body_                     = std::exchange(other.body_, nullptr);
+    maybe_touching_something_ = other.maybe_touching_something_;
+    spawn_data_               = std::move(other.spawn_data_);
+  }
+  return *this;
+}
+
+void ktp::AeroliteSpawnerPhysicsComponent::relocateSpawnPoint() {
+  const glm::vec2 screen_center {b2_screen_size_.x * 0.5f, b2_screen_size_.y * 0.5f};
+  constexpr auto total_spokes {64u};
+  const auto spoke {generateRand(0u, total_spokes - 1u)};
+  // first we find our spawn_point (start_point)
+  spawn_data_.start_point_ = {
+    1.5f * b2_screen_size_.x * glm::cos(2.f * b2_pi * (float)spoke / (float)total_spokes) + screen_center.x,
+    1.5f * b2_screen_size_.x * glm::sin(2.f * b2_pi * (float)spoke / (float)total_spokes) + screen_center.y
+  };
+  // move away from the center to create more randomness
+  const auto displacement {screen_center.y * generateRand(-1.f, 1.f)};
+  spawn_data_.start_point_ += displacement /* + spawn_data_.start_point_ */;
+  // a far away point in the line of the trajectory of the aerolite
+  spawn_data_.end_point_ = displacement + screen_center;
+  // now move the spawner body (the sensor) to the new coords
+  body_->SetTransform({spawn_data_.start_point_.x, spawn_data_.start_point_.y}, body_->GetAngle());
+}
+
+void ktp::AeroliteSpawnerPhysicsComponent::update(const GameEntity& aerolite_spawner, float delta_time) {
+  if (collided_) {
+    relocateSpawnPoint();
+    maybe_touching_something_ = true;
+  } else {
+    maybe_touching_something_ = false;
+  }
+  // this goes false here b/c it seems a good place to do it
+  // use maybe_touching_something_ flag to spawn (or not) this tick
+  collided_ = false;
 }

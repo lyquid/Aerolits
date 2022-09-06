@@ -12,6 +12,7 @@
 #include "physics_component.hpp"
 #include "player.hpp"
 #include "projectile.hpp"
+#include <algorithm> // std::find
 #include <map>
 #include <memory>
 #include <utility> // std::move std::exchange
@@ -22,6 +23,7 @@ enum class EntityTypes {
   Undefined,
   Aerolite,
   AeroliteArrow,
+  AeroliteSpawner,
   Background,
   Emitter,
   Explosion,
@@ -97,6 +99,9 @@ class GameEntity {
         entity->graphics_ = std::make_unique<AeroliteArrowGraphicsComponent>();
         entity->physics_  = std::make_unique<AeroliteArrowPhysicsComponent>(entity, static_cast<AeroliteArrowGraphicsComponent*>(entity->graphics_.get()));
         break;
+      case EntityTypes::AeroliteSpawner:
+        entity->physics_  = std::make_unique<AeroliteSpawnerPhysicsComponent>(entity);
+        break;
       case EntityTypes::Background:
         entity->graphics_ = std::make_unique<BackgroundGraphicsComponent>();
         entity->physics_  = std::make_unique<BackgroundPhysicsComponent>(entity, static_cast<BackgroundGraphicsComponent*>(entity->graphics_.get()));
@@ -159,6 +164,18 @@ class GameEntity {
    * @return The number of active entities of the type requested.
    */
   static auto entitiesCount(EntityTypes type) { return entities_count_[type]; }
+
+  /**
+   * @brief Returns the first entity that matches the type specified.
+   * @param type The type of the entity to look for.
+   * @return A pointer to the requested entity or nullptr if not found.
+   */
+  static GameEntity* findFirstOf(EntityTypes type) {
+    for (auto i = 0u; i < game_entities_.highestActiveIndex(); ++i) {
+      if (game_entities_[i].type_ == type) return &game_entities_[i];
+    }
+    return nullptr;
+  }
 
   /**
    * @brief Resets the GameEntity and sets it the first available in the pool.

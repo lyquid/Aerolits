@@ -4,6 +4,8 @@
 
 namespace ktp {
 
+class GameEntity;
+
 /**
  * @brief Implement this class to get contact information.
  * You can use these results for things like sounds and game logic.
@@ -28,7 +30,7 @@ class ContactListener: public b2ContactListener {
    * @brief Called when two fixtures cease to touch.
    * @param contact
    */
-  virtual void EndContact(b2Contact* contact) override {}
+  virtual void EndContact(b2Contact* contact) override;
 
   /**
    * @brief This lets you inspect a contact after the solver is finished.
@@ -58,6 +60,10 @@ class ContactListener: public b2ContactListener {
   virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override {}
 
  private:
+
+  inline void aeroliteCollision(GameEntity* aerolite, GameEntity* other, b2Contact* contact);
+  inline void explosionCollision(GameEntity* explosion, GameEntity* other);
+  inline void projectileCollision(GameEntity* projectile, GameEntity* other);
 };
 
 } // namespace ktp
