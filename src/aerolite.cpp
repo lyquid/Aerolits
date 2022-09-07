@@ -213,10 +213,10 @@ ktp::GameEntity* ktp::AerolitePhysicsComponent::spawnMovingAerolite() {
   const auto spawner {static_cast<AeroliteSpawnerPhysicsComponent*>(GameEntity::findFirstOf(EntityTypes::AeroliteSpawner)->physics())};
   // check if spawner maybe touching something
   if (!spawner || spawner->maybeTouching()) return nullptr;
-  const auto aerolite {static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics())};
   // check if we are allowed to create a new entity
+  const auto aerolite {static_cast<AerolitePhysicsComponent*>(GameEntity::createEntity(EntityTypes::Aerolite)->physics())};
   if (!aerolite) return nullptr;
-  // all good to go!
+  // all good to go! where do we spam the aerolite?
   const auto spawn_data {*spawner->spawnPoint()};
   // now we have to find the direction we want the aerolite to go (towards the center)
   // the directional vector can be determined by subtracting the start from the terminal point

@@ -54,7 +54,7 @@ void ktp::ContactListener::aeroliteCollision(GameEntity* aerolite, GameEntity* o
 void ktp::ContactListener::explosionCollision(GameEntity* explosion, GameEntity* other) {
   switch (other->type()) {
     case EntityTypes::AeroliteSpawner:
-      // do something
+      other->physics()->collide(explosion);
       break;
     case EntityTypes::Projectile:
       explosion->physics()->collide(other);

@@ -66,7 +66,6 @@ ktp::Game::Game() {
   state_ = GameState::goToState(*this, GameState::title_);
   // state_ = GameState::goToState(*this, GameState::testing_);
   backend_sys_.resetStatistics();
-
 }
 
 void ktp::Game::clean() {

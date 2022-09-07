@@ -177,7 +177,7 @@ class AeroliteSpawnerPhysicsComponent: public PhysicsComponent {
 
  private:
   b2Body*           body_ {nullptr};
-  bool              maybe_touching_something_ {false};
+  bool              maybe_touching_something_ {true};
   AeroliteSpawnData spawn_data_ {};
 };
 
