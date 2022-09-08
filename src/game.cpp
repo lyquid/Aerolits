@@ -114,11 +114,11 @@ bool ktp::Game::loadResources() {
   Resources::loadFont("future", font_path, 512);
   // textures
   auto texture_path {Resources::getResourcesPath("textures") + "aerolite_00.png"};
-  Resources::loadTexture("aerolite_00", texture_path, false);
+  Resources::loadTexture("aerolite_00", texture_path);
   texture_path = Resources::getResourcesPath("textures") + "aerolite_01.png";
-  Resources::loadTexture("aerolite_01", texture_path, false);
+  Resources::loadTexture("aerolite_01", texture_path);
   texture_path = Resources::getResourcesPath("textures") + "particle_01.png";
-  Resources::loadTexture("particle_01", texture_path, false);
+  Resources::loadTexture("particle_01", texture_path);
   texture_path = Resources::getResourcesPath("textures") + "particle_02.png";
   Resources::loadTexture("particle_02", texture_path, true);
   // shaders

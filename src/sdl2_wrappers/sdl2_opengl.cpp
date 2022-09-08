@@ -15,9 +15,7 @@ bool ktp::SDL2_GL::initGLEW(SDL2_GLContext& context, const SDL2_Window& window) 
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    // glEnable(GL_CULL_FACE);
     const auto clear_color {Palette::black};
     glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
     // GLEW

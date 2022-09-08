@@ -112,7 +112,7 @@ inline auto getTexture(const std::string& name) { return Texture2D{textures_map.
  * @param file The full path to the image file.
  * @param alpha Alpha channel?
  */
-void loadTexture(const std::string& name, const std::string& file, bool alpha);
+void loadTexture(const std::string& name, const std::string& file, bool alpha = false);
 
 /**
  * @brief Tries to create textures with text. Blended in this case, which may be slow.
