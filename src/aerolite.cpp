@@ -341,6 +341,8 @@ void ktp::AerolitePhysicsComponent::split() {
       if (!aerolite) return;
       aerolite->new_born_ = false;
       aerolite->arrow_needed_ = false;
+      aerolite->arrow_->owner()->deactivate();
+      aerolite->arrow_ = nullptr;
       aerolite->reshape(piece_size); // need this until we can use the size constructor
       aerolite->body_->SetAngularVelocity(old_angular * generateRand(-1.5f, 1.5f));
       aerolite->body_->SetLinearVelocity({old_delta.x * generateRand(0.5f, 1.5f), old_delta.y * generateRand(0.5f, 1.5f)});
