@@ -229,9 +229,8 @@ void ktp::Resources::loadTexture(const std::string& name, const std::string& fil
   }
 
   stbi_set_flip_vertically_on_load(true);
-  unsigned char* data {stbi_load(file.c_str(), &width, &height, &num_channels, 0)};
+  auto data {stbi_load(file.c_str(), &width, &height, &num_channels, 0)};
   if (data) {
-    logMessage("Loaded texture \"" + name + "\" from file " + file);
     glGenTextures(1, &id);
     glCheckError();
     glBindTexture(GL_TEXTURE_2D, id);
@@ -242,15 +241,16 @@ void ktp::Resources::loadTexture(const std::string& name, const std::string& fil
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_min);
     // When MAGnifying the image (no bigger mipmap available), use XXXX filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_max);
-
+    // upload the img data
     glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, image_format, GL_UNSIGNED_BYTE, data);
     glCheckError();
     glGenerateMipmap(GL_TEXTURE_2D);
     glCheckError();
     // unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
-
+    // free the image
     stbi_image_free(data);
+    logMessage("Loaded texture \"" + name + "\" from file " + file);
   } else {
     logError("Could NOT load texture " + file);
   }
@@ -264,27 +264,12 @@ ktp::Texture2D ktp::Resources::loadTextureFromTextBlended(const std::string& nam
   SDL_Surface* surface {TTF_RenderUTF8_Blended(Resources::getFont(font), text.c_str(), color)};
   if (surface) {
     GLuint id {};
-    GLint internal_format {};
-    GLenum image_format {};
+    constexpr GLint internal_format {GL_RGBA};
+    GLenum format {};
     constexpr GLint wrap_s {GL_REPEAT}, wrap_t {GL_REPEAT};
     constexpr GLint filter_max {GL_LINEAR}, filter_min {GL_NEAREST};
-    const auto bytesPerPixel {surface->format->BytesPerPixel};
-    // find out the image format
-    if (bytesPerPixel == 4u) {    // alpha
-      internal_format = GL_RGBA;
-      if (surface->format->Rmask == 255u) {
-        image_format = GL_RGBA;
-      } else {
-        image_format = GL_BGRA;
-      }
-    } else {                      // no alpha
-      internal_format = GL_RGB;
-      if (surface->format->Rmask == 255u) {
-        image_format = GL_RGB;
-      } else {
-        image_format = GL_BGR;
-      }
-    }
+    // find out the format
+    surface->format->Rmask == 255u ? format = GL_RGBA : format = GL_BGRA;
     // lets generate the opengl texture
     glGenTextures(1, &id);
     glCheckError();
@@ -297,7 +282,7 @@ ktp::Texture2D ktp::Resources::loadTextureFromTextBlended(const std::string& nam
     // When MAGnifying the image (no bigger mipmap available)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_max);
     // upload the surface data
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, surface->w, surface->h, 0, image_format, GL_UNSIGNED_BYTE, surface->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
     glCheckError();
     // unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -313,49 +298,18 @@ ktp::Texture2D ktp::Resources::loadTextureFromTextBlended(const std::string& nam
 }
 
 ktp::Texture2D ktp::Resources::loadTextureFromTextSolid(const std::string& name, const std::string& text, const std::string& font, SDL_Color color) {
+  // if already exists, delete the texture
+  if (textures_map.count(name)) glDeleteTextures(1, &textures_map[name]);
   // render a surface, remember to free it when done
   SDL_Surface* surface {TTF_RenderUTF8_Solid(Resources::getFont(font), text.c_str(), color)};
   if (surface) {
     GLuint id {};
-    GLint internal_format {};
-    GLenum image_format {};
+    constexpr GLint internal_format {GL_RGB};
+    GLenum format {};
     constexpr GLint wrap_s {GL_REPEAT}, wrap_t {GL_REPEAT};
     constexpr GLint filter_max {GL_LINEAR}, filter_min {GL_NEAREST};
-    const GLint bytesPerPixel {surface->format->BytesPerPixel};
-    logMessage("bytesperpixel: " + std::to_string(bytesPerPixel));
     // find out the image format
-    // if (bytesPerPixel == 4u) {    // alpha
-    //   internal_format = GL_RGBA;
-    //   if (surface->format->Rmask == 255u) {
-    //     image_format = GL_RGBA;
-    //   } else {
-    //     image_format = GL_BGRA;
-    //   }
-    // } else {                      // no alpha
-    //   internal_format = GL_RGB;
-    //   if (surface->format->Rmask == 255u) {
-    //     image_format = GL_RGB;
-    //   } else {
-    //     image_format = GL_BGR;
-    //   }
-    // }
-    switch (bytesPerPixel) {
-      case 1:
-        image_format = GL_ALPHA;
-        break;
-      case 3:  // no alpha channel
-        if (surface->format->Rmask == 0x000000ff)
-            image_format = GL_RGB;
-        else
-            image_format = GL_BGR;
-        break;
-      case 4: // alpha channel
-        if (surface->format->Rmask == 0x000000ff)
-            image_format = GL_RGBA;
-        else
-            image_format = GL_BGRA;
-        break;
-    }
+    surface->format->Rmask == 255u ? format = GL_RGB : format = GL_BGR;
     // lets generate the opengl texture
     glGenTextures(1, &id);
     glCheckError();
@@ -368,7 +322,7 @@ ktp::Texture2D ktp::Resources::loadTextureFromTextSolid(const std::string& name,
     // When MAGnifying the image (no bigger mipmap available)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_max);
     // upload the surface data
-    glTexImage2D(GL_TEXTURE_2D, 0, bytesPerPixel, surface->w, surface->h, 0, GL_ALPHA, GL_UNSIGNED_BYTE, surface->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
     glCheckError();
     // unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
