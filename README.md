@@ -2,6 +2,7 @@
 ![CMake badge](https://github.com/lyquid/Aerolits/actions/workflows/build.yml/badge.svg)
 
 Asteroids clone. 
+
 Project mainly for learning and trying new stuff.
 
 ## Libraries used
@@ -10,9 +11,11 @@ Project mainly for learning and trying new stuff.
  - [SDL2_ttf](https://wiki.libsdl.org/SDL_ttf/FrontPage) for GUI's fonts rendering.    
  - [SDL2_mixer](https://wiki.libsdl.org/SDL_mixer/FrontPage) *not yet used :P* 
  - [Box2D](https://box2d.org/) for physics. 
+ - [Dear ImGui](https://github.com/ocornut/imgui) for backend information.
  - [GLEW](http://glew.sourceforge.net/) for OpenGL context creation and functions. 
- - [glm](https://github.com/g-truc/glm) for algebra and camera.   
+ - [glm](https://github.com/g-truc/glm) for algebra and camera.
  - [pugixml](https://pugixml.org/) to parse config files.
+ - [stb_image](https://github.com/nothings/stb) for image loading.
 
 ## Features
 
