@@ -1,20 +1,28 @@
-# Aeròlits
 ![CMake badge](https://github.com/lyquid/Aerolits/actions/workflows/build.yml/badge.svg)
-
+# Aeròlits
 Asteroids clone. 
-
 Project mainly for learning and trying new stuff.
 
-## Libraries used
+It started as a simple project to try out SDL2.
 
- - [SDL2](https://www.libsdl.org/) for window creation and input handling. 
- - [SDL2_ttf](https://wiki.libsdl.org/SDL_ttf/FrontPage) for GUI's fonts rendering.    
- - [SDL2_mixer](https://wiki.libsdl.org/SDL_mixer/FrontPage) *not yet used :P* 
- - [Box2D](https://box2d.org/) for physics. 
- - [Dear ImGui](https://github.com/ocornut/imgui) for backend information.
+The ship was just a bunch of points united by lines without even filling up the shape, and the aerolites were just circles made with the midpoint circle algorithm.
+
+Elastic collision algorithm was used for aerolites bouncing into another and chaos was ensured when they wrapped into another one.
+
+Eventually the aerolites become more than a circle, it was needed a more advanced physics system, so Box2D was introduced.
+Then the particles. How fun was to code and mess with the config to get ridiculous effects.
+
+The last improvement was the porting from the sdl renderer to OpenGL, which gave me the ability to texture map the aerolites and fill the polygonal player's ship. Also instanced rendering improved the particles' performance.
+
+## Libraries used
+ - [Box2D](https://box2d.org/) for the physics. 
+ - [Dear ImGui](https://github.com/ocornut/imgui) for backend information and debugging.
  - [GLEW](http://glew.sourceforge.net/) for OpenGL context creation and functions. 
- - [glm](https://github.com/g-truc/glm) for algebra and camera.
- - [pugixml](https://pugixml.org/) to parse config files.
+ - [glm](https://github.com/g-truc/glm) for algebra and camera utilities.
+ - [pugixml](https://pugixml.org/) to parse the config files.
+ - [SDL2](https://www.libsdl.org/) for window creation and input handling. 
+ - [SDL2_ttf](https://wiki.libsdl.org/SDL_ttf/FrontPage) for fonts rendering.    
+ - [SDL2_mixer](https://wiki.libsdl.org/SDL_mixer/FrontPage) *not yet used :P* 
  - [stb_image](https://github.com/nothings/stb) for image loading.
 
 ## Features
