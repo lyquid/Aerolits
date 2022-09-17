@@ -7,12 +7,12 @@ It started as a simple project to try out SDL2.
 
 The ship was just a bunch of points united by lines without even filling up the shape, and the aerolites were just circles made with the midpoint circle algorithm.
 
-Elastic collision algorithm was used for aerolites bouncing into another and chaos was ensured when they wrapped into another one.
+Elastic collision algorithm was used for aerolites bouncing into another. Chaos was ensured when they wrapped into another one.
 
-Eventually the aerolites become more than a circle, it was needed a more advanced physics system, so Box2D was introduced.
+Eventually the aerolites become more than a circle, so a more advanced physics system was needed. Box2D was introduced.
 Then the particles. How fun was to code and mess with the config to get ridiculous effects.
 
-The last improvement was the porting from the sdl renderer to OpenGL, which gave me the ability to texture map the aerolites and fill the polygonal player's ship. Also instanced rendering improved the particles' performance.
+The last improvement was the porting from the SDL renderer to OpenGL, which gave the ability to texture map the aerolites and fill the polygonal player's ship. Also improved the particles' performance with instanced rendering.
 
 ## Libraries used
  - [Box2D](https://box2d.org/) for the physics. 
