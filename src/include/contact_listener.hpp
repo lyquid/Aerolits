@@ -30,7 +30,7 @@ class ContactListener: public b2ContactListener {
    * @brief Called when two fixtures cease to touch.
    * @param contact
    */
-  virtual void EndContact(b2Contact* contact) override;
+  virtual void EndContact(b2Contact* contact) override {}
 
   /**
    * @brief This lets you inspect a contact after the solver is finished.
@@ -42,7 +42,7 @@ class ContactListener: public b2ContactListener {
    * @param contact
    * @param impulse
    */
-  virtual void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override {}
+  virtual void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
 
   /**
    * @brief This is called after a contact is updated. This allows you to
@@ -57,12 +57,13 @@ class ContactListener: public b2ContactListener {
    * @param contact
    * @param oldManifold
    */
-  virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override {}
+  virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
 
  private:
 
   inline void aeroliteCollision(GameEntity* aerolite, GameEntity* other, b2Contact* contact);
   inline void explosionCollision(GameEntity* explosion, GameEntity* other);
+  inline void playerCollision(GameEntity* player, GameEntity* other, b2Contact* contact);
   inline void projectileCollision(GameEntity* projectile, GameEntity* other);
 };
 

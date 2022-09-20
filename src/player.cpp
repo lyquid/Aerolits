@@ -114,6 +114,10 @@ ktp::PlayerPhysicsComponent& ktp::PlayerPhysicsComponent::operator=(PlayerPhysic
     cos_             = other.cos_;
     sin_             = other.sin_;
     exhaust_emitter_ = std::exchange(other.exhaust_emitter_, nullptr);
+    // health stuff
+    approach_velocity_ = other.approach_velocity_;
+    health_            = other.health_;
+    health_factor_     = other.health_factor_;
   }
   return *this;
 }
@@ -177,6 +181,16 @@ void ktp::PlayerPhysicsComponent::setBox2D() {
 }
 
 void ktp::PlayerPhysicsComponent::update(const GameEntity& player, float delta_time) {
+  if (approach_velocity_ < -1.f || approach_velocity_ > 1.f) {
+    const auto damage {std::abs(approach_velocity_ * health_factor_)};
+    logMessage("health " + std::to_string(health_) + " damage: " + std::to_string(damage));
+    health_ -= damage;
+    approach_velocity_ = 0.f;
+  }
+  if (health_ <= 0.f) {
+    owner_->deactivate();
+    return;
+  }
   checkWrap();
   updateMVP();
   // exhaust emitter stuff

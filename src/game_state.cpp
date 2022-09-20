@@ -15,11 +15,12 @@
 #include <string> // std::to_string
 #include <utility> // std::move
 
-ktp::DemoState    ktp::GameState::demo_ {};
-ktp::PausedState  ktp::GameState::paused_ {};
-ktp::PlayingState ktp::GameState::playing_ {};
-ktp::TestingState ktp::GameState::testing_ {};
-ktp::TitleState   ktp::GameState::title_ {};
+ktp::DemoState     ktp::GameState::demo_ {};
+ktp::GameOverState ktp::GameState::game_over_ {};
+ktp::PausedState   ktp::GameState::paused_ {};
+ktp::PlayingState  ktp::GameState::playing_ {};
+ktp::TestingState  ktp::GameState::testing_ {};
+ktp::TitleState    ktp::GameState::title_ {};
 
 ktp::DebugDraw ktp::GameState::b2_debug_ {};
 bool ktp::GameState::backend_draw_ {false};
@@ -299,6 +300,12 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
     if (GameEntity::game_entities_.active(i)) {
       if (GameEntity::game_entities_[i].canBeDeactivated()) {
+        if (GameEntity::game_entities_[i].type() == EntityTypes::Player || GameEntity::game_entities_[i].type() == EntityTypes::PlayerDemo) {
+          // game over!
+          GameEntity::game_entities_[i].free(i);
+          game.state_ = goToState(game, GameState::title_); // go to gameover
+          return;
+        }
         GameEntity::game_entities_[i].free(i);
       } else {
         GameEntity::game_entities_[i].update(delta_time);

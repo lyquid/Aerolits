@@ -14,6 +14,7 @@ namespace ktp {
 class Game;
 class DebugDraw;
 class DemoState;
+class GameOverState;
 class PausedState;
 class PlayingState;
 class TestingState;
@@ -42,11 +43,12 @@ class GameState {
   static bool deep_test_;
   static bool polygon_draw_;
 
-  static DemoState    demo_;
-  static PausedState  paused_;
-  static PlayingState playing_;
-  static TestingState testing_;
-  static TitleState   title_;
+  static DemoState     demo_;
+  static GameOverState game_over_;
+  static PausedState   paused_;
+  static PlayingState  playing_;
+  static TestingState  testing_;
+  static TitleState    title_;
 
  protected:
 
@@ -65,6 +67,16 @@ class DemoState: public GameState {
   void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override;
   Uint32 blink_timer_ {};
   bool blink_flag_ {true};
+};
+
+class GameOverState: public GameState {
+ public:
+  virtual void draw(Game& game) override {};
+  virtual void handleEvents(Game& game) override {};
+  virtual void update(Game& game, float delta_time) override {};
+ private:
+  virtual GameState* enter(Game& game) override {};
+  virtual void handleSDL2KeyEvents(Game& game, SDL_Keycode key) override {};
 };
 
 class PausedState: public GameState {
