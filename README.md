@@ -19,6 +19,7 @@ The last improvement was porting from the SDL renderer to OpenGL, which gave the
  - [Dear ImGui](https://github.com/ocornut/imgui) for backend information and debugging.
  - [GLEW](http://glew.sourceforge.net/) for OpenGL context creation and functions. 
  - [glm](https://github.com/g-truc/glm) for algebra and camera utilities.
+ - [GoogleTest](https://google.github.io/googletest/) for testing!
  - [pugixml](https://pugixml.org/) to parse the config files.
  - [SDL2](https://www.libsdl.org/) for window creation and input handling. 
  - [SDL2_ttf](https://wiki.libsdl.org/SDL_ttf/FrontPage) for fonts rendering.    
