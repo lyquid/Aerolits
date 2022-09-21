@@ -57,6 +57,7 @@ class GUISystem: public System {
   void updateScore(Uint32 points);
 
   inline auto& demoText() const { return demo_text_; }
+  inline auto& gameOverText() const { return game_over_text_; }
   inline auto& pausedText() const { return paused_text_; }
   inline auto& scoreText() const { return score_text_; }
   inline auto& titleText() const { return title_text_; }
@@ -65,6 +66,7 @@ class GUISystem: public System {
   // inline static const std::string kPausedText_ {"PAUSAT"};
   // inline static const std::string kScoreText_ {"PUNTUACIÓ "};
   inline static const std::string kDemoModeText_ {"DEMO"};
+  inline static const std::string kGameOverText_ {"GAME OVER"};
   inline static const std::string kPausedText_ {"PAUSED"};
   inline static const std::string kScoreText_ {"SCORE "};
   inline static const std::string kTitleText_ {"Aeròlits"};
@@ -72,6 +74,7 @@ class GUISystem: public System {
  private:
 
   GUIString demo_text_ {};
+  GUIString game_over_text_ {};
   GUIString paused_text_ {};
   GUIString score_text_ {};
   GUIString title_text_ {};

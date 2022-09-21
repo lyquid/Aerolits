@@ -31,11 +31,12 @@ kuge::GUISystem& kuge::GUISystem::operator=(GUISystem&& other) noexcept {
     // inherited members
     event_bus_ = std::exchange(other.event_bus_, nullptr);
     // own members
-    demo_text_   = std::move(other.demo_text_);
-    paused_text_ = std::move(other.paused_text_);
-    score_text_  = std::move(other.score_text_);
-    title_text_  = std::move(other.title_text_);
-    score_       = other.score_;
+    demo_text_      = std::move(other.demo_text_);
+    game_over_text_ = std::move(other.game_over_text_);
+    paused_text_    = std::move(other.paused_text_);
+    score_text_     = std::move(other.score_text_);
+    title_text_     = std::move(other.title_text_);
+    score_          = other.score_;
   }
   return *this;
 }
@@ -90,6 +91,19 @@ void kuge::GUISystem::init() {
     -0.2f,  0.1f, 0.0f   // top left
   };
   demo_text_ = std::make_unique<GUIStringImpl>(config);
+  /* GAME OVER TEXT */
+  config.name_   = "game_over";
+  config.text_   = kGameOverText_;
+  config.color_  = ktp::Palette::white;
+  config.font_   = "future";
+  config.shader_ = "gui_string";
+  config.vertices_ = {
+     0.6f,  0.3f, 0.0f,  // top right
+     0.6f, -0.3f, 0.0f,  // bottom right
+    -0.6f, -0.3f, 0.0f,  // bottom left
+    -0.6f,  0.3f, 0.0f   // top left
+  };
+  game_over_text_ = std::make_unique<GUIStringImpl>(config);
   /* PAUSED TEXT */
   config.name_   = "paused";
   config.text_   = kPausedText_;

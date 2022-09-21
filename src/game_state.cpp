@@ -133,6 +133,89 @@ void ktp::DemoState::update(Game& game, float delta_time) {
   playing_.update(game, delta_time);
 }
 
+/* GAMEOVER STATE */
+
+void ktp::GameOverState::draw(Game& game) {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
+    if (GameEntity::game_entities_[i].type() == EntityTypes::Background) {
+      GameEntity::game_entities_[i].draw();
+      break;
+    }
+  }
+
+  game.gui_sys_.gameOverText()->draw();
+
+  if (debug_draw_) {
+    Game::b2_world_.DebugDraw();
+    b2_debug_.Draw();
+  }
+
+  if (backend_draw_) game.backend_sys_.draw();
+
+  SDL_GL_SwapWindow(game.main_window_.getWindow());
+}
+
+ktp::GameState* ktp::GameOverState::enter(Game& game) {
+  title_time_ = SDL2_Timer::SDL2Ticks();
+  // stop the gameplay timer
+  Game::gameplay_timer_.stop();
+  // free all entities except the background
+  for (auto i = 0u; i < GameEntity::game_entities_.highestActiveIndex(); ++i) {
+    if (GameEntity::game_entities_[i].type() != EntityTypes::Background) {
+      GameEntity::game_entities_[i].free(i);
+    }
+  }
+  // return a pointer to this state
+  return this;
+}
+
+void ktp::GameOverState::handleEvents(Game& game) {
+  while (SDL_PollEvent(&sdl_event_)) {
+    ImGui_ImplSDL2_ProcessEvent(&sdl_event_);
+    switch (sdl_event_.type) {
+      case SDL_QUIT:
+        game.quit_ = true;
+        break;
+      case SDL_KEYDOWN:
+        if (!ImGui::GetIO().WantCaptureKeyboard) handleSDL2KeyEvents(game, sdl_event_.key.keysym.sym);
+        break;
+      case SDL_MOUSEBUTTONDOWN:
+        if (!ImGui::GetIO().WantCaptureMouse) game.state_ = goToState(game, GameState::title_);
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+void ktp::GameOverState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
+  switch (key) {
+    case SDLK_F1:
+      backend_draw_ = !backend_draw_;
+      break;
+    case SDLK_F2:
+      polygon_draw_ = !polygon_draw_;
+      updatePolygonDraw();
+      break;
+    default:
+      game.state_ = goToState(game, GameState::title_);
+      break;
+  }
+}
+
+void ktp::GameOverState::update(Game& game, float delta_time) {
+  // Background
+  for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
+    GameEntity::game_entities_[i].update(delta_time * kBackgroundDelta_);
+  }
+  // go to title
+  if (SDL2_Timer::SDL2Ticks() - title_time_ > kWaitForTitle_) {
+    game.state_ = goToState(game, GameState::title_);
+  }
+}
+
 /* PAUSED STATE */
 
 void ktp::PausedState::draw(Game& game) {
@@ -303,7 +386,7 @@ void ktp::PlayingState::update(Game& game, float delta_time) {
         if (GameEntity::game_entities_[i].type() == EntityTypes::Player || GameEntity::game_entities_[i].type() == EntityTypes::PlayerDemo) {
           // game over!
           GameEntity::game_entities_[i].free(i);
-          game.state_ = goToState(game, GameState::title_); // go to gameover
+          game.state_ = goToState(game, GameState::game_over_);
           return;
         }
         GameEntity::game_entities_[i].free(i);
@@ -500,7 +583,7 @@ void ktp::TitleState::handleSDL2KeyEvents(Game& game, SDL_Keycode key) {
 void ktp::TitleState::update(Game& game, float delta_time) {
   // Background
   for (auto i = 0u; i <= GameEntity::game_entities_.highestActiveIndex(); ++i) {
-    GameEntity::game_entities_[i].update(delta_time * kDefaultBackgroundDeltaInMenu_);
+    GameEntity::game_entities_[i].update(delta_time * kBackgroundDelta_);
   }
   // enter Demo mode
   if (SDL2_Timer::SDL2Ticks() - demo_time_ > kWaitForDemo_) {

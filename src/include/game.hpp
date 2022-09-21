@@ -15,6 +15,7 @@ class Game {
 
   friend class DemoState;
   friend class GameState;
+  friend class GameOverState;
   friend class PausedState;
   friend class PlayingState;
   friend class TestingState;
