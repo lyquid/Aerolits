@@ -12,7 +12,7 @@ Elastic collision algorithm was used for aerolites bouncing into another. Chaos 
 Eventually the aerolites become more than a circle, so a more advanced physics system was needed. Box2D was introduced.
 Then the particles. How fun was to code and mess with the config to get ridiculous effects.
 
-The last improvement was the porting from the SDL renderer to OpenGL, which gave the ability to texture map the aerolites and fill the polygonal player's ship. Also improved the particles' performance with instanced rendering.
+The last improvement was porting from the SDL renderer to OpenGL, which gave the ability to texture map the aerolites and fill the polygonal player's ship. Also improved the particles' performance with instanced rendering.
 
 ## Libraries used
  - [Box2D](https://box2d.org/) for the physics. 
